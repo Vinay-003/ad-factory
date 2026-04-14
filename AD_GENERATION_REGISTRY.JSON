@@ -1,0 +1,40 @@
+{
+  "mode": {
+    "phase": "testing",
+    "write_enabled": false,
+    "note": "Read for avoid-signals when entries exist. Do not append during testing."
+  },
+  "rules": {
+    "dedupe_scope": [
+      "persona",
+      "angle",
+      "hook_pattern",
+      "format",
+      "visual_composition"
+    ],
+    "dedupe_level": "angle-level",
+    "sentence_reuse_allowed": false,
+    "background_non_repeat_window": 5
+  },
+  "backgrounds": {
+    "catalog_file": "info/BACKGROUND_VARIANTS.JSON",
+    "selection_mode": "catalog_first",
+    "catalog_ratio": 0.8,
+    "allow_fresh_generated_backgrounds": true,
+    "fresh_generation_ratio": 0.2,
+    "enforce_fresh_not_in_catalog": true,
+    "fresh_non_repeat_window": 10,
+    "fresh_uniqueness_keys": [
+      "scene_context",
+      "surface",
+      "camera",
+      "lighting",
+      "props"
+    ],
+    "fallback_order": [
+      "catalog",
+      "fresh_generate"
+    ]
+  },
+  "entries": []
+}
