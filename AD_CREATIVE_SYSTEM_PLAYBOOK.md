@@ -35,9 +35,9 @@ Generate high-converting static ads for Obesity Killer Kit across 5 formats:
 - FEAT (Features/benefits)
 - UGC (Creator-style)
 
-Current testing mode:
-- Generate 1 variation per format first.
-- Expand to 8 variations per format only after quality is stable.
+Current production mode:
+- Generate 8 variations per format.
+- Log every generation to registry immediately after output finalization.
 
 ---
 
@@ -214,10 +214,11 @@ Primary background catalog file:
 ### How it works:
 
 Before generating any prompt, the assistant must:
-1. Check `info/AD_GENERATION_REGISTRY.JSON` for recently used background slots.
-2. Select a background slot that has NOT been used in the last 5 entries for that format.
-3. Include the selected background slot ID in the prompt and log it to the registry after generation.
-4. Prefer background IDs from `info/BACKGROUND_VARIANTS.JSON` first.
+1. Check `info/AD_GENERATION_REGISTRY.JSON` slot usage for the selected format.
+2. Build allowed catalog pool from `info/BACKGROUND_VARIANTS.JSON` where `formats` contains the selected format.
+3. Select only from slots not yet used in current cycle for that format (`indexes.slot_exhaustion_tracker.<FORMAT>.remaining_slots_current_cycle`).
+4. Include the selected background slot ID in the prompt and log it to the registry after generation.
+5. When the remaining pool becomes empty, reset cycle for that format and continue.
 
 ### Background Slot Library (20 slots — rotate through these):
 
@@ -263,8 +264,8 @@ BG-20 — Dark premium moody. Deep charcoal or dark warm brown background. Drama
 
 ### Selection rules:
 
-- No background slot may repeat within 5 consecutive generations for the same format.
-- If registry is empty or unavailable: start from BG-01 and go in order.
+- Exhaustive rotation is mandatory for catalog slots: no slot may repeat for a format until all allowed slots for that format are used once.
+- If registry is empty or tracker missing: initialize cycle with full allowed pool for that format and pick one.
 - For UGC format: always use slots BG-03, BG-06, BG-08, BG-13, BG-16 only (lifestyle contexts only, no flat-lays or clinical settings).
 - For HERO format: prefer BG-01, BG-10, BG-17, BG-20 for maximum product focus.
 - For TEST format: prefer BG-03, BG-08, BG-13 for relatable personal context.
@@ -274,11 +275,13 @@ BG-20 — Dark premium moody. Deep charcoal or dark warm brown background. Drama
 ### Background selection algorithm (mandatory)
 
 - Use policy split: 80% catalog (`info/BACKGROUND_VARIANTS.JSON`) and 20% fresh-generated backgrounds.
-- Enforce format dedupe window: selected catalog `id` cannot appear in last 5 entries of same format.
+- Catalog path uses exhaustive rotation tracker (not a last-N window).
+- For selected format, choose from `remaining_slots_current_cycle`; after selection, move slot to `used_slots_current_cycle`.
+- If `remaining_slots_current_cycle` becomes empty, increment cycle_number, reset used/remaining from current allowed pool, then continue selection.
 - For fresh-generated path: generate descriptor first, then reject if semantically matches any catalog variant.
 - Fresh-generated match check must compare at least: scene context, surface, camera framing, lighting style, key props.
 - If fresh candidate overlaps a catalog concept, regenerate fresh descriptor until it is distinct.
-- Fresh-generated backgrounds must also avoid repeating in recent history (use last 10 fresh entries across same format).
+- Fresh-generated backgrounds must also avoid repeating in recent history (use last 20 fresh entries across same format).
 - Save selection metadata in registry: source (`catalog` or `fresh`), id or fresh signature, and format.
 - If constraints cannot be satisfied, fallback order is catalog first, then fresh regenerate, never random blind pick.
 
@@ -288,12 +291,12 @@ BG-20 — Dark premium moody. Deep charcoal or dark warm brown background. Drama
 
 Registry file: `info/AD_GENERATION_REGISTRY.JSON`
 
-### Current mode: TESTING — Registry read mode ON, write mode OFF.
+### Current mode: PRODUCTION — Registry read mode ON, write mode ON.
 
-In testing mode:
+In production mode:
 - Read registry to check what has been used recently (avoid repeating).
-- Do NOT write new entries yet.
-- When write mode is turned ON, log every generation immediately.
+- Write one entry per generation immediately after final output.
+- Never overwrite history; append-only logging.
 
 ### Registry schema (use this exact structure):
 
@@ -309,8 +312,26 @@ In testing mode:
       "headline_angle": "sacrifice_reduction",
       "headline_en": "Weight loss without life disruption.",
       "headline_hi": "जीवन बिगाड़े बिना वज़न घटाएं।",
-      "background_slot": "BG-01",
+      "support_line_en": "Control cravings, support metabolism daily.",
+      "support_line_hi": "रोज cravings control करें, metabolism support पाएं।",
+      "cta_en": "Start Now",
+      "cta_hi": "आज शुरू करें",
+      "disclaimer_en": "Results vary by body type and routine.",
+      "disclaimer_hi": "परिणाम शरीर और दिनचर्या के अनुसार अलग हो सकते हैं।",
+      "caption_en": "Ayurvedic support for consistent fat-loss habits without crash diets.",
+      "caption_hi": "बिना crash diet के fat-loss habit बनाने में ayurvedic support।",
+      "bullets_en": [
+        "Helps reduce frequent hunger spikes",
+        "Supports digestion and daily metabolism"
+      ],
+      "bullets_hi": [
+        "बार-बार लगने वाली भूख को कम करने में सहायक",
+        "पाचन और रोज़ाना metabolism को support"
+      ],
+      "background_slot": "BG-001",
       "background_name": "Clean warm studio",
+      "background_source": "catalog",
+      "fresh_background_signature": null,
       "language": "EN",
       "output_quality": "approved",
       "notes": "First test generation"
@@ -329,23 +350,32 @@ In testing mode:
 - headline_angle: pain / objection / mechanism / time / proof / sacrifice_reduction
 - headline_en: exact English headline used
 - headline_hi: exact Hindi headline used
-- background_slot: BG-01 through BG-20
+- support_line_en/support_line_hi: exact support line used on image
+- cta_en/cta_hi: exact CTA used on image
+- disclaimer_en/disclaimer_hi: exact disclaimer text used
+- caption_en/caption_hi: exact long-form caption used (if any)
+- bullets_en/bullets_hi: exact bullet text array used (if any)
+- background_slot: BG-001 through BG-500 (or fresh-generated background signature)
 - background_name: readable name of slot
+- background_source: catalog / fresh
+- fresh_background_signature: required when source is fresh, else null
 - language: EN / HI / BOTH
 - output_quality: approved / rejected / pending
 - notes: optional free text
 
-### Deduplication rules (read even in testing mode):
+### Deduplication rules (apply in production):
 
 - Same persona + same format = flag if used in last 3 entries for that format. Suggest switching persona or angle.
-- Same background_slot + same format = block if used in last 5 entries for that format. Force a different slot.
+- Catalog background dedupe = exhaustive rotation hard block by format until cycle exhaustion reset.
+- Same fresh_background_signature + same format = hard block if used in last 20 entries for that format.
 - Same headline_angle + same format = flag if used in last 3 entries. Rotate angle.
 - Same persona + same headline_angle = hard block regardless of format. Always change at least one.
+- Any exact text reuse is forbidden across all history: headline, support line, CTA, disclaimer, caption, and bullets in both EN and HI must be new every time.
 
 ### Production switch instruction:
 
 When moving to production, change registry write mode from OFF to ON.
-When scaling, move to 8 variations per format and log every entry before delivering to user.
+Generate 8 variations per format and log every entry before delivering to user.
 
 ---
 
@@ -562,7 +592,7 @@ QUALITY BAR — verify before accepting output:
 - If any item above fails — regenerate immediately without compromise
 
 VISUAL DIRECTION BLOCK
-- Background slot: [BG-XX — slot name] (selected from background variation engine, not used in last 5 entries for this format)
+- Background slot: [BG-XXX — slot name] (selected from background variation engine, not used in last 20 entries for this format)
 - Scene: [describe scene based on selected slot]
 - Subject: [for UGC — Indian woman 27-35, natural unposed expression. For product-only formats — no subject]
 - Action: [holding product toward camera / products arranged on surface — specify]
@@ -624,10 +654,23 @@ Step 4 — Background slot selection
 - Check registry for recently used slots per selected format.
 - Select an unused slot automatically and state which one was selected.
 - User may override by requesting a specific slot number.
+- For catalog selection, read/update `indexes.slot_exhaustion_tracker.<FORMAT>` (used/remaining/cycle_number).
+
+Step 4.5 - Text dedupe gate (mandatory)
+- Before finalizing output text, check registry `indexes.used_text` for headline/support/CTA/disclaimer/caption/bullets in both EN and HI.
+- If any text string already exists in index, regenerate that text until unique.
+- Never reuse any previously used text string.
 
 Step 5 — Final output
 - Deliver final Gemini-ready prompts in both EN and HI for selected format(s).
 - State the background slot used and log it to registry (if write mode is ON).
+
+Step 6 - Registry write (mandatory in production)
+- Append full entry to `entries`.
+- Append `{entry_id, timestamp, background_slot, background_source}` to `indexes.backgrounds_by_format.<FORMAT>`.
+- If background_source is `catalog`, update `indexes.slot_exhaustion_tracker.<FORMAT>` for cycle progression.
+- Append every used text string to `indexes.used_text` buckets.
+- Keep append-only behavior; do not delete or rewrite past records.
 
 Default behavior if user gives minimal input:
 - Generate default starter batch immediately using the default mapping in Section 0.
@@ -782,14 +825,15 @@ Follow these rules strictly:
 - Caption must increase Value = (Dream Outcome x Likelihood) / (Time Delay x Sacrifice).
 - Keep language simple, active, specific, and short.
 - Reject generic templates; prioritize clear hierarchy and premium composition.
-- Output first in testing mode: 1 variation per format.
+- Default production output: 8 variations per format.
 - Always provide English + Hindi versions of final prompts.
 - Never rely on fixed headline banks; generate fresh headlines each request.
 - Keep typography pin-sharp; regenerate if any on-image text is blurry.
 - Use Poppins font family for all on-image text (Headline: Poppins Bold; body/support/CTA: Poppins Medium or Regular).
-- Select a background slot from the Background Variation Engine (Section 9 of playbook) that has not been used in the last 5 generations for the selected format. State which slot you selected.
+- Select a background slot from the Background Variation Engine (Section 9 of playbook) using exhaustive format-wise rotation (no repeat until all allowed slots for that format are used once). State which slot you selected.
+- Enforce strict text uniqueness: headline/support/CTA/disclaimer/caption/bullets in EN and HI must never repeat any previously used string.
 - Check the registry at info/AD_GENERATION_REGISTRY.JSON before generation to avoid persona, angle, and background repetition.
-- Registry is currently in read-only testing mode. Do not write entries yet.
+- Registry is in production mode. Write one entry after each generation.
 ```
 
 Optional add-on line:
@@ -812,10 +856,10 @@ When I ask for ad creation, follow this sequence: ask persona number -> ask head
 9. When write mode is turned ON: log each generation to registry using the schema in Section 10.
 
 How to avoid repetition at scale:
-- Do not reuse old headline text directly.
-- Recompute headline every time from persona fields.
-- Use registry for angle-level dedupe, not sentence-level cloning.
-- Rotate background slots — never reuse the same slot within 5 consecutive generations for a format.
+- Never reuse old text directly (headline, support line, CTA, disclaimer, caption, bullets).
+- Recompute all copy every generation from persona fields and approved claims.
+- Use registry for both angle-level dedupe and strict text-level dedupe.
+- Rotate catalog background slots with exhaustive format-wise cycles (no repeat until pool exhaustion, then reset cycle).
 
 ---
 
@@ -823,10 +867,10 @@ How to avoid repetition at scale:
 
 File path: `info/AD_GENERATION_REGISTRY.JSON`
 
-Current write mode: OFF (testing)
+Current write mode: ON (production)
 Current read mode: ON
 
-Starting state (empty — to be populated when write mode is turned ON):
+Starting state example (append entries in live production):
 
 ```json
 {
@@ -836,8 +880,14 @@ Starting state (empty — to be populated when write mode is turned ON):
 }
 ```
 
-When production switch is made:
-- Set "write_mode" to true.
+Registry indexing requirement (production):
+- Maintain `indexes.backgrounds_by_format` for per-format background tracking.
+- Maintain `indexes.slot_exhaustion_tracker` for catalog cycle state per format.
+- Maintain `indexes.used_text` for global text uniqueness tracking.
+- Treat every string in `indexes.used_text` as permanently blocked from reuse.
+
+Production live rules:
+- Keep "write_mode" true.
 - Set "last_updated" to current timestamp on every write.
 - Append one entry per generation using schema from Section 10.
 - Never overwrite existing entries — append only.

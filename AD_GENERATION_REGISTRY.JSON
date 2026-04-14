@@ -1,8 +1,8 @@
 {
   "mode": {
-    "phase": "testing",
-    "write_enabled": false,
-    "note": "Read for avoid-signals when entries exist. Do not append during testing."
+    "phase": "production",
+    "write_enabled": true,
+    "note": "Production mode active. Read before generation and append one entry after every generation."
   },
   "rules": {
     "dedupe_scope": [
@@ -14,16 +14,35 @@
     ],
     "dedupe_level": "angle-level",
     "sentence_reuse_allowed": false,
-    "background_non_repeat_window": 5
+    "background_non_repeat_window": null,
+    "catalog_background_repeat_policy": "exhaustive_rotation_by_format",
+    "catalog_background_repeat_rule": "no_repeat_until_all_allowed_slots_used_for_format",
+    "catalog_background_cycle_reset": "auto_reset_when_pool_exhausted",
+    "text_reuse_policy": "never_reuse_any_text",
+    "text_dedupe_scope": [
+      "headline_en",
+      "headline_hi",
+      "support_line_en",
+      "support_line_hi",
+      "cta_en",
+      "cta_hi",
+      "disclaimer_en",
+      "disclaimer_hi",
+      "caption_en",
+      "caption_hi",
+      "bullets_en",
+      "bullets_hi"
+    ]
   },
   "backgrounds": {
     "catalog_file": "info/BACKGROUND_VARIANTS.JSON",
     "selection_mode": "catalog_first",
+    "catalog_rotation_mode": "exhaustive_by_format",
     "catalog_ratio": 0.8,
     "allow_fresh_generated_backgrounds": true,
     "fresh_generation_ratio": 0.2,
     "enforce_fresh_not_in_catalog": true,
-    "fresh_non_repeat_window": 10,
+    "fresh_non_repeat_window": 20,
     "fresh_uniqueness_keys": [
       "scene_context",
       "surface",
@@ -36,5 +55,55 @@
       "fresh_generate"
     ]
   },
-  "entries": []
+  "entries": [],
+  "indexes": {
+    "backgrounds_by_format": {
+      "HERO": [],
+      "BA": [],
+      "TEST": [],
+      "FEAT": [],
+      "UGC": []
+    },
+    "slot_exhaustion_tracker": {
+      "HERO": {
+        "cycle_number": 1,
+        "used_slots_current_cycle": [],
+        "remaining_slots_current_cycle": []
+      },
+      "BA": {
+        "cycle_number": 1,
+        "used_slots_current_cycle": [],
+        "remaining_slots_current_cycle": []
+      },
+      "TEST": {
+        "cycle_number": 1,
+        "used_slots_current_cycle": [],
+        "remaining_slots_current_cycle": []
+      },
+      "FEAT": {
+        "cycle_number": 1,
+        "used_slots_current_cycle": [],
+        "remaining_slots_current_cycle": []
+      },
+      "UGC": {
+        "cycle_number": 1,
+        "used_slots_current_cycle": [],
+        "remaining_slots_current_cycle": []
+      }
+    },
+    "used_text": {
+      "headline_en": [],
+      "headline_hi": [],
+      "support_line_en": [],
+      "support_line_hi": [],
+      "cta_en": [],
+      "cta_hi": [],
+      "disclaimer_en": [],
+      "disclaimer_hi": [],
+      "caption_en": [],
+      "caption_hi": [],
+      "bullets_en": [],
+      "bullets_hi": []
+    }
+  }
 }
