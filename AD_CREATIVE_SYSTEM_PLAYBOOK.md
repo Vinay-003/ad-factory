@@ -36,7 +36,7 @@ Generate high-converting static ads for Obesity Killer Kit across 5 formats:
 - UGC (Creator-style)
 
 Current production mode:
-- Generate 8 variations per format.
+- Generate 1 variation per format.
 - Log every generation to registry immediately after output finalization.
 
 ---
@@ -375,7 +375,7 @@ In production mode:
 ### Production switch instruction:
 
 When moving to production, change registry write mode from OFF to ON.
-Generate 8 variations per format and log every entry before delivering to user.
+Generate 1 variation per format and log every entry before delivering to user.
 
 ---
 
@@ -592,7 +592,7 @@ QUALITY BAR — verify before accepting output:
 - If any item above fails — regenerate immediately without compromise
 
 VISUAL DIRECTION BLOCK
-- Background slot: [BG-XXX — slot name] (selected from background variation engine, not used in last 20 entries for this format)
+- Background slot: [BG-XXX — slot name] (selected from background variation engine using exhaustive format-wise rotation)
 - Scene: [describe scene based on selected slot]
 - Subject: [for UGC — Indian woman 27-35, natural unposed expression. For product-only formats — no subject]
 - Action: [holding product toward camera / products arranged on surface — specify]
@@ -825,7 +825,7 @@ Follow these rules strictly:
 - Caption must increase Value = (Dream Outcome x Likelihood) / (Time Delay x Sacrifice).
 - Keep language simple, active, specific, and short.
 - Reject generic templates; prioritize clear hierarchy and premium composition.
-- Default production output: 8 variations per format.
+- Default production output: 1 variation per format.
 - Always provide English + Hindi versions of final prompts.
 - Never rely on fixed headline banks; generate fresh headlines each request.
 - Keep typography pin-sharp; regenerate if any on-image text is blurry.
