@@ -9,7 +9,7 @@ How to use this playbook in chat:
 - If user gives no specific inputs (persona/headline/format), generate a default starter batch immediately.
 - If user gives specific inputs (persona and/or headline and/or format), use those inputs first.
 - If user gives partial inputs, use what they gave and fill missing fields with defaults from this playbook.
-- Always keep claims restricted to `info/productinfo.txt` and preserve product fidelity rules.
+- Always keep claims restricted to `info/productinfomain.txt` and preserve product fidelity rules.
 
 Accepted user input styles (examples):
 - "Create ads" -> generate default starter batch (all 5 formats, 1 variation each)
@@ -43,10 +43,30 @@ Current production mode:
 
 ## 2) Source of Truth (Do not invent)
 
-Use only approved claims and context from `info/productinfo.txt`.
+Use only approved claims and context from `info/productinfomain.txt`.
+Use `info/PRODUCT_MECHANISM_V1.txt` as the mechanism-model file derived from `info/productinfomain.txt`.
+
+Persona language source:
+- Use `info/PERSONA_DEEP_DIVE_01_05.txt` as the active bridge file for persona-specific ad language.
+- This file adds: raw pain lines, trigger scenarios, objections, language bank, mechanism match, and trust anchors.
+- This file now follows a 3-layer system: Raw Persona Truth -> Message Strategy -> Output Language Rendering.
+- When a covered persona is selected, pull wording and proof angles from the deep-dive file before writing headlines, captions, hooks, or testimonial-style language.
+- Do not invent generic persona language when a deep-dive entry already exists.
+- Current coverage in the deep-dive file: personas 1-15.
+
+Mechanism grounding rules:
+- Use `info/productinfomain.txt`, `info/faq.txt`, and `info/PRODUCT_MECHANISM_V1.txt` together.
+- `info/productinfomain.txt` is the source for approved claims, mechanism boundaries, support details, and offer details.
+- `info/faq.txt` is the source for protocol details, Q&A handling, and usage caveats.
+- `info/PRODUCT_MECHANISM_V1.txt` is the source for simplified mechanism framing and behavior-change mapping.
+- Only use mechanism logic defined in `info/PRODUCT_MECHANISM_V1.txt`.
+- Do not invent new benefit logic outside that file.
+- Do not frame the product as a fat burner.
+- Do not use claims like `boosts metabolism`, `burns fat fast`, `accelerates fat loss`, or similar shortcuts.
+- Product logic must stay grounded in: reduced hunger, reduced cravings, reduced random eating, reduced intake, and digestion support.
 
 Approved anchors:
-- 3-5 kg average in 15 days (with asterisk/disclaimer)
+- 3-5 kg average in 15 days
 - Ayurvedic kit, natural ingredients
 - Cravings/hunger control support
 - Digestion/metabolism support
@@ -95,7 +115,7 @@ Product fidelity rules:
 
 ## 4) Brand and Writing Rules
 
-From `info/productinfo.txt`:
+From `info/productinfomain.txt`:
 - Tone: empathetic coach, trustworthy, uplifting
 - Style: simple language, active voice, short sentences, no filler
 - Credibility: specifics over vague adjectives
@@ -152,6 +172,28 @@ For each persona, define these 5 fields before writing copy:
 - Friction: why they failed before
 - Proof needed: what makes them believe
 - Tone cue: how the voice should feel
+
+Deep-dive expansion rule:
+- If the selected persona exists in `info/PERSONA_DEEP_DIVE_01_05.txt`, treat that file as the working persona brief.
+- Pull ad inputs from these blocks when present: Pain Points, Trigger Scenarios, Objections, Language Bank, Mechanism Match, Trust Anchors.
+- Use the exact natural phrasing style from the deep-dive file to avoid generic copy.
+- Mechanism lines must explain the product in simple relatable terms, not abstract health language.
+- Trust angles must match the persona-specific proof preferences from the deep-dive file.
+
+3-layer rendering workflow:
+- Step 1: Read Layer 1 - Raw Persona Truth to understand how the person actually thinks and speaks.
+- Step 2: Read `info/productinfomain.txt` for approved claims and product boundaries.
+- Step 2b: Read `info/faq.txt` for protocol details, restrictions, and edge-case usage rules.
+- Step 3: Read `info/PRODUCT_MECHANISM_V1.txt` to lock the allowed product behavior.
+- Step 4: Read Layer 2 - Message Strategy to choose the right pain angle, mechanism angle, and trust angle.
+- Step 5: Read Layer 3 - Output Language Rendering and convert the same angle into English, Hindi, or Hinglish as requested.
+- Do not translate raw Hinglish lines word-for-word into ad copy. Use them to understand emotion first, then render cleanly in the target language.
+- For English ads: prefer the English-ready phrasing block as the base tone.
+- For Hindi ads: prefer the Hindi-ready phrasing block as the base tone.
+- For Hinglish ads: prefer the Hinglish-ready phrasing block as the base tone.
+- Keep the underlying pain, mechanism, and trust angle consistent across all 3 language outputs.
+- When using persona mechanism sections, map the persona's eating behavior to the product's approved behavior change from `info/PRODUCT_MECHANISM_V1.txt`.
+- When protocol-specific details are needed, such as timing, fasting window, support, restrictions, or usage caveats, pull them from `info/faq.txt` rather than inventing them.
 
 Selection rule:
 - Use one primary persona plus one optional secondary micro-context.
@@ -316,8 +358,8 @@ In production mode:
       "support_line_hi": "रोज cravings control करें, metabolism support पाएं।",
       "cta_en": "Start Now",
       "cta_hi": "आज शुरू करें",
-      "disclaimer_en": "Results vary by body type and routine.",
-      "disclaimer_hi": "परिणाम शरीर और दिनचर्या के अनुसार अलग हो सकते हैं।",
+      "disclaimer_en": "",
+      "disclaimer_hi": "",
       "caption_en": "Ayurvedic support for consistent fat-loss habits without crash diets.",
       "caption_hi": "बिना crash diet के fat-loss habit बनाने में ayurvedic support।",
       "bullets_en": [
@@ -352,7 +394,6 @@ In production mode:
 - headline_hi: exact Hindi headline used
 - support_line_en/support_line_hi: exact support line used on image
 - cta_en/cta_hi: exact CTA used on image
-- disclaimer_en/disclaimer_hi: exact disclaimer text used
 - caption_en/caption_hi: exact long-form caption used (if any)
 - bullets_en/bullets_hi: exact bullet text array used (if any)
 - background_slot: BG-001 through BG-500 (or fresh-generated background signature)
@@ -370,7 +411,7 @@ In production mode:
 - Same fresh_background_signature + same format = hard block if used in last 20 entries for that format.
 - Same headline_angle + same format = flag if used in last 3 entries. Rotate angle.
 - Same persona + same headline_angle = hard block regardless of format. Always change at least one.
-- Any exact text reuse is forbidden across all history: headline, support line, CTA, disclaimer, caption, and bullets in both EN and HI must be new every time.
+- Any exact text reuse is forbidden across all history: headline, support line, CTA, caption, and bullets in both EN and HI must be new every time.
 
 ### Production switch instruction:
 
@@ -387,38 +428,38 @@ Keep format structure fixed. Swap persona-specific headline/caption blocks.
 - Purpose: broad conversion
 - Persona use: strongest pain-led hook + fastest believable outcome
 - Copy shape: strong headline, one support line, CTA
-- Text budget: 18-32 words + disclaimer
-- Minimum copy units: headline + 1 support line + CTA + disclaimer
+- Text budget: 18-32 words
+      - Minimum copy units: headline + 1 support line + CTA
 
 ### BA
 - Purpose: show transition from pain to control
 - Persona use: "before" = persona struggle, "after" = first meaningful win
 - Copy shape: pain-to-progress headline + 3 outcome bullets
-- Text budget: 22-36 words + disclaimer
-- Minimum copy units: headline + 2-3 short bullets + CTA + disclaimer
+- Text budget: 22-36 words
+      - Minimum copy units: headline + 2-3 short bullets + CTA
 
 ### TEST
 - Purpose: trust
 - Persona use: testimonial language mirrors persona words (cravings, stuck, no time)
 - Copy shape: quote + attribution + trust line + CTA
-- Text budget: 24-40 words + disclaimer
-- Minimum copy units: headline/quote + attribution + trust line + CTA + disclaimer
+- Text budget: 24-40 words
+      - Minimum copy units: headline/quote + attribution + trust line + CTA
 - Testimonial integrity: never fabricate customer quotes; if real quote is unavailable, use rating + user-count + mechanism proof framing instead
 
 ### FEAT
 - Purpose: mechanism clarity
 - Persona use: map each feature to persona friction
 - Copy shape: "what makes it work" + 3-4 benefit bullets + CTA
-- Text budget: 26-42 words + disclaimer
-- Minimum copy units: headline + 3 feature-benefit bullets + CTA + disclaimer
+- Text budget: 26-42 words
+      - Minimum copy units: headline + 3 feature-benefit bullets + CTA
 
 ### UGC
 - Purpose: authenticity
 - Persona use: first-person micro-story from persona POV
 - Copy shape: my routine support + 3 practical wins + CTA
-- Text budget: 16-26 words + disclaimer
-- Default text policy: headline (max 8 words) + support line (max 8 words) + CTA (max 4 words) + disclaimer only
-- Minimum copy units: headline + 1 short support line + CTA + disclaimer
+- Text budget: 16-26 words
+      - Default text policy: headline (max 8 words) + support line (max 8 words) + CTA (max 4 words)
+      - Minimum copy units: headline + 1 short support line + CTA
 - No bullets or long paragraph quote unless explicitly requested
 
 ---
@@ -460,7 +501,7 @@ Section 4 — Persona Input: minimum 5 bullets
 - Include: pain, desire, friction, proof needed, tone cue
 
 Section 5 — Exact On-Image Copy: minimum 4 copy lines
-- Include: headline, support or quote line, CTA, disclaimer — render exactly as written, no alterations
+- Include: headline, support or quote line, CTA — render exactly as written, no alterations
 
 Section 6 — Negative Constraints: minimum 8 bullets
 - Include: visual and claim-level "do not" constraints
@@ -657,7 +698,7 @@ Step 4 — Background slot selection
 - For catalog selection, read/update `indexes.slot_exhaustion_tracker.<FORMAT>` (used/remaining/cycle_number).
 
 Step 4.5 - Text dedupe gate (mandatory)
-- Before finalizing output text, check registry `indexes.used_text` for headline/support/CTA/disclaimer/caption/bullets in both EN and HI.
+- Before finalizing output text, check registry `indexes.used_text` for headline/support/CTA/caption/bullets in both EN and HI.
 - If any text string already exists in index, regenerate that text until unique.
 - Never reuse any previously used text string.
 
@@ -681,7 +722,7 @@ Prompt quality upgrade block (add by default):
 - "Typography must be pin-sharp. If any text appears soft, blurry, or smeared, regenerate."
 - "Keep text count minimal and increase font size rather than packing more copy."
 - "Use clean sans typography with strong stroke clarity; no thin/light weights for body text."
-- "Use Poppins only for on-image text: Headline in Poppins Bold, support/CTA/disclaimer in Poppins Medium or Regular."
+- "Use Poppins only for on-image text: Headline in Poppins Bold, support/CTA in Poppins Medium or Regular."
 
 Mandatory visual-direction block (add by default):
 - "Describe scene, subject, and props explicitly (what is visible in frame)."
@@ -715,28 +756,27 @@ Balance rule:
 Global rules:
 - Never place paragraph captions on-image unless user explicitly asks.
 - Prefer short headline + short support line + CTA.
-- Keep disclaimer to one short line.
+
 - If bilingual is needed, generate separate EN and HI creatives (no mixed-language text in one creative).
 
 Recommended on-image text limits by format:
-- HERO: 18-32 words (+ disclaimer)
-- BA: 22-36 words (+ disclaimer)
-- TEST: 24-40 words (+ disclaimer)
-- FEAT: 26-42 words (+ disclaimer)
-- UGC: 16-26 words (+ disclaimer)
+- HERO: 18-32 words
+- BA: 22-36 words
+- TEST: 24-40 words
+- FEAT: 26-42 words
+- UGC: 16-26 words
 
 Minimum required on-image copy units by format:
-- HERO: headline + 1 support line + CTA + disclaimer
-- BA: headline + 2-3 short bullets + CTA + disclaimer
-- TEST: headline/quote + attribution + trust line + CTA + disclaimer
-- FEAT: headline + 3 feature-benefit bullets + CTA + disclaimer
-- UGC: headline + 1 short support line + CTA + disclaimer
+- HERO: headline + 1 support line + CTA
+- BA: headline + 2-3 short bullets + CTA
+- TEST: headline/quote + attribution + trust line + CTA
+- FEAT: headline + 3 feature-benefit bullets + CTA
+- UGC: headline + 1 short support line + CTA
 
 UGC default text policy:
 - One headline (max 8 words)
 - One short support line (max 8 words)
 - One CTA (max 4 words)
-- One disclaimer line
 - No bullets or long paragraph quote unless requested
 
 Text budget repair commands:
@@ -745,7 +785,7 @@ If output is too empty:
 - "Keep same visual concept, add one concise support line and one trust/proof line while preserving clean spacing and readability."
 
 If output is copy-heavy:
-- "Regenerate same concept with minimal text: remove paragraphs and bullets; keep only headline, CTA, one-line disclaimer. Maintain product fidelity and composition."
+- "Regenerate same concept with minimal text: remove paragraphs and bullets; keep only headline and CTA. Maintain product fidelity and composition."
 
 Visual quality repair commands:
 
@@ -801,8 +841,6 @@ Quick repair prompts:
 
 ## 17) Compliance and Trust Notes
 
-- Use asterisk with result claims when appropriate.
-- Keep disclaimer readable: "Results vary by body type and routine." or equivalent.
 - Avoid fear tactics and fake urgency.
 - Losing a sale is better than losing trust.
 
@@ -821,6 +859,8 @@ Follow these rules strictly:
 - Use uploaded Obesity Killer product packshot images as absolute visual truth. I will upload 6 images each session.
 - Create ads in 5 formats: HERO, BA, TEST, FEAT, UGC.
 - For each ad, use one persona input block (pain, desire, friction, proof needed, tone cue).
+- If the persona is covered in `info/PERSONA_DEEP_DIVE_01_05.txt`, also use that file for objections, trigger moments, mirrored phrases, mechanism framing, and trust selection.
+- If the persona is covered in `info/PERSONA_DEEP_DIVE_01_05.txt`, generate final copy through the 3-layer workflow: raw truth -> strategy -> target language rendering.
 - Headline must do two things: scroll stop + pain-solution fit.
 - Caption must increase Value = (Dream Outcome x Likelihood) / (Time Delay x Sacrifice).
 - Keep language simple, active, specific, and short.
@@ -831,7 +871,7 @@ Follow these rules strictly:
 - Keep typography pin-sharp; regenerate if any on-image text is blurry.
 - Use Poppins font family for all on-image text (Headline: Poppins Bold; body/support/CTA: Poppins Medium or Regular).
 - Select a background slot from the Background Variation Engine (Section 9 of playbook) using exhaustive format-wise rotation (no repeat until all allowed slots for that format are used once). State which slot you selected.
-- Enforce strict text uniqueness: headline/support/CTA/disclaimer/caption/bullets in EN and HI must never repeat any previously used string.
+- Enforce strict text uniqueness: headline/support/CTA/caption/bullets in EN and HI must never repeat any previously used string.
 - Check the registry at info/AD_GENERATION_REGISTRY.JSON before generation to avoid persona, angle, and background repetition.
 - Registry is in production mode. Write one entry after each generation.
 ```
@@ -856,7 +896,7 @@ When I ask for ad creation, follow this sequence: ask persona number -> ask head
 9. When write mode is turned ON: log each generation to registry using the schema in Section 10.
 
 How to avoid repetition at scale:
-- Never reuse old text directly (headline, support line, CTA, disclaimer, caption, bullets).
+- Never reuse old text directly (headline, support line, CTA, caption, bullets).
 - Recompute all copy every generation from persona fields and approved claims.
 - Use registry for both angle-level dedupe and strict text-level dedupe.
 - Rotate catalog background slots with exhaustive format-wise cycles (no repeat until pool exhaustion, then reset cycle).

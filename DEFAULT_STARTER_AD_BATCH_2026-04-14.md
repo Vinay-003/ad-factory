@@ -41,7 +41,7 @@ FORMAT LAYOUT INSTRUCTIONS
 - Keep the OK Kit Box as the largest visual anchor.
 - Arrange the remaining four products around it in correct size proportion.
 - Reserve the upper-left quadrant for headline and support line.
-- Reserve the lower-left area for CTA and disclaimer on flat negative space.
+- Reserve the lower-left area for CTA and  on flat negative space.
 - Keep background detail subtle and secondary to product clarity.
 - Camera framing: close-medium editorial product shot.
 - Lighting: soft warm daylight from top-left with clean, gentle shadows.
@@ -76,7 +76,7 @@ NEGATIVE CONSTRAINTS
 QUALITY BAR
 - Product fidelity must remain exact.
 - Typography must stay crisp at mobile size.
-- Headline, support line, CTA, and disclaimer must all read clearly.
+- Headline, support line, CTA, and  must all read clearly.
 - Composition must feel premium, calm, and conversion-ready.
 - The product cluster must remain the dominant focal point.
 - If any text or label is soft, regenerate immediately.
@@ -94,7 +94,7 @@ VISUAL DIRECTION BLOCK
 
 TYPOGRAPHY SHARPNESS BLOCK
 - Headline font: Poppins Bold.
-- Support, CTA, and disclaimer: Poppins Medium or Regular.
+- Support, CTA, and : Poppins Medium or Regular.
 - Use headline color `#973015` and body text color `#421808`.
 - Place all copy only on flat, low-noise space.
 - No glow, outline, script font, or soft shadow on text.
@@ -179,7 +179,7 @@ VISUAL DIRECTION BLOCK
 
 TYPOGRAPHY SHARPNESS BLOCK
 - Headline font: Poppins Bold.
-- Support, CTA, and disclaimer: Poppins Medium or Regular.
+- Support, CTA, and : Poppins Medium or Regular.
 - हेडलाइन रंग `#973015` और बॉडी टेक्स्ट रंग `#421808` रखें।
 - सारा टेक्स्ट केवल फ्लैट और साफ जगह पर रखें।
 - टेक्स्ट पर ग्लो, आउटलाइन, स्क्रिप्ट फॉन्ट या सॉफ्ट शैडो न दें।
@@ -214,7 +214,7 @@ FORMAT LAYOUT INSTRUCTIONS
 - Use the left half for the "before" feeling and the right half for the "after" feeling.
 - Place headline at top center spanning both halves.
 - Use three short bullets stacked on the right half in a clean panel.
-- Keep CTA beneath the bullets and disclaimer near the bottom edge.
+- Keep CTA beneath the bullets and  near the bottom edge.
 - Camera framing: medium lifestyle-product hybrid.
 - Lighting: softer and dimmer on the left, brighter and warmer on the right.
 - Maintain wide breathing room around text.
@@ -268,7 +268,7 @@ VISUAL DIRECTION BLOCK
 
 TYPOGRAPHY SHARPNESS BLOCK
 - Headline font: Poppins Bold.
-- Bullet, CTA, and disclaimer font: Poppins Medium or Regular.
+- Bullet, CTA, and  font: Poppins Medium or Regular.
 - Keep bullets on a clean flat panel with strong contrast.
 - Avoid placing text over tile lines or prop edges.
 - No outlined fonts, glow, or soft text shadows.
@@ -355,7 +355,7 @@ VISUAL DIRECTION BLOCK
 
 TYPOGRAPHY SHARPNESS BLOCK
 - Headline font: Poppins Bold.
-- Bullet, CTA, and disclaimer font: Poppins Medium or Regular.
+- Bullet, CTA, and  font: Poppins Medium or Regular.
 - बुलेट्स को साफ फ्लैट पैनल पर मजबूत कॉन्ट्रास्ट के साथ रखें।
 - टेक्स्ट को टाइल लाइन या प्रॉप एज पर न रखें।
 - आउटलाइन, ग्लो या सॉफ्ट शैडो वाले फॉन्ट न लें।
@@ -390,7 +390,7 @@ FORMAT LAYOUT INSTRUCTIONS
 - Place attribution directly below the quote.
 - Add one proof line below attribution.
 - Place CTA beneath the proof line.
-- Keep disclaimer aligned at the very bottom in a single clean line.
+- Keep  aligned at the very bottom in a single clean line.
 - Camera framing: medium editorial scene with a credible home-office context.
 - Lighting: warm lamp ambience with soft falloff.
 - Preserve generous padding around the testimonial text block.
@@ -443,7 +443,7 @@ VISUAL DIRECTION BLOCK
 
 TYPOGRAPHY SHARPNESS BLOCK
 - Headline font: Poppins Bold.
-- Attribution, support line, CTA, and disclaimer: Poppins Medium or Regular.
+- Attribution, support line, CTA, and : Poppins Medium or Regular.
 - Keep the quote on a flat clean zone with no lamp glare.
 - Use strong contrast between text and background panel.
 - No decorative quote marks larger than the text itself.
@@ -476,7 +476,7 @@ FORMAT LAYOUT INSTRUCTIONS
 - attribution को quote के नीचे रखें।
 - attribution के नीचे एक proof line रखें।
 - proof line के बाद CTA रखें।
-- disclaimer को सबसे नीचे एक साफ लाइन में रखें।
+-  को सबसे नीचे एक साफ लाइन में रखें।
 - कैमरा फ्रेमिंग: credible home-office context के साथ मीडियम एडिटोरियल दृश्य।
 - लाइटिंग: वार्म लैम्प एम्बियंस और सॉफ्ट फॉलऑफ।
 - testimonial text block के आसपास पर्याप्त padding रखें।
@@ -529,7 +529,7 @@ VISUAL DIRECTION BLOCK
 
 TYPOGRAPHY SHARPNESS BLOCK
 - Headline font: Poppins Bold.
-- Attribution, support line, CTA, and disclaimer: Poppins Medium or Regular.
+- Attribution, support line, CTA, and : Poppins Medium or Regular.
 - quote को फ्लैट साफ क्षेत्र में रखें, लैम्प glare से दूर।
 - टेक्स्ट और बैकग्राउंड पैनल के बीच मजबूत contrast रखें।
 - सजावटी quote marks को मुख्य टेक्स्ट से बड़ा न बनाएं।
@@ -560,7 +560,7 @@ OUTPUT SPEC
 FORMAT LAYOUT INSTRUCTIONS
 - Format: FEAT.
 - Place the full product group on the left 45% of canvas.
-- Use the right 55% for headline, three bullets, CTA, and disclaimer.
+- Use the right 55% for headline, three bullets, CTA, and .
 - Keep each bullet in one short line if possible.
 - Arrange bullets vertically with equal spacing and strong alignment.
 - Maintain a strong top-to-bottom reading flow.
@@ -618,12 +618,12 @@ VISUAL DIRECTION BLOCK
 
 TYPOGRAPHY SHARPNESS BLOCK
 - Headline font: Poppins Bold.
-- Bullets, CTA, and disclaimer: Poppins Medium or Regular.
+- Bullets, CTA, and : Poppins Medium or Regular.
 - Use strong dark text on clean light space.
 - Keep bullets left-aligned with clean spacing.
 - No icons unless extremely minimal and non-distracting.
 - No decorative type treatments, shadows, or warping.
-- If any bullet or disclaimer blurs, regenerate.
+- If any bullet or  blurs, regenerate.
 
 ### Hindi Prompt
 
@@ -647,7 +647,7 @@ OUTPUT SPEC
 FORMAT LAYOUT INSTRUCTIONS
 - फॉर्मेट: FEAT.
 - पूरे उत्पाद समूह को कैनवास के बाएं 45% हिस्से में रखें।
-- दाएं 55% हिस्से में हेडलाइन, तीन बुलेट, CTA और disclaimer रखें।
+- दाएं 55% हिस्से में हेडलाइन, तीन बुलेट, CTA और  रखें।
 - हर बुलेट को संभव हो तो एक ही छोटी लाइन में रखें।
 - बुलेट्स को बराबर दूरी के साथ लंबवत रखें।
 - ऊपर से नीचे तक मजबूत reading flow बनाए रखें।
@@ -705,12 +705,12 @@ VISUAL DIRECTION BLOCK
 
 TYPOGRAPHY SHARPNESS BLOCK
 - Headline font: Poppins Bold.
-- Bullets, CTA, and disclaimer: Poppins Medium or Regular.
+- Bullets, CTA, and : Poppins Medium or Regular.
 - साफ हल्के क्षेत्र पर गहरा टेक्स्ट रखें।
 - बुलेट्स को left-aligned और संतुलित spacing में रखें।
 - icons बहुत हल्के हों या न हों।
 - सजावटी type treatment, shadow या warping न दें।
-- यदि कोई बुलेट या disclaimer धुंधला लगे तो पुनर्जनन करें।
+- यदि कोई बुलेट या  धुंधला लगे तो पुनर्जनन करें।
 
 ## UGC
 
@@ -730,7 +730,7 @@ OUTPUT SPEC
 - Style intent: creator-style static ad that still looks premium and real.
 - Keep on-image text minimal and mobile-readable. Avoid dense copy blocks.
 - Typography must be pin-sharp. If any text appears soft, blurry, or smeared, regenerate.
-- Keep copy to headline, one support line, CTA, and disclaimer only.
+- Keep copy to headline, one support line, CTA, and  only.
 - Maintain realism over polish-heavy styling.
 
 FORMAT LAYOUT INSTRUCTIONS
@@ -739,7 +739,7 @@ FORMAT LAYOUT INSTRUCTIONS
 - Keep her holding or interacting with the kit naturally while all 5 products remain visible.
 - Place the product group in the lower-right foreground with one product lightly in hand if needed.
 - Place headline at top-left with generous spacing.
-- Put support line below headline, CTA below that, and disclaimer near bottom edge.
+- Put support line below headline, CTA below that, and  near bottom edge.
 - Keep the background airy and domestic, not staged like a studio.
 - Camera framing: handheld close-medium lifestyle shot.
 - Lighting: soft early morning natural light.
@@ -792,7 +792,7 @@ VISUAL DIRECTION BLOCK
 
 TYPOGRAPHY SHARPNESS BLOCK
 - Headline font: Poppins Bold.
-- Support, CTA, and disclaimer: Poppins Medium or Regular.
+- Support, CTA, and : Poppins Medium or Regular.
 - Keep text on calm negative space away from the subject's face and hands.
 - Use strong contrast with no glow or decorative effects.
 - Keep the support line short and fully legible.
@@ -815,7 +815,7 @@ OUTPUT SPEC
 - शैली: creator-style static ad जो प्रीमियम और वास्तविक दोनों लगे।
 - Keep on-image text minimal and mobile-readable. Avoid dense copy blocks.
 - Typography must be pin-sharp. If any text appears soft, blurry, or smeared, regenerate.
-- कॉपी को केवल headline, एक support line, CTA और disclaimer तक सीमित रखें।
+- कॉपी को केवल headline, एक support line, CTA और  तक सीमित रखें।
 - अधिक polish से ज्यादा realism को प्राथमिकता दें।
 
 FORMAT LAYOUT INSTRUCTIONS
@@ -824,7 +824,7 @@ FORMAT LAYOUT INSTRUCTIONS
 - वह किट के साथ सहज रूप से इंटरैक्ट करे और सभी 5 उत्पाद दिखाई दें।
 - उत्पाद समूह को लोअर-राइट foreground में रखें; जरूरत हो तो एक उत्पाद हाथ में हल्का दिख सकता है।
 - हेडलाइन को ऊपर-बाएं खुले स्पेस में रखें।
-- उसके नीचे support line, फिर CTA, और सबसे नीचे disclaimer रखें।
+- उसके नीचे support line, फिर CTA, और सबसे नीचे  रखें।
 - बैकग्राउंड हवा-दार घरेलू लगे, स्टूडियो जैसा staged नहीं।
 - कैमरा फ्रेमिंग: handheld close-medium lifestyle shot।
 - लाइटिंग: सॉफ्ट मॉर्निंग नेचुरल लाइट।
@@ -877,7 +877,7 @@ VISUAL DIRECTION BLOCK
 
 TYPOGRAPHY SHARPNESS BLOCK
 - Headline font: Poppins Bold.
-- Support, CTA, and disclaimer: Poppins Medium or Regular.
+- Support, CTA, and : Poppins Medium or Regular.
 - टेक्स्ट को चेहरे और हाथों से दूर शांत नेगेटिव स्पेस में रखें।
 - मजबूत contrast रखें, glow या decorative effects नहीं।
 - support line छोटी और पूरी तरह readable रहे।

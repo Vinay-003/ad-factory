@@ -1,0 +1,87 @@
+## BA FORMAT - HINDI
+
+PRODUCT LOCK BLOCK
+- Use the uploaded Obesity Killer product packshot images as absolute visual truth.
+- Do not redesign, redraw, relabel, or alter any product or packaging in any way.
+- Do not change brand name, label colors, illustrations, proportions, or any text (Hindi or English).
+- If any label text is unclear — preserve the original image as-is. Do not reinterpret it.
+- Only permitted: placement, scaling, subtle drop shadows, mild warm lighting correction.
+
+OUTPUT SPEC
+- Canvas: 1080 x 1350 pixels. Portrait. 4:5 ratio.
+- Style: BA (Before/After journey style) — polished enough for paid ad deployment.
+- Text policy: Low-text by default. All copy minimal and mobile-readable at 375px width.
+- Rendering: No compression artifacts. No soft edges on text or product label.
+- All 5 products present, proportionally sized per reference dimensions, unmodified.
+- Readability: maintain high-contrast foreground/background treatment for ad-platform legibility.
+
+FORMAT LAYOUT INSTRUCTIONS
+- Composition: Product zone center, journey narrative in text zones.
+- Focal hierarchy: product dominant, text secondary, background tertiary.
+- Product zone: center for anchor.
+- Text zones: flat uncluttered areas only — never over busy background detail.
+- Background: BG-005 Yoga ritual mat — natural mat scene, small wooden tray, calm daylight, minimal props.
+- Camera: medium, product with journey context framing.
+- Lighting: warm soft natural daylight. Subtle drop shadows beneath products.
+- Spacing: strong whitespace between zones. Grid-based alignment.
+
+PERSONA INPUT BLOCK
+- Persona: 1. Craving-Control Struggler
+- Pain: Struggles with constant food cravings, especially in the evening. Often eats without true hunger.
+- Desire: To feel in control of what and when they eat, without feeling deprived.
+- Friction: Past efforts to control eating led to binge eating or total loss of control. Feels powerless around food.
+- Proof needed: Evidence that the product reduces cravings without extreme willpower, real user stories.
+- Tone cue: Empathetic, understanding — acknowledges the struggle is real.
+
+EXACT ON-IMAGE COPY — DO NOT ALTER ANYTHING
+- Headline: "cravings से लड़ना to control में आना."*
+- Support line: "सुबह का liquid fullness support करता है। रात के tablets पाचन support करते हैं।"
+- CTA: "बदलाव देखें"
+- Disclaimer: "*परिणाम अलग होते हैं। ज्यादातर यूज़र्स routine के साथ 15 दिन में 3-5 kg loss देखते हैं।"
+- Bullets:
+  - "15 दिन के course में hunger spikes कम हो जाते हैं।"
+  - "शाम की cravings manageable हो जाती हैं।"
+  - "कोई crash diet नहीं। कोई extreme willpower की ज़रूरत नहीं।"
+Render every character exactly as written. No paraphrasing, no punctuation changes, no autocorrection.
+
+NEGATIVE CONSTRAINTS
+- Do not recreate or redraw any product
+- Do not blur, approximate, or rewrite any label text
+- Do not use sale badges, burst graphics, or stickers
+- Do not show body transformations or weight-loss visuals
+- Do not use colors outside the defined palette
+- Do not use more than 2 font weights
+- Do not overcrowd the layout
+- Do not make medical cure claims of any kind
+- Do not render unnatural or anatomically incorrect hands
+- Do not use ring light, studio flash, or overproduced lighting
+
+QUALITY BAR — verify before accepting output:
+- All 5 products present, correctly proportioned, completely unmodified
+- All on-image text sharp and readable at 375px mobile size
+- Product label accurate, unmodified, and fully readable
+- Layout is calm, balanced, and premium
+- No clutter, no hype, no forbidden elements
+- Single clear focal hierarchy — product dominant throughout
+- If any item above fails — regenerate immediately without compromise
+
+VISUAL DIRECTION BLOCK
+- Background slot: BG-005 — Yoga ritual mat
+- Scene: Natural yoga mat with small wooden tray. Soft natural daylight from window. Calm, intentional morning ritual mood.
+- Subject: No human subject — product-focused BA creative
+- Action: Products neatly arranged on wooden tray on the mat
+- Camera: medium, product with journey context framing
+- Lighting: warm soft natural daylight from window
+- Props: Small wooden tray, folded yoga block or small plant nearby
+- Surfaces: natural yoga mat texture, light wood tray
+- Mood: Intentional, calm, transformation journey beginning
+- Realism: Natural product rendering, no artificial lighting artifacts
+
+TYPOGRAPHY SHARPNESS BLOCK
+- Headline: Poppins Bold — high contrast against background zone
+- Support and CTA: Poppins Medium/Regular — same typeface family
+- Size: large enough to read on 375px mobile screen without zooming
+- Placement: flat uncluttered zones only — never over busy background detail
+- Forbidden: thin fonts, script fonts, decorative typefaces, glow effects, outlined text, drop shadows on copy
+- Mandatory: crisp hard text edges — zero softness — zero anti-alias blur on any character
+- If any text is soft, blurry, or illegible — discard and regenerate immediately

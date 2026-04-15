@@ -69,8 +69,8 @@
       "support_line_hi": "आयुर्वेदिक सपोर्ट जो भूख और पाचन को संभालकर 15 दिन की हल्की शुरुआत दे।*",
       "cta_en": "Start Simple",
       "cta_hi": "आसान शुरुआत करें",
-      "disclaimer_en": "*Average loss is 3-5 kg in 15 days. Results vary by body, routine, and adherence.",
-      "disclaimer_hi": "*औसतन 15 दिनों में 3-5 किलो तक कमी देखी गई है। परिणाम शरीर, दिनचर्या और पालन पर निर्भर करते हैं।",
+      "disclaimer_en": "",
+      "disclaimer_hi": "",
       "caption_en": "Start with a simple Ayurvedic routine that helps manage hunger, supports digestion, and aims for visible 15-day progress without crash diets.",
       "caption_hi": "एक आसान आयुर्वेदिक रूटीन से शुरुआत करें जो भूख को संभालने, पाचन को सपोर्ट करने और बिना crash diet के 15 दिन की दिखने वाली प्रगति की दिशा में मदद करे।",
       "bullets_en": [],
@@ -96,8 +96,8 @@
       "support_line_hi": "तीन-भाग वाला रूटीन सुबह की fullness support से रात के शांत पाचन सपोर्ट तक साथ देता है।",
       "cta_en": "See Your Shift",
       "cta_hi": "अपना बदलाव देखें",
-      "disclaimer_en": "*Visible progress varies. Average users may lose 3-5 kg in 15 days with routine compliance.",
-      "disclaimer_hi": "*दिखने वाले परिणाम अलग हो सकते हैं। औसतन 15 दिनों में 3-5 किलो कमी रूटीन पालन पर निर्भर है।",
+      "disclaimer_en": "",
+      "disclaimer_hi": "",
       "caption_en": "For people who snack hardest at night, this Ayurvedic routine supports appetite control in the morning and digestion at bedtime without punishing restrictions.",
       "caption_hi": "जो लोग रात में सबसे ज्यादा स्नैक करते हैं, उनके लिए यह आयुर्वेदिक रूटीन सुबह appetite control और सोने से पहले digestion support देता है, बिना कठोर रोक-टोक के।",
       "bullets_en": [
@@ -131,8 +131,8 @@
       "support_line_hi": "सुबह भूख नियंत्रण का सपोर्ट। रात में पाचन का सपोर्ट।",
       "cta_en": "Make Room For You",
       "cta_hi": "अपने लिए जगह बनाएं",
-      "disclaimer_en": "*Supportive weight-loss results differ from person to person and depend on daily follow-through.",
-      "disclaimer_hi": "*वजन घटाने में मिलने वाला सपोर्ट और परिणाम व्यक्ति व उसकी दिनचर्या के अनुसार अलग हो सकते हैं।",
+      "disclaimer_en": "",
+      "disclaimer_hi": "",
       "caption_en": "Built for packed days, this trust-led creative leans on 70,000+ users, Dr. Arun Tyagi's Ayurvedic approach, and a simple daily rhythm people can actually follow.",
       "caption_hi": "व्यस्त दिनचर्या के लिए बना यह भरोसे-आधारित संदेश 70,000+ यूज़र्स, डॉ. अरुण त्यागी के आयुर्वेदिक दृष्टिकोण और ऐसे सरल रूटीन पर आधारित है जिसे लोग सच में निभा सकें।",
       "bullets_en": [],
@@ -158,8 +158,8 @@
       "support_line_hi": "डॉक्टर-समर्थित आयुर्वेदिक संरचना साफ बताती है कि किट का हर भाग क्या करता है।",
       "cta_en": "Review The Kit",
       "cta_hi": "किट को समझें",
-      "disclaimer_en": "*This is Ayurvedic support, not a medical cure. Progress differs by body response and consistency.",
-      "disclaimer_hi": "*यह आयुर्वेदिक सपोर्ट है, कोई चिकित्सीय इलाज नहीं। प्रगति शरीर की प्रतिक्रिया और नियमितता पर निर्भर करती है।",
+      "disclaimer_en": "",
+      "disclaimer_hi": "",
       "caption_en": "Trust-first buyers get a clearer view of the method here: morning hunger support, nighttime digestion support, and a structured Ayurvedic routine with guidance.",
       "caption_hi": "भरोसा पहले चाहने वाले खरीदार यहां तरीके को अधिक साफ समझते हैं: सुबह भूख का सपोर्ट, रात में पाचन का सपोर्ट, और मार्गदर्शन के साथ संरचित आयुर्वेदिक रूटीन।",
       "bullets_en": [
@@ -193,14 +193,165 @@
       "support_line_hi": "इस routine ने दिनभर मुझे ज्यादा steady महसूस कराया।",
       "cta_en": "Try My Routine",
       "cta_hi": "मेरा routine देखें",
-      "disclaimer_en": "*The kit supports appetite and digestion. Outcomes differ across users and routines.",
-      "disclaimer_hi": "*यह किट भूख और पाचन को सपोर्ट करती है। परिणाम हर व्यक्ति और दिनचर्या के अनुसार अलग होते हैं।",
+      "disclaimer_en": "",
+      "disclaimer_hi": "",
       "caption_en": "The creator-style angle keeps the message human: a calmer relationship with cravings, a lighter daily rhythm, and support that fits normal life.",
       "caption_hi": "creator-style एंगल संदेश को मानवीय रखता है: cravings के साथ अधिक शांति, हल्की दैनिक लय, और ऐसा सपोर्ट जो सामान्य जीवन में फिट बैठे।",
       "bullets_en": [],
       "bullets_hi": [],
       "background_slot": "BG-016",
       "background_name": "Balcony morning",
+      "background_source": "catalog",
+      "fresh_background_signature": null,
+      "language": "BOTH",
+      "output_quality": "approved",
+      "notes": "Default starter batch UGC prompt generated in EN and HI."
+    },
+    {
+      "id": "entry_006",
+      "timestamp": "2026-04-16T00:00:00Z",
+      "format": "HERO",
+      "persona_number": 7,
+      "persona_name": "Post-Failure Re-starter",
+      "headline_angle": "sacrifice_reduction",
+      "headline_en": "Tried every diet? This one works without the struggle.*",
+      "headline_hi": "हर diet try की? यह एक काम करता है, बिना struggle के।*",
+      "support_line_en": "Ayurvedic kit that reduces hunger and supports digestion.*",
+      "support_line_hi": "आयुर्वेदिक किट जो भूख कम करती है और पाचन को support करती है।*",
+      "cta_en": "Start Fresh",
+      "cta_hi": "नई शुरुआत करें",
+      "disclaimer_en": "",
+      "disclaimer_hi": "",
+      "caption_en": "After failed attempts with restrictive diets, this Ayurvedic approach offers hunger control and digestion support without extreme willpower.",
+      "caption_hi": "restrictive diets के बाद के failed attempts के बाद, यह आयुर्वेदिक approach extreme willpower के बिना hunger control और digestion support offer करता है।",
+      "bullets_en": [],
+      "bullets_hi": [],
+      "background_slot": "BG-002",
+      "background_name": "Morning kitchen wood",
+      "background_source": "catalog",
+      "fresh_background_signature": null,
+      "language": "BOTH",
+      "output_quality": "approved",
+      "notes": "Default starter batch HERO prompt generated in EN and HI."
+    },
+    {
+      "id": "entry_007",
+      "timestamp": "2026-04-16T00:00:00Z",
+      "format": "BA",
+      "persona_number": 1,
+      "persona_name": "Craving-Control Struggler",
+      "headline_angle": "pain",
+      "headline_en": "From fighting cravings to feeling in control.*",
+      "headline_hi": "cravings से लड़ना to control में आना।*",
+      "support_line_en": "Morning liquid supports fullness. Night tablets support digestion.",
+      "support_line_hi": "सुबह का liquid fullness support करता है। रात के tablets पाचन support करते हैं।",
+      "cta_en": "See The Change",
+      "cta_hi": "बदलाव देखें",
+      "disclaimer_en": "",
+      "disclaimer_hi": "",
+      "caption_en": "The journey from constant cravings to feeling in control of eating habits, supported by morning liquid and nighttime tablets.",
+      "caption_hi": "लगातार cravings से खाने की आदतों पर control में आने की यात्रा, सुबह के liquid और रात के tablets द्वारा support।",
+      "bullets_en": [
+        "Hunger spikes reduce over the 15-day course.",
+        "Evening cravings become easier to manage.",
+        "No crash diet. No extreme willpower needed."
+      ],
+      "bullets_hi": [
+        "15 दिन के course में hunger spikes कम हो जाते हैं।",
+        "शाम की cravings manageable हो जाती हैं।",
+        "कोई crash diet नहीं। कोई extreme willpower की ज़रूरत नहीं।"
+      ],
+      "background_slot": "BG-005",
+      "background_name": "Yoga ritual mat",
+      "background_source": "catalog",
+      "fresh_background_signature": null,
+      "language": "BOTH",
+      "output_quality": "approved",
+      "notes": "Default starter batch BA prompt generated in EN and HI."
+    },
+    {
+      "id": "entry_008",
+      "timestamp": "2026-04-16T00:00:00Z",
+      "format": "TEST",
+      "persona_number": 4,
+      "persona_name": "Plateau Victim",
+      "headline_angle": "proof",
+      "headline_en": "\"I was stuck for weeks. Then this happened.\"",
+      "headline_hi": "\"मैं हफ़्तों से stuck था। फिर यह हुआ।\"",
+      "support_line_en": "Hunger control in the morning. Digestive support at night.",
+      "support_line_hi": "सुबह भूख नियंत्रण। रात में पाचन सपोर्ट।",
+      "cta_en": "Break Through",
+      "cta_hi": "आगे बढ़ें",
+      "disclaimer_en": "",
+      "disclaimer_hi": "",
+      "caption_en": "Testimonial from someone who hit a plateau and found a way through with the kit's morning and night support system.",
+      "caption_hi": "किसी के testimonial जो plateau पर पहुंचा और kit के सुबह और रात के support system के साथ रास्ता मिला।",
+      "bullets_en": [],
+      "bullets_hi": [],
+      "background_slot": "BG-006",
+      "background_name": "Dining table after meal",
+      "background_source": "catalog",
+      "fresh_background_signature": null,
+      "language": "BOTH",
+      "output_quality": "approved",
+      "notes": "Default starter batch TEST prompt generated in EN and HI."
+    },
+    {
+      "id": "entry_009",
+      "timestamp": "2026-04-16T00:00:00Z",
+      "format": "FEAT",
+      "persona_number": 14,
+      "persona_name": "Metabolism-Worry Buyer",
+      "headline_angle": "mechanism",
+      "headline_en": "How the kit supports your body naturally.",
+      "headline_hi": "किट आपके शरीर को naturally कैसे support करती है।",
+      "support_line_en": "Three-part Ayurvedic system: morning, afternoon, night.",
+      "support_line_hi": "तीन-भागीय आयुर्वेदिक सिस्टम: सुबह, दोपहर, रात।",
+      "cta_en": "See How It Works",
+      "cta_hi": "देखें कैसे काम करता है",
+      "disclaimer_en": "",
+      "disclaimer_hi": "",
+      "caption_en": "A clear breakdown of how each component supports the body: OK Liquid for hunger, Powder and Tablet for digestion, Amla for taste.",
+      "caption_hi": "यह स्पष्ट breakdown है कि हर component शरीर को कैसे support करता है: hunger के लिए OK Liquid, digestion के लिए Powder और Tablet, taste के लिए Amla।",
+      "bullets_en": [
+        "OK Liquid: reduces hunger, supports natural fullness.",
+        "OK Powder + Tablet: supports digestion and metabolism.",
+        "Amla: supports taste balance and digestion."
+      ],
+      "bullets_hi": [
+        "OK Liquid: भूख कम करता है, natural fullness support करता है।",
+        "OK Powder + Tablet: पाचन और metabolism support करते हैं।",
+        "Amla: taste balance और पाचन support करता है।"
+      ],
+      "background_slot": "BG-004",
+      "background_name": "Wellness shelf white",
+      "background_source": "catalog",
+      "fresh_background_signature": null,
+      "language": "BOTH",
+      "output_quality": "approved",
+      "notes": "Default starter batch FEAT prompt generated in EN and HI."
+    },
+    {
+      "id": "entry_010",
+      "timestamp": "2026-04-16T00:00:00Z",
+      "format": "UGC",
+      "persona_number": 2,
+      "persona_name": "Busy Professional",
+      "headline_angle": "sacrifice_reduction",
+      "headline_en": "My kind of routine. Simple.",
+      "headline_hi": "मेरे जैसा routine। Simple.",
+      "support_line_en": "Morning shake. Night tablets. Done.",
+      "support_line_hi": "सुबह shake। रात tablets। हो गया।",
+      "cta_en": "Try It",
+      "cta_hi": "try करें",
+      "disclaimer_en": "",
+      "disclaimer_hi": "",
+      "caption_en": "Creator-style message from a busy professional: simple morning shake, night tablets, fits into a packed day.",
+      "caption_hi": "busy professional से creator-style message: simple सुबह shake, रात tablets, packed day में fit होता है।",
+      "bullets_en": [],
+      "bullets_hi": [],
+      "background_slot": "BG-003",
+      "background_name": "Home-office lamp",
       "background_source": "catalog",
       "fresh_background_signature": null,
       "language": "BOTH",
@@ -216,6 +367,12 @@
           "timestamp": "2026-04-14T10:45:48Z",
           "background_slot": "BG-001",
           "background_source": "catalog"
+        },
+        {
+          "entry_id": "entry_006",
+          "timestamp": "2026-04-16T00:00:00Z",
+          "background_slot": "BG-002",
+          "background_source": "catalog"
         }
       ],
       "BA": [
@@ -223,6 +380,12 @@
           "entry_id": "entry_002",
           "timestamp": "2026-04-14T10:45:48Z",
           "background_slot": "BG-002",
+          "background_source": "catalog"
+        },
+        {
+          "entry_id": "entry_007",
+          "timestamp": "2026-04-16T00:00:00Z",
+          "background_slot": "BG-005",
           "background_source": "catalog"
         }
       ],
@@ -232,6 +395,12 @@
           "timestamp": "2026-04-14T10:45:48Z",
           "background_slot": "BG-003",
           "background_source": "catalog"
+        },
+        {
+          "entry_id": "entry_008",
+          "timestamp": "2026-04-16T00:00:00Z",
+          "background_slot": "BG-006",
+          "background_source": "catalog"
         }
       ],
       "FEAT": [
@@ -239,6 +408,12 @@
           "entry_id": "entry_004",
           "timestamp": "2026-04-14T10:45:48Z",
           "background_slot": "BG-015",
+          "background_source": "catalog"
+        },
+        {
+          "entry_id": "entry_009",
+          "timestamp": "2026-04-16T00:00:00Z",
+          "background_slot": "BG-004",
           "background_source": "catalog"
         }
       ],
@@ -248,6 +423,12 @@
           "timestamp": "2026-04-14T10:45:48Z",
           "background_slot": "BG-016",
           "background_source": "catalog"
+        },
+        {
+          "entry_id": "entry_010",
+          "timestamp": "2026-04-16T00:00:00Z",
+          "background_slot": "BG-003",
+          "background_source": "catalog"
         }
       ]
     },
@@ -255,7 +436,8 @@
       "HERO": {
         "cycle_number": 1,
         "used_slots_current_cycle": [
-          "BG-001"
+          "BG-001",
+          "BG-002"
         ],
         "remaining_slots_current_cycle": [
           "BG-002",
@@ -441,7 +623,8 @@
       "BA": {
         "cycle_number": 1,
         "used_slots_current_cycle": [
-          "BG-002"
+          "BG-002",
+          "BG-005"
         ],
         "remaining_slots_current_cycle": [
           "BG-005",
@@ -673,7 +856,8 @@
       "TEST": {
         "cycle_number": 1,
         "used_slots_current_cycle": [
-          "BG-003"
+          "BG-003",
+          "BG-006"
         ],
         "remaining_slots_current_cycle": [
           "BG-006",
@@ -864,7 +1048,8 @@
       "FEAT": {
         "cycle_number": 1,
         "used_slots_current_cycle": [
-          "BG-015"
+          "BG-015",
+          "BG-004"
         ],
         "remaining_slots_current_cycle": [
           "BG-001",
@@ -1093,7 +1278,8 @@
       "UGC": {
         "cycle_number": 1,
         "used_slots_current_cycle": [
-          "BG-016"
+          "BG-016",
+          "BG-003"
         ],
         "remaining_slots_current_cycle": [
           "BG-003",
@@ -1294,70 +1480,98 @@
         "When late-night hunger settles down, progress starts showing.*",
         "\"I needed something simple enough for real life.\"",
         "What makes this kit easier to trust?",
-        "I needed calmer cravings."
+        "I needed calmer cravings.",
+        "Tried every diet? This one works without the struggle.*",
+        "From fighting cravings to feeling in control.*",
+        "\"I was stuck for weeks. Then this happened.\"",
+        "How the kit supports your body naturally.",
+        "My kind of routine. Simple."
       ],
       "headline_hi": [
         "वजन घटाना शुरू हो सकता है, बिना मुश्किल प्लान के।",
         "जब रात की भूख शांत होती है, तब बदलाव दिखना शुरू होता है।*",
         "\"मुझे कुछ ऐसा चाहिए था जो सच में रोज़मर्रा की ज़िंदगी में फिट हो सके।\"",
         "इस किट पर भरोसा करना आसान क्यों लगे?",
-        "मुझे cravings में थोड़ी शांति चाहिए थी।"
+        "मुझे cravings में थोड़ी शांति चाहिए थी।",
+        "हर diet try की? यह एक काम करता है, बिना struggle के।*",
+        "cravings से लड़ना to control में आना।*",
+        "\"मैं हफ़्तों से stuck था। फिर यह हुआ।\"",
+        "किट आपके शरीर को naturally कैसे support करती है।",
+        "मेरे जैसा routine। Simple."
       ],
       "support_line_en": [
         "Ayurvedic hunger and digestion support for a lighter 15-day start.*",
         "Three-part routine moves from fullness support to calmer nighttime digestion.",
         "Hunger control in the morning. Digestion support at night.",
         "A doctor-backed Ayurvedic structure explains what each part of the kit does.",
-        "This routine helped me feel steadier through the day."
+        "This routine helped me feel steadier through the day.",
+        "Ayurvedic kit that reduces hunger and supports digestion.*",
+        "Morning liquid supports fullness. Night tablets support digestion.",
+        "Hunger control in the morning. Digestive support at night.",
+        "Three-part Ayurvedic system: morning, afternoon, night.",
+        "Morning shake. Night tablets. Done."
       ],
       "support_line_hi": [
         "आयुर्वेदिक सपोर्ट जो भूख और पाचन को संभालकर 15 दिन की हल्की शुरुआत दे।*",
         "तीन-भाग वाला रूटीन सुबह की fullness support से रात के शांत पाचन सपोर्ट तक साथ देता है।",
         "सुबह भूख नियंत्रण का सपोर्ट। रात में पाचन का सपोर्ट।",
         "डॉक्टर-समर्थित आयुर्वेदिक संरचना साफ बताती है कि किट का हर भाग क्या करता है।",
-        "इस routine ने दिनभर मुझे ज्यादा steady महसूस कराया।"
+        "इस routine ने दिनभर मुझे ज्यादा steady महसूस कराया।",
+        "आयुर्वेदिक किट जो भूख कम करती है और पाचन को support करती है।*",
+        "सुबह का liquid fullness support करता है। रात के tablets पाचन support करते हैं।",
+        "सुबह भूख नियंत्रण। रात में पाचन सपोर्ट।",
+        "तीन-भागीय आयुर्वेदिक सिस्टम: सुबह, दोपहर, रात।",
+        "सुबह shake। रात tablets। हो गया।"
       ],
       "cta_en": [
         "Start Simple",
         "See Your Shift",
         "Make Room For You",
         "Review The Kit",
-        "Try My Routine"
+        "Try My Routine",
+        "Start Fresh",
+        "See The Change",
+        "Break Through",
+        "See How It Works",
+        "Try It"
       ],
       "cta_hi": [
         "आसान शुरुआत करें",
         "अपना बदलाव देखें",
         "अपने लिए जगह बनाएं",
         "किट को समझें",
-        "मेरा routine देखें"
+        "मेरा routine देखें",
+        "नई शुरुआत करें",
+        "बदलाव देखें",
+        "आगे बढ़ें",
+        "देखें कैसे काम करता है",
+        "try करें"
       ],
-      "disclaimer_en": [
-        "*Average loss is 3-5 kg in 15 days. Results vary by body, routine, and adherence.",
-        "*Visible progress varies. Average users may lose 3-5 kg in 15 days with routine compliance.",
-        "*Supportive weight-loss results differ from person to person and depend on daily follow-through.",
-        "*This is Ayurvedic support, not a medical cure. Progress differs by body response and consistency.",
-        "*The kit supports appetite and digestion. Outcomes differ across users and routines."
-      ],
-      "disclaimer_hi": [
-        "*औसतन 15 दिनों में 3-5 किलो तक कमी देखी गई है। परिणाम शरीर, दिनचर्या और पालन पर निर्भर करते हैं।",
-        "*दिखने वाले परिणाम अलग हो सकते हैं। औसतन 15 दिनों में 3-5 किलो कमी रूटीन पालन पर निर्भर है।",
-        "*वजन घटाने में मिलने वाला सपोर्ट और परिणाम व्यक्ति व उसकी दिनचर्या के अनुसार अलग हो सकते हैं।",
-        "*यह आयुर्वेदिक सपोर्ट है, कोई चिकित्सीय इलाज नहीं। प्रगति शरीर की प्रतिक्रिया और नियमितता पर निर्भर करती है।",
-        "*यह किट भूख और पाचन को सपोर्ट करती है। परिणाम हर व्यक्ति और दिनचर्या के अनुसार अलग होते हैं।"
-      ],
+      "disclaimer_en": [],
+      "disclaimer_hi": [],
       "caption_en": [
         "Start with a simple Ayurvedic routine that helps manage hunger, supports digestion, and aims for visible 15-day progress without crash diets.",
         "For people who snack hardest at night, this Ayurvedic routine supports appetite control in the morning and digestion at bedtime without punishing restrictions.",
         "Built for packed days, this trust-led creative leans on 70,000+ users, Dr. Arun Tyagi's Ayurvedic approach, and a simple daily rhythm people can actually follow.",
         "Trust-first buyers get a clearer view of the method here: morning hunger support, nighttime digestion support, and a structured Ayurvedic routine with guidance.",
-        "The creator-style angle keeps the message human: a calmer relationship with cravings, a lighter daily rhythm, and support that fits normal life."
+        "The creator-style angle keeps the message human: a calmer relationship with cravings, a lighter daily rhythm, and support that fits normal life.",
+        "After failed attempts with restrictive diets, this Ayurvedic approach offers hunger control and digestion support without extreme willpower.",
+        "The journey from constant cravings to feeling in control of eating habits, supported by morning liquid and nighttime tablets.",
+        "Testimonial from someone who hit a plateau and found a way through with the kit's morning and night support system.",
+        "A clear breakdown of how each component supports the body: OK Liquid for hunger, Powder and Tablet for digestion, Amla for taste.",
+        "Creator-style message from a busy professional: simple morning shake, night tablets, fits into a packed day."
       ],
       "caption_hi": [
         "एक आसान आयुर्वेदिक रूटीन से शुरुआत करें जो भूख को संभालने, पाचन को सपोर्ट करने और बिना crash diet के 15 दिन की दिखने वाली प्रगति की दिशा में मदद करे।",
         "जो लोग रात में सबसे ज्यादा स्नैक करते हैं, उनके लिए यह आयुर्वेदिक रूटीन सुबह appetite control और सोने से पहले digestion support देता है, बिना कठोर रोक-टोक के।",
         "व्यस्त दिनचर्या के लिए बना यह भरोसे-आधारित संदेश 70,000+ यूज़र्स, डॉ. अरुण त्यागी के आयुर्वेदिक दृष्टिकोण और ऐसे सरल रूटीन पर आधारित है जिसे लोग सच में निभा सकें।",
         "भरोसा पहले चाहने वाले खरीदार यहां तरीके को अधिक साफ समझते हैं: सुबह भूख का सपोर्ट, रात में पाचन का सपोर्ट, और मार्गदर्शन के साथ संरचित आयुर्वेदिक रूटीन।",
-        "creator-style एंगल संदेश को मानवीय रखता है: cravings के साथ अधिक शांति, हल्की दैनिक लय, और ऐसा सपोर्ट जो सामान्य जीवन में फिट बैठे।"
+        "creator-style एंगल संदेश को मानवीय रखता है: cravings के साथ अधिक शांति, हल्की दैनिक लय, और ऐसा सपोर्ट जो सामान्य जीवन में फिट बैठे।",
+        "restrictive diets के बाद के failed attempts के बाद, यह आयुर्वेदिक approach extreme willpower के बिना hunger control और digestion support offer करता है।",
+        "लगातार cravings से खाने की आदतों पर control में आने की यात्रा, सुबह के liquid और रात के tablets द्वारा support।",
+        "किसी के testimonial जो plateau पर पहुंचा और kit के सुबह और रात के support system के साथ रास्ता मिला।",
+        "यह स्पष्ट breakdown है कि हर component शरीर को कैसे support करता है: hunger के लिए OK Liquid, digestion के लिए Powder और Tablet, taste के लिए Amla।",
+        "busy professional से creator-style message: simple सुबह shake, रात tablets, packed day में fit होता है।"
       ],
       "bullets_en": [
         "Morning OK Liquid supports fullness for longer.",
@@ -1365,7 +1579,13 @@
         "No crash diet. No punishing workout routine.",
         "Morning liquid helps manage hunger and cravings.",
         "Night powder and tablet support digestion and metabolism.",
-        "Ayurvedic routine with 70,000+ users and support guidance."
+        "Ayurvedic routine with 70,000+ users and support guidance.",
+        "Hunger spikes reduce over the 15-day course.",
+        "Evening cravings become easier to manage.",
+        "No crash diet. No extreme willpower needed.",
+        "OK Liquid: reduces hunger, supports natural fullness.",
+        "OK Powder + Tablet: supports digestion and metabolism.",
+        "Amla: supports taste balance and digestion."
       ],
       "bullets_hi": [
         "सुबह का OK Liquid लंबे समय तक भरा हुआ महसूस कराने में सहायक है।",
@@ -1373,7 +1593,13 @@
         "न crash diet, न बहुत कठिन workout routine।",
         "सुबह का liquid भूख और cravings को संभालने में सहायक है।",
         "रात का powder और tablet पाचन और metabolism को सपोर्ट करते हैं।",
-        "आयुर्वेदिक रूटीन, 70,000+ यूज़र्स और सपोर्ट गाइडेंस के साथ।"
+        "आयुर्वेदिक रूटीन, 70,000+ यूज़र्स और सपोर्ट गाइडेंस के साथ।",
+        "15 दिन के course में hunger spikes कम हो जाते हैं।",
+        "शाम की cravings manageable हो जाती हैं।",
+        "कोई crash diet नहीं। कोई extreme willpower की ज़रूरत नहीं।",
+        "OK Liquid: भूख कम करता है, natural fullness support करता है।",
+        "OK Powder + Tablet: पाचन और metabolism support करते हैं।",
+        "Amla: taste balance और पाचन support करता है।"
       ]
     }
   }

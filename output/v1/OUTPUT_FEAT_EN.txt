@@ -1,0 +1,87 @@
+## FEAT FORMAT - ENGLISH
+
+PRODUCT LOCK BLOCK
+- Use the uploaded Obesity Killer product packshot images as absolute visual truth.
+- Do not redesign, redraw, relabel, or alter any product or packaging in any way.
+- Do not change brand name, label colors, illustrations, proportions, or any text (Hindi or English).
+- If any label text is unclear — preserve the original image as-is. Do not reinterpret it.
+- Only permitted: placement, scaling, subtle drop shadows, mild warm lighting correction.
+
+OUTPUT SPEC
+- Canvas: 1080 x 1350 pixels. Portrait. 4:5 ratio.
+- Style: FEAT (Features/benefits) — polished enough for paid ad deployment.
+- Text policy: Low-text by default. All copy minimal and mobile-readable at 375px width.
+- Rendering: No compression artifacts. No soft edges on text or product label.
+- All 5 products present, proportionally sized per reference dimensions, unmodified.
+- Readability: maintain high-contrast foreground/background treatment for ad-platform legibility.
+
+FORMAT LAYOUT INSTRUCTIONS
+- Composition: Product zone center, feature-benefit bullets below or beside.
+- Focal hierarchy: product dominant, text secondary, background tertiary.
+- Product zone: center for maximum visibility.
+- Text zones: flat uncluttered areas only — never over busy background detail.
+- Background: BG-004 Wellness shelf white — white marble shelf, folded towel, soft diffused clinical light.
+- Camera: close-medium, product-focused framing.
+- Lighting: soft diffused clinical light. Subtle drop shadows beneath products.
+- Spacing: strong whitespace between zones. Grid-based alignment.
+
+PERSONA INPUT BLOCK
+- Persona: 14. Metabolism-Worry Buyer
+- Pain: Worries their metabolism is too slow. Has tried methods that claim to "boost metabolism" but didn't work.
+- Desire: To support their body's natural processes in a way that feels safe and sustainable.
+- Friction: Previous "metabolism boost" products felt artificial or made them jittery. Wants something natural.
+- Proof needed: Explanation of how the product supports natural body processes without stimulants, doctor backing.
+- Tone cue: Informative but accessible — explains without overcomplicating.
+
+EXACT ON-IMAGE COPY — DO NOT ALTER ANYTHING
+- Headline: "How the kit supports your body naturally."
+- Support line: "Three-part Ayurvedic system: morning, afternoon, night."
+- CTA: "See How It Works"
+- Disclaimer: "*Ayurvedic support for weight management. Results vary with routine."
+- Bullets:
+  - "OK Liquid: reduces hunger, supports natural fullness."
+  - "OK Powder + Tablet: supports digestion and metabolism."
+  - "Amla: supports taste balance and digestion."
+Render every character exactly as written. No paraphrasing, no punctuation changes, no autocorrection.
+
+NEGATIVE CONSTRAINTS
+- Do not recreate or redraw any product
+- Do not blur, approximate, or rewrite any label text
+- Do not use sale badges, burst graphics, or stickers
+- Do not show body transformations or weight-loss visuals
+- Do not use colors outside the defined palette
+- Do not use more than 2 font weights
+- Do not overcrowd the layout
+- Do not make medical cure claims of any kind
+- Do not render unnatural or anatomically incorrect hands
+- Do not use ring light, studio flash, or overproduced lighting
+
+QUALITY BAR — verify before accepting output:
+- All 5 products present, correctly proportioned, completely unmodified
+- All on-image text sharp and readable at 375px mobile size
+- Product label accurate, unmodified, and fully readable
+- Layout is calm, balanced, and premium
+- No clutter, no hype, no forbidden elements
+- Single clear focal hierarchy — product dominant throughout
+- If any item above fails — regenerate immediately without compromise
+
+VISUAL DIRECTION BLOCK
+- Background slot: BG-004 — Wellness shelf white
+- Scene: White marble shelf with soft diffused clinical light. Small folded towel neatly to one side. Clean, clinical-premium feel.
+- Subject: No human subject — product-focused FEAT creative
+- Action: Products arranged on marble shelf surface, balanced spacing
+- Camera: close-medium, product-focused framing
+- Lighting: soft diffused clinical light from above
+- Props: Small folded towel, clean white surface
+- Surfaces: white marble
+- Mood: Clinical, clean, premium, informative
+- Realism: Natural product rendering, no artificial lighting artifacts
+
+TYPOGRAPHY SHARPNESS BLOCK
+- Headline: Poppins Bold — high contrast against background zone
+- Support and CTA: Poppins Medium/Regular — same typeface family
+- Size: large enough to read on 375px mobile screen without zooming
+- Placement: flat uncluttered zones only — never over busy background detail
+- Forbidden: thin fonts, script fonts, decorative typefaces, glow effects, outlined text, drop shadows on copy
+- Mandatory: crisp hard text edges — zero softness — zero anti-alias blur on any character
+- If any text is soft, blurry, or illegible — discard and regenerate immediately
