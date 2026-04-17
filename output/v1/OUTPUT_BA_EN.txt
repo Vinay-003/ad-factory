@@ -34,10 +34,9 @@ PERSONA INPUT BLOCK
 - Tone cue: Empathetic, understanding — acknowledges the struggle is real.
 
 EXACT ON-IMAGE COPY — DO NOT ALTER ANYTHING
-- Headline: "From fighting cravings to feeling in control."*
+- Headline: "From fighting cravings to feeling in control."
 - Support line: "Morning liquid supports fullness. Night tablets support digestion."
 - CTA: "See The Change"
-- Disclaimer: "*Results vary. Most users see 3-5 kg loss in 15 days with routine."
 - Bullets:
   - "Hunger spikes reduce over the 15-day course."
   - "Evening cravings become easier to manage."

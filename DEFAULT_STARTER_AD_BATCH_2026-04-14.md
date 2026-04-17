@@ -59,7 +59,6 @@ EXACT ON-IMAGE COPY - DO NOT ALTER ANYTHING
 - Headline: Weight loss can start without a complicated plan.
 - Support line: Ayurvedic hunger and digestion support for a lighter 15-day start.*
 - CTA: Start Simple
-- Disclaimer: *Average loss is 3-5 kg in 15 days. Results vary by body, routine, and adherence.
 - Render every character exactly as written.
 
 NEGATIVE CONSTRAINTS
@@ -144,7 +143,6 @@ EXACT ON-IMAGE COPY - DO NOT ALTER ANYTHING
 - Headline: वजन घटाना शुरू हो सकता है, बिना मुश्किल प्लान के।
 - Support line: आयुर्वेदिक सपोर्ट जो भूख और पाचन को संभालकर 15 दिन की हल्की शुरुआत दे।*
 - CTA: आसान शुरुआत करें
-- Disclaimer: *औसतन 15 दिनों में 3-5 किलो तक कमी देखी गई है। परिणाम शरीर, दिनचर्या और पालन पर निर्भर करते हैं।
 - Render every character exactly as written.
 
 NEGATIVE CONSTRAINTS
@@ -233,7 +231,6 @@ EXACT ON-IMAGE COPY - DO NOT ALTER ANYTHING
 - Bullet 2: Night tablet and powder support digestion before sleep.
 - Bullet 3: No crash diet. No punishing workout routine.
 - CTA: See Your Shift
-- Disclaimer: *Visible progress varies. Average users may lose 3-5 kg in 15 days with routine compliance.
 - Render every character exactly as written.
 
 NEGATIVE CONSTRAINTS
@@ -320,7 +317,6 @@ EXACT ON-IMAGE COPY - DO NOT ALTER ANYTHING
 - Bullet 2: रात का टैबलेट और पाउडर सोने से पहले पाचन को सपोर्ट करते हैं।
 - Bullet 3: न crash diet, न बहुत कठिन workout routine।
 - CTA: अपना बदलाव देखें
-- Disclaimer: *दिखने वाले परिणाम अलग हो सकते हैं। औसतन 15 दिनों में 3-5 किलो कमी रूटीन पालन पर निर्भर है।
 - Render every character exactly as written.
 
 NEGATIVE CONSTRAINTS
@@ -408,7 +404,6 @@ EXACT ON-IMAGE COPY - DO NOT ALTER ANYTHING
 - Attribution: Trust backed by 70,000+ users and Dr. Arun Tyagi's Ayurvedic approach.
 - Support line: Hunger control in the morning. Digestion support at night.
 - CTA: Make Room For You
-- Disclaimer: *Supportive weight-loss results differ from person to person and depend on daily follow-through.
 - Render every character exactly as written.
 
 NEGATIVE CONSTRAINTS
@@ -494,7 +489,6 @@ EXACT ON-IMAGE COPY - DO NOT ALTER ANYTHING
 - Attribution: 70,000+ यूज़र्स के भरोसे और डॉ. अरुण त्यागी के आयुर्वेदिक दृष्टिकोण से समर्थित।
 - Support line: सुबह भूख नियंत्रण का सपोर्ट। रात में पाचन का सपोर्ट।
 - CTA: अपने लिए जगह बनाएं
-- Disclaimer: *वजन घटाने में मिलने वाला सपोर्ट और परिणाम व्यक्ति व उसकी दिनचर्या के अनुसार अलग हो सकते हैं।
 - Render every character exactly as written.
 
 NEGATIVE CONSTRAINTS
@@ -583,7 +577,6 @@ EXACT ON-IMAGE COPY - DO NOT ALTER ANYTHING
 - Bullet 2: Night powder and tablet support digestion and metabolism.
 - Bullet 3: Ayurvedic routine with 70,000+ users and support guidance.
 - CTA: Review The Kit
-- Disclaimer: *This is Ayurvedic support, not a medical cure. Progress differs by body response and consistency.
 - Render every character exactly as written.
 
 NEGATIVE CONSTRAINTS
@@ -670,7 +663,6 @@ EXACT ON-IMAGE COPY - DO NOT ALTER ANYTHING
 - Bullet 2: रात का powder और tablet पाचन और metabolism को सपोर्ट करते हैं।
 - Bullet 3: आयुर्वेदिक रूटीन, 70,000+ यूज़र्स और सपोर्ट गाइडेंस के साथ।
 - CTA: किट को समझें
-- Disclaimer: *यह आयुर्वेदिक सपोर्ट है, कोई चिकित्सीय इलाज नहीं। प्रगति शरीर की प्रतिक्रिया और नियमितता पर निर्भर करती है।
 - Render every character exactly as written.
 
 NEGATIVE CONSTRAINTS
@@ -757,7 +749,6 @@ EXACT ON-IMAGE COPY - DO NOT ALTER ANYTHING
 - Headline: I needed calmer cravings.
 - Support line: This routine helped me feel steadier through the day.
 - CTA: Try My Routine
-- Disclaimer: *The kit supports appetite and digestion. Outcomes differ across users and routines.
 - Render every character exactly as written.
 
 NEGATIVE CONSTRAINTS
@@ -842,7 +833,6 @@ EXACT ON-IMAGE COPY - DO NOT ALTER ANYTHING
 - Headline: मुझे cravings में थोड़ी शांति चाहिए थी।
 - Support line: इस routine ने दिनभर मुझे ज्यादा steady महसूस कराया।
 - CTA: मेरा routine देखें
-- Disclaimer: *यह किट भूख और पाचन को सपोर्ट करती है। परिणाम हर व्यक्ति और दिनचर्या के अनुसार अलग होते हैं।
 - Render every character exactly as written.
 
 NEGATIVE CONSTRAINTS

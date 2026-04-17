@@ -1,0 +1,23 @@
+{
+  "task_id": "8ed4e36f935507f25bcd3c0302faaa8a",
+  "format": "HERO",
+  "language": "EN",
+  "variation": 1,
+  "prompt_file": "output/v1/OUTPUT_HERO_EN.txt",
+  "starting_prompt_file": "input/startingprompt.txt",
+  "image_input": [
+    "https://res.cloudinary.com/dzhodklsr/image/upload/q_100,f_png/v1776194127/2_khq3s2.png",
+    "https://res.cloudinary.com/dzhodklsr/image/upload/q_100,f_png/v1776194118/5_yqd39b.png",
+    "https://res.cloudinary.com/dzhodklsr/image/upload/q_100,f_png/v1776194115/3_gg3vch.png",
+    "https://res.cloudinary.com/dzhodklsr/image/upload/q_100,f_png/v1776194115/4_y2a9uk.png",
+    "https://res.cloudinary.com/dzhodklsr/image/upload/q_100,f_png/v1776194114/1_hpau74.png",
+    "https://res.cloudinary.com/dzhodklsr/image/upload/q_100,f_png/v1776194114/Untitled_design_1_qrtikg.png"
+  ],
+  "state": "success",
+  "result_urls": [
+    "https://tempfile.aiquickdraw.com/images/1776293438935-wqf4qfp076.png"
+  ],
+  "saved_files": [
+    "generated_image/v1/hero-en/hero-en-v01-01.png"
+  ]
+}

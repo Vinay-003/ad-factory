@@ -2,7 +2,8 @@
   "mode": {
     "phase": "production",
     "write_enabled": true,
-    "note": "Production mode active. Read before generation and append one entry after every generation."
+    "note": "Production mode active. Read before generation and append one entry after every generation.",
+    "last_updated": "2026-04-15T23:27:12Z"
   },
   "rules": {
     "dedupe_scope": [
@@ -357,6 +358,308 @@
       "language": "BOTH",
       "output_quality": "approved",
       "notes": "Default starter batch UGC prompt generated in EN and HI."
+    },
+    {
+      "id": "entry_011",
+      "timestamp": "2026-04-15T23:16:46Z",
+      "format": "HERO",
+      "persona_number": 16,
+      "persona_name": "Budget-Conscious Result Seeker",
+      "headline_angle": "proof",
+      "headline_en": "Real progress should not demand expensive plans.",
+      "headline_hi": "सच्ची प्रगति के लिए महंगे प्लान जरूरी नहीं।",
+      "support_line_en": "Ayurvedic hunger and digestion support designed for a practical 15-day start.*",
+      "support_line_hi": "आयुर्वेदिक भूख और पाचन सपोर्ट, व्यावहारिक 15-दिन की शुरुआत के लिए।*",
+      "cta_en": "Begin Smart",
+      "cta_hi": "स्मार्ट शुरुआत करें",
+      "disclaimer_en": "",
+      "disclaimer_hi": "",
+      "caption_en": "For budget-conscious buyers, this routine focuses on appetite control and digestion support so progress can begin without expensive overhauls.",
+      "caption_hi": "बजट का ध्यान रखने वालों के लिए यह रूटीन भूख नियंत्रण और पाचन सपोर्ट पर केंद्रित है, ताकि बिना महंगे बदलाव के प्रगति शुरू हो सके।",
+      "bullets_en": [],
+      "bullets_hi": [],
+      "background_slot": "BG-010",
+      "background_name": "Minimal overhead white",
+      "background_source": "catalog",
+      "fresh_background_signature": null,
+      "language": "BOTH",
+      "output_quality": "pending",
+      "notes": "Create ads request: v2 prompts generated; API run pending due missing KIE_API_KEY."
+    },
+    {
+      "id": "entry_012",
+      "timestamp": "2026-04-15T23:16:46Z",
+      "format": "BA",
+      "persona_number": 13,
+      "persona_name": "Festive/Travel Weight Regainer",
+      "headline_angle": "objection",
+      "headline_en": "Travel and festivals disrupted your routine? Reset without extremes.*",
+      "headline_hi": "यात्रा और त्योहार से रूटीन बिगड़ा? बिना कठोरता के रीसेट करें।*",
+      "support_line_en": "Morning OK Liquid helps tame random hunger.",
+      "support_line_hi": "सुबह का OK Liquid अनियमित भूख को संभालने में मदद करता है।",
+      "cta_en": "Reset My Routine",
+      "cta_hi": "मेरा रूटीन रीसेट करें",
+      "disclaimer_en": "",
+      "disclaimer_hi": "",
+      "caption_en": "When social schedules derail consistency, this morning-to-night routine helps rebuild control over hunger and digestion without all-or-nothing pressure.",
+      "caption_hi": "जब सामाजिक कार्यक्रमों से निरंतरता टूटती है, यह सुबह-से-रात रूटीन बिना अत्यधिक दबाव के भूख और पाचन पर फिर से नियंत्रण बनाने में मदद करता है।",
+      "bullets_en": [
+        "Morning OK Liquid helps tame random hunger.",
+        "Night powder and tablet support calmer digestion.",
+        "No crash diet. No punishing workout cycle."
+      ],
+      "bullets_hi": [
+        "सुबह का OK Liquid अनियमित भूख को संभालने में मदद करता है।",
+        "रात का पाउडर और टैबलेट पाचन को शांत सपोर्ट देते हैं।",
+        "न crash diet, न थकाने वाला workout cycle।"
+      ],
+      "background_slot": "BG-009",
+      "background_name": "Outdoor garden table",
+      "background_source": "catalog",
+      "fresh_background_signature": null,
+      "language": "BOTH",
+      "output_quality": "pending",
+      "notes": "Create ads request: v2 prompts generated; API run pending due missing KIE_API_KEY."
+    },
+    {
+      "id": "entry_013",
+      "timestamp": "2026-04-15T23:16:46Z",
+      "format": "TEST",
+      "persona_number": 20,
+      "persona_name": "Support-Dependent Persona (needs accountability)",
+      "headline_angle": "mechanism",
+      "headline_en": "Consistency improves when support is built in.",
+      "headline_hi": "जब सपोर्ट साथ हो, निरंतरता आसान होती है।",
+      "support_line_en": "Simple morning-evening routine with guided follow-through.",
+      "support_line_hi": "सरल सुबह-शाम रूटीन, मार्गदर्शित पालन के साथ।",
+      "cta_en": "Get Supported",
+      "cta_hi": "सपोर्ट के साथ शुरू करें",
+      "disclaimer_en": "",
+      "disclaimer_hi": "",
+      "caption_en": "This trust-led creative highlights structure: a simple AM/PM routine, guidance, and a proof anchor from 70,000+ users.",
+      "caption_hi": "यह भरोसा-केंद्रित क्रिएटिव संरचना दिखाता है: सरल सुबह-शाम रूटीन, मार्गदर्शन, और 70,000+ यूज़र्स का प्रमाण।",
+      "bullets_en": [],
+      "bullets_hi": [],
+      "background_slot": "BG-013",
+      "background_name": "Living room coffee table",
+      "background_source": "catalog",
+      "fresh_background_signature": null,
+      "language": "BOTH",
+      "output_quality": "pending",
+      "notes": "Create ads request: v2 prompts generated; API run pending due missing KIE_API_KEY."
+    },
+    {
+      "id": "entry_014",
+      "timestamp": "2026-04-15T23:16:46Z",
+      "format": "FEAT",
+      "persona_number": 11,
+      "persona_name": "Office Snacker (tea-time/junk cycle)",
+      "headline_angle": "pain",
+      "headline_en": "What helps break the 4 PM snack cycle?",
+      "headline_hi": "4 बजे की स्नैक आदत कैसे टूटे?",
+      "support_line_en": "Targeted Ayurvedic kit for hunger control and digestion rhythm.",
+      "support_line_hi": "भूख नियंत्रण और पाचन लय के लिए लक्षित आयुर्वेदिक किट।",
+      "cta_en": "See The System",
+      "cta_hi": "सिस्टम समझें",
+      "disclaimer_en": "",
+      "disclaimer_hi": "",
+      "caption_en": "Designed for office snack loops, the kit maps morning fullness support and nighttime digestion support into one practical daily flow.",
+      "caption_hi": "ऑफिस स्नैकिंग चक्र के लिए यह किट सुबह की संतुष्टि सपोर्ट और रात के पाचन सपोर्ट को एक व्यावहारिक दैनिक प्रवाह में जोड़ती है।",
+      "bullets_en": [
+        "Morning liquid supports longer fullness between meals.",
+        "Night tablet and powder support digestion rhythm.",
+        "Amla supports taste balance when cravings spike."
+      ],
+      "bullets_hi": [
+        "सुबह का liquid भोजन के बीच लंबे समय तक भरा महसूस कराने में मदद करता है।",
+        "रात का tablet और powder पाचन की लय को सपोर्ट करते हैं।",
+        "cravings बढ़ने पर amla taste balance को सपोर्ट करता है।"
+      ],
+      "background_slot": "BG-010",
+      "background_name": "Minimal overhead white",
+      "background_source": "catalog",
+      "fresh_background_signature": null,
+      "language": "BOTH",
+      "output_quality": "pending",
+      "notes": "Create ads request: v2 prompts generated; API run pending due missing KIE_API_KEY."
+    },
+    {
+      "id": "entry_015",
+      "timestamp": "2026-04-15T23:16:46Z",
+      "format": "UGC",
+      "persona_number": 22,
+      "persona_name": "35+ Slow-Progress Persona",
+      "headline_angle": "time",
+      "headline_en": "Slow progress? I stayed steady.",
+      "headline_hi": "धीमी प्रगति? मैंने निरंतरता रखी।",
+      "support_line_en": "Simple daily routine, better control.",
+      "support_line_hi": "सरल रोज़ाना रूटीन, बेहतर नियंत्रण।",
+      "cta_en": "Try This",
+      "cta_hi": "यह रूटीन आज़माएं",
+      "disclaimer_en": "",
+      "disclaimer_hi": "",
+      "caption_en": "A calm creator-style message for slower-progress journeys: stay consistent, support hunger control, and keep digestion steady day after day.",
+      "caption_hi": "धीमी प्रगति वाली यात्रा के लिए शांत creator-style संदेश: निरंतर रहें, भूख नियंत्रण का सपोर्ट लें, और पाचन को रोज स्थिर रखें।",
+      "bullets_en": [],
+      "bullets_hi": [],
+      "background_slot": "BG-008",
+      "background_name": "Bedroom nightstand",
+      "background_source": "catalog",
+      "fresh_background_signature": null,
+      "language": "BOTH",
+      "output_quality": "pending",
+      "notes": "Create ads request: v2 prompts generated; API run pending due missing KIE_API_KEY."
+    },
+    {
+      "id": "entry_016",
+      "timestamp": "2026-04-15T23:27:12Z",
+      "format": "HERO",
+      "persona_number": 11,
+      "persona_name": "Office Snacker (tea-time/junk cycle)",
+      "headline_angle": "pain",
+      "headline_en": "Your meals may be fine. Office snacking is the hidden leak.",
+      "headline_hi": "समस्या meals नहीं, ऑफिस स्नैकिंग का hidden loop है।",
+      "support_line_en": "Ayurvedic appetite and digestion support for steadier 15-day progress.*",
+      "support_line_hi": "15 दिनों की स्थिर प्रगति के लिए आयुर्वेदिक भूख और पाचन सपोर्ट.*",
+      "cta_en": "Take Back Control",
+      "cta_hi": "कंट्रोल वापस लें",
+      "disclaimer_en": "",
+      "disclaimer_hi": "",
+      "caption_en": "For office snack cycles, this routine targets random desk bites with appetite support and nighttime digestion support so consistency feels doable.",
+      "caption_hi": "ऑफिस स्नैकिंग चक्र में यह रूटीन random desk bites को कम करने, भूख सपोर्ट और रात के पाचन सपोर्ट के साथ निरंतरता आसान बनाता है।",
+      "bullets_en": [],
+      "bullets_hi": [],
+      "background_slot": "BG-017",
+      "background_name": "Wooden tray flatlay",
+      "background_source": "catalog",
+      "fresh_background_signature": null,
+      "language": "BOTH",
+      "output_quality": "approved",
+      "notes": "Create ads request: v3 EN image generated successfully (task 114a719aceb317d18359c93ada54f10f)."
+    },
+    {
+      "id": "entry_017",
+      "timestamp": "2026-04-15T23:27:12Z",
+      "format": "BA",
+      "persona_number": 13,
+      "persona_name": "Festive/Travel Weight Regainer",
+      "headline_angle": "objection",
+      "headline_en": "Trips and festivals should not reset your progress every time.*",
+      "headline_hi": "Travel और festivals के बाद हर बार progress reset होना जरूरी नहीं.*",
+      "support_line_en": "Morning OK Liquid helps stabilize post-event hunger.",
+      "support_line_hi": "Morning OK Liquid post-event hunger को stabilize करने में मदद करता है।",
+      "cta_en": "Reset Smoothly",
+      "cta_hi": "Smooth Reset करें",
+      "disclaimer_en": "",
+      "disclaimer_hi": "",
+      "caption_en": "Built for regain cycles, this reset-focused creative combines post-event appetite stabilization with nighttime digestion support to restart without extremes.",
+      "caption_hi": "regain cycles के लिए बना यह reset-focused संदेश post-event appetite stabilization और रात के digestion support के साथ बिना कठोरता के restart में मदद करता है।",
+      "bullets_en": [
+        "Morning OK Liquid helps stabilize post-event hunger.",
+        "Night powder and tablets support lighter digestion.",
+        "Practical reset routine. No crash diet required."
+      ],
+      "bullets_hi": [
+        "Morning OK Liquid post-event hunger को stabilize करने में मदद करता है।",
+        "Night powder और tablets हल्का digestion support करते हैं।",
+        "Practical reset routine. Crash diet की जरूरत नहीं।"
+      ],
+      "background_slot": "BG-006",
+      "background_name": "Dining table after meal",
+      "background_source": "catalog",
+      "fresh_background_signature": null,
+      "language": "BOTH",
+      "output_quality": "approved",
+      "notes": "Create ads request: v3 EN image generated successfully (task 9aba6a057299b08a43a55945eea68c22)."
+    },
+    {
+      "id": "entry_018",
+      "timestamp": "2026-04-15T23:27:12Z",
+      "format": "TEST",
+      "persona_number": 4,
+      "persona_name": "Plateau Victim",
+      "headline_angle": "proof",
+      "headline_en": "Scale stuck despite effort? Fix daily leak points, not your motivation.",
+      "headline_hi": "मेहनत के बाद भी scale stuck? Motivation नहीं, daily leak points ठीक करें।",
+      "support_line_en": "Trusted by 70,000+ users for practical hunger and digestion support.*",
+      "support_line_hi": "70,000+ users द्वारा भरोसेमंद, practical hunger और digestion support के लिए.*",
+      "cta_en": "Get Practical Support",
+      "cta_hi": "Practical Support लें",
+      "disclaimer_en": "",
+      "disclaimer_hi": "",
+      "caption_en": "This proof-led testimonial style focuses on practical mechanism clarity and user trust for people stuck in plateau phases.",
+      "caption_hi": "यह proof-led testimonial शैली plateau phase में अटके लोगों के लिए practical mechanism clarity और user trust पर केंद्रित है।",
+      "bullets_en": [],
+      "bullets_hi": [],
+      "background_slot": "BG-008",
+      "background_name": "Bedroom nightstand",
+      "background_source": "catalog",
+      "fresh_background_signature": null,
+      "language": "BOTH",
+      "output_quality": "approved",
+      "notes": "Create ads request: v3 EN image generated successfully (task 40ed0e5556d7f3d67d818fa8b1d74774)."
+    },
+    {
+      "id": "entry_019",
+      "timestamp": "2026-04-15T23:27:12Z",
+      "format": "FEAT",
+      "persona_number": 15,
+      "persona_name": "Digestion-Issue + Weight Combo Seeker",
+      "headline_angle": "mechanism",
+      "headline_en": "Weight concern plus bloating? Use a routine that supports both.",
+      "headline_hi": "Weight issue के साथ bloating? दोनों के लिए structured support चुनें।",
+      "support_line_en": "Morning OK Liquid supports fullness and fewer random bites.",
+      "support_line_hi": "Morning OK Liquid fullness और random bites कम करने में मदद करता है।",
+      "cta_en": "Understand The Routine",
+      "cta_hi": "Routine समझें",
+      "disclaimer_en": "",
+      "disclaimer_hi": "",
+      "caption_en": "Feature-first breakdown: morning fullness support, nighttime digestion support, and a structured Ayurvedic flow designed for gut-comfort plus consistency.",
+      "caption_hi": "feature-first breakdown: सुबह fullness support, रात digestion support, और gut comfort के साथ consistency के लिए structured Ayurvedic flow।",
+      "bullets_en": [
+        "Morning OK Liquid supports fullness and fewer random bites.",
+        "Night powder and tablets support digestion before sleep.",
+        "Structured Ayurvedic routine with 70,000+ users."
+      ],
+      "bullets_hi": [
+        "Morning OK Liquid fullness और random bites कम करने में मदद करता है।",
+        "Night powder और tablets सोने से पहले digestion support करते हैं।",
+        "Structured Ayurvedic routine, 70,000+ users के भरोसे के साथ।"
+      ],
+      "background_slot": "BG-017",
+      "background_name": "Wooden tray flatlay",
+      "background_source": "catalog",
+      "fresh_background_signature": null,
+      "language": "BOTH",
+      "output_quality": "approved",
+      "notes": "Create ads request: v3 EN image generated successfully (task cd230efe2dbef01dd4d13a03b72241cb)."
+    },
+    {
+      "id": "entry_020",
+      "timestamp": "2026-04-15T23:27:12Z",
+      "format": "UGC",
+      "persona_number": 9,
+      "persona_name": "Time-Starved Parent",
+      "headline_angle": "sacrifice_reduction",
+      "headline_en": "No time for perfect routines? Keep one that survives real life.",
+      "headline_hi": "Perfect routine का time नहीं? Real life में चलने वाला routine रखें।",
+      "support_line_en": "Simple morning-plus-night support for steadier eating control.*",
+      "support_line_hi": "सुबह+रात का simple support, ताकि eating control steady रहे.*",
+      "cta_en": "Try This Routine",
+      "cta_hi": "यह routine आजमाएं",
+      "disclaimer_en": "",
+      "disclaimer_hi": "",
+      "caption_en": "Creator-style message for overloaded parents: a low-planning daily structure that supports steadier appetite control and easier continuation after chaotic days.",
+      "caption_hi": "overloaded parents के लिए creator-style संदेश: कम planning वाला daily structure जो appetite control और chaotic दिनों के बाद continuation आसान बनाता है।",
+      "bullets_en": [],
+      "bullets_hi": [],
+      "background_slot": "BG-013",
+      "background_name": "Living room coffee table",
+      "background_source": "catalog",
+      "fresh_background_signature": null,
+      "language": "BOTH",
+      "output_quality": "approved",
+      "notes": "Create ads request: v3 EN image generated successfully (task ad464c117793773e3a341e8ef400330c)."
     }
   ],
   "indexes": {
@@ -373,6 +676,18 @@
           "timestamp": "2026-04-16T00:00:00Z",
           "background_slot": "BG-002",
           "background_source": "catalog"
+        },
+        {
+          "entry_id": "entry_011",
+          "timestamp": "2026-04-15T23:16:46Z",
+          "background_slot": "BG-010",
+          "background_source": "catalog"
+        },
+        {
+          "entry_id": "entry_016",
+          "timestamp": "2026-04-15T23:27:12Z",
+          "background_slot": "BG-017",
+          "background_source": "catalog"
         }
       ],
       "BA": [
@@ -386,6 +701,18 @@
           "entry_id": "entry_007",
           "timestamp": "2026-04-16T00:00:00Z",
           "background_slot": "BG-005",
+          "background_source": "catalog"
+        },
+        {
+          "entry_id": "entry_012",
+          "timestamp": "2026-04-15T23:16:46Z",
+          "background_slot": "BG-009",
+          "background_source": "catalog"
+        },
+        {
+          "entry_id": "entry_017",
+          "timestamp": "2026-04-15T23:27:12Z",
+          "background_slot": "BG-006",
           "background_source": "catalog"
         }
       ],
@@ -401,6 +728,18 @@
           "timestamp": "2026-04-16T00:00:00Z",
           "background_slot": "BG-006",
           "background_source": "catalog"
+        },
+        {
+          "entry_id": "entry_013",
+          "timestamp": "2026-04-15T23:16:46Z",
+          "background_slot": "BG-013",
+          "background_source": "catalog"
+        },
+        {
+          "entry_id": "entry_018",
+          "timestamp": "2026-04-15T23:27:12Z",
+          "background_slot": "BG-008",
+          "background_source": "catalog"
         }
       ],
       "FEAT": [
@@ -414,6 +753,18 @@
           "entry_id": "entry_009",
           "timestamp": "2026-04-16T00:00:00Z",
           "background_slot": "BG-004",
+          "background_source": "catalog"
+        },
+        {
+          "entry_id": "entry_014",
+          "timestamp": "2026-04-15T23:16:46Z",
+          "background_slot": "BG-010",
+          "background_source": "catalog"
+        },
+        {
+          "entry_id": "entry_019",
+          "timestamp": "2026-04-15T23:27:12Z",
+          "background_slot": "BG-017",
           "background_source": "catalog"
         }
       ],
@@ -429,6 +780,18 @@
           "timestamp": "2026-04-16T00:00:00Z",
           "background_slot": "BG-003",
           "background_source": "catalog"
+        },
+        {
+          "entry_id": "entry_015",
+          "timestamp": "2026-04-15T23:16:46Z",
+          "background_slot": "BG-008",
+          "background_source": "catalog"
+        },
+        {
+          "entry_id": "entry_020",
+          "timestamp": "2026-04-15T23:27:12Z",
+          "background_slot": "BG-013",
+          "background_source": "catalog"
         }
       ]
     },
@@ -437,14 +800,14 @@
         "cycle_number": 1,
         "used_slots_current_cycle": [
           "BG-001",
-          "BG-002"
+          "BG-002",
+          "BG-010",
+          "BG-017"
         ],
         "remaining_slots_current_cycle": [
           "BG-002",
           "BG-004",
           "BG-009",
-          "BG-010",
-          "BG-017",
           "BG-020",
           "BG-024",
           "BG-027",
@@ -624,12 +987,12 @@
         "cycle_number": 1,
         "used_slots_current_cycle": [
           "BG-002",
-          "BG-005"
+          "BG-005",
+          "BG-009",
+          "BG-006"
         ],
         "remaining_slots_current_cycle": [
           "BG-005",
-          "BG-006",
-          "BG-009",
           "BG-012",
           "BG-014",
           "BG-016",
@@ -857,14 +1220,14 @@
         "cycle_number": 1,
         "used_slots_current_cycle": [
           "BG-003",
-          "BG-006"
+          "BG-006",
+          "BG-013",
+          "BG-008"
         ],
         "remaining_slots_current_cycle": [
           "BG-006",
           "BG-007",
-          "BG-008",
           "BG-011",
-          "BG-013",
           "BG-014",
           "BG-015",
           "BG-018",
@@ -1049,15 +1412,15 @@
         "cycle_number": 1,
         "used_slots_current_cycle": [
           "BG-015",
-          "BG-004"
+          "BG-004",
+          "BG-010",
+          "BG-017"
         ],
         "remaining_slots_current_cycle": [
           "BG-001",
           "BG-004",
           "BG-007",
-          "BG-010",
           "BG-012",
-          "BG-017",
           "BG-020",
           "BG-025",
           "BG-027",
@@ -1279,14 +1642,14 @@
         "cycle_number": 1,
         "used_slots_current_cycle": [
           "BG-016",
-          "BG-003"
+          "BG-003",
+          "BG-008",
+          "BG-013"
         ],
         "remaining_slots_current_cycle": [
           "BG-003",
           "BG-005",
-          "BG-008",
           "BG-011",
-          "BG-013",
           "BG-018",
           "BG-019",
           "BG-022",
@@ -1485,7 +1848,17 @@
         "From fighting cravings to feeling in control.*",
         "\"I was stuck for weeks. Then this happened.\"",
         "How the kit supports your body naturally.",
-        "My kind of routine. Simple."
+        "My kind of routine. Simple.",
+        "Real progress should not demand expensive plans.",
+        "Travel and festivals disrupted your routine? Reset without extremes.*",
+        "Consistency improves when support is built in.",
+        "What helps break the 4 PM snack cycle?",
+        "Slow progress? I stayed steady.",
+        "Your meals may be fine. Office snacking is the hidden leak.",
+        "Trips and festivals should not reset your progress every time.*",
+        "Scale stuck despite effort? Fix daily leak points, not your motivation.",
+        "Weight concern plus bloating? Use a routine that supports both.",
+        "No time for perfect routines? Keep one that survives real life."
       ],
       "headline_hi": [
         "वजन घटाना शुरू हो सकता है, बिना मुश्किल प्लान के।",
@@ -1497,7 +1870,17 @@
         "cravings से लड़ना to control में आना।*",
         "\"मैं हफ़्तों से stuck था। फिर यह हुआ।\"",
         "किट आपके शरीर को naturally कैसे support करती है।",
-        "मेरे जैसा routine। Simple."
+        "मेरे जैसा routine। Simple.",
+        "सच्ची प्रगति के लिए महंगे प्लान जरूरी नहीं।",
+        "यात्रा और त्योहार से रूटीन बिगड़ा? बिना कठोरता के रीसेट करें।*",
+        "जब सपोर्ट साथ हो, निरंतरता आसान होती है।",
+        "4 बजे की स्नैक आदत कैसे टूटे?",
+        "धीमी प्रगति? मैंने निरंतरता रखी।",
+        "समस्या meals नहीं, ऑफिस स्नैकिंग का hidden loop है।",
+        "Travel और festivals के बाद हर बार progress reset होना जरूरी नहीं.*",
+        "मेहनत के बाद भी scale stuck? Motivation नहीं, daily leak points ठीक करें।",
+        "Weight issue के साथ bloating? दोनों के लिए structured support चुनें।",
+        "Perfect routine का time नहीं? Real life में चलने वाला routine रखें।"
       ],
       "support_line_en": [
         "Ayurvedic hunger and digestion support for a lighter 15-day start.*",
@@ -1509,7 +1892,17 @@
         "Morning liquid supports fullness. Night tablets support digestion.",
         "Hunger control in the morning. Digestive support at night.",
         "Three-part Ayurvedic system: morning, afternoon, night.",
-        "Morning shake. Night tablets. Done."
+        "Morning shake. Night tablets. Done.",
+        "Ayurvedic hunger and digestion support designed for a practical 15-day start.*",
+        "Morning OK Liquid helps tame random hunger.",
+        "Simple morning-evening routine with guided follow-through.",
+        "Targeted Ayurvedic kit for hunger control and digestion rhythm.",
+        "Simple daily routine, better control.",
+        "Ayurvedic appetite and digestion support for steadier 15-day progress.*",
+        "Morning OK Liquid helps stabilize post-event hunger.",
+        "Trusted by 70,000+ users for practical hunger and digestion support.*",
+        "Morning OK Liquid supports fullness and fewer random bites.",
+        "Simple morning-plus-night support for steadier eating control.*"
       ],
       "support_line_hi": [
         "आयुर्वेदिक सपोर्ट जो भूख और पाचन को संभालकर 15 दिन की हल्की शुरुआत दे।*",
@@ -1521,7 +1914,17 @@
         "सुबह का liquid fullness support करता है। रात के tablets पाचन support करते हैं।",
         "सुबह भूख नियंत्रण। रात में पाचन सपोर्ट।",
         "तीन-भागीय आयुर्वेदिक सिस्टम: सुबह, दोपहर, रात।",
-        "सुबह shake। रात tablets। हो गया।"
+        "सुबह shake। रात tablets। हो गया।",
+        "आयुर्वेदिक भूख और पाचन सपोर्ट, व्यावहारिक 15-दिन की शुरुआत के लिए।*",
+        "सुबह का OK Liquid अनियमित भूख को संभालने में मदद करता है।",
+        "सरल सुबह-शाम रूटीन, मार्गदर्शित पालन के साथ।",
+        "भूख नियंत्रण और पाचन लय के लिए लक्षित आयुर्वेदिक किट।",
+        "सरल रोज़ाना रूटीन, बेहतर नियंत्रण।",
+        "15 दिनों की स्थिर प्रगति के लिए आयुर्वेदिक भूख और पाचन सपोर्ट.*",
+        "Morning OK Liquid post-event hunger को stabilize करने में मदद करता है।",
+        "70,000+ users द्वारा भरोसेमंद, practical hunger और digestion support के लिए.*",
+        "Morning OK Liquid fullness और random bites कम करने में मदद करता है।",
+        "सुबह+रात का simple support, ताकि eating control steady रहे.*"
       ],
       "cta_en": [
         "Start Simple",
@@ -1533,7 +1936,17 @@
         "See The Change",
         "Break Through",
         "See How It Works",
-        "Try It"
+        "Try It",
+        "Begin Smart",
+        "Reset My Routine",
+        "Get Supported",
+        "See The System",
+        "Try This",
+        "Take Back Control",
+        "Reset Smoothly",
+        "Get Practical Support",
+        "Understand The Routine",
+        "Try This Routine"
       ],
       "cta_hi": [
         "आसान शुरुआत करें",
@@ -1545,10 +1958,32 @@
         "बदलाव देखें",
         "आगे बढ़ें",
         "देखें कैसे काम करता है",
-        "try करें"
+        "try करें",
+        "स्मार्ट शुरुआत करें",
+        "मेरा रूटीन रीसेट करें",
+        "सपोर्ट के साथ शुरू करें",
+        "सिस्टम समझें",
+        "यह रूटीन आज़माएं",
+        "कंट्रोल वापस लें",
+        "Smooth Reset करें",
+        "Practical Support लें",
+        "Routine समझें",
+        "यह routine आजमाएं"
       ],
-      "disclaimer_en": [],
-      "disclaimer_hi": [],
+      "disclaimer_en": [
+        "",
+        "",
+        "",
+        "",
+        ""
+      ],
+      "disclaimer_hi": [
+        "",
+        "",
+        "",
+        "",
+        ""
+      ],
       "caption_en": [
         "Start with a simple Ayurvedic routine that helps manage hunger, supports digestion, and aims for visible 15-day progress without crash diets.",
         "For people who snack hardest at night, this Ayurvedic routine supports appetite control in the morning and digestion at bedtime without punishing restrictions.",
@@ -1559,7 +1994,17 @@
         "The journey from constant cravings to feeling in control of eating habits, supported by morning liquid and nighttime tablets.",
         "Testimonial from someone who hit a plateau and found a way through with the kit's morning and night support system.",
         "A clear breakdown of how each component supports the body: OK Liquid for hunger, Powder and Tablet for digestion, Amla for taste.",
-        "Creator-style message from a busy professional: simple morning shake, night tablets, fits into a packed day."
+        "Creator-style message from a busy professional: simple morning shake, night tablets, fits into a packed day.",
+        "For budget-conscious buyers, this routine focuses on appetite control and digestion support so progress can begin without expensive overhauls.",
+        "When social schedules derail consistency, this morning-to-night routine helps rebuild control over hunger and digestion without all-or-nothing pressure.",
+        "This trust-led creative highlights structure: a simple AM/PM routine, guidance, and a proof anchor from 70,000+ users.",
+        "Designed for office snack loops, the kit maps morning fullness support and nighttime digestion support into one practical daily flow.",
+        "A calm creator-style message for slower-progress journeys: stay consistent, support hunger control, and keep digestion steady day after day.",
+        "For office snack cycles, this routine targets random desk bites with appetite support and nighttime digestion support so consistency feels doable.",
+        "Built for regain cycles, this reset-focused creative combines post-event appetite stabilization with nighttime digestion support to restart without extremes.",
+        "This proof-led testimonial style focuses on practical mechanism clarity and user trust for people stuck in plateau phases.",
+        "Feature-first breakdown: morning fullness support, nighttime digestion support, and a structured Ayurvedic flow designed for gut-comfort plus consistency.",
+        "Creator-style message for overloaded parents: a low-planning daily structure that supports steadier appetite control and easier continuation after chaotic days."
       ],
       "caption_hi": [
         "एक आसान आयुर्वेदिक रूटीन से शुरुआत करें जो भूख को संभालने, पाचन को सपोर्ट करने और बिना crash diet के 15 दिन की दिखने वाली प्रगति की दिशा में मदद करे।",
@@ -1571,7 +2016,17 @@
         "लगातार cravings से खाने की आदतों पर control में आने की यात्रा, सुबह के liquid और रात के tablets द्वारा support।",
         "किसी के testimonial जो plateau पर पहुंचा और kit के सुबह और रात के support system के साथ रास्ता मिला।",
         "यह स्पष्ट breakdown है कि हर component शरीर को कैसे support करता है: hunger के लिए OK Liquid, digestion के लिए Powder और Tablet, taste के लिए Amla।",
-        "busy professional से creator-style message: simple सुबह shake, रात tablets, packed day में fit होता है।"
+        "busy professional से creator-style message: simple सुबह shake, रात tablets, packed day में fit होता है।",
+        "बजट का ध्यान रखने वालों के लिए यह रूटीन भूख नियंत्रण और पाचन सपोर्ट पर केंद्रित है, ताकि बिना महंगे बदलाव के प्रगति शुरू हो सके।",
+        "जब सामाजिक कार्यक्रमों से निरंतरता टूटती है, यह सुबह-से-रात रूटीन बिना अत्यधिक दबाव के भूख और पाचन पर फिर से नियंत्रण बनाने में मदद करता है।",
+        "यह भरोसा-केंद्रित क्रिएटिव संरचना दिखाता है: सरल सुबह-शाम रूटीन, मार्गदर्शन, और 70,000+ यूज़र्स का प्रमाण।",
+        "ऑफिस स्नैकिंग चक्र के लिए यह किट सुबह की संतुष्टि सपोर्ट और रात के पाचन सपोर्ट को एक व्यावहारिक दैनिक प्रवाह में जोड़ती है।",
+        "धीमी प्रगति वाली यात्रा के लिए शांत creator-style संदेश: निरंतर रहें, भूख नियंत्रण का सपोर्ट लें, और पाचन को रोज स्थिर रखें।",
+        "ऑफिस स्नैकिंग चक्र में यह रूटीन random desk bites को कम करने, भूख सपोर्ट और रात के पाचन सपोर्ट के साथ निरंतरता आसान बनाता है।",
+        "regain cycles के लिए बना यह reset-focused संदेश post-event appetite stabilization और रात के digestion support के साथ बिना कठोरता के restart में मदद करता है।",
+        "यह proof-led testimonial शैली plateau phase में अटके लोगों के लिए practical mechanism clarity और user trust पर केंद्रित है।",
+        "feature-first breakdown: सुबह fullness support, रात digestion support, और gut comfort के साथ consistency के लिए structured Ayurvedic flow।",
+        "overloaded parents के लिए creator-style संदेश: कम planning वाला daily structure जो appetite control और chaotic दिनों के बाद continuation आसान बनाता है।"
       ],
       "bullets_en": [
         "Morning OK Liquid supports fullness for longer.",
@@ -1585,7 +2040,19 @@
         "No crash diet. No extreme willpower needed.",
         "OK Liquid: reduces hunger, supports natural fullness.",
         "OK Powder + Tablet: supports digestion and metabolism.",
-        "Amla: supports taste balance and digestion."
+        "Amla: supports taste balance and digestion.",
+        "Morning OK Liquid helps tame random hunger.",
+        "Night powder and tablet support calmer digestion.",
+        "No crash diet. No punishing workout cycle.",
+        "Morning liquid supports longer fullness between meals.",
+        "Night tablet and powder support digestion rhythm.",
+        "Amla supports taste balance when cravings spike.",
+        "Morning OK Liquid helps stabilize post-event hunger.",
+        "Night powder and tablets support lighter digestion.",
+        "Practical reset routine. No crash diet required.",
+        "Morning OK Liquid supports fullness and fewer random bites.",
+        "Night powder and tablets support digestion before sleep.",
+        "Structured Ayurvedic routine with 70,000+ users."
       ],
       "bullets_hi": [
         "सुबह का OK Liquid लंबे समय तक भरा हुआ महसूस कराने में सहायक है।",
@@ -1599,7 +2066,19 @@
         "कोई crash diet नहीं। कोई extreme willpower की ज़रूरत नहीं।",
         "OK Liquid: भूख कम करता है, natural fullness support करता है।",
         "OK Powder + Tablet: पाचन और metabolism support करते हैं।",
-        "Amla: taste balance और पाचन support करता है।"
+        "Amla: taste balance और पाचन support करता है।",
+        "सुबह का OK Liquid अनियमित भूख को संभालने में मदद करता है।",
+        "रात का पाउडर और टैबलेट पाचन को शांत सपोर्ट देते हैं।",
+        "न crash diet, न थकाने वाला workout cycle।",
+        "सुबह का liquid भोजन के बीच लंबे समय तक भरा महसूस कराने में मदद करता है।",
+        "रात का tablet और powder पाचन की लय को सपोर्ट करते हैं।",
+        "cravings बढ़ने पर amla taste balance को सपोर्ट करता है।",
+        "Morning OK Liquid post-event hunger को stabilize करने में मदद करता है।",
+        "Night powder और tablets हल्का digestion support करते हैं।",
+        "Practical reset routine. Crash diet की जरूरत नहीं।",
+        "Morning OK Liquid fullness और random bites कम करने में मदद करता है।",
+        "Night powder और tablets सोने से पहले digestion support करते हैं।",
+        "Structured Ayurvedic routine, 70,000+ users के भरोसे के साथ।"
       ]
     }
   }

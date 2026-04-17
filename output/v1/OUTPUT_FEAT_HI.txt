@@ -37,7 +37,6 @@ EXACT ON-IMAGE COPY — DO NOT ALTER ANYTHING
 - Headline: "किट आपके शरीर को naturally कैसे support करती है।"
 - Support line: "तीन-भागीय आयुर्वेदिक सिस्टम: सुबह, दोपहर, रात।"
 - CTA: "देखें कैसे काम करता है"
-- Disclaimer: "*वजन management के लिए आयुर्वेदिक support। परिणाम routine के साथ अलग होते हैं।"
 - Bullets:
   - "OK Liquid: भूख कम करता है, natural fullness support करता है।"
   - "OK Powder + Tablet: पाचन और metabolism support करते हैं।"

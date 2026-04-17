@@ -37,7 +37,6 @@ EXACT ON-IMAGE COPY — DO NOT ALTER ANYTHING
 - Headline: "\"I was stuck for weeks. Then this happened.\""
 - Support line: "Hunger control in the morning. Digestive support at night."
 - CTA: "Break Through"
-- Disclaimer: "*Results vary. Most users see 3-5 kg loss in 15 days with routine."
 Render every character exactly as written. No paraphrasing, no punctuation changes, no autocorrection.
 
 NEGATIVE CONSTRAINTS

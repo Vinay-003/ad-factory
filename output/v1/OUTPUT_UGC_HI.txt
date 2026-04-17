@@ -37,7 +37,6 @@ EXACT ON-IMAGE COPY — DO NOT ALTER ANYTHING
 - Headline: "मेरे जैसा routine। Simple."
 - Support line: "सुबह shake। रात tablets। हो गया।"
 - CTA: "try करें"
-- Disclaimer: "*परिणाम अलग होते हैं। ज्यादातर यूज़र्स routine के साथ 15 दिन में 3-5 kg loss देखते हैं।"
 Render every character exactly as written. No paraphrasing, no punctuation changes, no autocorrection.
 
 NEGATIVE CONSTRAINTS

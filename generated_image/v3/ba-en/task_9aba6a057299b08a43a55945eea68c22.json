@@ -1,0 +1,17 @@
+{
+  "task_id": "9aba6a057299b08a43a55945eea68c22",
+  "format": "BA",
+  "language": "EN",
+  "variation": 1,
+  "prompt_file": "output/v3/OUTPUT_BA_EN.txt",
+  "result_urls": [
+    "https://tempfile.aiquickdraw.com/images/1776295721634-tvud7896vm8.png"
+  ],
+  "saved_files": [
+    "generated_image/v3/ba-en/ba-en-v01-01.png"
+  ],
+  "state": "success",
+  "create_time": 1776295640665,
+  "complete_time": 1776295722835,
+  "cost_time": 81
+}

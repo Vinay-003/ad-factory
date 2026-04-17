@@ -1,0 +1,66 @@
+## HERO FORMAT - ENGLISH
+
+PRODUCT LOCK BLOCK
+- Use the uploaded Obesity Killer product packshot images as absolute visual truth.
+- Use provided product references as exact appearance truth for pack shape, label, and color.
+- Do not redesign, redraw, relabel, crop out, or alter any product packaging.
+- Preserve all original label text exactly as visible in references.
+- All 5 products must appear with correct relative proportions in every output.
+- Only placement, scaling, subtle drop shadows, and mild lighting correction are allowed.
+
+OUTPUT SPEC
+- Canvas: 1080 x 1350 pixels. Portrait. 4:5 ratio.
+- Style: premium direct-response static ad for paid social.
+- Keep on-image text minimal and mobile-readable at 375px width.
+- Typography must be pin-sharp. If any text appears soft, blurry, or smeared, regenerate.
+- Maintain high contrast and clean hierarchy for ad readability.
+
+FORMAT LAYOUT INSTRUCTIONS
+- Composition: product cluster in center-right; copy in upper-left and lower-left zones.
+- Product zone: keep OK Kit Box largest anchor, other four products proportionally arranged.
+- Background slot: BG-010 - Minimal overhead white.
+- Background prompt: top-down clean white setup with balanced spacing and premium simplicity.
+- Camera: close-medium editorial framing with gentle depth.
+- Lighting: soft warm daylight from top-left with subtle grounded shadows.
+
+PERSONA INPUT BLOCK
+- Persona: 16. Budget-Conscious Result Seeker.
+- Pain: feels weight-loss attempts become expensive and hard to sustain.
+- Desire: visible progress with a practical routine that fits normal spending.
+- Friction: expensive meal plans and complex systems fail in real life.
+- Proof needed: believable 15-day milestone with simple daily use.
+- Tone cue: practical, respectful, value-focused.
+
+EXACT ON-IMAGE COPY - DO NOT ALTER ANYTHING
+- Headline: Real progress should not demand expensive plans.
+- Support line: Ayurvedic hunger and digestion support designed for a practical 15-day start.*
+- CTA: Begin Smart
+- Render every character exactly as written.
+
+NEGATIVE CONSTRAINTS
+- Do not recreate or redraw any product.
+- Do not blur, approximate, or rewrite any label text.
+- Do not show body transformation visuals or exaggerated before/after bodies.
+- Do not add discount bursts, stickers, or clutter overlays.
+- Do not use colors outside the approved warm palette.
+- Do not make cure claims, guaranteed claims, or disease claims.
+
+QUALITY BAR
+- Product fidelity stays exact to uploaded references.
+- All on-image text is crisp and readable on mobile.
+- Layout feels premium, uncluttered, and conversion-ready.
+- Clear focal hierarchy: product first, copy second, background third.
+- If text or labels look soft, reject and regenerate.
+
+VISUAL DIRECTION BLOCK
+- Scene: clean overhead white setup with premium spacing and low-noise background.
+- Subject: no person in frame.
+- Props: none beyond a subtle clean surface.
+- Mood: practical confidence and financial peace-of-mind.
+
+TYPOGRAPHY SHARPNESS BLOCK
+- Headline: Poppins Bold.
+- Support line, bullets, CTA: Poppins Medium/Regular.
+- Keep copy on flat low-noise areas only.
+- Avoid thin fonts, script fonts, glow, outlines, and text shadows.
+- Keep edges crisp with zero blur on characters.

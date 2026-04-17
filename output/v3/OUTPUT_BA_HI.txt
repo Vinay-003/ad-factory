@@ -1,0 +1,76 @@
+PRODUCT LOCK BLOCK
+- Use the uploaded Obesity Killer product packshot images as absolute visual truth.
+- Use provided product references as exact appearance truth for pack shape, label, and color.
+- सभी 5 उत्पाद सही अनुपात में स्पष्ट रूप से दिखने चाहिए।
+- किसी भी पैकेजिंग को दोबारा डिजाइन, रीपेंट, रीलेबल या सरल न करें।
+- अपलोडेड रेफरेंस के अनुसार हर लेबल ज्यों का त्यों रखें।
+- केवल प्लेसमेंट, स्केल, हल्की शैडो और हल्का वार्म लाइट बैलेंस स्वीकार्य है।
+
+OUTPUT SPEC
+- कैनवास: 1080 x 1350 पिक्सेल। पोर्ट्रेट। 4:5 अनुपात।
+- स्टाइल: BA (व्यवहार-आधारित before/after, बिना body-shaming visual के)।
+- ऑन-इमेज टेक्स्ट कम और मोबाइल-पठनीय रखें।
+- Typography must be pin-sharp. If any text appears soft, blurry, or smeared, regenerate.
+- लेआउट साफ और तेज स्कैन करने लायक रहे।
+- सभी दृश्य टेक्स्ट उच्च कॉन्ट्रास्ट में रहें।
+
+FORMAT LAYOUT INSTRUCTIONS
+- फॉर्मेट: BA.
+- बाईं तरफ post-travel drift और दाईं तरफ reset routine control दिखाएं।
+- उत्पाद समूह लोअर सेंटर में दोनों हिस्सों को जोड़ता हुआ रखें।
+- हेडलाइन ऊपर सेंटर में रखें।
+- तीन छोटे बुलेट दाईं तरफ साफ पैनल में रखें।
+- CTA बुलेट के नीचे और डिस्क्लेमर निचले किनारे के पास रखें।
+- कैमरा: मीडियम लाइफस्टाइल-प्रोडक्ट हाइब्रिड फ्रेम।
+- लाइटिंग: बायां हिस्सा थोड़ा मंद, दायां हिस्सा साफ और उजला।
+
+PERSONA INPUT BLOCK
+- Persona: Festive/Travel Weight Regainer.
+- Pain: यात्रा और त्योहार के बाद वजन फिर बढ़ जाता है।
+- Desire: बिना कठोर सज़ा जैसे नियमों के जल्दी रीसेट करना।
+- Friction: सोशल ईटिंग और टूटा हुआ शेड्यूल restart fatigue बढ़ाते हैं।
+- Proof needed: post-event व्यावहारिक रूटीन जो भूख और पाचन दोनों सपोर्ट करे।
+- Tone cue: भरोसेमंद, व्यावहारिक, रीस्टार्ट-केंद्रित।
+
+EXACT ON-IMAGE COPY - DO NOT ALTER ANYTHING
+- Headline: Travel और festivals के बाद हर बार progress reset होना जरूरी नहीं.*
+- Bullet 1: Morning OK Liquid post-event hunger को stabilize करने में मदद करता है।
+- Bullet 2: Night powder और tablets हल्का digestion support करते हैं।
+- Bullet 3: Practical reset routine. Crash diet की जरूरत नहीं।
+- CTA: Smooth Reset करें
+- Render every character exactly as written.
+
+NEGATIVE CONSTRAINTS
+- बहुत नाटकीय बॉडी-साइज़ बदलाव न दिखाएं।
+- नकली स्केल रीडिंग या tape-measure gimmick न जोड़ें।
+- प्रोडक्ट लेबल टेक्स्ट न बदलें।
+- अतिरिक्त सप्लीमेंट या अनअप्रूव्ड सामग्री न जोड़ें।
+- तय पैलेट के बाहर रंग न लाएं।
+- टेक्स्ट ज़ोन को भीड़भाड़ वाला न बनाएं।
+- instant या guaranteed outcome का दावा न करें।
+
+QUALITY BAR
+- सभी उत्पाद रेफरेंस के बिल्कुल अनुरूप रहें।
+- टेक्स्ट तेज, साफ और तुरंत पढ़ने योग्य रहे।
+- before/after का अर्थ व्यवहार बदलाव हो, न कि अतिरंजित ट्रांसफॉर्मेशन।
+- बुलेट छोटे, साफ और संतुलित रहें।
+- हाइरार्की: पहले हेडलाइन, फिर उत्पाद, फिर बुलेट।
+
+VISUAL DIRECTION BLOCK
+- Background slot: BG-006 - Dining table after meal.
+- Scene: वार्म डाइनिंग सेटअप, हल्का लिनेन, साइड में खाली प्लेट और पानी का ग्लास।
+- Subject: पूरा व्यक्ति दिखाना आवश्यक नहीं; स्टाइलिंग से reset संकेत दें।
+- Action: प्रोडक्ट समूह drift से control की ओर बदलाव का एंकर बने।
+- Camera: मीडियम फ्रंट-फेसिंग संरचना।
+- Lighting: वार्म इनडोर एंबियंस + हल्की डायरेक्शनल फिल।
+- Props: केवल न्यूनतम डाइनिंग प्रॉप्स।
+- Surfaces: हल्का लिनेन और न्यूट्रल टेबल टोन।
+- Mood: indulgent phase के बाद व्यावहारिक रीसेट।
+
+TYPOGRAPHY SHARPNESS BLOCK
+- ऑन-इमेज टेक्स्ट के लिए केवल Poppins उपयोग करें।
+- Headline: Poppins Bold.
+- Bullets और CTA: Poppins Medium या Regular.
+- टेक्स्ट केवल फ्लैट, लो-नॉइज़ क्षेत्रों में रखें।
+- ग्लो, आउटलाइन, स्क्रिप्ट फॉन्ट या सॉफ्ट-शैडो टेक्स्ट इफेक्ट न दें।
+- कोई अक्षर धुंधला हो तो आउटपुट अस्वीकार करें।

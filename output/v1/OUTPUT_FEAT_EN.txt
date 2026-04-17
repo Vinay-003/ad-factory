@@ -37,7 +37,6 @@ EXACT ON-IMAGE COPY — DO NOT ALTER ANYTHING
 - Headline: "How the kit supports your body naturally."
 - Support line: "Three-part Ayurvedic system: morning, afternoon, night."
 - CTA: "See How It Works"
-- Disclaimer: "*Ayurvedic support for weight management. Results vary with routine."
 - Bullets:
   - "OK Liquid: reduces hunger, supports natural fullness."
   - "OK Powder + Tablet: supports digestion and metabolism."

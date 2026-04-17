@@ -500,7 +500,7 @@ Section 3 — Format Layout Instructions: minimum 8 bullets
 Section 4 — Persona Input: minimum 5 bullets
 - Include: pain, desire, friction, proof needed, tone cue
 
-Section 5 — Exact On-Image Copy: minimum 4 copy lines
+Section 5 — Exact On-Image Copy: minimum 3 copy lines
 - Include: headline, support or quote line, CTA — render exactly as written, no alterations
 
 Section 6 — Negative Constraints: minimum 8 bullets
@@ -541,7 +541,7 @@ Section 9 — Typography Sharpness Block: minimum 6 bullets
 - Preserve all guardrail lines during rewrites.
 
 ### Language output mode:
-- Always produce two final prompts together:
+- Always generate two final prompts together and save both in the batch folder:
   - English prompt
   - Hindi prompt
 - Keep the same layout instructions in both, only language/copy changes.
@@ -549,6 +549,9 @@ Section 9 — Typography Sharpness Block: minimum 6 bullets
   - English output must be fully English (no Hinglish transliteration).
   - Hindi output must be fully Hindi in Devanagari script.
   - Do not mix scripts in one line unless explicitly requested.
+- Image-generation default rule:
+  - Send only EN prompt to Nano Banana API by default.
+  - Do not submit HI prompt unless user explicitly asks.
 
 ### Text clarity and sharpness rule (mandatory):
 - Prioritize crisp typography over decorative styling.
@@ -608,7 +611,6 @@ EXACT ON-IMAGE COPY — DO NOT ALTER ANYTHING
 - Headline: [exact text]
 - Support line: [exact text]
 - CTA: [exact text]
-- Disclaimer: [exact text]
 Render every character exactly as written. No paraphrasing, no punctuation changes, no autocorrection.
 
 NEGATIVE CONSTRAINTS
@@ -662,6 +664,7 @@ Always produce two final prompts together:
 - Hindi prompt (fully Hindi in Devanagari script — no mixed scripts in one line unless explicitly requested)
 
 Keep the same layout instructions in both. Only the copy block changes language.
+For image generation, submit EN prompt only by default. Submit HI only on explicit request.
 
 ---
 
@@ -669,6 +672,7 @@ Keep the same layout instructions in both. Only the copy block changes language.
 
 Decision policy (mandatory):
 - If user gives no specific inputs in first ad request, generate default starter batch immediately (no clarification round).
+- Single-command behavior: when user says "create ads", run end-to-end in one flow: generate prompts -> save `output/vN/` -> submit API jobs (EN default) -> save images in `generated_image/vN/`.
 - If user gives specific inputs (persona/headline/format), apply them directly.
 - If user gives partial inputs, apply provided values and fill missing values with defaults.
 - Ask follow-up questions only when user intent is conflicting (for example, two different persona instructions for same format).
@@ -702,9 +706,41 @@ Step 4.5 - Text dedupe gate (mandatory)
 - If any text string already exists in index, regenerate that text until unique.
 - Never reuse any previously used text string.
 
-Step 5 — Final output
-- Deliver final Gemini-ready prompts in both EN and HI for selected format(s).
+Step 5 — Final output and storage
+- Deliver final prompts in both EN and HI for selected format(s).
+- Save prompts under `output/vN/` where `N` increments per request (`v1`, `v2`, ...).
+- File naming per format/language/variation:
+  - `OUTPUT_<FORMAT>_EN.txt`
+  - `OUTPUT_<FORMAT>_HI.txt`
+  - For multiple variations: `OUTPUT_<FORMAT>_EN_V2.txt` (and same pattern for HI)
 - State the background slot used and log it to registry (if write mode is ON).
+
+Step 5.5 — Prompt assembly for API
+- For each API job, build one complete prompt only:
+  - Start with `input/startingprompt.txt`
+  - Then append exactly one generated prompt file body
+- Never merge multiple format prompts into one API call.
+
+Step 5.6 — API execution (Nano Banana 2 via Kie)
+- Endpoint: `POST https://api.kie.ai/api/v1/jobs/createTask`
+- Auth: `Authorization: Bearer <KIE_API_KEY>`
+- API key source priority:
+  - First read `KIE_API_KEY` from shell environment.
+  - If not present, load it from `scripts/.env`.
+  - Expected format in `scripts/.env`: `KIE_API_KEY=your_key_here`
+- Model: `nano-banana-2`
+- Images source for API: read URLs from `input/activeimages.txt` (one URL per line, max 14)
+- Keep `input/passiveimage.txt` for fallback inventory only (do not use by default)
+- Default generation settings: `resolution=2K`, `aspect_ratio=4:5`, `output_format=png`
+- Submit one job per prompt file (EN by default).
+- Poll task state via `GET /api/v1/jobs/recordInfo?taskId=...` until `success` or `fail`.
+
+Step 5.7 — Generated image storage
+- Save results in `generated_image/vN/<format>-<language>/`
+- Examples:
+  - `generated_image/v1/feat-en/`
+  - `generated_image/v2/hero-en/`
+- Keep task metadata JSON in same folder for traceability (`task_<taskId>.json`).
 
 Step 6 - Registry write (mandatory in production)
 - Append full entry to `entries`.
@@ -866,7 +902,7 @@ Follow these rules strictly:
 - Keep language simple, active, specific, and short.
 - Reject generic templates; prioritize clear hierarchy and premium composition.
 - Default production output: 1 variation per format.
-- Always provide English + Hindi versions of final prompts.
+- Always provide English + Hindi versions of final prompts and save them in `output/vN/`.
 - Never rely on fixed headline banks; generate fresh headlines each request.
 - Keep typography pin-sharp; regenerate if any on-image text is blurry.
 - Use Poppins font family for all on-image text (Headline: Poppins Bold; body/support/CTA: Poppins Medium or Regular).
@@ -891,9 +927,10 @@ When I ask for ad creation, follow this sequence: ask persona number -> ask head
 4. Start with: "Create ad."
 5. Follow the interaction flow: persona -> headline mode -> format(s) -> background slot confirmation -> final prompts.
 6. On headline step: receive 5 fresh options (EN + HI). Pick one.
-7. Copy the final English/Hindi Gemini prompt. Run in Gemini Web with images already uploaded.
-8. Use repair commands (Section 16) if quality fails.
-9. When write mode is turned ON: log each generation to registry using the schema in Section 10.
+7. Save generated prompts in `output/vN/` and run API jobs (EN by default) using links from `input/activeimages.txt`.
+8. Store generated images in `generated_image/vN/<format>-en/` (or `-hi` only when requested).
+9. Use repair commands (Section 16) if quality fails.
+10. When write mode is turned ON: log each generation to registry using the schema in Section 10.
 
 How to avoid repetition at scale:
 - Never reuse old text directly (headline, support line, CTA, caption, bullets).

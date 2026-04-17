@@ -1,0 +1,74 @@
+PRODUCT LOCK BLOCK
+- Use the uploaded Obesity Killer product packshot images as absolute visual truth.
+- Use provided product references as exact appearance truth for pack shape, label, and color.
+- सभी 5 उत्पाद सही अनुपात और स्पष्टता के साथ दिखें।
+- किसी भी उत्पाद को दोबारा डिजाइन, रीलेबल, क्रॉप या स्टाइलाइज़ न करें।
+- लेबल टेक्स्ट को मूल रूप में ज्यों का त्यों रखें।
+- केवल प्लेसमेंट, स्केल, हल्की शैडो और हल्का वार्म लाइट करेक्शन स्वीकार्य है।
+
+OUTPUT SPEC
+- कैनवास: 1080 x 1350 पिक्सेल। पोर्ट्रेट। 4:5 अनुपात।
+- स्टाइल: FEAT (features और mechanism clarity)।
+- कॉपी छोटी, स्पष्ट और मोबाइल-पठनीय रखें।
+- Typography must be pin-sharp. If any text appears soft, blurry, or smeared, regenerate.
+- सभी दृश्य टेक्स्ट उच्च-कॉन्ट्रास्ट में रहें।
+- प्रोडक्ट fidelity पूरी तरह सटीक रहे।
+
+FORMAT LAYOUT INSTRUCTIONS
+- फॉर्मेट: FEAT.
+- साफ सूचना हाइरार्की रखें: ऊपर-बाएं हेडलाइन, बीच-बाएं 3 फीचर बुलेट, नीचे-बाएं CTA।
+- प्रोडक्ट समूह सेंटर-राइट रहे और kit box मुख्य एंकर बने।
+- स्पेसिंग खुली और ग्रिड-आधारित रखें।
+- लंबे पैराग्राफ न रखें; छोटे कार्यात्मक बुलेट रखें।
+- कैमरा: मीडियम एडिटोरियल प्रोडक्ट-क्लैरिटी फ्रेम।
+- लाइटिंग: न्यूट्रल-वार्म, साफ और भरोसेमंद।
+
+PERSONA INPUT BLOCK
+- Persona: Digestion-Issue + Weight Combo Seeker.
+- Pain: bloating और digestive discomfort से वजन प्रगति अस्थिर लगती है।
+- Desire: पेट हल्का महसूस हो और खाने की दिनचर्या स्थिर रहे।
+- Friction: सामान्य weight plans gut discomfort को नज़रअंदाज़ करते हैं।
+- Proof needed: सुबह और रात सपोर्ट की स्पष्ट भूमिका।
+- Tone cue: सहानुभूतिपूर्ण, समझाने वाला, व्यावहारिक।
+
+EXACT ON-IMAGE COPY - DO NOT ALTER ANYTHING
+- Headline: Weight issue के साथ bloating? दोनों के लिए structured support चुनें।
+- Bullet 1: Morning OK Liquid fullness और random bites कम करने में मदद करता है।
+- Bullet 2: Night powder और tablets सोने से पहले digestion support करते हैं।
+- Bullet 3: Structured Ayurvedic routine, 70,000+ users के भरोसे के साथ।
+- CTA: Routine समझें
+- Render every character exactly as written.
+
+NEGATIVE CONSTRAINTS
+- किसी रोग-उपचार का दावा न करें।
+- instant fat burn या metabolism boost जैसे शॉर्टकट दावे न करें।
+- प्रोडक्ट लेबल में कोई बदलाव न करें।
+- अतिरिक्त flashy icons, badges या clutter graphics न जोड़ें।
+- तय पैलेट के बाहर रंग न लाएं।
+- दो से अधिक फॉन्ट वेट न रखें।
+
+QUALITY BAR
+- फीचर बुलेट छोटे, ठोस और पठनीय रहें।
+- मैकेनिज्म केवल अनुमोदित hunger/craving/digestion logic तक सीमित रहे।
+- प्रोडक्ट विजुअल पूरी तरह रेफरेंस जैसा रहे।
+- लेआउट प्रीमियम और uncluttered रहे।
+- टेक्स्ट या लेबल सॉफ्ट दिखें तो पुनर्जनन करें।
+
+VISUAL DIRECTION BLOCK
+- Background slot: BG-017 - Wooden tray flatlay.
+- Scene: वार्म लकड़ी की ट्रे, उत्पादों के बीच साफ स्पेसिंग, न्यूनतम स्टाइलिंग प्रॉप्स।
+- Subject: फ्रेम में कोई व्यक्ति नहीं।
+- Action: प्रोडक्ट व्यवस्था से फीचर कॉलआउट स्पष्ट दिखें।
+- Camera: हल्का ऊंचा मीडियम फ्रेम।
+- Lighting: सॉफ्ट वार्म डे-लाइट, नियंत्रित कॉन्ट्रास्ट।
+- Props: केवल न्यूनतम न्यूट्रल प्रॉप्स।
+- Surfaces: साफ वार्म लकड़ी, लो विजुअल नॉइज़।
+- Mood: स्पष्ट, भरोसेमंद, mechanism-first प्रस्तुति।
+
+TYPOGRAPHY SHARPNESS BLOCK
+- ऑन-इमेज टेक्स्ट के लिए केवल Poppins उपयोग करें।
+- Headline: Poppins Bold.
+- Bullets और CTA: Poppins Medium या Regular.
+- टेक्स्ट को फ्लैट नेगेटिव-स्पेस क्षेत्रों में रखें।
+- ग्लो, आउटलाइन, स्क्रिप्ट फॉन्ट या टेक्स्ट ड्रॉप-शैडो न दें।
+- कोई अक्षर धुंधला हो तो आउटपुट अस्वीकार करें।

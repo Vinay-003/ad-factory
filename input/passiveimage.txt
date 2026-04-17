@@ -1,0 +1,2 @@
+# Keep passive or backup image URLs here (one per line).
+# This file is not used by default generation flow.

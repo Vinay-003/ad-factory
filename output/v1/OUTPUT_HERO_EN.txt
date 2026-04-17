@@ -34,10 +34,9 @@ PERSONA INPUT BLOCK
 - Tone cue: Hopeful but cautious — needs to believe this time is different.
 
 EXACT ON-IMAGE COPY — DO NOT ALTER ANYTHING
-- Headline: "Tried every diet? This one works without the struggle."*
-- Support line: "Ayurvedic kit that reduces hunger and supports digestion.*"
+- Headline: "Tried every diet? This one works without the struggle."
+- Support line: "Ayurvedic kit that reduces hunger and supports digestion."
 - CTA: "Start Fresh"
-- Disclaimer: "*Results vary. Most users see 3-5 kg loss in 15 days with routine."
 Render every character exactly as written. No paraphrasing, no punctuation changes, no autocorrection.
 
 NEGATIVE CONSTRAINTS
