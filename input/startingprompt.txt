@@ -99,9 +99,9 @@ OBESITY KILLER KIT — COMPLETE AD GENERATION PROMPT
 
       A8. TYPOGRAPHY — AD COPY      
 
-      Font: Modern geometric sans-serif — DM Sans, Inter, or equivalent clean typeface      
+      Font: Poppins only (clean sans, consistent across the entire creative).      
 
-      Maximum 2 weights: Regular and Bold only      
+      Maximum 2 weights: Regular and Bold only (avoid thin/light weights).      
 
       Headline size: Large and mobile-legible      
 
@@ -117,7 +117,7 @@ OBESITY KILLER KIT — COMPLETE AD GENERATION PROMPT
 
       CTA: Subtle and clear — example: "Explore the Kit"      
 
-      Avoid: Hype, exclamation spam, before/after references, unrealistic claims, salesy or cheap language      
+      Avoid: Hype, exclamation spam, body-transformation before/after imagery, unrealistic claims, salesy or cheap language      
 
       A10. MASTER FORBIDDEN LIST      
 
@@ -159,7 +159,4 @@ OBESITY KILLER KIT — COMPLETE AD GENERATION PROMPT
 
       If any single item above fails — regenerate immediately without compromise.      
 
-     use the images that i send u earlier for product image references      
-
-
- Use the uploaded Obesity Killer product packshot images as absolute visual truth.
+     Use the uploaded Obesity Killer product packshot images as absolute visual truth.      

@@ -1,0 +1,18 @@
+{
+  "task_id": "acf49a1f9464cdce3dae7eae3d250f84",
+  "format": "FEAT",
+  "language": "EN",
+  "variation": 1,
+  "prompt_file": "output/v7/OUTPUT_FEAT_EN.txt",
+  "result_urls": [
+    "https://tempfile.aiquickdraw.com/images/1776485666537-04c7gwi07zg8.png"
+  ],
+  "saved_files": [
+    "generated_image/v7/feat-en/feat-en-v01-01.png"
+  ],
+  "state": "success",
+  "create_time": 1776485564161,
+  "complete_time": 1776485668038,
+  "cost_time": 104,
+  "composed_prompt_file": "generated_image/v7/feat-en/prompt_task_acf49a1f9464cdce3dae7eae3d250f84.txt"
+}

@@ -701,6 +701,16 @@ Step 4 — Background slot selection
 - User may override by requesting a specific slot number.
 - For catalog selection, read/update `indexes.slot_exhaustion_tracker.<FORMAT>` (used/remaining/cycle_number).
 
+Step 4.25 — Safe-zone enforcement (mandatory)
+- Every background must be treated as a *safe-zone controlled* scene: keep key subject and all important copy away from edge risk bands.
+- Use the structured background catalog in `background_variant.json` (not `BACKGROUND_VARIANTS.JSON`) because it includes safe-zone control fields:
+  - `composition`, `layout_intent`, `cta_safe_space`, `crop_safety`
+- When you pick a background slot `BG-XXX`, generate a *seeded* background prompt so the safe-zone phrasing is deterministic per batch.
+  - Use: `python3 scripts/upgrade_safezone_backgrounds.py --prompt-only --id BG-XXX --format 4:5 --seed <SEED>`
+  - Paste the resulting sentence into Section 8 (VISUAL DIRECTION BLOCK) and keep the selected `BG-XXX`.
+  - Store `<SEED>` in the registry notes (or a dedicated field if you add one) so the same safe-zone background prompt can be reproduced later.
+- Never “fix safe-zones after the fact” by rewriting the prompt mid-run; safe-zone rules must be present in the prompt *before* the API call.
+
 Step 4.5 - Text dedupe gate (mandatory)
 - Before finalizing output text, check registry `indexes.used_text` for headline/support/CTA/caption/bullets in both EN and HI.
 - If any text string already exists in index, regenerate that text until unique.
@@ -720,6 +730,7 @@ Step 5.5 — Prompt assembly for API
   - Start with `input/startingprompt.txt`
   - Then append exactly one generated prompt file body
 - Never merge multiple format prompts into one API call.
+- Traceability: save the *composed* prompt (startingprompt + generated prompt) under `generated_image/vN/<format>-<language>/prompt_task_<taskId>.txt`.
 
 Step 5.6 — API execution (Nano Banana 2 via Kie)
 - Endpoint: `POST https://api.kie.ai/api/v1/jobs/createTask`
@@ -741,6 +752,7 @@ Step 5.7 — Generated image storage
   - `generated_image/v1/feat-en/`
   - `generated_image/v2/hero-en/`
 - Keep task metadata JSON in same folder for traceability (`task_<taskId>.json`).
+- Also keep the composed prompt file in the same folder (`prompt_task_<taskId>.txt`).
 
 Step 6 - Registry write (mandatory in production)
 - Append full entry to `entries`.

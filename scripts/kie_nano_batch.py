@@ -299,6 +299,10 @@ def write_json(path: Path, payload: dict) -> None:
     path.write_text(json.dumps(payload, ensure_ascii=False, indent=2) + "\n", encoding="utf-8")
 
 
+def write_text(path: Path, text: str) -> None:
+    path.write_text(text, encoding="utf-8")
+
+
 def iter_grouped(items: Iterable[PromptFile]) -> dict[tuple[str, str], list[PromptFile]]:
     grouped: dict[tuple[str, str], list[PromptFile]] = {}
     for item in items:
@@ -402,6 +406,9 @@ def main() -> int:
             )
             print(f"[{ad_format}-{language}] variation {prompt_file.variation}: submitted task {task_id}")
 
+            composed_prompt_path = format_dir / f"prompt_task_{task_id}.txt"
+            write_text(composed_prompt_path, complete_prompt)
+
             task_data = wait_for_task(
                 api_key=args.api_key,
                 task_id=task_id,
@@ -424,6 +431,7 @@ def main() -> int:
                 "language": language,
                 "variation": prompt_file.variation,
                 "prompt_file": str(prompt_file.path.relative_to(root)),
+                "composed_prompt_file": str(composed_prompt_path.relative_to(root)),
                 "result_urls": result_urls,
                 "saved_files": saved_files,
                 "state": task_data.get("state"),

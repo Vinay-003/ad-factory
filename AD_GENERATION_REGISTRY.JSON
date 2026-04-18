@@ -741,6 +741,41 @@
       "language": "EN",
       "output_quality": "approved",
       "notes": "Persona 7 HERO ad - v6 EN image generated successfully (task 79a5f7c89d5e4867fc99f7b51012cf92)."
+    },
+    {
+      "id": "entry_024",
+      "timestamp": "2026-04-18T04:15:26Z",
+      "format": "FEAT",
+      "persona_number": 7,
+      "persona_name": "Post-Failure Re-starter",
+      "headline_angle": "mechanism",
+      "headline_en": "Restart fatigue is real. Choose a first step you can repeat.*",
+      "headline_hi": "रीस्टार्ट थकान असली है। ऐसा पहला कदम चुनें जो दोहराया जा सके।*",
+      "support_line_en": "Morning OK Liquid supports hunger control and fewer random bites.*",
+      "support_line_hi": "सुबह ओके लिक्विड भूख नियंत्रण में मदद करता है, ताकि बेवजह खाने की आदत कम हो।*",
+      "cta_en": "Start Again, Simply",
+      "cta_hi": "फिर से, सरल शुरुआत",
+      "disclaimer_en": "",
+      "disclaimer_hi": "",
+      "caption_en": "Feature-first breakdown for post-failure re-starters: a morning hunger-control anchor, night digestion support, and a repeatable 15-day routine to rebuild confidence.",
+      "caption_hi": "पोस्ट-फेल्योर री-स्टार्टर्स के लिए फीचर-फर्स्ट ब्रेकडाउन: सुबह का भूख-नियंत्रण एंकर, रात का पाचन सपोर्ट, और कॉन्फिडेंस वापस लाने के लिए दोहराने योग्य 15-दिन का रूटीन।",
+      "bullets_en": [
+        "Morning OK Liquid supports hunger control and fewer random bites.*",
+        "Night powder + tablets support digestion before sleep.*",
+        "Repeatable 15-day Ayurvedic routine, trusted by 70,000+ users.*"
+      ],
+      "bullets_hi": [
+        "सुबह ओके लिक्विड भूख नियंत्रण में मदद करता है, ताकि बेवजह खाने की आदत कम हो।*",
+        "रात ओके पाउडर + टैबलेट्स सोने से पहले पाचन सहयोग देते हैं।*",
+        "दोहराने योग्य 15-दिन का आयुर्वेदिक रूटीन, 70,000+ यूज़र्स का भरोसा।*"
+      ],
+      "background_slot": "BG-001",
+      "background_name": "Warm studio cream",
+      "background_source": "catalog",
+      "fresh_background_signature": null,
+      "language": "BOTH",
+      "output_quality": "approved",
+      "notes": "Persona 7 FEAT ad - v7 EN image generated successfully (task acf49a1f9464cdce3dae7eae3d250f84)."
     }
   ],
   "indexes": {
@@ -864,6 +899,12 @@
           "entry_id": "entry_019",
           "timestamp": "2026-04-15T23:27:12Z",
           "background_slot": "BG-017",
+          "background_source": "catalog"
+        },
+        {
+          "entry_id": "entry_024",
+          "timestamp": "2026-04-18T04:15:26Z",
+          "background_slot": "BG-001",
           "background_source": "catalog"
         }
       ],
@@ -2110,10 +2151,10 @@
           "BG-015",
           "BG-004",
           "BG-010",
-          "BG-017"
+          "BG-017",
+          "BG-001"
         ],
         "remaining_slots_current_cycle": [
-          "BG-001",
           "BG-004",
           "BG-007",
           "BG-012",
@@ -2974,7 +3015,8 @@
         "Weight concern plus bloating? Use a routine that supports both.",
         "No time for perfect routines? Keep one that survives real life.",
         "Trips and festivals should not undo your progress so easily.",
-        "Lost count of restarts? Build a plan you can repeat after a bad weekend.*"
+        "Lost count of restarts? Build a plan you can repeat after a bad weekend.*",
+        "Restart fatigue is real. Choose a first step you can repeat.*"
       ],
       "headline_hi": [
         "वजन घटाना शुरू हो सकता है, बिना मुश्किल प्लान के।",
@@ -2998,7 +3040,8 @@
         "Weight issue के साथ bloating? दोनों के लिए structured support चुनें।",
         "Perfect routine का time नहीं? Real life में चलने वाला routine रखें।",
         "यात्रा और त्योहारों में आपकी प्रगति इतनी आसानी से बिगड़नी नहीं चाहिए।",
-        "कितनी बार फिर से शुरू करेंगे? खराब वीकेंड के बाद भी चलने वाली योजना चुनें।*"
+        "कितनी बार फिर से शुरू करेंगे? खराब वीकेंड के बाद भी चलने वाली योजना चुनें।*",
+        "रीस्टार्ट थकान असली है। ऐसा पहला कदम चुनें जो दोहराया जा सके।*"
       ],
       "support_line_en": [
         "Ayurvedic hunger and digestion support for a lighter 15-day start.*",
@@ -3022,7 +3065,8 @@
         "Morning OK Liquid supports fullness and fewer random bites.",
         "Simple morning-plus-night support for steadier eating control.*",
         "Get a practical reset without crash diets or extreme restrictions.",
-        "Morning satiety plus night digestion support helps you continue without all-or-nothing pressure.*"
+        "Morning satiety plus night digestion support helps you continue without all-or-nothing pressure.*",
+        "Morning OK Liquid supports hunger control and fewer random bites.*"
       ],
       "support_line_hi": [
         "आयुर्वेदिक सपोर्ट जो भूख और पाचन को संभालकर 15 दिन की हल्की शुरुआत दे।*",
@@ -3046,7 +3090,8 @@
         "Morning OK Liquid fullness और random bites कम करने में मदद करता है।",
         "सुबह+रात का simple support, ताकि eating control steady रहे.*",
         "बिना crash diet या कठोर प्रतिबंधों के, एक व्यावहारिक reset पाएं।",
-        "सुबह तृप्ति और रात पाचन सहयोग से निरंतरता रखें, बिना सब-कुछ-या-कुछ-नहीं दबाव के।*"
+        "सुबह तृप्ति और रात पाचन सहयोग से निरंतरता रखें, बिना सब-कुछ-या-कुछ-नहीं दबाव के।*",
+        "सुबह ओके लिक्विड भूख नियंत्रण में मदद करता है, ताकि बेवजह खाने की आदत कम हो।*"
       ],
       "cta_en": [
         "Start Simple",
@@ -3070,7 +3115,8 @@
         "Understand The Routine",
         "Try This Routine",
         "Start Your Reset",
-        "Restart With Confidence"
+        "Restart With Confidence",
+        "Start Again, Simply"
       ],
       "cta_hi": [
         "आसान शुरुआत करें",
@@ -3094,9 +3140,11 @@
         "Routine समझें",
         "यह routine आजमाएं",
         "अपना Reset शुरू करें",
-        "विश्वास के साथ शुरू करें"
+        "विश्वास के साथ शुरू करें",
+        "फिर से, सरल शुरुआत"
       ],
       "disclaimer_en": [
+        "",
         "",
         "",
         "",
@@ -3104,6 +3152,7 @@
         ""
       ],
       "disclaimer_hi": [
+        "",
         "",
         "",
         "",
@@ -3131,7 +3180,8 @@
         "This proof-led testimonial style focuses on practical mechanism clarity and user trust for people stuck in plateau phases.",
         "Feature-first breakdown: morning fullness support, nighttime digestion support, and a structured Ayurvedic flow designed for gut-comfort plus consistency.",
         "Creator-style message for overloaded parents: a low-planning daily structure that supports steadier appetite control and easier continuation after chaotic days.",
-        "For post-failure re-starters, this routine gives one clear morning anchor and night digestion support so one slip does not become another full quit."
+        "For post-failure re-starters, this routine gives one clear morning anchor and night digestion support so one slip does not become another full quit.",
+        "Feature-first breakdown for post-failure re-starters: a morning hunger-control anchor, night digestion support, and a repeatable 15-day routine to rebuild confidence."
       ],
       "caption_hi": [
         "एक आसान आयुर्वेदिक रूटीन से शुरुआत करें जो भूख को संभालने, पाचन को सपोर्ट करने और बिना crash diet के 15 दिन की दिखने वाली प्रगति की दिशा में मदद करे।",
@@ -3154,7 +3204,8 @@
         "यह proof-led testimonial शैली plateau phase में अटके लोगों के लिए practical mechanism clarity और user trust पर केंद्रित है।",
         "feature-first breakdown: सुबह fullness support, रात digestion support, और gut comfort के साथ consistency के लिए structured Ayurvedic flow।",
         "overloaded parents के लिए creator-style संदेश: कम planning वाला daily structure जो appetite control और chaotic दिनों के बाद continuation आसान बनाता है।",
-        "बार-बार असफल होकर फिर शुरू करने वालों के लिए यह रूटीन सुबह का एक स्पष्ट पहला कदम और रात का पाचन सहयोग देता है, ताकि एक चूक फिर से पूरा छोड़ने में न बदले।"
+        "बार-बार असफल होकर फिर शुरू करने वालों के लिए यह रूटीन सुबह का एक स्पष्ट पहला कदम और रात का पाचन सहयोग देता है, ताकि एक चूक फिर से पूरा छोड़ने में न बदले।",
+        "पोस्ट-फेल्योर री-स्टार्टर्स के लिए फीचर-फर्स्ट ब्रेकडाउन: सुबह का भूख-नियंत्रण एंकर, रात का पाचन सपोर्ट, और कॉन्फिडेंस वापस लाने के लिए दोहराने योग्य 15-दिन का रूटीन।"
       ],
       "bullets_en": [
         "Morning OK Liquid supports fullness for longer.",
@@ -3180,7 +3231,10 @@
         "Practical reset routine. No crash diet required.",
         "Morning OK Liquid supports fullness and fewer random bites.",
         "Night powder and tablets support digestion before sleep.",
-        "Structured Ayurvedic routine with 70,000+ users."
+        "Structured Ayurvedic routine with 70,000+ users.",
+        "Morning OK Liquid supports hunger control and fewer random bites.*",
+        "Night powder + tablets support digestion before sleep.*",
+        "Repeatable 15-day Ayurvedic routine, trusted by 70,000+ users.*"
       ],
       "bullets_hi": [
         "सुबह का OK Liquid लंबे समय तक भरा हुआ महसूस कराने में सहायक है।",
@@ -3206,7 +3260,10 @@
         "Practical reset routine. Crash diet की जरूरत नहीं।",
         "Morning OK Liquid fullness और random bites कम करने में मदद करता है।",
         "Night powder और tablets सोने से पहले digestion support करते हैं।",
-        "Structured Ayurvedic routine, 70,000+ users के भरोसे के साथ।"
+        "Structured Ayurvedic routine, 70,000+ users के भरोसे के साथ।",
+        "सुबह ओके लिक्विड भूख नियंत्रण में मदद करता है, ताकि बेवजह खाने की आदत कम हो।*",
+        "रात ओके पाउडर + टैबलेट्स सोने से पहले पाचन सहयोग देते हैं।*",
+        "दोहराने योग्य 15-दिन का आयुर्वेदिक रूटीन, 70,000+ यूज़र्स का भरोसा।*"
       ]
     }
   }
