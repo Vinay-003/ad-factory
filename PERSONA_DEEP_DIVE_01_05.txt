@@ -4,8 +4,8 @@ Coverage: Personas 1-22 from the playbook persona system
 PURPOSE
 - This file is the bridge between persona labels and final ad copy.
 - It uses a 3-layer system so one persona can be converted into English, Hindi, and Hinglish ads without losing emotional truth.
-- All mechanism logic in this file must come from `info/PRODUCT_MECHANISM_V1.txt`.
-- If product behavior changes later, update `info/PRODUCT_MECHANISM_V1.txt` first, then update this file.
+- All mechanism logic in this file must come from `PRODUCT_MECHANISM_V1.txt`.
+- If product behavior changes later, update `PRODUCT_MECHANISM_V1.txt` first, then update this file.
 
 3-LAYER SYSTEM
 

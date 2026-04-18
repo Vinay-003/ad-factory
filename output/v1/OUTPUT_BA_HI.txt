@@ -1,86 +1,94 @@
-## BA FORMAT - HINDI
-
-PRODUCT LOCK BLOCK
+Section 1 — PRODUCT LOCK BLOCK
 - Use the uploaded Obesity Killer product packshot images as absolute visual truth.
 - Do not redesign, redraw, relabel, or alter any product or packaging in any way.
 - Do not change brand name, label colors, illustrations, proportions, or any text (Hindi or English).
 - If any label text is unclear — preserve the original image as-is. Do not reinterpret it.
 - Only permitted: placement, scaling, subtle drop shadows, mild warm lighting correction.
+- All 5 products must appear in every output with exact dimensions from reference.
 
-OUTPUT SPEC
+Section 2 — OUTPUT SPEC
 - Canvas: 1080 x 1350 pixels. Portrait. 4:5 ratio.
-- Style: BA (Before/After journey style) — polished enough for paid ad deployment.
+- Style: BA (Before/After journey) — polished enough for paid ad deployment.
 - Text policy: Low-text by default. All copy minimal and mobile-readable at 375px width.
 - Rendering: No compression artifacts. No soft edges on text or product label.
 - All 5 products present, proportionally sized per reference dimensions, unmodified.
 - Readability: maintain high-contrast foreground/background treatment for ad-platform legibility.
 
-FORMAT LAYOUT INSTRUCTIONS
-- Composition: Product zone center, journey narrative in text zones.
+Section 3 — FORMAT LAYOUT INSTRUCTIONS
+- Composition: Product centered, with visual narrative of transformation implied through simple clean layout.
 - Focal hierarchy: product dominant, text secondary, background tertiary.
-- Product zone: center for anchor.
-- Text zones: flat uncluttered areas only — never over busy background detail.
-- Background: BG-005 Yoga ritual mat — natural mat scene, small wooden tray, calm daylight, minimal props.
-- Camera: medium, product with journey context framing.
-- Lighting: warm soft natural daylight. Subtle drop shadows beneath products.
-- Spacing: strong whitespace between zones. Grid-based alignment.
+- Product zone: center — vertically centered.
+- Text zones: flat uncluttered areas — upper headline area and lower bullet/CTA zone.
+- Background: pale oak counter, clean tile wall.
+- Camera: slightly elevated medium shot, balanced depth layering.
+- Lighting: gentle window daylight from the side with clean diffusion.
+- Spacing: strong whitespace between zones.
 
-PERSONA INPUT BLOCK
-- Persona: 1. Craving-Control Struggler
-- Pain: Struggles with constant food cravings, especially in the evening. Often eats without true hunger.
-- Desire: To feel in control of what and when they eat, without feeling deprived.
-- Friction: Past efforts to control eating led to binge eating or total loss of control. Feels powerless around food.
-- Proof needed: Evidence that the product reduces cravings without extreme willpower, real user stories.
-- Tone cue: Empathetic, understanding — acknowledges the struggle is real.
+Section 4 — PERSONA INPUT BLOCK
+- Persona: Plateau Victim (Persona 4)
+- Pain: Weight stopped dropping despite continued effort, feels stuck and defeated.
+- Desire: Get the scale moving again, see meaningful progress.
+- Friction: Tried everything, nothing breaks through the plateau.
+- Proof needed: concrete results, breaks through stuck weight.
+- Tone cue: encouraging, direct, results-focused.
 
-EXACT ON-IMAGE COPY — DO NOT ALTER ANYTHING
-- Headline: "cravings से लड़ना to control में आना."
-- Support line: "सुबह का liquid fullness support करता है। रात के tablets पाचन support करते हैं।"
-- CTA: "बदलाव देखें"
+Section 5 — EXACT ON-IMAGE COPY — DO NOT ALTER ANYTHING
+- Headline: Same weight पर अटक गए? Plateau तोड़ें।
+- Support line: एक natural system जो आपके body के साथ काम करता है।
+- CTA: शुरू करें
 - Bullets:
-  - "15 दिन के course में hunger spikes कम हो जाते हैं।"
-  - "शाम की cravings manageable हो जाती हैं।"
-  - "कोई crash diet नहीं। कोई extreme willpower की ज़रूरत नहीं।"
-Render every character exactly as written. No paraphrasing, no punctuation changes, no autocorrection.
+  • बार-बार लगने वाली भूख को control करता है
+  • digestion support करता है
+  • 15 दिन में औसतन 3-5 kg
+Render every character exactly as written. No paraphrasing, no punctuation changes.
 
-NEGATIVE CONSTRAINTS
-- Do not recreate or redraw any product
-- Do not blur, approximate, or rewrite any label text
-- Do not use sale badges, burst graphics, or stickers
-- Do not show body transformations or weight-loss visuals
-- Do not use colors outside the defined palette
-- Do not use more than 2 font weights
-- Do not overcrowd the layout
-- Do not make medical cure claims of any kind
-- Do not render unnatural or anatomically incorrect hands
-- Do not use ring light, studio flash, or overproduced lighting
+Section 6 — NEGATIVE CONSTRAINTS
+- Do not recreate or redraw any product.
+- Do not blur, approximate, or rewrite any label text.
+- Do not use sale badges, burst graphics, or stickers.
+- Do not show body transformations or weight-loss visuals.
+- Do not use colors outside the defined palette (#FFFBED to #FCDBAC background, #F79040 to #E66410 accents).
+- Do not use more than 2 font weights.
+- Do not overcrowd the layout.
+- Do not make medical cure claims of any kind.
+- Do not use ring light, studio flash, or overproduced lighting.
 
-QUALITY BAR — verify before accepting output:
-- All 5 products present, correctly proportioned, completely unmodified
-- All on-image text sharp and readable at 375px mobile size
-- Product label accurate, unmodified, and fully readable
-- Layout is calm, balanced, and premium
-- No clutter, no hype, no forbidden elements
-- Single clear focal hierarchy — product dominant throughout
-- If any item above fails — regenerate immediately without compromise
+Section 7 — QUALITY BAR — verify before accepting output:
+- All 5 products present, correctly proportioned, completely unmodified.
+- All on-image text sharp and readable at 375px mobile size.
+- Product label accurate, unmodified, and fully readable.
+- Layout is calm, balanced, and premium.
+- No clutter, no hype, no forbidden elements.
+- Single clear focal hierarchy — product dominant throughout.
+- If any item above fails — regenerate immediately without compromise.
 
-VISUAL DIRECTION BLOCK
-- Background slot: BG-005 — Yoga ritual mat
-- Scene: Natural yoga mat with small wooden tray. Soft natural daylight from window. Calm, intentional morning ritual mood.
-- Subject: No human subject — product-focused BA creative
-- Action: Products neatly arranged on wooden tray on the mat
-- Camera: medium, product with journey context framing
-- Lighting: warm soft natural daylight from window
-- Props: Small wooden tray, folded yoga block or small plant nearby
-- Surfaces: natural yoga mat texture, light wood tray
-- Mood: Intentional, calm, transformation journey beginning
-- Realism: Natural product rendering, no artificial lighting artifacts
+Section 8 — VISUAL DIRECTION BLOCK
+- Background slot: BG-002
+- Seed: 2012
+- Scene: Pale oak counter, clean tile wall on a smooth concrete-style base with clean tonal variation and modern premium feel, with soft foreground-to-background depth transition preserving premium focus hierarchy, lit by gentle window daylight from the side with clean diffusion and balanced fill, conveying clean domestic wellness rhythm.
+- Subject: no human subject — product-only composition.
+- Action: products arranged on surface.
+- Camera: slightly elevated medium shot, balanced depth layering, gentle blur in rear context.
+- Lighting: gentle window daylight from the side with clean diffusion and balanced fill.
+- Props: none — minimal.
+- Surfaces: smooth concrete-style base, pale oak counter.
+- Mood: clean domestic wellness rhythm.
+- Realism: correct product proportions, clean commercial finish.
+- Composition: symmetrical commercial framing with stable side spacing and restrained detail near top and bottom limits.
+- Layout intent: prioritize central hierarchy and avoid any composition that relies on top, bottom, or side edge information.
+- CTA safe space: avoid placing focal edges or high-frequency texture near the bottom risk band.
+- Crop safety: keep focal hierarchy compact and central so multi-placement crops preserve premium readability.
 
-TYPOGRAPHY SHARPNESS BLOCK
-- Headline: Poppins Bold — high contrast against background zone
-- Support and CTA: Poppins Medium/Regular — same typeface family
-- Size: large enough to read on 375px mobile screen without zooming
-- Placement: flat uncluttered zones only — never over busy background detail
-- Forbidden: thin fonts, script fonts, decorative typefaces, glow effects, outlined text, drop shadows on copy
-- Mandatory: crisp hard text edges — zero softness — zero anti-alias blur on any character
-- If any text is soft, blurry, or illegible — discard and regenerate immediately
+Section 9 — TYPOGRAPHY SHARPNESS BLOCK
+- Headline: Poppins Bold — high contrast against background zone.
+- Support and CTA: Poppins Medium/Regular — same typeface family.
+- Size: large enough to read on 375px mobile screen without zooming.
+- Placement: flat uncluttered zones only — never over busy background detail.
+- Forbidden: thin fonts, script fonts, decorative typefaces, glow effects, outlined text, drop shadows on copy.
+- Mandatory: crisp hard text edges — zero softness — zero anti-alias blur on any character.
+- If any text is soft, blurry, or illegible — discard and regenerate immediately.
+
+Keep text count minimal and increase font size rather than packing more copy.
+Typography must be pin-sharp. If any text appears soft, blurry, or smeared, regenerate.
+Use clean sans typography with strong stroke clarity; no thin/light weights for body text.
+Use Poppins only for on-image text: Headline in Poppins Bold, support/CTA in Poppins Medium or Regular.

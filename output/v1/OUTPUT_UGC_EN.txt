@@ -1,13 +1,12 @@
-## UGC FORMAT - ENGLISH
-
-PRODUCT LOCK BLOCK
+Section 1 — PRODUCT LOCK BLOCK
 - Use the uploaded Obesity Killer product packshot images as absolute visual truth.
 - Do not redesign, redraw, relabel, or alter any product or packaging in any way.
 - Do not change brand name, label colors, illustrations, proportions, or any text (Hindi or English).
 - If any label text is unclear — preserve the original image as-is. Do not reinterpret it.
 - Only permitted: placement, scaling, subtle drop shadows, mild warm lighting correction.
+- All 5 products must appear in every output with exact dimensions from reference.
 
-OUTPUT SPEC
+Section 2 — OUTPUT SPEC
 - Canvas: 1080 x 1350 pixels. Portrait. 4:5 ratio.
 - Style: UGC (Creator-style) — polished enough for paid ad deployment.
 - Text policy: Low-text by default. All copy minimal and mobile-readable at 375px width.
@@ -15,68 +14,77 @@ OUTPUT SPEC
 - All 5 products present, proportionally sized per reference dimensions, unmodified.
 - Readability: maintain high-contrast foreground/background treatment for ad-platform legibility.
 
-FORMAT LAYOUT INSTRUCTIONS
-- Composition: Subject holding product in foreground, lifestyle context in background.
-- Focal hierarchy: subject and product co-dominant, text secondary, background tertiary.
-- Product zone: foreground-right, held toward camera.
-- Text zones: flat uncluttered areas only — never over busy background detail.
-- Background: BG-003 Home-office lamp — dark wood desk, warm table lamp key light, blurred laptop in back.
-- Camera: handheld close-medium, authentic feel.
-- Lighting: warm desk lamp as key light with soft ambient fill.
-- Spacing: strong whitespace between zones. Grid-based alignment.
+Section 3 — FORMAT LAYOUT INSTRUCTIONS
+- Composition: First-person authentic feel, products held naturally.
+- Focal hierarchy: products visible as primary, human secondary.
+- Product zone: hand-held or prominently featured.
+- Text zones: minimal — headline + support line + CTA only.
+- Background: natural mat scene, small tray.
+- Camera: eye-level medium framing.
+- Lighting: warm balanced key light.
+- Spacing: natural, not overly staged.
 
-PERSONA INPUT BLOCK
-- Persona: 2. Busy Professional
-- Pain: Doesn't have time for complicated weight-loss routines. Work takes up most of the day.
-- Desire: A simple solution that fits into a busy schedule without requiring meal prep or gym time.
-- Friction: Past methods required too much planning, cooking, or time investment that doesn't exist in their day.
-- Proof needed: Evidence it's simple to use, fits into normal routine, doesn't require lifestyle overhaul.
-- Tone cue: Relatable, casual — speaks as someone who understands time pressure.
+Section 4 — PERSONA INPUT BLOCK
+- Persona: Post-Failure Re-starter (Persona 7)
+- Pain: Tried every diet, nothing works long-term. Feel defeated.
+- Desire: Finally find something that actually delivers visible results.
+- Friction: Multiple past failures created deep doubt.
+- Proof needed: real results others have achieved.
+- Tone cue: authentic, relatable, hopeful.
 
-EXACT ON-IMAGE COPY — DO NOT ALTER ANYTHING
-- Headline: "My kind of routine. Simple."
-- Support line: "Morning shake. Night tablets. Done."
-- CTA: "Try It"
-Render every character exactly as written. No paraphrasing, no punctuation changes, no autocorrection.
+Section 5 — EXACT ON-IMAGE COPY — DO NOT ALTER ANYTHING
+- Headline: Tried everything. This finally worked.
+- Support line: 3-5 kg in 15 days.
+- CTA: Try It
+Render every character exactly as written. No paraphrasing, no punctuation changes.
 
-NEGATIVE CONSTRAINTS
-- Do not recreate or redraw any product
-- Do not blur, approximate, or rewrite any label text
-- Do not use sale badges, burst graphics, or stickers
-- Do not show body transformations or weight-loss visuals
-- Do not use colors outside the defined palette
-- Do not use more than 2 font weights
-- Do not overcrowd the layout
-- Do not make medical cure claims of any kind
-- Do not render unnatural or anatomically incorrect hands
-- Do not use ring light, studio flash, or overproduced lighting
+Section 6 — NEGATIVE CONSTRAINTS
+- Do not recreate or redraw any product.
+- Do not blur, approximate, or rewrite any label text.
+- Do not use sale badges, burst graphics, or stickers.
+- Do not show body transformations or weight-loss visuals.
+- Do not use colors outside the defined palette (#FFFBED to #FCDBAC background, #F79040 to #E66410 accents).
+- Do not use more than 2 font weights.
+- Do not overcrowd the layout.
+- Do not make medical cure claims of any kind.
+- Do not render unnatural or anatomically incorrect hands.
 
-QUALITY BAR — verify before accepting output:
-- All 5 products present, correctly proportioned, completely unmodified
-- All on-image text sharp and readable at 375px mobile size
-- Product label accurate, unmodified, and fully readable
-- Layout is calm, balanced, and premium
-- No clutter, no hype, no forbidden elements
-- Single clear focal hierarchy — product dominant throughout
-- If any item above fails — regenerate immediately without compromise
+Section 7 — QUALITY BAR — verify before accepting output:
+- All 5 products present, correctly proportioned, completely unmodified.
+- All on-image text sharp and readable at 375px mobile size.
+- Product label accurate, unmodified, and fully readable.
+- Layout is calm, balanced, and premium.
+- No clutter, no hype, no forbidden elements.
+- Single clear focal hierarchy — product dominant throughout.
+- If any item above fails — regenerate immediately without compromise.
 
-VISUAL DIRECTION BLOCK
-- Background slot: BG-003 — Home-office lamp
-- Scene: Dark wood desk with warm desk lamp as key light. Laptop softly blurred in background. Notebook and pen to the left. Evening home-office context.
-- Subject: Indian woman, 27-35 years, professional appearance, natural unposed expression, holding product toward camera.
-- Action: Holding product bottle in hand, toward camera, authentic lifestyle pose.
-- Camera: handheld close-medium, authentic UGC feel.
-- Lighting: warm desk lamp key light + soft ambient fill.
-- Props: Notebook, pen, blurred laptop.
-- Surfaces: dark wood desk.
-- Mood: Relatable, casual, authentic — "this fits my life" energy.
-- Realism: Natural skin, correct hand anatomy, true-to-life proportions, no stock-template look.
+Section 8 — VISUAL DIRECTION BLOCK
+- Background slot: BG-005
+- Seed: 5015
+- Scene: Natural mat scene, small tray on a clean premium composite surface with restrained texture and ad-ready clarity, with subtle background blur with layered depth separation and low visual noise, lit by warm balanced key light with subtle directional depth and premium cleanliness, conveying natural polished habit-first setting.
+- Subject: Indian woman 27-35, natural unposed expression.
+- Action: holding product toward camera, authentic grip.
+- Camera: eye-level medium framing, 50mm-equivalent perspective, shallow depth of field with smooth background blur.
+- Lighting: warm balanced key light with subtle directional depth and premium cleanliness.
+- Props: minimal, non-competing.
+- Surfaces: clean premium composite.
+- Mood: natural polished habit-first setting.
+- Realism: natural skin, correct hand anatomy, true-to-life proportions.
+- Composition: clean middle-focused arrangement with deliberate edge clearance for robust feed placement safety.
+- Layout intent: keep visual weight centered with mild upward lift and balanced side margins for feed-safe framing.
+- CTA safe space: keep the bottom 15% visually calm and free of critical detail for CTA flexibility.
+- Crop safety: maintain protected margin buffers so alternate crops do not clip meaningful scene structure.
 
-TYPOGRAPHY SHARPNESS BLOCK
-- Headline: Poppins Bold — high contrast against background zone
-- Support and CTA: Poppins Medium/Regular — same typeface family
-- Size: large enough to read on 375px mobile screen without zooming
-- Placement: flat uncluttered zones only — never over busy background detail
-- Forbidden: thin fonts, script fonts, decorative typefaces, glow effects, outlined text, drop shadows on copy
-- Mandatory: crisp hard text edges — zero softness — zero anti-alias blur on any character
-- If any text is soft, blurry, or illegible — discard and regenerate immediately
+Section 9 — TYPOGRAPHY SHARPNESS BLOCK
+- Headline: Poppins Bold — high contrast against background zone.
+- Support and CTA: Poppins Medium/Regular — same typeface family.
+- Size: large enough to read on 375px mobile screen without zooming.
+- Placement: flat uncluttered zones only — never over busy background detail.
+- Forbidden: thin fonts, script fonts, decorative typefaces, glow effects, outlined text, drop shadows on copy.
+- Mandatory: crisp hard text edges — zero softness — zero anti-alias blur on any character.
+- If any text is soft, blurry, or illegible — discard and regenerate immediately.
+
+Keep text count minimal and increase font size rather than packing more copy.
+Typography must be pin-sharp. If any text appears soft, blurry, or smeared, regenerate.
+Use clean sans typography with strong stroke clarity; no thin/light weights for body text.
+Use Poppins only for on-image text: Headline in Poppins Bold, support/CTA in Poppins Medium or Regular.

@@ -9,7 +9,12 @@ How to use this playbook in chat:
 - If user gives no specific inputs (persona/headline/format), generate a default starter batch immediately.
 - If user gives specific inputs (persona and/or headline and/or format), use those inputs first.
 - If user gives partial inputs, use what they gave and fill missing fields with defaults from this playbook.
-- Always keep claims restricted to `info/productinfomain.txt` and preserve product fidelity rules.
+- Always keep claims restricted to `productinfomain.txt` and preserve product fidelity rules.
+
+Execution mode lock (important):
+- This repo uses the custom in-repo playbook + scripts workflow as primary execution path.
+- Do not switch to the generic `ad-factory` skill flow unless the user explicitly asks to use that skill.
+- Treat "refer to playbook md and create ads" as the same as "create ads".
 
 Accepted user input styles (examples):
 - "Create ads" -> generate default starter batch (all 5 formats, 1 variation each)
@@ -43,23 +48,23 @@ Current production mode:
 
 ## 2) Source of Truth (Do not invent)
 
-Use only approved claims and context from `info/productinfomain.txt`.
-Use `info/PRODUCT_MECHANISM_V1.txt` as the mechanism-model file derived from `info/productinfomain.txt`.
+Use only approved claims and context from `productinfomain.txt`.
+Use `PRODUCT_MECHANISM_V1.txt` as the mechanism-model file derived from `productinfomain.txt`.
 
 Persona language source:
-- Use `info/PERSONA_DEEP_DIVE_01_05.txt` as the active bridge file for persona-specific ad language.
+- Use `PERSONA_DEEP_DIVE_01_05.txt` as the active bridge file for persona-specific ad language.
 - This file adds: raw pain lines, trigger scenarios, objections, language bank, mechanism match, and trust anchors.
 - This file now follows a 3-layer system: Raw Persona Truth -> Message Strategy -> Output Language Rendering.
 - When a covered persona is selected, pull wording and proof angles from the deep-dive file before writing headlines, captions, hooks, or testimonial-style language.
 - Do not invent generic persona language when a deep-dive entry already exists.
-- Current coverage in the deep-dive file: personas 1-15.
+- Current coverage in the deep-dive file: personas 1-22.
 
 Mechanism grounding rules:
-- Use `info/productinfomain.txt`, `info/faq.txt`, and `info/PRODUCT_MECHANISM_V1.txt` together.
-- `info/productinfomain.txt` is the source for approved claims, mechanism boundaries, support details, and offer details.
-- `info/faq.txt` is the source for protocol details, Q&A handling, and usage caveats.
-- `info/PRODUCT_MECHANISM_V1.txt` is the source for simplified mechanism framing and behavior-change mapping.
-- Only use mechanism logic defined in `info/PRODUCT_MECHANISM_V1.txt`.
+- Use `productinfomain.txt`, `faq.txt`, and `PRODUCT_MECHANISM_V1.txt` together.
+- `productinfomain.txt` is the source for approved claims, mechanism boundaries, support details, and offer details.
+- `faq.txt` is the source for protocol details, Q&A handling, and usage caveats.
+- `PRODUCT_MECHANISM_V1.txt` is the source for simplified mechanism framing and behavior-change mapping.
+- Only use mechanism logic defined in `PRODUCT_MECHANISM_V1.txt`.
 - Do not invent new benefit logic outside that file.
 - Do not frame the product as a fat burner.
 - Do not use claims like `boosts metabolism`, `burns fat fast`, `accelerates fat loss`, or similar shortcuts.
@@ -116,7 +121,7 @@ Product fidelity rules:
 
 ## 4) Brand and Writing Rules
 
-From `info/productinfomain.txt`:
+From `productinfomain.txt`:
 - Tone: empathetic coach, trustworthy, uplifting
 - Style: simple language, active voice, short sentences, no filler
 - Credibility: specifics over vague adjectives
@@ -175,7 +180,7 @@ For each persona, define these 5 fields before writing copy:
 - Tone cue: how the voice should feel
 
 Deep-dive expansion rule:
-- If the selected persona exists in `info/PERSONA_DEEP_DIVE_01_05.txt`, treat that file as the working persona brief.
+- If the selected persona exists in `PERSONA_DEEP_DIVE_01_05.txt`, treat that file as the working persona brief.
 - Pull ad inputs from these blocks when present: Pain Points, Trigger Scenarios, Objections, Language Bank, Mechanism Match, Trust Anchors.
 - Use the exact natural phrasing style from the deep-dive file to avoid generic copy.
 - Mechanism lines must explain the product in simple relatable terms, not abstract health language.
@@ -183,18 +188,26 @@ Deep-dive expansion rule:
 
 3-layer rendering workflow:
 - Step 1: Read Layer 1 - Raw Persona Truth to understand how the person actually thinks and speaks.
-- Step 2: Read `info/productinfomain.txt` for approved claims and product boundaries.
-- Step 2b: Read `info/faq.txt` for protocol details, restrictions, and edge-case usage rules.
-- Step 3: Read `info/PRODUCT_MECHANISM_V1.txt` to lock the allowed product behavior.
+- Step 2: Read `productinfomain.txt` for approved claims and product boundaries.
+- Step 2b: Read `faq.txt` for protocol details, restrictions, and edge-case usage rules.
+- Step 3: Read `PRODUCT_MECHANISM_V1.txt` to lock the allowed product behavior.
 - Step 4: Read Layer 2 - Message Strategy to choose the right pain angle, mechanism angle, and trust angle.
 - Step 5: Read Layer 3 - Output Language Rendering and convert the same angle into English, Hindi, or Hinglish as requested.
 - Do not translate raw Hinglish lines word-for-word into ad copy. Use them to understand emotion first, then render cleanly in the target language.
-- For English ads: prefer the English-ready phrasing block as the base tone.
-- For Hindi ads: prefer the Hindi-ready phrasing block as the base tone.
-- For Hinglish ads: prefer the Hinglish-ready phrasing block as the base tone.
+- For English ads: use the English-ready phrasing block as tone guidance only, not as reusable copy.
+- For Hindi ads: use the Hindi-ready phrasing block as tone guidance only, not as reusable copy.
+- For Hinglish ads: use the Hinglish-ready phrasing block as tone guidance only, not as reusable copy.
 - Keep the underlying pain, mechanism, and trust angle consistent across all 3 language outputs.
-- When using persona mechanism sections, map the persona's eating behavior to the product's approved behavior change from `info/PRODUCT_MECHANISM_V1.txt`.
-- When protocol-specific details are needed, such as timing, fasting window, support, restrictions, or usage caveats, pull them from `info/faq.txt` rather than inventing them.
+- When using persona mechanism sections, map the persona's eating behavior to the product's approved behavior change from `PRODUCT_MECHANISM_V1.txt`.
+- When protocol-specific details are needed, such as timing, fasting window, support, restrictions, or usage caveats, pull them from `faq.txt` rather than inventing them.
+
+Layer 3 anti-template rule (mandatory):
+- Treat Layer 3 phrasing as style DNA, not a sentence bank.
+- Do not lift full lines or near-verbatim segments from Layer 3 into final ad copy.
+- Every headline/support/CTA/bullet must be freshly composed from Layer 1 + Layer 2 strategy.
+- Keep mechanism truth constant, but vary sentence rhythm, opening pattern, and proof framing.
+- In one batch, avoid repeating the same opening pattern across formats (for example, repeated "When...", "If...", "No..." starts).
+- Scale rule for high-volume production: rotate at least one major copy axis per ad (hook structure, proof style, sacrifice framing, or CTA voice), while keeping claims compliant.
 
 Selection rule:
 - Use one primary persona plus one optional secondary micro-context.
@@ -250,14 +263,14 @@ Fresh caption rule: generate fresh each run, keep meaning stable, vary phrasing 
 Goal: Every ad generation session must use a distinctly different background/scene setting so no two outputs look the same.
 
 Background files and purpose:
-- `info/BACKGROUND_VARIANTS.JSON` = master slot catalog (ID, title, format eligibility)
-- `info/background_variant.json` = safe-zone enriched structured descriptors used for seeded scene sentence generation
+- `BACKGROUND_VARIANTS.JSON` = master slot catalog (ID, title, format eligibility)
+- `background_variant.json` = safe-zone enriched structured descriptors used for seeded scene sentence generation
 
 ### How it works:
 
 Before generating any prompt, the assistant must:
-1. Check `info/AD_GENERATION_REGISTRY.JSON` slot usage for the selected format.
-2. Build allowed catalog pool from `info/BACKGROUND_VARIANTS.JSON` where `formats` contains the selected format.
+1. Check `AD_GENERATION_REGISTRY.JSON` slot usage for the selected format.
+2. Build allowed catalog pool from `BACKGROUND_VARIANTS.JSON` where `formats` contains the selected format.
 3. Select only from slots not yet used in current cycle for that format (`indexes.slot_exhaustion_tracker.<FORMAT>.remaining_slots_current_cycle`).
 4. Generate a seeded scene sentence with `scripts/upgrade_safezone_backgrounds.py` using the same slot ID.
 5. Include both slot ID and seeded sentence in Section 8 (VISUAL DIRECTION BLOCK), then log slot + seed in registry.
@@ -276,6 +289,9 @@ Before generating any prompt, the assistant must:
 - If `remaining_slots_current_cycle` is empty, increment cycle number and repopulate from current allowed pool.
 - Safe-zone sentence generation must use:
   - `python3 scripts/upgrade_safezone_backgrounds.py --prompt-only --id BG-XXX --format 4:5 --seed <SEED>`
+- Mandatory script execution note:
+  - Do not simulate this command. Run it and use the real stdout sentence.
+  - If command fails, stop prompt finalization, surface stderr, and retry only after fixing the failure.
 - SEED rule: `SEED = (BATCH_NUMBER * 1000) + (PERSONA_NUMBER * 10) + VARIATION`
 - Include in Section 8:
   - `Background slot: BG-XXX`
@@ -287,9 +303,9 @@ Before generating any prompt, the assistant must:
 
 ## 10) Registry System
 
-Registry file: `info/AD_GENERATION_REGISTRY.JSON`
+Registry file: `AD_GENERATION_REGISTRY.JSON`
 
-### Current mode: PRODUCTION — Registry read mode ON, write mode ON.
+### Current mode: PRODUCTION — registry read enabled, `mode.write_enabled: true`.
 
 In production mode:
 - Read registry to check what has been used recently (avoid repeating).
@@ -335,6 +351,12 @@ In production mode:
       "background_name": "Clean warm studio",
       "background_source": "catalog",
       "fresh_background_signature": null,
+      "opening_pattern_4tok_en": "your_day_goes_right",
+      "opening_pattern_4tok_hi": "दिन_ठीक_चलता_है",
+      "copy_skeleton": "pain_mechanism_time",
+      "hook_structure_class": "contrast_loop",
+      "proof_style_class": "mechanism_explainer",
+      "cta_voice_class": "urgent_start",
       "language": "EN",
       "output_quality": "approved",
       "notes": "First test generation",
@@ -344,7 +366,15 @@ In production mode:
   "indexes": {
     "backgrounds_by_format": {},
     "slot_exhaustion_tracker": {},
-    "used_text": {}
+    "used_text": {},
+    "copy_patterns": {
+      "by_format_language": {},
+      "recent_opening_4tok": {},
+      "recent_skeletons": {},
+      "recent_cta_voice": {},
+      "recent_hook_structure": {},
+      "recent_proof_style": {}
+    }
   }
 }
 ```
@@ -367,6 +397,11 @@ In production mode:
 - background_name: readable name of slot
 - background_source: catalog / fresh
 - fresh_background_signature: required when source is fresh, else null
+- opening_pattern_4tok_en/opening_pattern_4tok_hi: first 4-token normalized opening pattern of headline
+- copy_skeleton: high-level copy structure tag (for example: pain_mechanism_time)
+- hook_structure_class: hook composition class (question_lead / contrast_loop / command_lead / confession_lead / proof_lead)
+- proof_style_class: trust framing class (social_proof / mechanism_explainer / authority_anchor / routine_clarity / objection_flip)
+- cta_voice_class: CTA intent class (urgent_start / guided_next_step / reassurance_start / challenge_action / discovery_action)
 - language: EN / HI / BOTH
 - output_quality: approved / rejected / pending
 - notes: optional free text
@@ -379,6 +414,43 @@ In production mode:
 - Same headline_angle + same format = flag if used in last 3 entries. Rotate angle.
 - Same persona + same headline_angle = hard block regardless of format. Always change at least one.
 - Any exact text reuse is forbidden across all history: headline, support line, CTA, caption, and bullets in both EN and HI must be new every time.
+- Same opening_pattern_4tok + same format/language = hard block in recent window (last 10 entries).
+- Same copy_skeleton + same format/language = hard block if repeated in last 5 entries.
+- Same hook_structure_class + proof_style_class + cta_voice_class trio = hard block in last 12 entries (prevents "same ad with new words" effect).
+
+### Copy diversity matrix (mandatory for scaled production)
+
+Every ad must be tagged before finalization using these 4 axes and rotated intentionally across a batch.
+
+- hook_structure_class:
+  - `question_lead`
+  - `contrast_loop`
+  - `command_lead`
+  - `confession_lead`
+  - `proof_lead`
+- proof_style_class:
+  - `social_proof`
+  - `mechanism_explainer`
+  - `authority_anchor`
+  - `routine_clarity`
+  - `objection_flip`
+- cta_voice_class:
+  - `urgent_start`
+  - `guided_next_step`
+  - `reassurance_start`
+  - `challenge_action`
+  - `discovery_action`
+- copy_skeleton (examples):
+  - `pain_mechanism_time`
+  - `objection_flip_mechanism`
+  - `proof_then_routine`
+  - `micro_story_then_action`
+  - `problem_reframe_then_next_step`
+
+Batch diversity minimum:
+- In any 5-ad batch, at least 4 unique `hook_structure_class` values.
+- In any 5-ad batch, at least 3 unique `cta_voice_class` values.
+- No repeated `copy_skeleton` within the same batch.
 
 ### Production write instruction:
 
@@ -647,6 +719,8 @@ Decision policy (mandatory):
 - If user gives specific inputs (persona/headline/format), apply them directly.
 - If user gives partial inputs, apply provided values and fill missing values with defaults.
 - Ask follow-up questions only when user intent is conflicting (for example, two different persona instructions for same format).
+- Never ask pre-flight questions like "text prompts or images?" for standard create-ad requests; default to end-to-end flow.
+- If runtime blockers exist (missing API key, missing image URLs, API failure), still complete all non-blocked steps first (generate + save prompts), then report the exact blocker and stop only blocked steps.
 
 Input parsing rules:
 - Persona input accepted as one value for all formats, or format-wise values.
@@ -683,6 +757,9 @@ Step 4.25 — Safe-zone enforcement (mandatory)
   - Seed rule (mandatory, deterministic): `SEED = (BATCH_NUMBER * 1000) + (PERSONA_NUMBER * 10) + VARIATION`
     - Example: batch `v7`, persona `7`, variation `1` → seed `7071`
   - Use: `python3 scripts/upgrade_safezone_backgrounds.py --prompt-only --id BG-XXX --format 4:5 --seed <SEED>`
+  - Mandatory script execution note:
+    - Do not simulate this command. Run it and paste the real stdout sentence.
+    - If the script errors, stop and fix; never continue with guessed seed text.
   - Paste the resulting *seeded* sentence into Section 8 (VISUAL DIRECTION BLOCK) and keep the selected `BG-XXX`.
   - Add a line in Section 8: `Seed: <SEED>` so reviewers can verify deterministic seeding was applied.
   - MANDATORY CHECKPOINT: Section 8 must contain the full OUTPUT of upgrade_safezone_backgrounds.py (seeded sentence), not just the seed number. If your prompt only says "Seed: <SEED>" without the seeded background sentence, it is INVALID — regenerate immediately.
@@ -694,6 +771,39 @@ Step 4.5 - Text dedupe gate (mandatory)
 - Before finalizing output text, check registry `indexes.used_text` for headline/support/CTA/caption/bullets in both EN and HI.
 - If any text string already exists in index, regenerate that text until unique.
 - Never reuse any previously used text string.
+- Near-duplicate guard (mandatory): reject copy that is structurally too similar to recent outputs even if exact words changed.
+  - Reject if same first 4-token opening pattern appears in recent outputs for the same format/language.
+  - Reject if headline/support skeleton matches a recent pattern with minimal lexical change.
+  - Reject if 2 or more bullets reuse the same verb-led template as recent outputs in that format.
+- Diversity tag gate (mandatory): assign and validate tags before finalizing text:
+  - `opening_pattern_4tok_en` / `opening_pattern_4tok_hi`
+  - `copy_skeleton`
+  - `hook_structure_class`
+  - `proof_style_class`
+  - `cta_voice_class`
+- If tag combination violates matrix or recent-window rules, regenerate copy and re-tag before proceeding.
+
+Step 4.75 - Validation checklist gate (mandatory before writing `output/vN/*`)
+- The generator must run this checklist and pass all checks before writing any `OUTPUT_<FORMAT>_<LANG>.txt` file.
+- If any check fails, block write, report failed check IDs, regenerate/fix, then re-run checklist.
+
+Validation checklist (machine-checkable):
+- `CHK-01` sections_present: all 9 required sections exist (Section 1 through Section 9).
+- `CHK-02` section_depth: each section meets minimum bullet/line depth defined in Section 12.
+- `CHK-03` copy_units: required copy units exist for the format (headline/support-or-quote/CTA/bullets rules).
+- `CHK-04` text_budget: on-image copy word count falls within format budget.
+- `CHK-05` exact_text_uniqueness: no exact string reuse against `indexes.used_text`.
+- `CHK-06` structural_uniqueness: near-duplicate guards pass (opening pattern, skeleton, bullet-template checks).
+- `CHK-07` diversity_tags_present: all 5 diversity tags are assigned and valid.
+- `CHK-08` diversity_matrix_pass: batch-level diversity constraints are still satisfied after this ad is added.
+- `CHK-09` background_traceability: prompt contains `Background slot: BG-XXX`, `Seed: <SEED>`, seeded sentence, and all 4 safe-zone fields.
+- `CHK-10` product_lock_lines: product lock block includes required fidelity constraints and absolute visual truth line.
+- `CHK-11` language_purity: EN is fully English and HI is Devanagari-only unless mixed script is explicitly requested.
+- `CHK-12` script_execution_evidence: when script-based steps are required, command output evidence exists (no simulated results).
+
+Checklist result contract:
+- Emit a compact status object per prompt: `{"status":"pass|fail","failed_checks":[...],"format":"...","language":"..."}`.
+- Only `status=pass` prompts may be written to `output/vN/*`.
 
 Step 5 — Final output and storage
 - Deliver final prompts in both EN and HI for selected format(s).
@@ -702,7 +812,7 @@ Step 5 — Final output and storage
   - `OUTPUT_<FORMAT>_EN.txt`
   - `OUTPUT_<FORMAT>_HI.txt`
   - For multiple variations: `OUTPUT_<FORMAT>_EN_V2.txt` (and same pattern for HI)
-- State the background slot used and log it to registry (if write mode is ON).
+- State the background slot used and log it to registry (`mode.write_enabled: true`).
 
 Step 5.5 — Prompt assembly for API
 - For each API job, build one complete prompt only:
@@ -724,6 +834,9 @@ Step 5.6 — API execution (Nano Banana 2 via Kie)
 - Default generation settings: `resolution=2K`, `aspect_ratio=4:5`, `output_format=png`
 - Submit one job per prompt file (EN by default).
 - Poll task state via `GET /api/v1/jobs/recordInfo?taskId=...` until `success` or `fail`.
+- Mandatory script execution note:
+  - If running `scripts/kie_nano_batch.py`, execute it for real and rely on actual API responses.
+  - Never claim submission/poll/download success without task IDs and saved file paths from command output.
 
 Step 5.7 — Generated image storage
 - Save results in `generated_image/vN/<format>-<language>/`
@@ -738,6 +851,7 @@ Step 6 - Registry write (mandatory in production)
 - Append `{entry_id, timestamp, background_slot, background_source}` to `indexes.backgrounds_by_format.<FORMAT>`.
 - If background_source is `catalog`, update `indexes.slot_exhaustion_tracker.<FORMAT>` for cycle progression.
 - Append every used text string to `indexes.used_text` buckets.
+- Append diversity tags to `indexes.copy_patterns` buckets (`recent_opening_4tok`, `recent_skeletons`, `recent_cta_voice`, `recent_hook_structure`, `recent_proof_style`).
 - Keep append-only behavior; do not delete or rewrite past records.
 
 Default behavior if user gives minimal input:
@@ -886,8 +1000,8 @@ Follow these rules strictly:
 - Use uploaded Obesity Killer product packshot images as absolute visual truth. I will upload 6 images each session.
 - Create ads in 5 formats: HERO, BA, TEST, FEAT, UGC.
 - For each ad, use one persona input block (pain, desire, friction, proof needed, tone cue).
-- If the persona is covered in `info/PERSONA_DEEP_DIVE_01_05.txt`, also use that file for objections, trigger moments, mirrored phrases, mechanism framing, and trust selection.
-- If the persona is covered in `info/PERSONA_DEEP_DIVE_01_05.txt`, generate final copy through the 3-layer workflow: raw truth -> strategy -> target language rendering.
+- If the persona is covered in `PERSONA_DEEP_DIVE_01_05.txt`, also use that file for objections, trigger moments, mirrored phrases, mechanism framing, and trust selection.
+- If the persona is covered in `PERSONA_DEEP_DIVE_01_05.txt`, generate final copy through the 3-layer workflow: raw truth -> strategy -> target language rendering.
 - Headline must do two things: scroll stop + pain-solution fit.
 - Caption must increase Value = (Dream Outcome x Likelihood) / (Time Delay x Sacrifice).
 - Keep language simple, active, specific, and short.
@@ -899,7 +1013,7 @@ Follow these rules strictly:
 - Use Poppins font family for all on-image text (Headline: Poppins Bold; body/support/CTA: Poppins Medium or Regular).
 - Select a background slot from the Background Variation Engine (Section 9 of playbook) using exhaustive format-wise rotation (no repeat until all allowed slots for that format are used once). State which slot you selected.
 - Enforce strict text uniqueness: headline/support/CTA/caption/bullets in EN and HI must never repeat any previously used string.
-- Check the registry at info/AD_GENERATION_REGISTRY.JSON before generation to avoid persona, angle, and background repetition.
+- Check the registry at `AD_GENERATION_REGISTRY.JSON` before generation to avoid persona, angle, and background repetition.
 - Registry is in production mode. Write one entry after each generation.
 ```
 
@@ -933,7 +1047,7 @@ How to avoid repetition at scale:
 
 ## 20) Registry File — Current State
 
-File path: `info/AD_GENERATION_REGISTRY.JSON`
+File path: `AD_GENERATION_REGISTRY.JSON`
 
 Current mode: production (`mode.write_enabled: true`)
 
@@ -950,7 +1064,15 @@ Starting state example (append entries in live production):
   "indexes": {
     "backgrounds_by_format": {},
     "slot_exhaustion_tracker": {},
-    "used_text": {}
+    "used_text": {},
+    "copy_patterns": {
+      "by_format_language": {},
+      "recent_opening_4tok": {},
+      "recent_skeletons": {},
+      "recent_cta_voice": {},
+      "recent_hook_structure": {},
+      "recent_proof_style": {}
+    }
   }
 }
 ```
@@ -959,6 +1081,7 @@ Registry indexing requirement (production):
 - Maintain `indexes.backgrounds_by_format` for per-format background tracking.
 - Maintain `indexes.slot_exhaustion_tracker` for catalog cycle state per format.
 - Maintain `indexes.used_text` for global text uniqueness tracking.
+- Maintain `indexes.copy_patterns` for structural diversity tracking (opening patterns, skeletons, hook/proof/CTA classes).
 - Treat every string in `indexes.used_text` as permanently blocked from reuse.
 
 Production live rules:
