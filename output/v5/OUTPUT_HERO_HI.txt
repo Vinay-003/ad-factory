@@ -1,0 +1,85 @@
+PRODUCT LOCK BLOCK
+- Use the uploaded Obesity Killer product packshot images as absolute visual truth.
+- Do not redesign, redraw, relabel, or alter any product or packaging in any way.
+- Do not change brand name, label colors, illustrations, proportions, or any text (Hindi or English).
+- If any label text is unclear — preserve the original image as-is. Do not reinterpret it.
+- Only permitted: placement, scaling, subtle drop shadows, mild warm lighting correction.
+
+OUTPUT SPEC
+- Canvas: 1080 x 1350 pixels. Portrait. 4:5 ratio.
+- Style: HERO — polished enough for paid ad deployment.
+- Text policy: Low-text by default. All copy minimal and mobile-readable at 375px width.
+- Rendering: No compression artifacts. No soft edges on text or product label.
+- All 5 products present, proportionally sized per reference dimensions, unmodified.
+- Readability: maintain high-contrast foreground/background treatment for ad-platform legibility.
+
+FORMAT LAYOUT INSTRUCTIONS
+- HERO format: strong headline + one support line + CTA.
+- Composition: product dominant in center-right zone, text in upper-left clean area.
+- Focal hierarchy: product dominant, text secondary, background tertiary.
+- Product zone: center-right placement.
+- Text zones: flat uncluttered areas only — never over busy background detail.
+- Camera: eye-level medium framing, 50mm-equivalent perspective.
+- Lighting: warm soft directional — source from top-left. Subtle drop shadows beneath products.
+- Spacing: strong whitespace between zones. Grid-based alignment. Nothing floats randomly.
+
+PERSONA INPUT BLOCK
+- Persona: Late-Night Eater (Persona 12)
+- Pain: Your day goes well but night ruins it — post-dinner snacking, midnight urge spikes, guilt loops the next morning.
+- Desire: Stop the night eating loop that undoes full-day progress.
+- Friction: Rational control fails at night; healthy snacks also get overeaten; willpower preaching does not work.
+- Proof needed: Night-specific support, digestion comfort for next-morning restart, practical routine over willpower.
+- Tone cue: Non-shaming, practical, understanding.
+
+EXACT ON-IMAGE COPY — DO NOT ALTER ANYTHING
+- Headline: दिन ठीक और रात बर्बाद? Night loop को पहले fix करें।*
+- Support line: सुबह भूख support + रात पाचन comfort — अगले दिन आसान restart के लिए।*
+- CTA: आज रात शुरू करें
+Render every character exactly as written. No paraphrasing, no punctuation changes, no autocorrection.
+
+NEGATIVE CONSTRAINTS
+- Do not recreate or redraw any product
+- Do not blur, approximate, or rewrite any label text
+- Do not use sale badges, burst graphics, or stickers
+- Do not show body transformations or weight-loss visuals
+- Do not use colors outside the defined palette
+- Do not use more than 2 font weights
+- Do not overcrowd the layout
+- Do not make medical cure claims of any kind
+- Do not use ring light, studio flash, or overproduced lighting
+
+QUALITY BAR — verify before accepting output:
+- All 5 products present, correctly proportioned, completely unmodified
+- All on-image text sharp and readable at 375px mobile size
+- Product label accurate, unmodified, and fully readable
+- Layout is calm, balanced, and premium
+- No clutter, no hype, no forbidden elements
+- Single clear focal hierarchy — product dominant throughout
+- If any item above fails — regenerate immediately without compromise
+
+VISUAL DIRECTION BLOCK
+- Background slot: BG-004 — Wellness shelf white
+- Background seed: 42
+- Seeded background direction (single sentence, exact): White marble shelf, folded towel on a clean premium composite surface with restrained texture and ad-ready clarity, with minimal contextual backdrop with elegant bokeh falloff and clean negative space, lit by even clinical illumination with subtle micro-contrast and smooth highlights, conveying calm evidence-led care environment; eye-level medium framing, 50mm-equivalent perspective, shallow depth of field with smooth background blur, core subject contained within the inner 80% frame area, avoiding side-edge tension and preserving clean perimeter margins, maintain controlled negative space around the subject to prevent drift into crop-risk zones, maintain subtle low-contrast space near the lower edge to protect feed overlay readability, avoid edge-dependent framing; composition must survive moderate side and vertical trimming, soft desaturated clean tone with precise highlight control, designed for 4:5 feed framing with key content held inside the central safe field, centered to slightly above center, while top 10 percent, bottom 15 percent, and side edge zones remain low-priority, clean premium studio ad photography, ultra-detailed, flawless commercial finish.
+- Subject: No human subject — products only
+- Action: Products arranged on white marble shelf surface
+- Camera: eye-level medium framing, 50mm-equivalent perspective
+- Lighting: even clinical illumination with subtle micro-contrast
+- Props: folded towel, minimal
+- Surfaces: white marble shelf, polished light marble with subtle natural veining
+- Mood: calm evidence-led care environment, clinical confidence
+- Realism: premium product photography, clean and clinical
+
+TYPOGRAPHY SHARPNESS BLOCK
+- Headline: Poppins Bold — high contrast against background zone
+- Support and CTA: Poppins Medium/Regular — same typeface family
+- Size: large enough to read on 375px mobile screen without zooming
+- Placement: flat uncluttered zones only — never over busy background detail
+- Forbidden: thin fonts, script fonts, decorative typefaces, glow effects, outlined text, drop shadows on copy
+- Mandatory: crisp hard text edges — zero softness — zero anti-alias blur on any character
+- If any text is soft, blurry, or illegible — discard and regenerate immediately
+
+Typography must be pin-sharp. If any text appears soft, blurry, or smeared, regenerate.
+Keep text count minimal and increase font size rather than packing more copy.
+Use clean sans typography with strong stroke clarity; no thin/light weights for body text.
+Use Poppins only for on-image text: Headline in Poppins Bold, support/CTA in Poppins Medium or Regular.

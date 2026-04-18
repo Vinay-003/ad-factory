@@ -1,0 +1,34 @@
+{
+  "task_id": "79a5f7c89d5e4867fc99f7b51012cf92",
+  "format": "HERO",
+  "language": "EN",
+  "variation": 1,
+  "aspect_ratio": "4:5",
+  "resolution": "2K",
+  "output_format": "png",
+  "prompt_file": "output/v6/OUTPUT_HERO_EN.txt",
+  "persona_name": "Post-Failure Re-starter",
+  "persona_number": 7,
+  "background_seed": 314,
+  "on_image_copy": {
+    "headline": "Lost count of restarts? Build a plan you can repeat after a bad weekend.*",
+    "support_line": "Morning satiety plus night digestion support helps you continue without all-or-nothing pressure.*",
+    "cta": "Restart With Confidence"
+  },
+  "social_captions": {
+    "instagram": "Lost count of restarts? Build a plan you can repeat after a bad weekend.* For Post-Failure Re-starter, Morning satiety plus night digestion support helps you continue without all-or-nothing pressure.*\n\nBuilt for everyday consistency: morning appetite support and nighttime digestion support, without crash diets or punishing workouts.\n\nRestart With Confidence.\n\n*Average outcomes vary by person and adherence.",
+    "facebook": "Lost count of restarts? Build a plan you can repeat after a bad weekend.* Morning satiety plus night digestion support helps you continue without all-or-nothing pressure.* This Ayurvedic routine supports hunger control and digestion in a practical morning-to-night flow. Restart With Confidence. *Average outcomes vary by person and adherence.",
+    "format": "HERO"
+  },
+  "result_urls": [
+    "https://tempfile.aiquickdraw.com/images/1776426124623-sma2b78xqyc.png"
+  ],
+  "saved_files": [
+    "generated_image/v6/hero-en/hero-en-v01-01.png"
+  ],
+  "assembled_prompt_file": "generated_image/v6/hero-en/prompt_task_79a5f7c89d5e4867fc99f7b51012cf92.txt",
+  "state": "success",
+  "create_time": 1776426052194,
+  "complete_time": 1776426125546,
+  "cost_time": 73
+}
