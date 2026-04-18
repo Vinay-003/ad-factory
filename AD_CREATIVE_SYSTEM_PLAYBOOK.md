@@ -137,6 +137,7 @@ On-image copy realism rules (anti-AI style):
 - No emoji, no hashtag-style copy, no forced separators, no bracketed gimmicks.
 - Avoid all-caps headlines unless acronym is part of product label.
 - Keep headline human-sounding, not template-looking: avoid stacked fragments and slogan-like punctuation tricks.
+- No disclaimer line on-image by default. Do not add disclaimer text blocks in headline/support/CTA area.
 
 ---
 
@@ -146,8 +147,6 @@ Background: #FFFBED to #FEEFD6 to #FCDBAC — smooth top-to-bottom gradient only
 Accents and CTA: #F79040 to #E66410
 Headlines: #973015
 Body text and bullets: #421808
-Disclaimer text: #7A3314
-
 No colors outside this palette. No neon. No harsh gradients. No random accent colors anywhere.
 
 ---
@@ -260,7 +259,7 @@ Caption checklist:
 - Concrete benefit
 - Concrete mechanism
 - Low-sacrifice framing
-- Disclaimer where needed
+- No disclaimer sentence in on-image copy
 
 Fresh caption rule: generate fresh each run, keep meaning stable, vary phrasing and angle.
 
@@ -343,8 +342,6 @@ In production mode:
       "support_line_hi": "रोज cravings control करें, metabolism support पाएं।",
       "cta_en": "Start Now",
       "cta_hi": "आज शुरू करें",
-      "disclaimer_en": "",
-      "disclaimer_hi": "",
       "caption_en": "Ayurvedic support for consistent fat-loss habits without crash diets.",
       "caption_hi": "बिना crash diet के fat-loss habit बनाने में ayurvedic support।",
       "bullets_en": [
@@ -479,6 +476,7 @@ Keep format structure fixed. Swap persona-specific headline/caption blocks.
 - Copy shape: strong headline, one support line, CTA
 - Text budget: 18-32 words
       - Minimum copy units: headline + 1 support line + CTA
+      - Layout lock: headline in top text band only (top 15-32% of canvas), support directly below, CTA in lower safe band.
 
 ### BA
 - Purpose: show transition from pain to control
@@ -643,6 +641,11 @@ FORMAT LAYOUT INSTRUCTIONS
 - Focal hierarchy: product dominant, text secondary, background tertiary.
 - Product zone: [center / center-right / foreground-lower — specify per format]
 - Text zones: flat uncluttered areas only — never over busy background detail.
+- Text stack map (mandatory):
+  - Headline zone = upper band only (top 15-32% of canvas).
+  - Support line zone = directly below headline (top 32-45%).
+  - CTA zone = lower safe band (bottom 70-85%), never above headline/support.
+  - Forbidden placement = headline in lower-third or below product midline.
 - Background: [reference selected background slot — see Section 9 below]
 - Camera: [close-medium / medium / overhead — specify per format]
 - Lighting: warm soft directional — source from top-left. Subtle drop shadows beneath products.
@@ -660,6 +663,7 @@ EXACT ON-IMAGE COPY — DO NOT ALTER ANYTHING
 - Headline: [exact text]
 - Support line: [exact text]
 - CTA: [exact text]
+- Disclaimer: not allowed on-image unless user explicitly asks for disclaimer mode.
 Render every character exactly as written. No paraphrasing, no punctuation changes, no autocorrection.
 
 NEGATIVE CONSTRAINTS
@@ -701,7 +705,11 @@ TYPOGRAPHY SHARPNESS BLOCK
 - Headline: Poppins Bold — high contrast against background zone
 - Support and CTA: Poppins Medium/Regular — same typeface family
 - Size: large enough to read on 375px mobile screen without zooming
-- Placement: flat uncluttered zones only — never over busy background detail
+- Placement lock:
+  - Headline must sit in the upper text band (top 15-32%).
+  - Support line must sit directly under headline with consistent left alignment.
+  - CTA must sit in lower safe band only (bottom 70-85%).
+  - Never place headline below support or in lower-third.
 - Forbidden: thin fonts, script fonts, decorative typefaces, glow effects, outlined text, drop shadows on copy
 - Mandatory: crisp hard text edges — zero softness — zero anti-alias blur on any character
 - If any text is soft, blurry, or illegible — discard and regenerate immediately
@@ -811,6 +819,8 @@ Validation checklist (machine-checkable):
 - `CHK-13` symbol_hygiene: headline/support/CTA contain no banned decorative symbols (`*`, `-`, `_`, `|`, `~`, `#`, `@`, `/`, `\\`).
 - `CHK-14` version_progression: write target is next available `vN` (max existing + 1), never overwrite existing batch folder.
 - `CHK-15` registry_target_file: updates are applied to root `AD_GENERATION_REGISTRY.JSON` only; no alternate/new registry files created.
+- `CHK-16` text_placement_hierarchy: headline in top band, support below headline, CTA in lower safe band; headline never in lower-third.
+- `CHK-17` no_disclaimer_default: no Disclaimer line in on-image copy unless user explicitly requests disclaimer mode.
 
 Checklist result contract:
 - Emit a compact status object per prompt: `{"status":"pass|fail","failed_checks":[...],"format":"...","language":"..."}`.
@@ -1028,6 +1038,7 @@ Follow these rules strictly:
 - Default production output: 1 variation per format.
 - Always provide English + Hindi versions of final prompts and save them in `output/vN/`.
 - Use plain conversational punctuation in on-image copy. Do not use decorative symbols like `*`, `-`, `_`, `|`, `~`, `#`, `@`, `/`, `\\` in headline/support/CTA.
+- Do not add disclaimer lines on-image unless I explicitly ask for disclaimer mode.
 - Never rely on fixed headline banks; generate fresh headlines each request.
 - Keep typography pin-sharp; regenerate if any on-image text is blurry.
 - Use Poppins font family for all on-image text (Headline: Poppins Bold; body/support/CTA: Poppins Medium or Regular).

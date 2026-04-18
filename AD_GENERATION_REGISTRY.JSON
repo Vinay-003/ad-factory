@@ -3,7 +3,7 @@
     "phase": "production",
     "write_enabled": true,
     "note": "Production mode active. Read before generation and append one entry after every generation.",
-    "last_updated": "2026-04-18T08:38:45Z"
+    "last_updated": "2026-04-18T08:55:44Z"
   },
   "rules": {
     "dedupe_scope": [
@@ -832,6 +832,44 @@
       "language": "BOTH",
       "output_quality": "pending",
       "notes": "Persona 12 HERO ad - batch v9"
+    },
+    {
+      "id": "entry_027",
+      "timestamp": "2026-04-18T08:55:44Z",
+      "format": "FEAT",
+      "persona_number": 12,
+      "persona_name": "Late-Night Eater",
+      "headline_angle": "mechanism",
+      "headline_en": "Night cravings ruining your progress? Fix the night loop first.",
+      "headline_hi": "रात की cravings से progress टूटती है? पहले night loop संभालें।",
+      "support_line_en": "Morning fullness support and night digestion support in one daily routine.",
+      "support_line_hi": "सुबह fullness support और रात digestion support वाला एक सरल daily routine.",
+      "cta_en": "Reset Your Nights",
+      "cta_hi": "अपनी रात संभालें",
+      "disclaimer_en": "",
+      "disclaimer_hi": "",
+      "caption_en": "Late-night eaters can steady progress with a practical routine that supports satiety in the day and digestion before sleep.",
+      "caption_hi": "Late-night eating pattern के लिए यह routine दिन में satiety और रात में digestion support देकर प्रगति को स्थिर रखने में मदद करता है।",
+      "bullets_en": [
+        "Helps reduce late night hunger spikes",
+        "Helps cut random post dinner snacking",
+        "Supports calmer digestion before sleep",
+        "3 to 5 kg average in 15 days"
+      ],
+      "bullets_hi": [
+        "late night hunger spikes कम करने में मदद",
+        "random post dinner snacking कम करने में मदद",
+        "सोने से पहले digestion को शांत support",
+        "15 दिन में औसतन 3 से 5 kg"
+      ],
+      "background_slot": "BG-007",
+      "background_name": "Office desk midday",
+      "background_source": "catalog",
+      "fresh_background_signature": null,
+      "seed": 10121,
+      "language": "BOTH",
+      "output_quality": "approved",
+      "notes": "Persona 12 FEAT ad - batch v10"
     }
   ],
   "indexes": {
@@ -973,6 +1011,12 @@
           "entry_id": "entry_024",
           "timestamp": "2026-04-18T04:15:26Z",
           "background_slot": "BG-001",
+          "background_source": "catalog"
+        },
+        {
+          "entry_id": "entry_027",
+          "timestamp": "2026-04-18T08:55:44Z",
+          "background_slot": "BG-007",
           "background_source": "catalog"
         }
       ],
@@ -2221,11 +2265,11 @@
           "BG-004",
           "BG-010",
           "BG-017",
-          "BG-001"
+          "BG-001",
+          "BG-007"
         ],
         "remaining_slots_current_cycle": [
           "BG-004",
-          "BG-007",
           "BG-012",
           "BG-020",
           "BG-025",
