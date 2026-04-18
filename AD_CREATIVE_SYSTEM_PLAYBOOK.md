@@ -81,8 +81,9 @@ Never add unsupported medical claims, disease cures, or made-up mechanisms.
 ## 3) Product Fidelity Lock (Mandatory — applies to every single output)
 
 Image source:
-- All 5 product packshots are uploaded directly to Gemini Web by the user each session (6 images total: box front, box back/side, OKP bottle, OK Tablets bottle, Amla bottle, OK Liquid sachet).
-- In all Gemini prompts, always include this exact line: "Use the uploaded Obesity Killer product packshot images as absolute visual truth."
+- Primary production path: pass product reference image URLs from `input/activeimages.txt` into Kie Nano Banana API (`image_input`).
+- Prompt requirement (always include): "Use the uploaded Obesity Killer product packshot images as absolute visual truth."
+- Optional manual path (prompt-only workflow): if user runs prompts directly in Gemini/Web tools, use the same 6 reference packshots as visual truth.
 - Never ask the user to re-describe products — the images are the reference.
 
 Product dimensions (use for correct relative sizing in every image):
@@ -248,10 +249,9 @@ Fresh caption rule: generate fresh each run, keep meaning stable, vary phrasing 
 
 Goal: Every ad generation session must use a distinctly different background/scene setting so no two outputs look the same.
 
-Primary background catalog file:
-- `info/BACKGROUND_VARIANTS.JSON`
-- Use this as source of truth for background IDs, names, and prompt descriptors.
-- The 20-slot list below is legacy guidance; prefer the external catalog for scaled operation.
+Background files and purpose:
+- `info/BACKGROUND_VARIANTS.JSON` = master slot catalog (ID, title, format eligibility)
+- `info/background_variant.json` = safe-zone enriched structured descriptors used for seeded scene sentence generation
 
 ### How it works:
 
@@ -259,73 +259,29 @@ Before generating any prompt, the assistant must:
 1. Check `info/AD_GENERATION_REGISTRY.JSON` slot usage for the selected format.
 2. Build allowed catalog pool from `info/BACKGROUND_VARIANTS.JSON` where `formats` contains the selected format.
 3. Select only from slots not yet used in current cycle for that format (`indexes.slot_exhaustion_tracker.<FORMAT>.remaining_slots_current_cycle`).
-4. Include the selected background slot ID in the prompt and log it to the registry after generation.
-5. When the remaining pool becomes empty, reset cycle for that format and continue.
-
-### Background Slot Library (20 slots — rotate through these):
-
-BG-01 — Clean warm studio. Seamless warm cream gradient backdrop. Matte white product surface. One white ceramic mug and closed notebook far left. No environment cues.
-
-BG-02 — Morning kitchen counter. Soft natural daylight from left window. Pale wood counter surface. One glass of water and a small plant pot in background. Clean white tile wall.
-
-BG-03 — Evening home-office desk. Warm desk lamp as key light. Dark wood table. Laptop screen softly blurred in background. Notebook and pen to the left.
-
-BG-04 — Bathroom shelf / wellness corner. Soft diffused white light. White marble or tile surface. Small towel folded neatly to one side. Clean and clinical-premium feel.
-
-BG-05 — Yoga mat / morning ritual. Soft daylight from window. Products on a small wooden tray on the mat. Folded block or small plant nearby. Calm, intentional mood.
-
-BG-06 — Dining table after meal. Warm ambient overhead light. Light linen tablecloth surface. Empty plate pushed to side. A glass of water. End-of-meal context.
-
-BG-07 — Office desk mid-day. Cool-warm mixed light. Light grey or white desk. Phone face-down to side. Coffee cup and keyboard softly blurred in background.
-
-BG-08 — Bedroom side table / nightstand. Warm low lamp. Soft duvet edge visible. A book and phone on the table. Late-night wind-down context.
-
-BG-09 — Outdoor garden table. Soft diffused outdoor light. Pale stone or wooden table. Small succulent or leaf in corner. Light airy feel.
-
-BG-10 — Minimalist flat-lay overhead. Pure white background. Products arranged symmetrically from above. Dry herbs or small lemon slices as minimal props.
-
-BG-11 — Dressing table / mirror context. Warm vanity lighting. Light wood surface. Small tray with skincare items softly blurred. Confidence and self-care mood.
-
-BG-12 — Kitchen windowsill. Bright soft diffused light from window behind. Products on a small wooden board. Fresh ginger or amla in the corner as prop.
-
-BG-13 — Living room coffee table. Warm afternoon light. Cream couch edge softly blurred in background. Products on a light wooden tray on the table.
-
-BG-14 — Gym bag / locker context. Clean locker room or sport context. Towel on bench. Bag partially visible. Active, performance-minded mood.
-
-BG-15 — Doctor's desk / credibility context. Clean white desk. Stethoscope softly placed to side. Notepad and pen. Clinical trust mood. Reinforce Dr. ARUN TYAGI'S credential.
-
-BG-16 — Terrace / balcony morning. Soft early light. Railing edge visible. Products on a small tray on a table. City or green view softly blurred behind.
-
-BG-17 — Wooden tray flatlay. Warm toned wood surface. Neatly arranged products on tray. Dry rose petals or cinnamon sticks as minimal styling props.
-
-BG-18 — Festive home context. Warm fairy lights softly blurred in background. Dark wood surface. Diyas or small festive elements at edges. Subtle celebration mood.
-
-BG-19 — Travel/hotel room context. Neutral beige hotel surface or suitcase lid. Clean and away-from-home feel. Reinforces "routine even while travelling" persona.
-
-BG-20 — Dark premium moody. Deep charcoal or dark warm brown background. Dramatic directional lighting on products. High-contrast premium editorial feel.
+4. Generate a seeded scene sentence with `scripts/upgrade_safezone_backgrounds.py` using the same slot ID.
+5. Include both slot ID and seeded sentence in Section 8 (VISUAL DIRECTION BLOCK), then log slot + seed in registry.
+6. When remaining pool becomes empty, reset cycle for that format and continue.
 
 ### Selection rules:
 
 - Exhaustive rotation is mandatory for catalog slots: no slot may repeat for a format until all allowed slots for that format are used once.
 - If registry is empty or tracker missing: initialize cycle with full allowed pool for that format and pick one.
-- For UGC format: always use slots BG-03, BG-06, BG-08, BG-13, BG-16 only (lifestyle contexts only, no flat-lays or clinical settings).
-- For HERO format: prefer BG-01, BG-10, BG-17, BG-20 for maximum product focus.
-- For TEST format: prefer BG-03, BG-08, BG-13 for relatable personal context.
-- For FEAT format: prefer BG-04, BG-10, BG-15, BG-17 for clarity and credibility.
-- For BA format: prefer BG-02, BG-05, BG-06, BG-09 for transformation journey feel.
+- ID format is three digits (`BG-001` ... `BG-500`).
 
 ### Background selection algorithm (mandatory)
 
-- Use policy split: 80% catalog (`info/BACKGROUND_VARIANTS.JSON`) and 20% fresh-generated backgrounds.
-- Catalog path uses exhaustive rotation tracker (not a last-N window).
-- For selected format, choose from `remaining_slots_current_cycle`; after selection, move slot to `used_slots_current_cycle`.
-- If `remaining_slots_current_cycle` becomes empty, increment cycle_number, reset used/remaining from current allowed pool, then continue selection.
-- For fresh-generated path: generate descriptor first, then reject if semantically matches any catalog variant.
-- Fresh-generated match check must compare at least: scene context, surface, camera framing, lighting style, key props.
-- If fresh candidate overlaps a catalog concept, regenerate fresh descriptor until it is distinct.
-- Fresh-generated backgrounds must also avoid repeating in recent history (use last 20 fresh entries across same format).
-- Save selection metadata in registry: source (`catalog` or `fresh`), id or fresh signature, and format.
-- If constraints cannot be satisfied, fallback order is catalog first, then fresh regenerate, never random blind pick.
+- Use catalog-first selection from `BACKGROUND_VARIANTS.JSON` and enforce exhaustive rotation using `indexes.slot_exhaustion_tracker`.
+- Select from `remaining_slots_current_cycle`, then move selected slot to `used_slots_current_cycle`.
+- If `remaining_slots_current_cycle` is empty, increment cycle number and repopulate from current allowed pool.
+- Safe-zone sentence generation must use:
+  - `python3 scripts/upgrade_safezone_backgrounds.py --prompt-only --id BG-XXX --format 4:5 --seed <SEED>`
+- SEED rule: `SEED = (BATCH_NUMBER * 1000) + (PERSONA_NUMBER * 10) + VARIATION`
+- Include in Section 8:
+  - `Background slot: BG-XXX`
+  - `Seed: <SEED>`
+  - Full seeded sentence output
+  - Safe-zone fields: `composition`, `layout_intent`, `cta_safe_space`, `crop_safety`
 
 ---
 
@@ -340,11 +296,16 @@ In production mode:
 - Write one entry per generation immediately after final output.
 - Never overwrite history; append-only logging.
 
-### Registry schema (use this exact structure):
+### Registry schema (current production structure):
 
 ```json
 {
-  "registry": [
+  "mode": {
+    "phase": "production",
+    "write_enabled": true,
+    "last_updated": "2026-04-18T09:51:00Z"
+  },
+  "entries": [
     {
       "id": "entry_001",
       "timestamp": "2025-01-01T00:00:00Z",
@@ -376,9 +337,15 @@ In production mode:
       "fresh_background_signature": null,
       "language": "EN",
       "output_quality": "approved",
-      "notes": "First test generation"
+      "notes": "First test generation",
+      "seed": 7071
     }
-  ]
+  ],
+  "indexes": {
+    "backgrounds_by_format": {},
+    "slot_exhaustion_tracker": {},
+    "used_text": {}
+  }
 }
 ```
 
@@ -413,10 +380,12 @@ In production mode:
 - Same persona + same headline_angle = hard block regardless of format. Always change at least one.
 - Any exact text reuse is forbidden across all history: headline, support line, CTA, caption, and bullets in both EN and HI must be new every time.
 
-### Production switch instruction:
+### Production write instruction:
 
-When moving to production, change registry write mode from OFF to ON.
-Generate 1 variation per format and log every entry before delivering to user.
+- Keep `mode.write_enabled = true` in production.
+- Update `mode.last_updated` on every successful append.
+- Generate 1 variation per requested format unless user explicitly asks for more.
+- Append entry before final handoff.
 
 ---
 
@@ -772,7 +741,7 @@ Step 6 - Registry write (mandatory in production)
 - Keep append-only behavior; do not delete or rewrite past records.
 
 Default behavior if user gives minimal input:
-- Generate default starter batch immediately using the default mapping in Section 0.
+- Generate default starter batch immediately using Section 0 defaults.
 - Use AI-generated fresh headlines.
 - Use all 5 formats unless user narrowed scope.
 
@@ -936,7 +905,7 @@ Follow these rules strictly:
 
 Optional add-on line:
 ```
-When I ask for ad creation, follow this sequence: ask persona number -> ask headline mode -> ask format(s) -> select background slot -> deliver final Gemini prompts in both English and Hindi.
+When I ask for ad creation with no specific inputs, generate the default starter batch directly (no clarification round). If I provide persona/headline/format, apply those inputs directly.
 ```
 
 ---
@@ -947,12 +916,12 @@ When I ask for ad creation, follow this sequence: ask persona number -> ask head
 2. Paste it in a fresh Gemini or assistant chat.
 3. Upload all 6 product packshot images to Gemini Web.
 4. Start with: "Create ad."
-5. Follow the interaction flow: persona -> headline mode -> format(s) -> background slot confirmation -> final prompts.
-6. On headline step: receive 5 fresh options (EN + HI). Pick one.
+5. If no inputs are provided, generate default starter batch immediately.
+6. If partial/specific inputs are provided, apply them and fill missing fields from defaults.
 7. Save generated prompts in `output/vN/` and run API jobs (EN by default) using links from `input/activeimages.txt`.
 8. Store generated images in `generated_image/vN/<format>-en/` (or `-hi` only when requested).
 9. Use repair commands (Section 16) if quality fails.
-10. When write mode is turned ON: log each generation to registry using the schema in Section 10.
+10. In production (`mode.write_enabled: true`), append each generation to `entries` and update indexes.
 
 How to avoid repetition at scale:
 - Never reuse old text directly (headline, support line, CTA, caption, bullets).
@@ -966,16 +935,23 @@ How to avoid repetition at scale:
 
 File path: `info/AD_GENERATION_REGISTRY.JSON`
 
-Current write mode: ON (production)
-Current read mode: ON
+Current mode: production (`mode.write_enabled: true`)
 
 Starting state example (append entries in live production):
 
 ```json
 {
-  "write_mode": false,
-  "last_updated": null,
-  "registry": []
+  "mode": {
+    "phase": "production",
+    "write_enabled": true,
+    "last_updated": null
+  },
+  "entries": [],
+  "indexes": {
+    "backgrounds_by_format": {},
+    "slot_exhaustion_tracker": {},
+    "used_text": {}
+  }
 }
 ```
 
@@ -986,8 +962,8 @@ Registry indexing requirement (production):
 - Treat every string in `indexes.used_text` as permanently blocked from reuse.
 
 Production live rules:
-- Keep "write_mode" true.
-- Set "last_updated" to current timestamp on every write.
-- Append one entry per generation using schema from Section 10.
+- Keep `mode.write_enabled` true.
+- Set `mode.last_updated` to current timestamp on every write.
+- Append one entry per generation to `entries`.
 - Never overwrite existing entries — append only.
 - Read registry before every generation to check deduplication rules.
