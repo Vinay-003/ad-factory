@@ -22,12 +22,14 @@ Accepted user input styles (examples):
 - "Persona 9, HERO + TEST" -> use persona 9 for those formats
 - "Use this headline: ... for FEAT" -> keep that headline, generate rest as needed
 - "UGC only" -> generate only UGC with default persona/headline mode unless user specifies
+- "Create 9:16 ads" / "Stories ads" / "Reels ads" -> switch output sizing and text placement to 9:16 safe-zone rules before prompt finalization
 
 Default starter batch profile (use when no specific input is given):
 - Persona selection: random from 1-22 per format (do not use a fixed mapping)
 - Prefer unique personas across selected formats in the same batch when possible
 - If user provides persona for only some formats, keep those fixed and randomize remaining formats
 - Headline mode: AI-generated fresh headlines
+- Default canvas mode when user gives no placement/ratio instruction: 4:5
 - Formats: HERO, BA, TEST, FEAT, UGC
 
 ---
@@ -70,6 +72,9 @@ Mechanism grounding rules:
 - Do not frame the product as a fat burner.
 - Do not use claims like `boosts metabolism`, `burns fat fast`, `accelerates fat loss`, or similar shortcuts.
 - Product logic must stay grounded in: reduced hunger, reduced cravings, reduced random eating, reduced intake, and digestion support.
+- Support lines must not stop at generic routine language; they must connect the approved mechanism to the product's weight-management purpose.
+- Every support line should ladder up from mechanism to outcome using compliant phrasing such as: supports weight loss efforts, helps reduce overeating that drives weight gain, supports reducing excess weight, supports obesity reduction efforts, or helps make weight reduction more manageable.
+- Do not write support lines that only mention routine simplicity, clarity, consistency, mindset, or guidance unless they also make clear that the product is for reducing excess weight / obesity.
 
 Approved anchors:
 - 3-5 kg average in 15 days
@@ -535,9 +540,12 @@ Keep format structure fixed. Swap persona-specific headline/caption blocks.
 ### HERO
 - Purpose: broad conversion
 - Persona use: strongest pain-led hook + fastest believable outcome
-- Copy shape: strong headline, one support line, CTA
+- Copy shape: strong headline, one mechanism-to-outcome support line, CTA
 - Text budget: 18-32 words
       - Minimum copy units: headline + 1 support line + CTA
+      - HERO support-line rule: the support line must show how the approved mechanism supports weight loss / excess-weight reduction / obesity-reduction intent; it cannot be only a generic routine or mindset line
+      - Preferred support-line pattern: mechanism -> weight-management outcome
+      - Example direction only: "Helps control cravings so weight reduction feels easier to sustain."
       - Layout lock: headline in top text band only (top 15-32% of canvas), support directly below, CTA in lower safe band.
 
 ### BA
@@ -695,6 +703,12 @@ OUTPUT SPEC
 - Rendering: No compression artifacts. No soft edges on text or product label.
 - All 5 products present, proportionally sized per reference dimensions, unmodified.
 - Readability: maintain high-contrast foreground/background treatment for ad-platform legibility.
+- Placement safety: before finalizing any prompt, lock all critical text, logos, CTA, and product-signaling elements inside the format-safe protected area.
+- Default canvas mode when not specified by user: 4:5 portrait at 1080 x 1350.
+- 4:5 safe-zone rule for mobile-first delivery: keep critical elements away from the top 14%, bottom 35%, and outer 6% side margins.
+- 4:5 pixel guardrail at 1080 x 1350: avoid critical placements in the top 189px, bottom 473px, and outer 65px on left/right.
+- 9:16 safe-zone rule for Stories/Reels delivery: keep critical text, logos, and CTA out of the top and bottom UI-risk bands and away from side edges.
+- 9:16 pixel guardrail at 1080 x 1920: keep critical elements out of the top 250px, bottom 340px, and outer 65px on left/right unless the platform explicitly guarantees safe visibility.
 - Size override rule: if channel-specific export is requested, output exact dimensions explicitly in prompt.
 
 FORMAT LAYOUT INSTRUCTIONS
@@ -708,6 +722,14 @@ FORMAT LAYOUT INSTRUCTIONS
   - Support line zone = directly below headline (top 32-45%).
   - CTA zone = lower safe band (bottom 70-85%), never above headline/support.
   - Forbidden placement = headline in lower-third or below product midline.
+- 4:5 safe placement override:
+  - Keep all essential text, CTA, logos, and product-signaling elements inside the center-safe region.
+  - Do not place critical elements in the top 14%, bottom 35%, or outer 6% side margins.
+  - Treat the lower 35-40% as a danger zone for CTA and key copy when the ad may run in reels/story-like surfaces with UI overlays.
+- 9:16 safe placement override:
+  - Keep all essential text, CTA, logos, and product-signaling elements inside the central protected zone only.
+  - Do not place key elements in the top 250px, bottom 340px, or outer 65px on left/right of a 1080 x 1920 canvas.
+  - Keep the bottom interaction zone visually quiet so platform UI does not collide with message-critical copy.
 - Background: [reference selected background slot — see Section 9 below]
 - Camera: [close-medium / medium / overhead — specify per format]
 - Lighting: warm soft directional — source from top-left. Subtle drop shadows beneath products.
@@ -901,6 +923,9 @@ Validation checklist (machine-checkable):
 - `CHK-21` same_persona_batch_angle_separation: when one persona appears in multiple formats in a batch, each format uses a distinct sub-angle source and passes motif non-repetition checks.
 - `CHK-22` english_copy_no_hinglish: for `OUTPUT_*_EN.txt`, on-image copy fields (headline/support/quote/bullets/CTA/trust line/attribution) must not contain Hindi/romanized-Hindi phrasing.
 - `CHK-23` no_workstation_props_default: unless explicitly requested, do not include workstation-heavy props (keyboard, laptop, monitor, mouse) in visual direction blocks.
+- `CHK-24` support_line_outcome_anchor: support lines must not be generic routine-only language; they must connect approved mechanism logic to weight-loss / excess-weight / obesity-reduction intent using compliant wording.
+- `CHK-25` safe_zone_rules_present: prompt must include the correct safe-zone rule set for the selected canvas ratio before write.
+- `CHK-26` critical_elements_inside_safe_zone: headline, support line, CTA, logos, and product-signaling elements must stay out of declared top/bottom/side risk bands for 4:5 and 9:16 outputs.
 
 Operational examples of CHK-22 failure (reject and regenerate):
 - `Raat ko control nahi ho raha?`
