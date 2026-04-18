@@ -83,8 +83,6 @@ OBESITY KILLER KIT — COMPLETE AD GENERATION PROMPT
 
       Body text and bullets: #421808      
 
-      Disclaimer text: #7A3314      
-
       No colors outside this palette. No neon. No harsh gradients. No random accent colors anywhere.      
 
       A7. LIGHTING      
@@ -140,6 +138,10 @@ OBESITY KILLER KIT — COMPLETE AD GENERATION PROMPT
       Do not use harsh gradients or random background colors      
 
       Do not add emoji, overlays, or visual clutter of any kind      
+
+      Do not place keyboard, laptop, mouse, monitor, or workstation-heavy props in background unless explicitly requested by user      
+
+      No disclaimer copy line on-image unless user explicitly asks for disclaimer mode      
 
       A11. PART A QUALITY CHECKLIST      
 

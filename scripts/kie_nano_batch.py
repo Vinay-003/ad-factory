@@ -200,6 +200,66 @@ def compose_prompt(starting_prompt: str, prompt_file: Path) -> str:
     return f"{starting_prompt.strip()}\n\n{body}\n"
 
 
+def _find_line_value(pattern: str, text: str) -> str | None:
+    match = re.search(pattern, text, flags=re.IGNORECASE | re.MULTILINE)
+    if not match:
+        return None
+    value = match.group(1).strip()
+    return value or None
+
+
+def extract_prompt_metadata(prompt_text: str) -> dict:
+    metadata: dict[str, object] = {}
+
+    persona_line = _find_line_value(r"^-\s*Persona:\s*(.+)$", prompt_text)
+    if persona_line:
+        metadata["persona_line"] = persona_line
+        persona_num_match = re.search(r"\(\s*Persona\s*(\d+)\s*\)", persona_line, flags=re.IGNORECASE)
+        if persona_num_match:
+            metadata["persona_number"] = int(persona_num_match.group(1))
+            metadata["persona_name"] = re.sub(r"\s*\(\s*Persona\s*\d+\s*\)", "", persona_line, flags=re.IGNORECASE).strip()
+        else:
+            metadata["persona_name"] = persona_line
+
+    bg_line = _find_line_value(r"^-\s*Background\s*slot:\s*(.+)$", prompt_text)
+    if bg_line:
+        metadata["background_slot_line"] = bg_line
+        slot_match = re.search(r"\b(BG-\d{3})\b", bg_line, flags=re.IGNORECASE)
+        if slot_match:
+            metadata["background_slot"] = slot_match.group(1).upper()
+        title_match = re.search(r"BG-\d{3}\s*[—-]\s*\"?([^\"\n]+)\"?", bg_line, flags=re.IGNORECASE)
+        if title_match:
+            metadata["background_title"] = title_match.group(1).strip()
+
+    seed_value = _find_line_value(r"^-\s*Seed:\s*(\d+)\s*$", prompt_text)
+    if seed_value:
+        metadata["seed"] = int(seed_value)
+
+    seeded_prompt_block = re.search(
+        r"SEEDED BACKGROUND PROMPT:\s*\n([^\n].+?)\n\s*-\s*(?:SAFE-ZONE FIELDS|Subject:|Action:|Composition:)",
+        prompt_text,
+        flags=re.IGNORECASE | re.DOTALL,
+    )
+    if seeded_prompt_block:
+        metadata["seeded_background_prompt"] = seeded_prompt_block.group(1).strip()
+    else:
+        scene_value = _find_line_value(r"^-\s*Scene:\s*(.+)$", prompt_text)
+        if scene_value:
+            metadata["seeded_background_prompt"] = scene_value
+
+    headline = _find_line_value(r"^-\s*Headline(?:\s*\(EN\))?:\s*\"?([^\n\"]+)\"?\s*$", prompt_text)
+    support_line = _find_line_value(r"^-\s*Support\s*line(?:\s*\(EN\))?:\s*\"?([^\n\"]+)\"?\s*$", prompt_text)
+    cta = _find_line_value(r"^-\s*CTA(?:\s*\(EN\))?:\s*\"?([^\n\"]+)\"?\s*$", prompt_text)
+    if headline:
+        metadata["headline"] = headline
+    if support_line:
+        metadata["support_line"] = support_line
+    if cta:
+        metadata["cta"] = cta
+
+    return metadata
+
+
 def create_task(
     api_key: str,
     callback_url: str,
@@ -394,6 +454,8 @@ def main() -> int:
         ensure_dir(format_dir)
 
         for prompt_file in files:
+            prompt_body = prompt_file.path.read_text(encoding="utf-8")
+            prompt_metadata = extract_prompt_metadata(prompt_body)
             complete_prompt = compose_prompt(starting_prompt, prompt_file.path)
             task_id = create_task(
                 api_key=args.api_key,
@@ -432,6 +494,7 @@ def main() -> int:
                 "variation": prompt_file.variation,
                 "prompt_file": str(prompt_file.path.relative_to(root)),
                 "composed_prompt_file": str(composed_prompt_path.relative_to(root)),
+                "prompt_metadata": prompt_metadata,
                 "result_urls": result_urls,
                 "saved_files": saved_files,
                 "state": task_data.get("state"),

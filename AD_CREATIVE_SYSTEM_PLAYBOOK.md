@@ -15,6 +15,7 @@ Execution mode lock (important):
 - This repo uses the custom in-repo playbook + scripts workflow as primary execution path.
 - Do not switch to the generic `ad-factory` skill flow unless the user explicitly asks to use that skill.
 - Treat "refer to playbook md and create ads" as the same as "create ads".
+- For `create ads` requests, execute directly and return outputs; do not run exploratory commentary.
 
 Accepted user input styles (examples):
 - "Create ads" -> generate default starter batch (all 5 formats, 1 variation each)
@@ -272,6 +273,11 @@ Goal: Every ad generation session must use a distinctly different background/sce
 Background files and purpose:
 - `BACKGROUND_VARIANTS.JSON` = master slot catalog (ID, title, format eligibility)
 - `background_variant.json` = safe-zone enriched structured descriptors used for seeded scene sentence generation
+
+Background hygiene rule (mandatory):
+- Avoid workstation-heavy props by default (keyboard, laptop, monitor, mouse, dense office clutter), unless user explicitly requests office-device context.
+- Prefer clean lifestyle props (cup, book, towel, tray, plant) with low visual noise.
+- FEAT default pool preference: avoid desk/workstation scenes entirely; prioritize clean studio, shelf, tray, kitchen, or clinical-minimal contexts.
 
 ### How it works:
 
@@ -737,6 +743,15 @@ Decision policy (mandatory):
 - Ask follow-up questions only when user intent is conflicting (for example, two different persona instructions for same format).
 - Never ask pre-flight questions like "text prompts or images?" for standard create-ad requests; default to end-to-end flow.
 - If runtime blockers exist (missing API key, missing image URLs, API failure), still complete all non-blocked steps first (generate + save prompts), then report the exact blocker and stop only blocked steps.
+- Do not narrate internal workflow steps (for example: "reading files", "extracting sections", "checking patterns"). Return only final outputs and blockers.
+
+Read-scope rule for `create ads` (mandatory):
+- Read only required sources: this playbook, `productinfomain.txt`, `faq.txt`, `PRODUCT_MECHANISM_V1.txt`, `PERSONA_DEEP_DIVE_01_05.txt`, `BACKGROUND_VARIANTS.JSON`, `background_variant.json`, `AD_GENERATION_REGISTRY.JSON`.
+- Do not mine old `output/v*` prompt files for style or structure unless user explicitly asks to replicate a specific past batch.
+- Historical checks must use registry indexes first; do not crawl old output folders by default.
+- Forbidden sources for normal create-ad runs: `generated_image/v*/prompt_task_*.txt`, `generated_image/v*/task_*.json`, `generated_image/v*/batch_run_summary.json`.
+- Forbidden behavior for normal create-ad runs: progress narration blocks like "Explored X files", "Read ...", and step-by-step planning chatter.
+- Output contract: return only (a) files created/updated, (b) execution result, (c) blockers/errors with exact fix needed.
 
 Input parsing rules:
 - Persona input accepted as one value for all formats, or format-wise values.
@@ -821,6 +836,8 @@ Validation checklist (machine-checkable):
 - `CHK-15` registry_target_file: updates are applied to root `AD_GENERATION_REGISTRY.JSON` only; no alternate/new registry files created.
 - `CHK-16` text_placement_hierarchy: headline in top band, support below headline, CTA in lower safe band; headline never in lower-third.
 - `CHK-17` no_disclaimer_default: no Disclaimer line in on-image copy unless user explicitly requests disclaimer mode.
+- `CHK-18` no_forbidden_source_scan: normal create-ad run does not read old generated-image task artifacts (`generated_image/v*/prompt_task_*.txt`, `task_*.json`, `batch_run_summary.json`).
+- `CHK-19` no_progress_chatter: final response contains no internal exploration narration ("Explored", "Read", "I will now...").
 
 Checklist result contract:
 - Emit a compact status object per prompt: `{"status":"pass|fail","failed_checks":[...],"format":"...","language":"..."}`.
@@ -882,6 +899,19 @@ Step 6 - Registry write (mandatory in production)
 - Append every used text string to `indexes.used_text` buckets.
 - Append diversity tags to `indexes.copy_patterns` buckets (`recent_opening_4tok`, `recent_skeletons`, `recent_cta_voice`, `recent_hook_structure`, `recent_proof_style`).
 - Keep append-only behavior; do not delete or rewrite past records.
+
+Generated image task logging (mandatory):
+- Every `task_<taskId>.json` and `batch_run_summary.json` job record must include prompt metadata:
+  - `persona_name`
+  - `persona_number`
+  - `background_slot`
+  - `background_title` (if available)
+  - `seed`
+  - `seeded_background_prompt`
+  - `headline`
+  - `support_line`
+  - `cta`
+- Missing any of the above should be treated as logging failure and fixed before final handoff.
 
 Default behavior if user gives minimal input:
 - Generate default starter batch immediately using Section 0 defaults.

@@ -60,11 +60,10 @@
     },
     {
       "id": "BG-007",
-      "title": "Office desk midday",
-      "prompt": "Light gray desk, keyboard blur, cup prop, mixed cool-warm lighting",
+      "title": "Minimal surface midday",
+      "prompt": "Light gray matte surface, soft cup prop, mixed cool-warm lighting, no keyboard or laptop elements",
       "formats": [
-        "TEST",
-        "FEAT"
+        "TEST"
       ]
     },
     {

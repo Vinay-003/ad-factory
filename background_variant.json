@@ -464,8 +464,8 @@
     },
     {
       "id": "BG-007",
-      "title": "Office desk midday",
-      "base": "keyboard blur, cup prop",
+      "title": "Minimal surface midday",
+      "base": "clean light-gray surface, soft cup prop, no keyboard or laptop elements",
       "lighting": [
         "soft side window light with neutral fill and controlled desk-level highlights",
         "balanced cool-neutral daylight mixed with warm practical ambient spill",
@@ -513,8 +513,7 @@
         "slightly cool clean tone with smooth highlight handling"
       ],
       "formats": [
-        "TEST",
-        "FEAT"
+        "TEST"
       ],
       "layout_intent": [
         "keep the subject mass fully inside the central safe region with no edge-anchored focal detail",

@@ -1,95 +1,81 @@
 Section 1 — PRODUCT LOCK BLOCK
 - Use the uploaded Obesity Killer product packshot images as absolute visual truth.
 - Do not redesign, redraw, relabel, or alter any product or packaging in any way.
-- Do not change brand name, label colors, illustrations, proportions, or any text (Hindi or English).
-- If any label text is unclear — preserve the original image as-is. Do not reinterpret it.
+- Do not change brand name, label colors, illustrations, proportions, or any text in any language.
+- If any label text is unclear, preserve the original image exactly as-is.
 - Only permitted: placement, scaling, subtle drop shadows, mild warm lighting correction.
-- All 5 products must appear in every output with exact dimensions from reference.
+- All 5 products must appear in every output with exact relative proportions.
 
 Section 2 — OUTPUT SPEC
 - Canvas: 1080 x 1350 pixels. Portrait. 4:5 ratio.
-- Style: FEAT (Features/Benefits) — polished enough for paid ad deployment.
-- Text policy: Low-text by default. All copy minimal and mobile-readable at 375px width.
-- Rendering: No compression artifacts. No soft edges on text or product label.
-- All 5 products present, proportionally sized per reference dimensions, unmodified.
-- Readability: maintain high-contrast foreground/background treatment for ad-platform legibility.
+- Style: FEAT (Features/Benefits) polished for paid ad deployment.
+- Keep on-image text minimal and mobile-readable.
+- Rendering must be clean with no compression artifacts.
+- All visible text must remain crisp and high-contrast.
+- Product labels must remain sharp and fully faithful.
 
 Section 3 — FORMAT LAYOUT INSTRUCTIONS
-- Composition: Product centered with feature bullets in clean layout.
+- Composition: product centered with features in a clean readable stack.
 - Focal hierarchy: product dominant, features secondary, background tertiary.
 - Product zone: center-upper.
-- Text zones: lower area for bullets and CTA, clear readable zones.
-- Background: white marble shelf, folded towel.
+- Text zones: lower area for bullets and CTA only.
+- Headline zone: upper band on flat low-noise background.
 - Camera: medium-wide ad framing with restrained depth blur.
-- Lighting: soft overhead-plus-side blend.
-- Spacing: strong whitespace for bullet readability.
+- Lighting: warm soft directional light from top-left.
+- Spacing: generous whitespace for easy bullet scanning.
 
 Section 4 — PERSONA INPUT BLOCK
-- Persona: Busy Professional (Persona 2)
-- Pain: No time for complicated weight-loss routines, gym, or meal prep.
-- Desire: Simple routine that fits a packed schedule.
-- Friction: Anything requiring 1+ hours daily is impossible to maintain.
-- Proof needed: easy to follow, natural, no side effects.
-- Tone cue: practical, efficient, trustworthy.
+- Persona: Late-Night Eater (Persona 12)
+- Pain: दिन की मेहनत रात की स्नैकिंग से बिगड़ जाती है।
+- Desire: रात शांत रहे और अगला दिन स्थिर प्रगति वाला हो।
+- Friction: डिनर के बाद भूख और me-time स्नैकिंग का लूप टूटता नहीं।
+- Proof needed: रात की समस्या के लिए स्पष्ट और व्यावहारिक सपोर्ट।
+- Tone cue: बिना शर्मिंदा किए, व्यावहारिक और भरोसेमंद।
 
 Section 5 — EXACT ON-IMAGE COPY — DO NOT ALTER ANYTHING
-- Headline: Gym का time नहीं? कोई problem नहीं।
-- Support line: Simple daily routine, natural ingredients.
-- CTA: शुरू करें
+- Headline: रात की cravings से progress टूटती है? पहले night loop संभालें।
+- Support line: सुबह fullness support और रात digestion support वाला एक सरल daily routine.
+- CTA: अपनी रात संभालें
 - Bullets:
-  • hunger और cravings control करता है
-  • digestion support करता है
-  • 15 दिन में औसतन 3-5 kg
-  • कोई crash diet नहीं
+  • late night hunger spikes कम करने में मदद
+  • random post dinner snacking कम करने में मदद
+  • सोने से पहले digestion को शांत support
+  • 15 दिन में औसतन 3 से 5 kg
 Render every character exactly as written. No paraphrasing, no punctuation changes.
 
 Section 6 — NEGATIVE CONSTRAINTS
 - Do not recreate or redraw any product.
 - Do not blur, approximate, or rewrite any label text.
 - Do not use sale badges, burst graphics, or stickers.
-- Do not show body transformations or weight-loss visuals.
-- Do not use colors outside the defined palette (#FFFBED to #FCDBAC background, #F79040 to #E66410 accents).
+- Do not show body transformation visuals.
+- Do not use colors outside the defined palette.
 - Do not use more than 2 font weights.
-- Do not overcrowd the layout.
-- Do not make medical cure claims of any kind.
-- Do not use ring light, studio flash, or overproduced lighting.
+- Do not make medical cure claims.
+- Do not use harsh flash lighting or ring-light style glare.
 
-Section 7 — QUALITY BAR — verify before accepting output:
-- All 5 products present, correctly proportioned, completely unmodified.
-- All on-image text sharp and readable at 375px mobile size.
-- Product label accurate, unmodified, and fully readable.
-- Layout is calm, balanced, and premium.
-- No clutter, no hype, no forbidden elements.
-- Single clear focal hierarchy — product dominant throughout.
-- If any item above fails — regenerate immediately without compromise.
+Section 7 — QUALITY BAR
+- All 5 products present and proportionally accurate.
+- On-image text readable at mobile width.
+- Label text remains faithful and unmodified.
+- Layout stays calm, premium, and uncluttered.
+- Single focal hierarchy remains clear.
+- If any detail is soft or unclear, regenerate immediately.
 
 Section 8 — VISUAL DIRECTION BLOCK
-- Background slot: BG-004
-- Seed: 4014
-- Scene: White marble shelf, folded towel on a clean premium composite surface with restrained texture and ad-ready clarity, with sterile minimal background planes with smooth gradients and controlled depth, lit by soft overhead-plus-side blend preserving hygiene-forward brightness, conveying hygiene-forward modern wellness routine.
-- Subject: no human subject — product-only composition.
-- Action: products arranged on surface.
-- Camera: medium-wide ad framing with restrained depth blur and stable natural perspective.
-- Lighting: soft overhead-plus-side blend preserving hygiene-forward brightness.
-- Props: none — minimal.
-- Surfaces: clean premium composite, white marble shelf.
-- Mood: hygiene-forward modern wellness routine.
-- Realism: correct product proportions, clean commercial finish.
-- Composition: center-weighted layout with soft upward emphasis, ensuring no important detail touches edge risk zones.
+- Background slot: BG-007
+- Seed: 10121
+- Scene: keyboard blur, cup prop on a minimal matte neutral platform with crisp silhouette separation, with subtle background blur with layered depth separation and low visual noise, lit by refined mixed-office lighting with premium tonal consistency, conveying credible professional lifestyle calm; 45-degree three-quarter close framing, soft focus falloff, crisp subject plane and clean edge definition, balanced feed composition inside the central safe field, with top and bottom risk bands kept visually quiet, maintain controlled negative space around the subject to prevent drift into crop-risk zones, maintain subtle low-contrast space near the lower edge to protect feed overlay readability, avoid edge-dependent framing; composition must survive moderate side and vertical trimming, warm natural tones with commercial polish, designed for 4:5 feed framing with key content held inside the central safe field, centered to slightly above center, while top 10 percent, bottom 15 percent, and side edge zones remain low-priority, clean premium studio ad photography, ultra-detailed, flawless commercial finish.
+- Subject: no human subject, product-only composition.
+- Action: products arranged on surface with clean spacing.
+- Composition: maintain controlled negative space around the subject to prevent drift into crop-risk zones.
 - Layout intent: keep the subject mass fully inside the central safe region with no edge-anchored focal detail.
 - CTA safe space: maintain subtle low-contrast space near the lower edge to protect feed overlay readability.
 - Crop safety: avoid edge-dependent framing; composition must survive moderate side and vertical trimming.
 
 Section 9 — TYPOGRAPHY SHARPNESS BLOCK
-- Headline: Poppins Bold — high contrast against background zone.
-- Support and CTA: Poppins Medium/Regular — same typeface family.
-- Size: large enough to read on 375px mobile screen without zooming.
-- Placement: flat uncluttered zones only — never over busy background detail.
-- Forbidden: thin fonts, script fonts, decorative typefaces, glow effects, outlined text, drop shadows on copy.
-- Mandatory: crisp hard text edges — zero softness — zero anti-alias blur on any character.
-- If any text is soft, blurry, or illegible — discard and regenerate immediately.
-
-Keep text count minimal and increase font size rather than packing more copy.
-Typography must be pin-sharp. If any text appears soft, blurry, or smeared, regenerate.
-Use clean sans typography with strong stroke clarity; no thin/light weights for body text.
-Use Poppins only for on-image text: Headline in Poppins Bold, support/CTA in Poppins Medium or Regular.
+- Headline: Poppins Bold with high contrast.
+- Support, bullets, and CTA: Poppins Medium or Regular.
+- Text placement only on flat uncluttered zones.
+- No decorative fonts, glow, outlines, or text shadows.
+- Typography must be pin-sharp. If any text appears soft, blurry, or smeared, regenerate.
+- Keep copy minimal and increase font size instead of packing dense text.
