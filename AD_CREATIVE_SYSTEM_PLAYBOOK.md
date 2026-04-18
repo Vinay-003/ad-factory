@@ -632,6 +632,8 @@ QUALITY BAR — verify before accepting output:
 - Layout is calm, balanced, and premium
 - No clutter, no hype, no forbidden elements
 - Single clear focal hierarchy — product dominant throughout
+- Section 8 contains full seeded background sentence from script execution (not just seed number reference) — if missing, regenerate immediately
+- Section 8 contains all 4 safe-zone fields from background_variant.json: composition, layout_intent, cta_safe_space, crop_safety — if any missing, regenerate immediately
 - If any item above fails — regenerate immediately without compromise
 
 VISUAL DIRECTION BLOCK
@@ -706,9 +708,17 @@ Step 4.25 — Safe-zone enforcement (mandatory)
 - Use the structured background catalog in `background_variant.json` (not `BACKGROUND_VARIANTS.JSON`) because it includes safe-zone control fields:
   - `composition`, `layout_intent`, `cta_safe_space`, `crop_safety`
 - When you pick a background slot `BG-XXX`, generate a *seeded* background prompt so the safe-zone phrasing is deterministic per batch.
+  - Selection order (mandatory):
+    1) Pick an *unused* background slot for the requested format from `AD_GENERATION_REGISTRY.JSON` → `indexes.slot_exhaustion_tracker.<FORMAT>.remaining_slots_current_cycle` when present.
+    2) If that list is empty/missing, pick a slot not in `indexes.backgrounds_by_format.<FORMAT>` recent window; if still not possible, fall back to any valid slot but state it explicitly.
+  - Seed rule (mandatory, deterministic): `SEED = (BATCH_NUMBER * 1000) + (PERSONA_NUMBER * 10) + VARIATION`
+    - Example: batch `v7`, persona `7`, variation `1` → seed `7071`
   - Use: `python3 scripts/upgrade_safezone_backgrounds.py --prompt-only --id BG-XXX --format 4:5 --seed <SEED>`
-  - Paste the resulting sentence into Section 8 (VISUAL DIRECTION BLOCK) and keep the selected `BG-XXX`.
-  - Store `<SEED>` in the registry notes (or a dedicated field if you add one) so the same safe-zone background prompt can be reproduced later.
+  - Paste the resulting *seeded* sentence into Section 8 (VISUAL DIRECTION BLOCK) and keep the selected `BG-XXX`.
+  - Add a line in Section 8: `Seed: <SEED>` so reviewers can verify deterministic seeding was applied.
+  - MANDATORY CHECKPOINT: Section 8 must contain the full OUTPUT of upgrade_safezone_backgrounds.py (seeded sentence), not just the seed number. If your prompt only says "Seed: <SEED>" without the seeded background sentence, it is INVALID — regenerate immediately.
+  - ALSO: Extract and include these 4 safe-zone fields from background_variant.json into Section 8: composition, layout_intent, cta_safe_space, crop_safety. All 4 must be present in the final prompt.
+  - Store both `BG-XXX` and `<SEED>` in the registry notes (or dedicated fields) so the background prompt can be reproduced later.
 - Never “fix safe-zones after the fact” by rewriting the prompt mid-run; safe-zone rules must be present in the prompt *before* the API call.
 
 Step 4.5 - Text dedupe gate (mandatory)

@@ -1,0 +1,120 @@
+====================================================================
+SECTION 1 — PRODUCT LOCK BLOCK (MANDATORY)
+====================================================================
+- Use the uploaded Obesity Killer product packshot images as absolute visual truth.
+- Do not redesign, redraw, relabel, or alter any product or packaging in any way.
+- Do not change brand name, label colors, illustrations, proportions, or any text (Hindi or English).
+- If any label text is unclear — preserve the original image as-is. Do not reinterpret it.
+- Only permitted: placement, scaling, subtle drop shadows, mild warm lighting correction.
+- All 5 products must appear in every output, sized proportionally: OK Kit Box (20.3x10.1x14.8cm), OK Powder Bottle (dia5cm, h10cm), OK Tablet Bottle (dia3cm, h5cm), Amla Bottle (dia3cm, h5cm), OK Liquid Sachet (10x15.3cm).
+
+====================================================================
+SECTION 2 — OUTPUT SPEC (MANDATORY)
+====================================================================
+- Canvas: 1080 x 1350 pixels. Portrait. 4:5 ratio.
+- Style: HERO format — polished enough for paid ad deployment.
+- Text policy: Low-text by default. All copy minimal and mobile-readable at 375px width.
+- Rendering: No compression artifacts. No soft edges on text or product label.
+- All 5 products present, proportionally sized per reference dimensions, unmodified.
+- Readability: maintain high-contrast foreground/background treatment for ad-platform legibility.
+
+====================================================================
+SECTION 3 — FORMAT LAYOUT INSTRUCTIONS (HERO FORMAT)
+====================================================================
+- Composition: Product dominant center-right placement, text in left or lower-third zone.
+- Focal hierarchy: Product first, headline second, support line third, CTA fourth.
+- Product zone: Center-right or center-forward placement.
+- Text zones: Flat uncluttered areas only — never over busy background detail.
+- Background: Use seeded background from Section 8.
+- Camera: Medium-wide ad framing with restrained depth blur.
+- Lighting: Warm soft directional — source from top-left. Subtle drop shadows beneath products.
+- Spacing: Strong whitespace between zones. Grid-based alignment. Nothing floats randomly.
+
+====================================================================
+SECTION 4 — PERSONA INPUT BLOCK (PERSONA 12 - LATE-NIGHT EATER)
+====================================================================
+- Persona: Late-Night Eater (Persona 12)
+- Pain: Night eating undoes full-day effort and creates repeat guilt loops. Day goes fine but late-night urges and post-dinner snacking undo deficit.
+- Desire: Stop the night eating loop, wake up lighter, feel in control after dark.
+- Friction: Past attempts failed because willpower alone cannot handle late-night urge spikes. Simple tips do not work on urges. Healthy snacks also get over-eaten. Rational control goes out the window at night.
+- Proof needed: Night-specific messaging, digestion/heaviness relevance, non-shaming tone, practical routine over willpower preaching.
+- Tone cue: Empathetic, non-judgmental, practical. Acknowledge the struggle without shaming.
+- Persona language from deep-dive: "Agar din theek aur raat kharab, to night loop pe pehle kaam karein."
+
+====================================================================
+SECTION 5 — EXACT ON-IMAGE COPY (DO NOT ALTER ANYTHING)
+====================================================================
+Headline (EN): "Your day goes right. Your night undoes it. Fix the night loop first."*
+Headline (HI): "दिन ठीक चलता है, रात बर्बाद कर देती है। पहले night loop fix करें।"*
+
+Support Line (EN): "Morning hunger support + nighttime digestion comfort for easier next-day restart."*
+Support Line (HI): "सुबह भूख control + रात पाचन comfort — आसान next-day restart के लिए।"*
+
+CTA (EN): "Start Tonight"
+CTA (HI): "आज रात शुरू करें"
+
+Disclaimer (EN): "*Average outcomes vary by person and adherence."
+Disclaimer (HI): "*परिणाम व्यक्ति और पालन के अनुसार भिन्न हो सकते हैं।"
+
+====================================================================
+SECTION 6 — NEGATIVE CONSTRAINTS (MANDATORY)
+====================================================================
+- Do not recreate or redraw any product
+- Do not blur, approximate, or rewrite any label text
+- Do not use sale badges, burst graphics, or stickers
+- Do not show body transformations or weight-loss visuals
+- Do not use colors outside the defined palette (#FFFBED to #FCDBAC background, #F79040 to #E66410 accents)
+- Do not use more than 2 font weights
+- Do not overcrowd the layout
+- Do not make medical cure claims of any kind
+- Do not use ring light, studio flash, or overproduced lighting
+- Do not create stock-template look
+
+====================================================================
+SECTION 7 — QUALITY BAR (VERIFY BEFORE ACCEPTING)
+====================================================================
+- All 5 products present, correctly proportioned, completely unmodified
+- All on-image text sharp and readable at 375px mobile size
+- Product label accurate, unmodified, and fully readable
+- Layout is calm, balanced, and premium
+- No clutter, no hype, no forbidden elements
+- Single clear focal hierarchy — product dominant throughout
+- Section 8 contains full seeded background sentence (not just seed number reference)
+- Section 8 contains all 4 safe-zone fields: composition, layout_intent, cta_safe_space, crop_safety
+
+====================================================================
+SECTION 8 — VISUAL DIRECTION BLOCK (SEEDED BACKGROUND WITH SAFE-ZONE RULES)
+====================================================================
+Background Slot: BG-027 — "Minimal beige canvas"
+Seed: 8121
+
+SEEDED BACKGROUND PROMPT:
+Soft beige paper-texture wall, clean table on a clean premium composite surface with restrained texture and ad-ready clarity, with subtle background blur with layered depth separation and low visual noise, lit by gentle ambient light layering with studio-grade highlight control, conveying minimal clean lifestyle confidence; medium-wide ad framing with restrained depth blur and stable natural perspective, symmetrical commercial framing with stable side spacing and restrained detail near top and bottom limits, maintain controlled negative space around the subject to prevent drift into crop-risk zones, keep the bottom 15% visually calm and free of critical detail for CTA flexibility, ensure all critical visual information remains within the center so 1:1 center crop retains full message, neutral balanced grading with clean tonal hierarchy, designed for 4:5 feed framing with key content held inside the central safe field, centered to slightly above center, while top 10 percent, bottom 15 percent, and side edge zones remain low-priority, clean premium studio ad photography, ultra-detailed, flawless commercial finish.
+
+SAFE-ZONE FIELDS (from background_variant.json):
+- composition: "primary subject held in the upper-middle 14-65% band, avoiding top UI overlap and maintaining quiet visual weight below"
+- layout_intent: "maintain controlled negative space around the subject to prevent drift into crop-risk zones"
+- cta_safe_space: "reserve the lower 35% of the frame as a low-detail quiet zone for CTA and caption overlays"
+- crop_safety: "ensure all critical visual information remains within the center so 1:1 center crop retains full message"
+
+Scene: Soft beige paper-texture wall background, clean table surface, premium minimalist studio feel.
+Subject: None (product-only format).
+Product Placement: Center-right or center-forward on table surface.
+Camera: Medium-wide ad framing, 50mm-equivalent perspective, shallow depth of field.
+Lighting: Gentle ambient light layering with studio-grade highlight control, warm soft directional.
+Mood: Minimal clean lifestyle confidence, calm premium wellness routine.
+
+====================================================================
+SECTION 9 — TYPOGRAPHY SHARPNESS BLOCK (MANDATORY)
+====================================================================
+- Headline: Poppins Bold — high contrast against background zone, #973015 color
+- Support and CTA: Poppins Medium/Regular — #421808 for support, #F79040 for CTA
+- Size: large enough to read on 375px mobile screen without zooming (min 24px for headline, 18px for support)
+- Placement: flat uncluttered zones only — never over busy background detail
+- Forbidden: thin fonts, script fonts, decorative typefaces, glow effects, outlined text, drop shadows on copy
+- Mandatory: crisp hard text edges — zero softness — zero anti-alias blur on any character
+- Typography must be pin-sharp. If any text appears soft, blurry, or smeared, regenerate.
+
+====================================================================
+END OF PROMPT
+====================================================================
