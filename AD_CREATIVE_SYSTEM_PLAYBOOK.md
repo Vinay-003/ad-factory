@@ -130,6 +130,14 @@ From `productinfomain.txt`:
 
 Headline and caption must be clear, readable, and useful.
 
+On-image copy realism rules (anti-AI style):
+- Write headlines like real Indian performance ads: plain language, sentence case, natural rhythm.
+- Do not use decorative symbols in headline/support/CTA: `*`, `-`, `_`, `|`, `~`, `#`, `@`, `/`, `\\`.
+- Allowed punctuation on-image is minimal: `.`, `,`, `?`, apostrophe. Use only when naturally needed.
+- No emoji, no hashtag-style copy, no forced separators, no bracketed gimmicks.
+- Avoid all-caps headlines unless acronym is part of product label.
+- Keep headline human-sounding, not template-looking: avoid stacked fragments and slogan-like punctuation tricks.
+
 ---
 
 ## 5) Color Palette — Strict, No Exceptions
@@ -230,7 +238,7 @@ Freshness rule:
 - Rotate angle each time: pain, objection, mechanism, time, proof, sacrifice reduction.
 
 Examples (direction only, do not copy-paste):
-- "Cravings control nahi ho rahe? 15 din mein routine palat sakta hai.*"
+- "Cravings control nahi ho rahe? 15 din mein routine palat sakta hai."
 - "Time nahi hai gym ka? Weight routine fir bhi possible hai."
 - "Weight loss chahiye, weakness nahi."
 
@@ -800,6 +808,9 @@ Validation checklist (machine-checkable):
 - `CHK-10` product_lock_lines: product lock block includes required fidelity constraints and absolute visual truth line.
 - `CHK-11` language_purity: EN is fully English and HI is Devanagari-only unless mixed script is explicitly requested.
 - `CHK-12` script_execution_evidence: when script-based steps are required, command output evidence exists (no simulated results).
+- `CHK-13` symbol_hygiene: headline/support/CTA contain no banned decorative symbols (`*`, `-`, `_`, `|`, `~`, `#`, `@`, `/`, `\\`).
+- `CHK-14` version_progression: write target is next available `vN` (max existing + 1), never overwrite existing batch folder.
+- `CHK-15` registry_target_file: updates are applied to root `AD_GENERATION_REGISTRY.JSON` only; no alternate/new registry files created.
 
 Checklist result contract:
 - Emit a compact status object per prompt: `{"status":"pass|fail","failed_checks":[...],"format":"...","language":"..."}`.
@@ -807,7 +818,10 @@ Checklist result contract:
 
 Step 5 — Final output and storage
 - Deliver final prompts in both EN and HI for selected format(s).
-- Save prompts under `output/vN/` where `N` increments per request (`v1`, `v2`, ...).
+- Compute next version before writing: scan `output/` for existing `vN` folders and set `N = max(existing) + 1`.
+- Save prompts under `output/vN/` using that computed `N`.
+- Never rewrite an older version folder when user asks "create ads".
+- If user explicitly asks to reuse an existing `vN`, keep folder but write new files with `_V2`, `_V3`, etc.
 - File naming per format/language/variation:
   - `OUTPUT_<FORMAT>_EN.txt`
   - `OUTPUT_<FORMAT>_HI.txt`
@@ -847,6 +861,11 @@ Step 5.7 — Generated image storage
 - Also keep the composed prompt file in the same folder (`prompt_task_<taskId>.txt`).
 
 Step 6 - Registry write (mandatory in production)
+- Registry file handling rule (mandatory):
+  - Always read and update root `AD_GENERATION_REGISTRY.JSON`.
+  - "Create registry" means initialize missing keys in this file, not creating a new registry file.
+  - Do not create alternate names like `AD_GENERATION_REGISTRY_V2.JSON`, `registry.json`, or per-run registry files.
+  - If file exists, perform read-modify-append only; never reset `entries`.
 - Append full entry to `entries`.
 - Append `{entry_id, timestamp, background_slot, background_source}` to `indexes.backgrounds_by_format.<FORMAT>`.
 - If background_source is `catalog`, update `indexes.slot_exhaustion_tracker.<FORMAT>` for cycle progression.
@@ -1008,6 +1027,7 @@ Follow these rules strictly:
 - Reject generic templates; prioritize clear hierarchy and premium composition.
 - Default production output: 1 variation per format.
 - Always provide English + Hindi versions of final prompts and save them in `output/vN/`.
+- Use plain conversational punctuation in on-image copy. Do not use decorative symbols like `*`, `-`, `_`, `|`, `~`, `#`, `@`, `/`, `\\` in headline/support/CTA.
 - Never rely on fixed headline banks; generate fresh headlines each request.
 - Keep typography pin-sharp; regenerate if any on-image text is blurry.
 - Use Poppins font family for all on-image text (Headline: Poppins Bold; body/support/CTA: Poppins Medium or Regular).
@@ -1015,6 +1035,8 @@ Follow these rules strictly:
 - Enforce strict text uniqueness: headline/support/CTA/caption/bullets in EN and HI must never repeat any previously used string.
 - Check the registry at `AD_GENERATION_REGISTRY.JSON` before generation to avoid persona, angle, and background repetition.
 - Registry is in production mode. Write one entry after each generation.
+- When user says "create ads", write to next available `output/vN/` (max existing + 1). Never overwrite old version folders.
+- "Create registry" or "update registry" must target existing root `AD_GENERATION_REGISTRY.JSON` only.
 ```
 
 Optional add-on line:

@@ -1,0 +1,27 @@
+{
+  "batch": "v9",
+  "language_mode": "EN",
+  "max_variations_per_format": 1,
+  "submitted_at": "2026-04-18T08:41:22Z",
+  "image_input_count": 6,
+  "jobs": [
+    {
+      "task_id": "fa872f68efbaa60a50037e8e661f2a3a",
+      "format": "HERO",
+      "language": "EN",
+      "variation": 1,
+      "prompt_file": "output/v9/OUTPUT_HERO_EN.txt",
+      "composed_prompt_file": "generated_image/v9/hero-en/prompt_task_fa872f68efbaa60a50037e8e661f2a3a.txt",
+      "result_urls": [
+        "https://tempfile.aiquickdraw.com/images/1776501750824-hxt7setxkk6.png"
+      ],
+      "saved_files": [
+        "generated_image/v9/hero-en/hero-en-v01-01.png"
+      ],
+      "state": "success",
+      "create_time": 1776501683014,
+      "complete_time": 1776501751764,
+      "cost_time": 68
+    }
+  ]
+}

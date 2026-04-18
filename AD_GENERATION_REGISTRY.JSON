@@ -3,7 +3,7 @@
     "phase": "production",
     "write_enabled": true,
     "note": "Production mode active. Read before generation and append one entry after every generation.",
-    "last_updated": "2026-04-18T09:51:00Z"
+    "last_updated": "2026-04-18T08:38:45Z"
   },
   "rules": {
     "dedupe_scope": [
@@ -804,6 +804,34 @@
       "language": "BOTH",
       "output_quality": "pending",
       "notes": "Persona 12 HERO ad - batch v8"
+    },
+    {
+      "id": "entry_026",
+      "timestamp": "2026-04-18T08:38:45Z",
+      "format": "HERO",
+      "persona_number": 12,
+      "persona_name": "Late-Night Eater",
+      "headline_angle": "mechanism",
+      "headline_en": "Late-night snacking breaking your progress every day again?",
+      "headline_hi": "क्या late-night snacking रोज आपकी progress बिगाड़ देता है?",
+      "support_line_en": "Control cravings after dinner and wake up lighter tomorrow morning.",
+      "support_line_hi": "डिनर के बाद cravings control करें और कल सुबह हल्का महसूस करें।",
+      "cta_en": "Start tonight",
+      "cta_hi": "आज रात से शुरू करें",
+      "disclaimer_en": "Average outcomes vary by person and adherence.",
+      "disclaimer_hi": "परिणाम व्यक्ति और पालन के अनुसार भिन्न हो सकते हैं।",
+      "caption_en": "",
+      "caption_hi": "",
+      "bullets_en": [],
+      "bullets_hi": [],
+      "background_slot": "BG-004",
+      "background_name": "Wellness shelf white",
+      "background_source": "catalog",
+      "fresh_background_signature": null,
+      "seed": 4012,
+      "language": "BOTH",
+      "output_quality": "pending",
+      "notes": "Persona 12 HERO ad - batch v9"
     }
   ],
   "indexes": {
@@ -856,6 +884,12 @@
           "timestamp": "2026-04-18T09:51:00Z",
           "background_slot": "BG-027",
           "background_name": "Minimal beige canvas"
+        },
+        {
+          "entry_id": "entry_026",
+          "timestamp": "2026-04-18T08:38:45Z",
+          "background_slot": "BG-004",
+          "background_source": "catalog"
         }
       ],
       "BA": [
@@ -979,11 +1013,11 @@
           "BG-017",
           "BG-020",
           "BG-009",
-          "BG-027"
+          "BG-027",
+          "BG-004"
         ],
         "remaining_slots_current_cycle": [
           "BG-002",
-          "BG-004",
           "BG-024",
           "BG-028",
           "BG-032",
@@ -1156,7 +1190,9 @@
           "BG-498",
           "BG-500"
         ],
-        "used": [],
+        "used": [
+          "BG-004"
+        ],
         "remaining": [
           "BG-418",
           "BG-288",
@@ -1168,7 +1204,6 @@
           "BG-300",
           "BG-494",
           "BG-032",
-          "BG-004",
           "BG-212",
           "BG-220",
           "BG-106",
@@ -3051,7 +3086,8 @@
         "Trips and festivals should not undo your progress so easily.",
         "Lost count of restarts? Build a plan you can repeat after a bad weekend.*",
         "Restart fatigue is real. Choose a first step you can repeat.*",
-        "Your day goes right. Your night undoes it. Fix the night loop first.*"
+        "Your day goes right. Your night undoes it. Fix the night loop first.*",
+        "Late-night snacking breaking your progress every day again?"
       ],
       "headline_hi": [
         "वजन घटाना शुरू हो सकता है, बिना मुश्किल प्लान के।",
@@ -3077,7 +3113,8 @@
         "यात्रा और त्योहारों में आपकी प्रगति इतनी आसानी से बिगड़नी नहीं चाहिए।",
         "कितनी बार फिर से शुरू करेंगे? खराब वीकेंड के बाद भी चलने वाली योजना चुनें।*",
         "रीस्टार्ट थकान असली है। ऐसा पहला कदम चुनें जो दोहराया जा सके।*",
-        "दिन ठीक चलता है, रात बर्बाद कर देती है। पहले night loop fix करें।*"
+        "दिन ठीक चलता है, रात बर्बाद कर देती है। पहले night loop fix करें।*",
+        "क्या late-night snacking रोज आपकी progress बिगाड़ देता है?"
       ],
       "support_line_en": [
         "Ayurvedic hunger and digestion support for a lighter 15-day start.*",
@@ -3103,7 +3140,8 @@
         "Get a practical reset without crash diets or extreme restrictions.",
         "Morning satiety plus night digestion support helps you continue without all-or-nothing pressure.*",
         "Morning OK Liquid supports hunger control and fewer random bites.*",
-        "Morning hunger support + nighttime digestion comfort for easier next-day restart.*"
+        "Morning hunger support + nighttime digestion comfort for easier next-day restart.*",
+        "Control cravings after dinner and wake up lighter tomorrow morning."
       ],
       "support_line_hi": [
         "आयुर्वेदिक सपोर्ट जो भूख और पाचन को संभालकर 15 दिन की हल्की शुरुआत दे।*",
@@ -3129,7 +3167,8 @@
         "बिना crash diet या कठोर प्रतिबंधों के, एक व्यावहारिक reset पाएं।",
         "सुबह तृप्ति और रात पाचन सहयोग से निरंतरता रखें, बिना सब-कुछ-या-कुछ-नहीं दबाव के।*",
         "सुबह ओके लिक्विड भूख नियंत्रण में मदद करता है, ताकि बेवजह खाने की आदत कम हो।*",
-        "सुबह भूख control + रात पाचन comfort — आसान next-day restart के लिए।*"
+        "सुबह भूख control + रात पाचन comfort — आसान next-day restart के लिए।*",
+        "डिनर के बाद cravings control करें और कल सुबह हल्का महसूस करें।"
       ],
       "cta_en": [
         "Start Simple",
@@ -3155,7 +3194,8 @@
         "Start Your Reset",
         "Restart With Confidence",
         "Start Again, Simply",
-        "Start Tonight"
+        "Start Tonight",
+        "Start tonight"
       ],
       "cta_hi": [
         "आसान शुरुआत करें",
@@ -3181,7 +3221,8 @@
         "अपना Reset शुरू करें",
         "विश्वास के साथ शुरू करें",
         "फिर से, सरल शुरुआत",
-        "आज रात शुरू करें"
+        "आज रात शुरू करें",
+        "आज रात से शुरू करें"
       ],
       "disclaimer_en": [
         "",
@@ -3189,7 +3230,8 @@
         "",
         "",
         "",
-        ""
+        "",
+        "Average outcomes vary by person and adherence."
       ],
       "disclaimer_hi": [
         "",
@@ -3197,7 +3239,8 @@
         "",
         "",
         "",
-        ""
+        "",
+        "परिणाम व्यक्ति और पालन के अनुसार भिन्न हो सकते हैं।"
       ],
       "caption_en": [
         "Start with a simple Ayurvedic routine that helps manage hunger, supports digestion, and aims for visible 15-day progress without crash diets.",
