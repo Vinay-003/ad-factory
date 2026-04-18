@@ -1,0 +1,81 @@
+Section 1 — PRODUCT LOCK BLOCK
+- Use the uploaded Obesity Killer product packshot images as absolute visual truth.
+- Do not redesign, redraw, relabel, or alter any product or packaging in any way.
+- Do not change brand name, label colors, illustrations, proportions, or any text (Hindi or English).
+- If any label text is unclear — preserve the original image as-is. Do not reinterpret it.
+- Only permitted: placement, scaling, subtle drop shadows, mild lighting correction.
+
+Section 2 — OUTPUT SPEC
+- Canvas: 1080 x 1350 pixels. Portrait. 4:5 ratio.
+- Style: FEAT — polished enough for paid ad deployment.
+- Text policy: Low-text by default. All copy minimal and mobile-readable at 375px width.
+- Rendering: No compression artifacts. No soft edges on text or product label.
+- All 5 products present, proportionally sized per reference dimensions, unmodified.
+- Readability: maintain high-contrast foreground/background treatment for ad-platform legibility.
+- Placement safety: before finalizing any prompt, lock all critical text, logos, CTA, and product-signaling elements inside the format-safe protected area.
+- Designed for 4:5 feed framing with key content held inside the central safe field, centered to slightly above center, while top 10 percent, bottom 15 percent, and side edge zones remain low-priority.
+
+Section 3 — FORMAT LAYOUT INSTRUCTIONS
+- Composition: product dominant (center-lower), headline upper band (top 15-32%), support below headline, CTA lower safe band (bottom 70-85%).
+- Focal hierarchy: product dominant, text secondary, background tertiary.
+- Product zone: center-right foreground, all 5 items visible and unmodified.
+- Text zones: flat uncluttered areas only — never over busy background detail.
+- Text stack map: Headline in top text band only. Support line directly below. CTA in lower safe band only. Forbidden: headline below support or in lower-third.
+- 4:5 safe-zone: keep critical elements away from top 14%, bottom 35%, outer 6% sides.
+- Background: clean premium composite surface; use seeded visual from Section 8.
+- Camera: tight product-forward crop with subtle macro feel, premium shallow focus.
+- Lighting: gentle ambient light layering with studio-grade highlight control.
+- Spacing: strong whitespace between zones. Grid-based alignment.
+
+Section 4 — PERSONA INPUT BLOCK
+- Persona: 19 Trust-First Buyer (doctor-backed only).
+- Pain: distrust non-medical advice, family against side effects, no hype, risk/reward ratio.
+- Desire: transparent satiety/craving/digestion mechanism without hype.
+- Friction: non-transparent claims, safety concerns.
+- Proof needed: doctor-backed, anti-hype, safety clarity.
+- Tone cue: non-hype explanation, structured routine.
+
+Section 5 — EXACT ON-IMAGE COPY — DO NOT ALTER ANYTHING
+- Headline: What makes this kit easier to trust?
+- Support line: Doctor-backed Ayurvedic structure explains satiety and digestion support.
+- CTA: Review The Kit
+Render every character exactly as written. No paraphrasing, no punctuation changes, no autocorrection.
+
+Section 6 — NEGATIVE CONSTRAINTS
+- Do not recreate or redraw any product.
+- Do not blur, approximate, or rewrite any label text.
+- Do not use sale badges, burst graphics, or stickers.
+- Do not show body transformations or weight-loss visuals.
+- Do not use colors outside #FFFBED-#FEEFD6-#FCDBAC background, #F79040-#E66410 accents, #973015 headlines, #421808 body.
+- Do not use more than 2 font weights.
+- Do not overcrowd the layout.
+- Do not make medical cure claims.
+- Do not render unnatural hands.
+- Do not use decorative symbols in text.
+
+Section 7 — QUALITY BAR — verify before accepting
+- All 5 products present, unmodified, readable labels.
+- Text sharp, readable at 375px mobile.
+- Layout calm, premium, product-dominant.
+- No clutter, hype, forbidden elements.
+- Background matches seeded description exactly.
+- Typography crisp, Poppins Bold headline/Medium support/CTA.
+- If fails, regenerate.
+
+Section 8 — VISUAL DIRECTION BLOCK
+- Background slot: BG-015 (Doctor desk trust).
+- Seed: 200190.
+- Scene: White desk, stethoscope side prop on a minimal matte neutral platform with crisp silhouette separation, with minimal contextual backdrop with elegant bokeh falloff and clean negative space, lit by gentle daylight-balanced side key with minimal hard shadow and precise definition, conveying calm evidence-led care environment; 45-degree three-quarter close framing, soft focus falloff, crisp subject plane and clean edge definition, core subject contained within the inner 80% frame area, avoiding side-edge tension and preserving clean perimeter margins, maintain controlled negative space around the subject to prevent drift into crop-risk zones, preserve a quiet footer zone while keeping the subject comfortably within central margins, keep focal hierarchy compact and central so multi-placement crops preserve premium readability, neutral high-clarity white balance with clean premium contrast, designed for 4:5 feed framing with key content held inside the central safe field, centered to slightly above center, while top 10 percent, bottom 15 percent, and side edge zones remain low-priority, clean premium studio ad photography, ultra-detailed, flawless commercial finish.
+- Composition: subject anchored slightly above center within central vertical safe band, lower-frame detail minimized for CTA.
+- Layout_intent: enforce central placement lock so high-importance detail away from boundaries; bias focal center upward, lower region open for CTA.
+- Cta_safe_space: reserve lower 35% low-detail quiet zone for overlays; bottom textures soft, no key content in CTA band.
+- Crop_safety: all critical info in center for 1:1 crop retention; survive side/vertical trimming.
+
+Section 9 — TYPOGRAPHY SHARPNESS BLOCK
+- Headline: Poppins Bold, high contrast.
+- Support/CTA: Poppins Medium/Regular.
+- Size: large, mobile-readable at 375px.
+- Placement: headline top 15-32%, support below, CTA bottom 70-85%.
+- No thin/decorative fonts, glows, shadows.
+- Crisp edges, zero softness.
+- If blurry, regenerate.
