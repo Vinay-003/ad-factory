@@ -55,8 +55,8 @@ Use `PRODUCT_MECHANISM_V1.txt` as the mechanism-model file derived from `product
 Persona language source:
 - Use `PERSONA_DEEP_DIVE_01_05.txt` as the active bridge file for persona-specific ad language.
 - This file adds: raw pain lines, trigger scenarios, objections, language bank, mechanism match, and trust anchors.
-- This file now follows a 3-layer system: Raw Persona Truth -> Message Strategy -> Output Language Rendering.
-- When a covered persona is selected, pull wording and proof angles from the deep-dive file before writing headlines, captions, hooks, or testimonial-style language.
+- Operational generation mode is L1+L2 only: use Layer 1 (Raw Persona Truth) + Layer 2 (Message Strategy) as the copy source.
+- When a covered persona is selected, pull wording and proof angles from Layer 1 and Layer 2 before writing headlines, captions, hooks, or testimonial-style language.
 - Do not invent generic persona language when a deep-dive entry already exists.
 - Current coverage in the deep-dive file: personas 1-22.
 
@@ -194,24 +194,19 @@ Deep-dive expansion rule:
 - Mechanism lines must explain the product in simple relatable terms, not abstract health language.
 - Trust angles must match the persona-specific proof preferences from the deep-dive file.
 
-3-layer rendering workflow:
+L1+L2 rendering workflow (mandatory):
 - Step 1: Read Layer 1 - Raw Persona Truth to understand how the person actually thinks and speaks.
 - Step 2: Read `productinfomain.txt` for approved claims and product boundaries.
 - Step 2b: Read `faq.txt` for protocol details, restrictions, and edge-case usage rules.
 - Step 3: Read `PRODUCT_MECHANISM_V1.txt` to lock the allowed product behavior.
 - Step 4: Read Layer 2 - Message Strategy to choose the right pain angle, mechanism angle, and trust angle.
-- Step 5: Read Layer 3 - Output Language Rendering and convert the same angle into English, Hindi, or Hinglish as requested.
+- Step 5: Compose all final ad copy freshly from Layer 1 + Layer 2 only in the requested language.
 - Do not translate raw Hinglish lines word-for-word into ad copy. Use them to understand emotion first, then render cleanly in the target language.
-- For English ads: use the English-ready phrasing block as tone guidance only, not as reusable copy.
-- For Hindi ads: use the Hindi-ready phrasing block as tone guidance only, not as reusable copy.
-- For Hinglish ads: use the Hinglish-ready phrasing block as tone guidance only, not as reusable copy.
-- Keep the underlying pain, mechanism, and trust angle consistent across all 3 language outputs.
+- Keep the underlying pain, mechanism, and trust angle consistent across all language outputs.
 - When using persona mechanism sections, map the persona's eating behavior to the product's approved behavior change from `PRODUCT_MECHANISM_V1.txt`.
 - When protocol-specific details are needed, such as timing, fasting window, support, restrictions, or usage caveats, pull them from `faq.txt` rather than inventing them.
 
-Layer 3 anti-template rule (mandatory):
-- Treat Layer 3 phrasing as style DNA, not a sentence bank.
-- Do not lift full lines or near-verbatim segments from Layer 3 into final ad copy.
+Fresh composition rule (mandatory):
 - Every headline/support/CTA/bullet must be freshly composed from Layer 1 + Layer 2 strategy.
 - Keep mechanism truth constant, but vary sentence rhythm, opening pattern, and proof framing.
 - In one batch, avoid repeating the same opening pattern across formats (for example, repeated "When...", "If...", "No..." starts).
@@ -462,6 +457,67 @@ Batch diversity minimum:
 - In any 5-ad batch, at least 4 unique `hook_structure_class` values.
 - In any 5-ad batch, at least 3 unique `cta_voice_class` values.
 - No repeated `copy_skeleton` within the same batch.
+
+### Heading uniqueness rules (mandatory)
+
+1) Fresh composition source
+- Generate all headline/support/CTA copy from Persona Layer 1 + Layer 2 only.
+- Do not reuse any prior output sentence.
+- Do not paraphrase old lines from previous batches.
+
+2) Same-persona multi-format separation
+- If one persona is used across HERO, BA, TEST, FEAT, UGC in the same batch, each format must use a different sub-angle:
+  - HERO: strongest pain contrast
+  - BA: before to after transition from one specific trigger
+  - TEST: objection to belief shift
+  - FEAT: mechanism breakdown on a different trigger
+  - UGC: first-person micro-moment
+
+3) Motif non-repetition (hard block)
+- Do not repeat the same 2-4 word motif across formats in the same batch.
+- Examples of banned repeats in one batch: `night loop`, `undoes your day`, `late-night cravings`.
+- If overlap appears, regenerate lower-priority format copy.
+
+4) Structural uniqueness
+- Opening pattern must differ across formats.
+- Reject if first 4-token pattern repeats in same persona batch.
+- Reject if same copy skeleton repeats (example: question to mechanism to CTA).
+
+5) Headline angle rotation
+- Rotate headline angle each time: pain, objection, mechanism, proof, time, sacrifice reduction.
+- Same persona plus same angle in adjacent runs is not allowed.
+
+6) Lexical distance check
+- Headline must use substantially different core nouns/verbs from other formats in same persona batch.
+- Synonym swaps alone are not accepted as new.
+
+7) Language purity
+- EN files: fully English on-image copy.
+- HI files: Hindi-first unless Hinglish is explicitly requested.
+- Reject mixed-language accident in EN headings.
+
+8) Validation gate before write (mandatory)
+- If any uniqueness check fails, do not write files.
+- Regenerate until all formats pass.
+- Return pass/fail report per file with failed checks.
+
+Same-persona multi-format diversification (mandatory):
+- If one persona is used across multiple formats in the same batch, do not reuse the same core pain sentence across those formats.
+- Build a per-format sub-angle map from Layer 1 + Layer 2 before writing copy, and lock one unique sub-angle per format.
+- Allowed sub-angle sources:
+  - Layer 1 pain point line
+  - Layer 1 trigger scenario
+  - Layer 1 objection
+  - Layer 1 language-bank phrase
+  - Layer 2 trust-anchor angle
+- Sub-angle assignment rule for a 5-format batch using one persona:
+  - HERO: primary pain contrast
+  - BA: transition from one concrete trigger to one concrete recovery behavior
+  - TEST: objection-to-belief shift (quote-style trust framing)
+  - FEAT: mechanism breakdown mapped to a different trigger than HERO/BA
+  - UGC: first-person micro-moment using a language-bank phrase not used in other formats
+- Repetition block: do not reuse the same 2-4 word motif across more than one format in the batch (for example: `night loop`, `undoes your day`, `late-night cravings`).
+- If motif overlap appears, regenerate the lower-priority format copy until all five formats are meaningfully distinct in angle, not just wording.
 
 ### Production write instruction:
 
@@ -806,6 +862,8 @@ Step 4.5 - Text dedupe gate (mandatory)
   - Reject if same first 4-token opening pattern appears in recent outputs for the same format/language.
   - Reject if headline/support skeleton matches a recent pattern with minimal lexical change.
   - Reject if 2 or more bullets reuse the same verb-led template as recent outputs in that format.
+  - Reject if same-persona same-batch outputs reuse the same trigger scenario or objection source line across formats.
+  - Reject if same-persona same-batch outputs share the same 2-4 word motif in headline/support across formats.
 - Diversity tag gate (mandatory): assign and validate tags before finalizing text:
   - `opening_pattern_4tok_en` / `opening_pattern_4tok_hi`
   - `copy_skeleton`
@@ -817,6 +875,7 @@ Step 4.5 - Text dedupe gate (mandatory)
 Step 4.75 - Validation checklist gate (mandatory before writing `output/vN/*`)
 - The generator must run this checklist and pass all checks before writing any `OUTPUT_<FORMAT>_<LANG>.txt` file.
 - If any check fails, block write, report failed check IDs, regenerate/fix, then re-run checklist.
+- Hard fail policy: if any `CHK-*` fails, do not write partial batch files. Regenerate until all prompts in the requested batch pass.
 
 Validation checklist (machine-checkable):
 - `CHK-01` sections_present: all 9 required sections exist (Section 1 through Section 9).
@@ -838,6 +897,15 @@ Validation checklist (machine-checkable):
 - `CHK-17` no_disclaimer_default: no Disclaimer line in on-image copy unless user explicitly requests disclaimer mode.
 - `CHK-18` no_forbidden_source_scan: normal create-ad run does not read old generated-image task artifacts (`generated_image/v*/prompt_task_*.txt`, `task_*.json`, `batch_run_summary.json`).
 - `CHK-19` no_progress_chatter: final response contains no internal exploration narration ("Explored", "Read", "I will now...").
+- `CHK-20` fresh_composition_only: final copy is freshly composed from persona Layer 1 + Layer 2 and passes structural uniqueness checks.
+- `CHK-21` same_persona_batch_angle_separation: when one persona appears in multiple formats in a batch, each format uses a distinct sub-angle source and passes motif non-repetition checks.
+- `CHK-22` english_copy_no_hinglish: for `OUTPUT_*_EN.txt`, on-image copy fields (headline/support/quote/bullets/CTA/trust line/attribution) must not contain Hindi/romanized-Hindi phrasing.
+- `CHK-23` no_workstation_props_default: unless explicitly requested, do not include workstation-heavy props (keyboard, laptop, monitor, mouse) in visual direction blocks.
+
+Operational examples of CHK-22 failure (reject and regenerate):
+- `Raat ko control nahi ho raha?`
+- `Subah wale regret se mukt`
+- `Try Karein`
 
 Checklist result contract:
 - Emit a compact status object per prompt: `{"status":"pass|fail","failed_checks":[...],"format":"...","language":"..."}`.
@@ -1060,7 +1128,7 @@ Follow these rules strictly:
 - Create ads in 5 formats: HERO, BA, TEST, FEAT, UGC.
 - For each ad, use one persona input block (pain, desire, friction, proof needed, tone cue).
 - If the persona is covered in `PERSONA_DEEP_DIVE_01_05.txt`, also use that file for objections, trigger moments, mirrored phrases, mechanism framing, and trust selection.
-- If the persona is covered in `PERSONA_DEEP_DIVE_01_05.txt`, generate final copy through the 3-layer workflow: raw truth -> strategy -> target language rendering.
+- If the persona is covered in `PERSONA_DEEP_DIVE_01_05.txt`, generate final copy through the 2-layer workflow: raw truth -> strategy -> fresh target-language copy.
 - Headline must do two things: scroll stop + pain-solution fit.
 - Caption must increase Value = (Dream Outcome x Likelihood) / (Time Delay x Sacrifice).
 - Keep language simple, active, specific, and short.

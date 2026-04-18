@@ -1,0 +1,59 @@
+PRODUCT LOCK BLOCK
+- Use the uploaded Obesity Killer product packshot images as absolute visual truth.
+- Do not redesign, redraw, relabel, or alter any product or packaging.
+- Do not change brand name, label colors, illustrations, proportions, or any text.
+
+OUTPUT SPEC
+- Canvas: 1080 x 1350 pixels. Portrait. 4:5 ratio.
+- Style: BA — Before/After journey style — polished for paid ad deployment.
+- All 5 products present, proportionally sized, unmodified.
+- Text policy: Low-text, mobile-readable at 375px width.
+
+FORMAT LAYOUT INSTRUCTIONS
+- BA: pain-to-progress headline + 3 outcome bullets + CTA.
+- Background: pale oak counter, clean tile wall.
+
+PERSONA INPUT BLOCK
+- Persona: 12 - Late-Night Eater (रात को खाने वाला)
+- Pain: "रात को बहुत भूख लगती है और स्नैक खाना चाहता हूं", "खाने के बाद हमेशा अफसोस होता है", "सब कंट्रोल खो देता हूं"
+- Desire: रात की क्रेविंग्स कंट्रोल करना, सुबह अफसोस से मुक्त
+- Proof needed: रात-विशेष समाधान
+- Tone cue: आशावान, सहायक
+
+EXACT ON-IMAGE COPY — DO NOT ALTER ANYTHING
+- Headline: रात की स्नैकिंग से थक गए? सुबह से शुरू करें।
+- Bullet 1: रात की क्रेविंग्स कंट्रोल में आई
+- Bullet 2: सुबह के रीग्रेट से मुक्त
+- Bullet 3: 15 दिन में रूटीन बन गई
+- CTA: शुरू करें
+
+Render every character exactly in Devanagari script.
+
+NEGATIVE CONSTRAINTS
+- Do not recreate/redraw any product
+- No sale badges, stickers
+- No body transformations
+- No colors outside palette
+- No medical cure claims
+
+QUALITY BAR
+- All 5 products present
+- All text sharp and readable
+- Section 8 contains seeded background and safe-zone fields
+
+VISUAL DIRECTION BLOCK
+- Background slot: BG-002
+- Seed: 16012
+- composition: subject anchored slightly above center
+- layout_intent: keep subject mass fully inside central safe region
+- cta_safe_space: reserve lower 35% as quiet zone
+- crop_safety: keep focal hierarchy compact and central
+
+TYPOGRAPHY SHARPNESS BLOCK
+- Headline: Poppins Bold
+- Bullets/CTA: Poppins Medium/Regular
+- Forbidden: thin fonts, script fonts, glow effects
+- Mandatory: crisp hard text edges
+
+Keep on-image text minimal.
+Typography must be pin-sharp.

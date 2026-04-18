@@ -1,0 +1,80 @@
+PRODUCT LOCK BLOCK
+- Use the uploaded Obesity Killer product packshot images as absolute visual truth.
+- Do not redesign, redraw, relabel, or alter any product or packaging in any way.
+- Do not change brand name, label colors, illustrations, proportions, or any text (Hindi or English).
+- If any label text is unclear — preserve the original image as-is. Do not reinterpret it.
+- Only permitted: placement, scaling, subtle drop shadows, mild warm lighting correction.
+
+OUTPUT SPEC
+- Canvas: 1080 x 1350 pixels. Portrait. 4:5 ratio.
+- Style: BA — Before/After journey style — polished enough for paid ad deployment.
+- Text policy: Low-text by default. All copy minimal and mobile-readable at 375px width.
+- Rendering: No compression artifacts. No soft edges on text or product label.
+- All 5 products present, proportionally sized per reference dimensions, unmodified.
+- Readability: maintain high-contrast foreground/background treatment for ad-platform legibility.
+
+FORMAT LAYOUT INSTRUCTIONS
+- BA format: pain-to-progress headline + 3 outcome bullets.
+- Composition: product zone center, text zones in upper and lower safe bands.
+- Focal hierarchy: product dominant, text secondary, background tertiary.
+- Text stack map: Headline zone = upper band (top 15-32%), Bullet zone = middle band, CTA zone = lower safe band (bottom 70-85%).
+- Background: pale oak counter, clean tile wall.
+- Camera: medium-wide ad framing with restrained depth blur.
+- Lighting: gentle window daylight from the side with clean diffusion.
+- Spacing: strong whitespace between zones, grid-based alignment.
+
+PERSONA INPUT BLOCK
+- Persona: 12 - Late-Night Eater
+- Pain: "I get so hungry and just want to snack snack snack", "afterwards I always feel regret", "all bets are off"
+- Desire: Wake up without regret, feel in control of nighttime urges
+- Friction: Post-dinner snacking window, midnight wakeups trigger eating
+- Proof needed: Night-specific solution, easy restart the next morning
+- Tone cue: Hopeful, supportive, non-shaming
+
+EXACT ON-IMAGE COPY — DO NOT ALTER ANYTHING
+- Headline: Raat ki snacking se thak gaye? Subah se shuru karein.
+- Bullet 1: Raat ki cravings control mein aayi
+- Bullet 2: Subah wale regret se mukt
+- Bullet 3: 15 din mein routine ban gayi
+- CTA: Start Karein
+
+NEGATIVE CONSTRAINTS
+- Do not recreate or redraw any product
+- Do not blur, approximate, or rewrite any label text
+- Do not use sale badges, burst graphics, or stickers
+- Do not show body transformations or weight-loss visuals
+- Do not use colors outside the defined palette
+- Do not use more than 2 font weights
+- Do not overcrowd the layout
+- Do not make medical cure claims of any kind
+- Do not render unnatural or anatomically incorrect hands
+- Do not use ring light, studio flash, or overproduced lighting
+
+QUALITY BAR
+- All 5 products present, correctly proportioned, completely unmodified
+- All on-image text sharp and readable at 375px mobile size
+- Product label accurate, unmodified, and fully readable
+- Layout is calm, balanced, and premium
+- No clutter, no hype, no forbidden elements
+- Section 8 contains full seeded background sentence and all 4 safe-zone fields
+
+VISUAL DIRECTION BLOCK
+- Background slot: BG-002
+- Seed: 16012
+- Scene: Pale oak counter, clean tile wall on a refined stone surface with low-sheen finish and restrained mineral detail, with minimal contextual backdrop with elegant bokeh falloff and clean negative space, lit by gentle window daylight from the side with clean diffusion and balanced fill, conveying clean domestic wellness rhythm; medium-wide ad framing with restrained depth blur and stable natural perspective, clean middle-focused arrangement with deliberate edge clearance for robust feed placement safety, prioritize central hierarchy and avoid any composition that relies on top, bottom, or side edge information, avoid placing focal edges or high-frequency texture near the bottom risk band, keep focal hierarchy compact and central so multi-placement crops preserve premium readability, neutral balanced grading with clean tonal hierarchy, designed for 4:5 feed framing with key content held inside the central safe field, centered to slightly above center.
+- composition: subject anchored slightly above center within the central vertical safe band
+- layout_intent: keep the subject mass fully inside the central safe region with no edge-anchored focal detail
+- cta_safe_space: reserve the lower 35% of the frame as a low-detail quiet zone for CTA and caption overlays
+- crop_safety: keep focal hierarchy compact and central so multi-placement crops preserve premium readability
+
+TYPOGRAPHY SHARPNESS BLOCK
+- Headline: Poppins Bold — high contrast
+- Support and CTA: Poppins Medium/Regular
+- Size: large enough to read on 375px mobile screen
+- Placement: Headline top 15-32%, CTA bottom 70-85%
+- Forbidden: thin fonts, script fonts, decorative typefaces, glow effects
+- Mandatory: crisp hard text edges — zero softness
+
+Keep on-image text minimal and mobile-readable.
+Typography must be pin-sharp. If any text appears soft, blurry, or smeared, regenerate.
+Use provided product references as exact appearance truth.

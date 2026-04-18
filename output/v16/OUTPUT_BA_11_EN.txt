@@ -1,0 +1,60 @@
+PRODUCT LOCK BLOCK
+- Use the uploaded Obesity Killer product packshot images as absolute visual truth.
+- Do not redesign, redraw, relabel, or alter any product or packaging.
+- Do not change brand name, label colors, illustrations, proportions, or any text.
+
+OUTPUT SPEC
+- Canvas: 1080 x 1350 pixels. Portrait. 4:5 ratio.
+- Style: BA — Before/After journey style.
+- All 5 products present, proportionally sized, unmodified.
+- Text policy: Low-text, mobile-readable at 375px.
+
+FORMAT LAYOUT INSTRUCTIONS
+- BA: pain-to-progress headline + 3 outcome bullets + CTA.
+- Background: clean light-gray surface, soft cup prop.
+
+PERSONA INPUT BLOCK
+- Persona: 11 - Office Snacker
+- Pain: "they are hard to resist because they are there and free", "it is out of control"
+- Desire: Control office snacking, stop random bites
+- Friction: Free snacks visible, desk boredom
+- Proof needed: Workday solution
+- Tone cue: Hopeful, practical
+
+EXACT ON-IMAGE COPY — DO NOT ALTER ANYTHING
+- Headline: Office snacking se pare? 15 din mein change.
+- Bullet 1: Free treats ka temptation ab control mein
+- Bullet 2: Tea-time cravings kam hogyi
+- Bullet 3: Workday routine easy rahi
+- CTA: Start Karein
+
+NEGATIVE CONSTRAINTS
+- Do not recreate/redraw any product
+- No sale badges, stickers
+- No body transformations
+- No colors outside palette
+- No medical cure claims
+
+QUALITY BAR
+- All 5 products present
+- All text sharp and readable
+- Section 8 contains seeded background and safe-zone fields
+
+VISUAL DIRECTION BLOCK
+- Background slot: BG-007
+- Seed: 16111
+- Scene: Clean light-gray surface, soft cup prop, no keyboard or laptop elements, lit by soft side window light.
+- composition: clean middle-focused arrangement with deliberate edge clearance
+- layout_intent: maintain controlled negative space around subject
+- cta_safe_space: keep bottom 15% visually calm
+- crop_safety: maintain protected margin buffers
+
+TYPOGRAPHY SHARPNESS BLOCK
+- Headline: Poppins Bold
+- Support/CTA: Poppins Medium/Regular
+- Forbidden: thin fonts, script fonts, glow effects
+- Mandatory: crisp hard text edges
+
+Keep on-image text minimal.
+Typography must be pin-sharp.
+Use provided product references as exact appearance truth.

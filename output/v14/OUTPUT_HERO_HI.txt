@@ -1,0 +1,96 @@
+SECTION 1 — PRODUCT LOCK BLOCK
+- Use the uploaded Obesity Killer product packshot images as absolute visual truth.
+- Do not redesign, redraw, relabel, or alter any product or packaging in any way.
+- Do not change brand name, label colors, illustrations, proportions, or any text (Hindi or English).
+- If any label text is unclear — preserve the original image as-is. Do not reinterpret it.
+- Only permitted: placement, scaling, subtle drop shadows, mild warm lighting correction.
+
+SECTION 2 — OUTPUT SPEC
+- Canvas: 1080 x 1350 pixels. Portrait. 4:5 ratio.
+- Style: HERO — polished enough for paid ad deployment.
+- Text policy: Low-text by default. All copy minimal and mobile-readable at 375px width.
+- Rendering: No compression artifacts. No soft edges on text or product label.
+- All 5 products present, proportionally sized per reference dimensions, unmodified.
+- Readability: maintain high-contrast foreground/background treatment for ad-platform legibility.
+- Size override rule: if channel-specific export is requested, output exact dimensions explicitly in prompt.
+
+SECTION 3 — FORMAT LAYOUT INSTRUCTIONS
+- HERO format: broad conversion, strongest pain-led hook + fastest believable outcome
+- Composition: product zone center-right, text zone upper band only
+- Focal hierarchy: product dominant, text secondary, background tertiary
+- Product zone: center-right placement with slight overlap to left third
+- Text zones: flat uncluttered areas only — never over busy background detail
+- Text stack map (mandatory):
+  - Headline zone = upper band only (top 15-32% of canvas).
+  - Support line zone = directly below headline (top 32-45%).
+  - CTA zone = lower safe band (bottom 70-85%), never above headline/support.
+  - Forbidden placement = headline in lower-third or below product midline.
+- Background: BG-024 - Kitchen island clean
+- Camera: medium close-up, slight overhead angle
+- Lighting: warm soft directional from pendant light, subtle shadow gradients
+- Spacing: strong whitespace between zones. Grid-based alignment.
+
+SECTION 4 — PERSONA INPUT BLOCK (PERSONA 12 - LATE-NIGHT EATER)
+- Persona: Late-Night Eater
+- Pain: Night eating undoes full-day progress; "I get so hungry and just want to snack snack snack", "afterwards I always feel regret", "all bets are off", "self-control is out the window"
+- Desire: Wake up lighter tomorrow, steady morning-to-night control, no more regret
+- Friction: Night is when willpower drops; post-dinner urge spikes feel like "me-time" but create guilt; rational control vanishes after dark
+- Proof needed: Night-specific appetite support, morning fullness that carries through evening, digestion comfort for next-day restart
+- Tone cue: Empathetic, non-shaming, practical
+
+SECTION 5 — EXACT ON-IMAGE COPY — DO NOT ALTER ANYTHING
+- Headline: "दिन जीतता है, रात बर्बाद न करे।"*
+- Support line: "सुबह की भूख control जो रात को हल्का सोने और सुबह steady उठने में मदद करे।"*
+- CTA: "आज रात शुरू करें"
+- Disclaimer: not allowed on-image unless user explicitly asks for disclaimer mode.
+Render every character exactly as written. No paraphrasing, no punctuation changes, no autocorrection.
+
+SECTION 6 — NEGATIVE CONSTRAINTS
+- Do not recreate or redraw any product
+- Do not blur, approximate, or rewrite any label text
+- Do not use sale badges, burst graphics, or stickers
+- Do not show body transformations or weight-loss visuals
+- Do not use colors outside the defined palette (#FFFBED to #FCDBAC background, #F79040 to #E66410 accents, #973015 headlines, #421808 body)
+- Do not use more than 2 font weights
+- Do not overcrowd the layout
+- Do not make medical cure claims of any kind
+- Do not render unnatural or anatomically incorrect hands
+- Do not use ring light, studio flash, or overproduced lighting
+
+SECTION 7 — QUALITY BAR — verify before accepting output:
+- All 5 products present, correctly proportioned, completely unmodified
+- All on-image text sharp and readable at 375px mobile size
+- Product label accurate, unmodified, and fully readable
+- Layout is calm, balanced, and premium
+- No clutter, no hype, no forbidden elements
+- Single clear focal hierarchy — product dominant throughout
+- Section 8 contains full seeded background sentence from script execution (not just seed number reference)
+- Section 8 contains all 4 safe-zone fields from background_variant.json: composition, layout_intent, cta_safe_space, crop_safety
+- If any item above fails — regenerate immediately without compromise
+
+SECTION 8 — VISUAL DIRECTION BLOCK
+- Background slot: BG-024 (Kitchen island clean)
+- Seed: 14001
+- Scene: Quartz island surface, clutter-free depth on a clean premium composite surface with restrained texture and ad-ready clarity, with soft foreground-to-background depth transition preserving premium focus hierarchy, lit by balanced warm-neutral kitchen light with smooth shadow gradients, conveying clean domestic wellness rhythm
+- Composition: tight product-forward crop with subtle macro feel and premium shallow focus, clean middle-focused arrangement with deliberate edge clearance for robust feed placement safety
+- Layout_intent: keep the subject mass fully inside the central safe region with no edge-anchored focal detail, avoid placing focal edges or high-frequency texture near the bottom risk band
+- Crop_safety: ensure all critical visual information remains within the center so 1:1 center crop retains full message
+- Cta_safe_space: soft golden tint with restrained premium saturation, designed for 4:5 feed framing with key content held inside the central safe field, centered to slightly above center, while top 10 percent, bottom 15 percent, and side edge zones remain low-priority
+- Subject: No human subject for HERO format — products only
+- Camera: medium close-up, slight overhead angle
+- Lighting: warm soft pendant light, subtle shadow gradients
+- Props: none — clean surface only
+- Mood: clean premium domestic wellness, trustworthy, approachable
+
+SECTION 9 — TYPOGRAPHY SHARPNESS BLOCK
+- Headline: Poppins Bold — high contrast against background zone
+- Support and CTA: Poppins Medium/Regular — same typeface family
+- Size: large enough to read on 375px mobile screen without zooming
+- Placement lock:
+  - Headline must sit in the upper text band (top 15-32%).
+  - Support line must sit directly under headline with consistent left alignment.
+  - CTA must sit in lower safe band only (bottom 70-85%).
+  - Never place headline below support or in lower-third.
+- Forbidden: thin fonts, script fonts, decorative typefaces, glow effects, outlined text, drop shadows on copy
+- Mandatory: crisp hard text edges — zero softness — zero anti-alias blur on any character
+- If any text is soft, blurry, or illegible — discard and regenerate immediately

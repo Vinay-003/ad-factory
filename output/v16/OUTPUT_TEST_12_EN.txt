@@ -1,0 +1,66 @@
+PRODUCT LOCK BLOCK
+- Use the uploaded Obesity Killer product packshot images as absolute visual truth.
+- Do not redesign, redraw, relabel, or alter any product or packaging.
+- Do not change brand name, label colors, illustrations, proportions, or any text.
+
+OUTPUT SPEC
+- Canvas: 1080 x 1350 pixels. Portrait. 4:5 ratio.
+- Style: TEST (Testimonial) — polished enough for paid ad deployment.
+- Text policy: Low-text by default. Mobile-readable at 375px width.
+- All 5 products present, proportionally sized, unmodified.
+- Readability: high-contrast foreground/background.
+
+FORMAT LAYOUT INSTRUCTIONS
+- TEST format: quote + attribution + trust line + CTA.
+- Focal hierarchy: product dominant, text secondary.
+- Background: dark wood desk, blurred laptop in back.
+
+PERSONA INPUT BLOCK
+- Persona: 12 - Late-Night Eater
+- Pain: "I get so hungry and just want to snack snack snack", "afterwards I always feel regret"
+- Desire: Control late-night urges, wake up without regret
+- Friction: Post-dinner snacking window, midnight eating
+- Proof needed: Night-specific solution, real user story
+- Tone cue: Relatable, hopeful, authentic
+
+EXACT ON-IMAGE COPY — DO NOT ALTER ANYTHING
+- Quote: "Raat ko jab cravings aati thi, sab control chhod deta tha. Lekin 15 din ki routine se ab subah wale regret se mukt hoon."
+- Attribution: Priya S., 28, Designer
+- Trust line: 70,000+ users ki tarah resulta dekhein
+- CTA: Try Karein
+
+NEGATIVE CONSTRAINTS
+- Do not recreate or redraw any product
+- Do not blur, approximate, or rewrite any label text
+- Do not use sale badges, burst graphics
+- Do not show body transformations
+- Do not use colors outside the defined palette
+- Do not overcrowd the layout
+- Do not make medical cure claims
+- Do not use ring light or studio flash
+
+QUALITY BAR
+- All 5 products present, correctly proportioned, unmodified
+- All on-image text sharp and readable at 375px mobile size
+- Layout is calm, balanced, premium
+- Section 8 contains full seeded background and safe-zone fields
+
+VISUAL DIRECTION BLOCK
+- Background slot: BG-003
+- Seed: 16021
+- Scene: Dark wood desk, blurred laptop in back on a warm natural wood tabletop with fine grain continuity, with subtle background blur with layered depth separation and low visual noise, lit by balanced cool-neutral daylight mixed with warm practical ambient spill, conveying credible professional lifestyle calm.
+- composition: center-weighted layout with soft upward emphasis
+- layout_intent: enforce central placement lock so all high-importance detail remains away from frame boundaries
+- cta_safe_space: reserve the lower 35% as low-detail quiet zone
+- crop_safety: ensure all critical visual information remains within the center
+
+TYPOGRAPHY SHARPNESS BLOCK
+- Headline: Poppins Bold
+- Support/CTA: Poppins Medium/Regular
+- Size: readable on 375px mobile
+- Forbidden: thin fonts, script fonts, glow effects, drop shadows on copy
+- Mandatory: crisp hard text edges
+
+Keep on-image text minimal.
+Typography must be pin-sharp.
+Use provided product references as exact appearance truth.

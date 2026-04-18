@@ -1,0 +1,96 @@
+Section 1 — PRODUCT LOCK BLOCK
+- Use the uploaded Obesity Killer product packshot images as absolute visual truth.
+- Do not redesign, redraw, relabel, or alter any product or packaging in any way.
+- Do not change brand name, label colors, illustrations, proportions, or any text (Hindi or English).
+- If any label text is unclear — preserve the original image as-is. Do not reinterpret it.
+- Only permitted: placement, scaling, subtle drop shadows, mild warm lighting correction.
+- Keep all 5 products in correct proportions: Kit Box (20.3 x 10.1 x 14.8 cm), Powder Bottle (5cm dia, 10cm h), Tablet Bottle (3cm dia, 5cm h), Amla Bottle (3cm dia, 5cm h), Liquid Sachet (10cm w x 15.3cm h).
+
+Section 2 — OUTPUT SPEC
+- Canvas: 1080 x 1350 pixels. Portrait. 4:5 ratio.
+- Style: BA (Before/After journey style) — polished enough for paid ad deployment.
+- Text policy: Low-text by default. All copy minimal and mobile-readable at 375px width.
+- Rendering: No compression artifacts. No soft edges on text or product label.
+- All 5 products present, proportionally sized per reference dimensions, unmodified.
+- Readability: maintain high-contrast foreground/background treatment for ad-platform legibility.
+- Delivery: output PNG at 2K resolution.
+
+Section 3 — FORMAT LAYOUT INSTRUCTIONS
+- BA format: pain-to-progress headline + 3 outcome bullets + CTA.
+- Composition: product zone in center-right, text band in upper third with flat background, bullets in lower area above CTA.
+- Focal hierarchy: product dominant, text secondary, background tertiary.
+- Background: reference selected background slot (see Section 8 below).
+- Camera: medium close framing, slight upward angle.
+- Lighting: warm soft directional — source from top-left. Subtle drop shadows beneath products.
+- Spacing: strong whitespace between product zone and text zone. Grid-based alignment.
+
+Section 4 — PERSONA INPUT BLOCK
+- Persona: 1 — Craving-Control Struggler
+- Pain: some foods are too addictive for me, i cant even do a week without giving up the next week, Cravings were back yesterday.
+- Desire: fewer urge spikes so consistency lasts beyond a few days.
+- Friction: Calorie deficit starts but cravings spike and daily target breaks, trigger food starts binge pattern.
+- Proof needed: Mechanism clarity over hype, result proof with conditions.
+- Tone cue: Hopeful but grounded, not over-promising.
+
+Section 5 — EXACT ON-IMAGE COPY — DO NOT ALTER ANYTHING
+- Headline: रोज़ cravings से लड़ने से, उन्हें naturally control करने तक।*
+- Support line: सुबह का support cravings कम करता है। रात का support digestion शांत रखता है।
+- CTA: अपनी प्रगति देखें
+- Bullets: 
+  - पहले दिनों में cravings कम होने लगती हैं*
+  - रात का digestion support अगले दिन मदद करता है*
+  - कोई crash diet नहीं, कोई extreme willpower नहीं*
+- Disclaimer: not allowed on-image unless user explicitly asks for disclaimer mode.
+Render every character exactly as written. No paraphrasing, no punctuation changes, no autocorrection.
+
+Section 6 — NEGATIVE CONSTRAINTS
+- Do not recreate or redraw any product
+- Do not blur, approximate, or rewrite any label text
+- Do not use sale badges, burst graphics, or stickers
+- Do not show body transformations or weight-loss visuals
+- Do not use colors outside the defined palette (#FFFBED to #FEEFD6 to #FCDBAC, #F79040 to #E66410, #973015, #421808)
+- Do not use more than 2 font weights
+- Do not overcrowd the layout
+- Do not make medical cure claims of any kind
+- Do not render unnatural or anatomically incorrect hands
+- Do not use ring light, studio flash, or overproduced lighting
+
+Section 7 — QUALITY BAR
+- All 5 products present, correctly proportioned, completely unmodified
+- All on-image text sharp and readable at 375px mobile size
+- Product label accurate, unmodified, and fully readable
+- Layout is calm, balanced, and premium
+- No clutter, no hype, no forbidden elements
+- Single clear focal hierarchy — product dominant throughout
+- Section 8 contains full seeded background sentence from script execution
+- Section 8 contains all 4 safe-zone fields from background_variant.json: composition, layout_intent, cta_safe_space, crop_safety
+
+Section 8 — VISUAL DIRECTION BLOCK
+- Background slot: BG-003
+- Seed: 18011
+- Scene: Dark wood desk, blurred laptop in back on a clean premium composite surface with restrained texture and ad-ready clarity, with minimal contextual backdrop with elegant bokeh falloff and clean negative space, lit by gentle top-left key with diffused bounce and clean productivity-ready contrast, conveying focused productivity with balanced wellbeing; slightly elevated medium shot, balanced depth layering, gentle blur in rear context.
+- Composition: clean middle-focused arrangement with deliberate edge clearance for robust feed placement safety.
+- Layout_intent: maintain controlled negative space around the subject to prevent drift into crop-risk zones.
+- CTA_safe_space: maintain subtle low-contrast space near the lower edge to protect feed overlay readability.
+- Crop_safety: maintain protected margin buffers so alternate crops do not clip meaningful scene structure.
+- Subject: no human subject for BA format.
+- Action: products arranged on surface.
+- Camera: slightly elevated medium shot.
+- Lighting: gentle top-left key with diffused bounce.
+- Props: minimal — dark wood surface only.
+- Surfaces: clean premium composite.
+- Mood: focused productivity with balanced wellbeing.
+- Realism: natural lighting, true-to-life proportions, no stock-template look.
+
+Section 9 — TYPOGRAPHY SHARPNESS BLOCK
+- Headline: Poppins Bold — high contrast against background zone
+- Support, bullets and CTA: Poppins Medium/Regular — same typeface family
+- Size: large enough to read on 375px mobile screen without zooming
+- Placement lock:
+  - Headline must sit in the upper text band (top 15-32%).
+  - Support line must sit directly under headline.
+  - Bullets sit in middle area.
+  - CTA must sit in lower safe band only (bottom 70-85%).
+- Forbidden: thin fonts, script fonts, decorative typefaces, glow effects, outlined text, drop shadows on copy
+- Mandatory: crisp hard text edges — zero softness — zero anti-alias blur on any character
+- If any text is soft, blurry, or illegible — discard and regenerate immediately

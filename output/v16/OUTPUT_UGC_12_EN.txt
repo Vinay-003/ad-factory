@@ -1,0 +1,68 @@
+PRODUCT LOCK BLOCK
+- Use the uploaded Obesity Killer product packshot images as absolute visual truth.
+- Do not redesign, redraw, relabel, or alter any product or packaging.
+- Do not change brand name, label colors, illustrations, proportions, or any text.
+
+OUTPUT SPEC
+- Canvas: 1080 x 1350 pixels. Portrait. 4:5 ratio.
+- Style: UGC (Creator-style) — polished enough for paid ad deployment.
+- Text policy: Low-text by default. Mobile-readable at 375px width.
+- All 5 products present, proportionally sized, unmodified.
+- Readability: high-contrast foreground/background.
+
+FORMAT LAYOUT INSTRUCTIONS
+- UGC format: first-person micro-story from persona POV, headline + short support + CTA.
+- Text budget: headline (max 8 words) + support line (max 8 words) + CTA (max 4 words).
+- Focal hierarchy: product + subject dominant, text secondary.
+- Background: natural mat scene, small tray.
+- Camera: top-down flat-lay framing.
+
+PERSONA INPUT BLOCK
+- Persona: 12 - Late-Night Eater
+- Pain: "I get so hungry and just want to snack snack snack", "afterwards I always feel regret", "all bets are off"
+- Desire: Control late-night urges, wake up without guilt
+- Friction: Post-dinner snacking, midnight eating
+- Proof needed: Relatable story, simple routine
+- Tone cue: Authentic, personal, relatable
+
+EXACT ON-IMAGE COPY — DO NOT ALTER ANYTHING
+- Headline: Meri raat ki cravings end ho gayi
+- Support line: 15 din ki routine se pehli baar subah regret-free
+- CTA: Try Karein
+
+NEGATIVE CONSTRAINTS
+- Do not recreate or redraw any product
+- Do not blur or rewrite any label text
+- Do not use sale badges or stickers
+- Do not show body transformations
+- Do not use colors outside the defined palette
+- Do not overcrowd
+- Do not make medical cure claims
+- Do not render unnatural hands
+- Do not use ring light or studio flash
+
+QUALITY BAR
+- All 5 products present, correctly proportioned, unmodified
+- All on-image text sharp and readable at 375px mobile
+- Layout calm and premium
+- Section 8 contains seeded background and safe-zone fields
+
+VISUAL DIRECTION BLOCK
+- Background slot: BG-005
+- Seed: 16041
+- Scene: Natural mat scene, small tray on clean premium composite surface with restrained texture, with faint lifestyle prop silhouettes in soft blur, lit by neutral indoor daylight blend, conveying minimal clean lifestyle confidence.
+- composition: subject centered with slight above-center lift
+- layout_intent: keep subject mass fully inside central safe region
+- cta_safe_space: preserve quiet footer zone
+- crop_safety: keep focal hierarchy compact and central
+
+TYPOGRAPHY SHARPNESS BLOCK
+- Headline: Poppins Bold
+- Support/CTA: Poppins Medium/Regular
+- Size: readable on 375px mobile
+- Forbidden: thin fonts, script fonts, glow effects, drop shadows on copy
+- Mandatory: crisp hard text edges
+
+Keep on-image text minimal.
+Typography must be pin-sharp.
+Use provided product references as exact appearance truth.

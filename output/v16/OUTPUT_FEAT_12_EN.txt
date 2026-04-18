@@ -1,0 +1,68 @@
+PRODUCT LOCK BLOCK
+- Use the uploaded Obesity Killer product packshot images as absolute visual truth.
+- Do not redesign, redraw, relabel, or alter any product or packaging.
+- Do not change brand name, label colors, illustrations, proportions, or any text.
+
+OUTPUT SPEC
+- Canvas: 1080 x 1350 pixels. Portrait. 4:5 ratio.
+- Style: FEAT (Features/benefits) — polished enough for paid ad deployment.
+- Text policy: Low-text by default. Mobile-readable at 375px width.
+- All 5 products present, proportionally sized, unmodified.
+- Readability: high-contrast foreground/background.
+
+FORMAT LAYOUT INSTRUCTIONS
+- FEAT format: "what makes it work" + 3-4 benefit bullets + CTA.
+- Focal hierarchy: product dominant, text secondary.
+- Background: white marble shelf, folded towel.
+- Camera: tight product-forward crop with subtle macro feel.
+
+PERSONA INPUT BLOCK
+- Persona: 12 - Late-Night Eater
+- Pain: Night eating undoes full-day effort, "all bets are off", regret after snacking
+- Desire: Control late-night cravings, feel in control
+- Friction: Post-dinner snacking window, midnight wakeups trigger eating
+- Proof needed: Night-specific mechanism, digestion support for next-day restart
+- Tone cue: Informative, clear, helpful
+
+EXACT ON-IMAGE COPY — DO NOT ALTER ANYTHING
+- Headline: Raat ki cravings ka solution?
+- Bullet 1: Subah ki liquid se raat ki cravings control
+- Bullet 2: Raat ke powder se digestion support, subah light feel
+- Bullet 3: 15 din ki simple routine, koi complex plan nahi
+- CTA: Dekhein Kaise
+
+NEGATIVE CONSTRAINTS
+- Do not recreate or redraw any product
+- Do not blur or rewrite any label text
+- Do not use sale badges or stickers
+- Do not show body transformations
+- Do not use colors outside the defined palette
+- Do not overcrowd
+- Do not make medical cure claims
+- Do not use ring light or studio flash
+
+QUALITY BAR
+- All 5 products present, correctly proportioned, unmodified
+- All on-image text sharp and readable at 375px mobile
+- Layout calm and premium
+- Section 8 contains seeded background and safe-zone fields
+
+VISUAL DIRECTION BLOCK
+- Background slot: BG-004
+- Seed: 16031
+- Scene: White marble shelf, folded towel on clean premium composite surface with restrained texture, with sterile minimal background planes with smooth gradients, lit by even clinical illumination, conveying calm evidence-led care environment.
+- composition: subject centered with slight above-center lift
+- layout_intent: maintain controlled negative space around subject to prevent drift
+- cta_safe_space: preserve quiet footer zone
+- crop_safety: ensure all critical visual information within center
+
+TYPOGRAPHY SHARPNESS BLOCK
+- Headline: Poppins Bold
+- Bullets/CTA: Poppins Medium/Regular
+- Size: readable on 375px mobile
+- Forbidden: thin fonts, script fonts, glow effects, drop shadows on copy
+- Mandatory: crisp hard text edges
+
+Keep on-image text minimal.
+Typography must be pin-sharp.
+Use provided product references as exact appearance truth.

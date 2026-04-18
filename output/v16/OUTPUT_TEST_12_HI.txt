@@ -1,0 +1,54 @@
+PRODUCT LOCK BLOCK
+- Use the uploaded Obesity Killer product packshot images as absolute visual truth.
+- Do not redesign, redraw, relabel, or alter any product or packaging.
+- Do not change brand name, label colors, illustrations, proportions, or any text.
+
+OUTPUT SPEC
+- Canvas: 1080 x 1350 pixels. Portrait. 4:5 ratio.
+- Style: TEST (Testimonial) — polished for paid ad deployment.
+- All 5 products present, proportionally sized, unmodified.
+
+FORMAT LAYOUT INSTRUCTIONS
+- TEST: quote + attribution + trust line + CTA.
+- Background: dark wood desk, blurred laptop in back.
+
+PERSONA INPUT BLOCK
+- Persona: 12 - Late-Night Eater (रात को खाने वाला)
+- Pain: रात को cravings आती थीं, सब कंट्रोल खो देता था
+- Desire: रात को कंट्रोल, सुबह बिना regret
+- Proof needed: रियल यूजर स्टोरी
+
+EXACT ON-IMAGE COPY — DO NOT ALTER ANYTHING
+- Quote: "रात को जब क्रेविंग्स आती थीं, सब कंट्रोल छोड़ देता था। लेकिन 15 दिन की रूटीन से अब सुबह रीग्रेट से मुक्त हूं।"
+- Attribution: प्रिया एस., 28, डिज़ाइनर
+- Trust line: 70,000+ यूज़र्स की तरह रिज़ल्ट देखें
+- CTA: ट्राई करें
+
+Render every character in Devanagari script.
+
+NEGATIVE CONSTRAINTS
+- Do not recreate/redraw any product
+- No sale badges
+- No body transformations
+- No colors outside palette
+
+QUALITY BAR
+- All 5 products present
+- All text sharp and readable
+- Section 8 contains seeded background and safe-zone fields
+
+VISUAL DIRECTION BLOCK
+- Background slot: BG-003
+- Seed: 16021
+- composition: center-weighted layout with soft upward emphasis
+- layout_intent: enforce central placement lock
+- cta_safe_space: reserve lower 35% as quiet zone
+- crop_safety: ensure all critical information within center
+
+TYPOGRAPHY SHARPNESS BLOCK
+- Headline: Poppins Bold
+- Support/CTA: Poppins Medium/Regular
+- Forbidden: thin fonts, script fonts, glow effects
+
+Keep on-image text minimal.
+Typography must be pin-sharp.

@@ -1,0 +1,58 @@
+PRODUCT LOCK BLOCK
+- Use the uploaded Obesity Killer product packshot images as absolute visual truth.
+- Do not redesign, redraw, relabel, or alter any product or packaging.
+- Do not change brand name, label colors, illustrations, proportions, or any text.
+
+OUTPUT SPEC
+- Canvas: 1080 x 1350 pixels. Portrait. 4:5 ratio.
+- Style: FEAT (Features/benefits) — polished for paid ad deployment.
+- All 5 products present, proportionally sized, unmodified.
+
+FORMAT LAYOUT INSTRUCTIONS
+- FEAT: headline + 3-4 benefit bullets + CTA.
+- Background: pale stone table, single leaf accent.
+
+PERSONA INPUT BLOCK
+- Persona: 11 - Office Snacker
+- Pain: "they are hard to resist because they are there and free", "it is out of control"
+- Desire: Control office snacking
+- Friction: Free snacks, desk boredom, WFH proximity
+- Proof needed: Workday solution
+- Tone cue: Informative, clear
+
+EXACT ON-IMAGE COPY — DO NOT ALTER ANYTHING
+- Headline: Office cravings ka fix?
+- Bullet 1: Morning liquid se appetite control all day
+- Bullet 2: Tea-time temptation ab aapke control mein
+- Bullet 3: Night powder se digestion support
+- CTA: Dekhein Kaise
+
+NEGATIVE CONSTRAINTS
+- Do not recreate/redraw any product
+- No sale badges or stickers
+- No body transformations
+- No colors outside palette
+
+QUALITY BAR
+- All 5 products present
+- All text sharp and readable
+- Section 8 contains seeded background and safe-zone fields
+
+VISUAL DIRECTION BLOCK
+- Background slot: BG-009
+- Seed: 16131
+- Scene: Pale stone table, single leaf accent on smooth concrete-style base, lit by subtle side-lighting.
+- composition: core subject contained within inner 80% frame area
+- layout_intent: preserve stable center-of-interest corridor
+- cta_safe_space: avoid focal edges near bottom risk band
+- crop_safety: ensure all critical information within center
+
+TYPOGRAPHY SHARPNESS BLOCK
+- Headline: Poppins Bold
+- Bullets/CTA: Poppins Medium/Regular
+- Forbidden: thin fonts, script fonts, glow effects
+- Mandatory: crisp hard text edges
+
+Keep on-image text minimal.
+Typography must be pin-sharp.
+Use provided product references as exact appearance truth.

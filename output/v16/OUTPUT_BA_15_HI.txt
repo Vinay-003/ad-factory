@@ -1,0 +1,38 @@
+PRODUCT LOCK BLOCK
+- Use the uploaded Obesity Killer product packshot images as absolute visual truth.
+- Do not redesign, redraw, relabel, or alter any product or packaging.
+
+OUTPUT SPEC
+- Canvas: 1080 x 1350 pixels. Portrait. 4:5 ratio.
+- Style: BA — Before/After journey style.
+- All 5 products present, unmodified.
+
+PERSONA INPUT BLOCK
+- Persona: 15 - Digestion-Issue + Weight Combo Seeker
+
+EXACT ON-IMAGE COPY
+- Headline: ब्लोटिंग और वेट दोनों से पार? सॉल्यूशन मिल गया।
+- Bullet 1: पेट की समस्या कम हुई
+- Bullet 2: स्केल अब स्टेबल दिखने लगता है
+- Bullet 3: लाइट फील हुआ, ब्लोटिंग कम हुई
+- CTA: शुरू करें
+
+Render in Devanagari script.
+
+QUALITY BAR
+- All 5 products present, all text sharp and readable
+
+VISUAL DIRECTION BLOCK
+- Background slot: BG-012
+- Seed: 16511
+- composition: core subject contained within inner 80% frame area
+- layout_intent: prioritize central hierarchy
+- cta_safe_space: maintain subtle low-contrast space near lower edge
+- crop_safety: avoid edge-dependent framing
+
+TYPOGRAPHY SHARPNESS BLOCK
+- Headline: Poppins Bold
+- Bullets/CTA: Poppins Medium/Regular
+
+Keep on-image text minimal.
+Typography must be pin-sharp.

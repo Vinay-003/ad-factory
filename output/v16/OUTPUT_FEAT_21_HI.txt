@@ -1,0 +1,38 @@
+PRODUCT LOCK BLOCK
+- Use the uploaded Obesity Killer product packshot images as absolute visual truth.
+- Do not redesign, redraw, relabel, or alter any product or packaging.
+
+OUTPUT SPEC
+- Canvas: 1080 x 1350 pixels. Portrait. 4:5 ratio.
+- Style: FEAT (Features/benefits)
+- All 5 products present, unmodified.
+
+PERSONA INPUT BLOCK
+- Persona: 21 - Beginner Who Hates Complex Plans
+
+EXACT ON-IMAGE COPY
+- Headline: सिंपल वेट लॉस जर्नी चाहिए?
+- Bullet 1: नो कैलोरी काउंटिंग, नो मैक्रो ट्रैकिंग
+- Bullet 2: मॉर्निंग लिक्विड + नाइट पाउडर = सिंपल रूटीन
+- Bullet 3: 15 दिन में 3-5 किलो लॉस पॉसिबल
+- CTA: देखें कैसे
+
+Render in Devanagari script.
+
+QUALITY BAR
+- All 5 products present, all text sharp and readable
+
+VISUAL DIRECTION BLOCK
+- Background slot: BG-019
+- Seed: 16531
+- composition: symmetrical commercial framing
+- layout_intent: maintain controlled negative space
+- cta_safe_space: avoid focal edges near bottom risk band
+- crop_safety: ensure all critical information within center
+
+TYPOGRAPHY SHARPNESS BLOCK
+- Headline: Poppins Bold
+- Bullets/CTA: Poppins Medium/Regular
+
+Keep on-image text minimal.
+Typography must be pin-sharp.

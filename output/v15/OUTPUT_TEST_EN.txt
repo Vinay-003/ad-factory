@@ -1,0 +1,97 @@
+Section 1 — PRODUCT LOCK BLOCK
+- Use the uploaded Obesity Killer product packshot images as absolute visual truth.
+- Do not redesign, redraw, relabel, or alter any product or packaging in any way.
+- Do not change brand name, label colors, illustrations, proportions, or any text (Hindi or English).
+- If any label text is unclear — preserve the original image as-is. Do not reinterpret it.
+- Only permitted: placement, scaling, subtle drop shadows, mild warm lighting correction.
+
+Section 2 — OUTPUT SPEC
+- Canvas: 1080 x 1350 pixels. Portrait. 4:5 ratio.
+- Style: TEST (Testimonial) — polished enough for paid ad deployment.
+- Text policy: Low-text by default. All copy minimal and mobile-readable at 375px width.
+- Rendering: No compression artifacts. No soft edges on text or product label.
+- All 5 products present, proportionally sized per reference dimensions, unmodified.
+- Readability: maintain high-contrast foreground/background treatment for ad-platform legibility.
+
+Section 3 — FORMAT LAYOUT INSTRUCTIONS
+- TEST format: trust-focused with testimonial language mirroring persona words
+- Composition: product zone in center-right, quote and attribution below
+- Focal hierarchy: product dominant, text secondary, background tertiary.
+- Text stack map (mandatory):
+  - Quote/Attribution zone = upper band only (top 15-40% of canvas).
+  - Trust line zone = directly below (top 40-55%).
+  - CTA zone = lower safe band (bottom 70-85%), never above quote/trust line.
+- Background: dining table after meal setting per BG-006
+- Camera: 45-degree three-quarter close framing
+- Lighting: warm natural daylight from left with soft diffusion.
+- Spacing: strong whitespace between zones. Grid-based alignment.
+
+Section 4 — PERSONA INPUT BLOCK
+- Persona: 12 — Late-Night Eater
+- Pain: "I get so hungry and just want to snack snack snack", "I cannot fall asleep hungry", "all bets are off", "self-control is out the window"
+- Desire: Stop night snacking from undoing day progress, feel in control of evening urges
+- Friction: Night eating loop undoes full-day effort, "it feels like me-time" but creates regret
+- Proof needed: Night-specific mechanism, non-shaming tone, practical routine over willpower preaching
+- Tone cue: Sincere, hopeful, authentic
+
+Section 5 — EXACT ON-IMAGE COPY — DO NOT ALTER ANYTHING
+- Quote: "I finally stopped letting night cravings undo my day."
+- Attribution: "— Priya, Mumbai"
+- Trust line: "Trusted by 70,000+ users for practical hunger and digestion support."
+- CTA: "Start Tonight"
+- Disclaimer: "*Average outcomes vary by person and adherence."
+Render every character exactly as written. No paraphrasing, no punctuation changes, no autocorrection.
+
+Section 6 — NEGATIVE CONSTRAINTS
+- Do not recreate or redraw any product
+- Do not blur, approximate, or rewrite any label text
+- Do not use sale badges, burst graphics, or stickers
+- Do not show body transformations or weight-loss visuals
+- Do not use colors outside the defined palette (#FFFBED to #FEEFD6 to #FCDBAC background, #F79040 to #E66410 accents, #973015 headlines, #421808 body)
+- Do not use more than 2 font weights
+- Do not overcrowd the layout
+- Do not make medical cure claims of any kind
+- Do not render unnatural or anatomically incorrect hands
+- Do not use ring light, studio flash, or overproduced lighting
+
+Section 7 — QUALITY BAR — verify before accepting output:
+- All 5 products present, correctly proportioned, completely unmodified
+- All on-image text sharp and readable at 375px mobile size
+- Product label accurate, unmodified, and fully readable
+- Layout is calm, balanced, and premium
+- No clutter, no hype, no forbidden elements
+- Single clear focal hierarchy — product dominant throughout
+
+Section 8 — VISUAL DIRECTION BLOCK
+- Background slot: BG-006 — Dining table after meal
+- Scene: Linen table surface with empty plate edge, warm natural daylight from the left
+- Subject: No human subject — products only on neatly laid woven textile surface
+- Action: Products arranged on linen surface, balanced composition
+- Camera: 45-degree three-quarter close framing, soft focus falloff, crisp subject plane
+- Lighting: warm natural daylight from the left with soft diffusion and realistic shadow
+- Props: None — clean minimal surface only
+- Surfaces: neatly laid woven textile with soft tactile texture and premium cleanliness
+- Mood: healthy everyday habit and nourishment context, clean domestic wellness rhythm
+- Realism: premium commercial polish, no stock-template look
+- Seed: 15003
+- Composition: subject centered with a slight above-center lift, maintaining equal margin breathing room
+- Layout intent: keep the subject mass fully inside the central safe region with no edge-anchored focal detail
+- CTA safe space: keep the bottom 15% visually calm and free of critical detail for CTA flexibility
+- Crop safety: ensure all critical visual information remains within the center so 1:1 center crop retains full message
+
+Section 9 — TYPOGRAPHY SHARPNESS BLOCK
+- Quote/Attribution: Poppins Bold Italic — high contrast against background zone
+- Trust line and CTA: Poppins Medium/Regular — same typeface family
+- Size: large enough to read on 375px mobile screen without zooming
+- Placement lock:
+  - Quote must sit in the upper text band (top 15-40%).
+  - Trust line must sit directly under quote with consistent left alignment.
+  - CTA must sit in lower safe band only (bottom 70-85%).
+  - Never place quote below trust line or in lower-third.
+- Forbidden: thin fonts, script fonts, decorative typefaces, glow effects, outlined text, drop shadows on copy
+- Mandatory: crisp hard text edges — zero softness — zero anti-alias blur on any character
+- If any text is soft, blurry, or illegible — discard and regenerate immediately
+- Typography must be pin-sharp. If any text appears soft, blurry, or smeared, regenerate.
+- Keep text count minimal and increase font size rather than packing more copy.
+- Use clean sans typography with strong stroke clarity; no thin/light weights for body text.
+- Use Poppins only for on-image text: Quote in Poppins Bold Italic, trust line/CTA in Poppins Medium or Regular.

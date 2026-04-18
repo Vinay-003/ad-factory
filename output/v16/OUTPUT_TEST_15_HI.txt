@@ -1,0 +1,37 @@
+PRODUCT LOCK BLOCK
+- Use the uploaded Obesity Killer product packshot images as absolute visual truth.
+- Do not redesign, redraw, relabel, or alter any product or packaging.
+
+OUTPUT SPEC
+- Canvas: 1080 x 1350 pixels. Portrait. 4:5 ratio.
+- Style: TEST (Testimonial)
+- All 5 products present, unmodified.
+
+PERSONA INPUT BLOCK
+- Persona: 15 - Digestion-Issue + Weight Combo Seeker
+
+EXACT ON-IMAGE COPY
+- Quote: "मेरे पेट की समस्या और वेट दोनों एक साथ थे। 15 दिन की किट से ब्लोटिंग कम हुई और स्केल स्टेबल दिखने लगता है।"
+- Attribution: कविता एस., 39, बूटीक ओनर
+- Trust line: 70,000+ यूज़र्स की तरह रिज़ल्ट देखें
+- CTA: ट्राई करें
+
+Render in Devanagari script.
+
+QUALITY BAR
+- All 5 products present, all text sharp and readable
+
+VISUAL DIRECTION BLOCK
+- Background slot: BG-013
+- Seed: 16521
+- composition: top-down flat-lay framing with controlled spacing
+- layout_intent: keep visual weight centered with mild upward lift
+- cta_safe_space: keep bottom 15% visually calm
+- crop_safety: ensure all critical information within center
+
+TYPOGRAPHY SHARPNESS BLOCK
+- Headline: Poppins Bold
+- Support/CTA: Poppins Medium/Regular
+
+Keep on-image text minimal.
+Typography must be pin-sharp.

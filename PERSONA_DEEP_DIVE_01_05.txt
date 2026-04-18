@@ -3,11 +3,11 @@ Coverage: Personas 1-22 from the playbook persona system
 
 PURPOSE
 - This file is the bridge between persona labels and final ad copy.
-- It uses a 3-layer system so one persona can be converted into English, Hindi, and Hinglish ads without losing emotional truth.
+- It uses a 2-layer system so one persona can be converted into ad-ready strategy without losing emotional truth.
 - All mechanism logic in this file must come from `PRODUCT_MECHANISM_V1.txt`.
 - If product behavior changes later, update `PRODUCT_MECHANISM_V1.txt` first, then update this file.
 
-3-LAYER SYSTEM
+2-LAYER SYSTEM
 
 LAYER 1 - RAW PERSONA TRUTH
 - Raw thoughts, complaints, objections, and phrases the person actually says.
@@ -16,18 +16,6 @@ LAYER 1 - RAW PERSONA TRUTH
 LAYER 2 - MESSAGE STRATEGY
 - Convert raw voice into ad-ready strategy.
 - Pull these from each persona: core pain, trigger scenarios, objections, language bank, mechanism match, trust anchors.
-
-LAYER 3 - OUTPUT LANGUAGE RENDERING
-- Render the same persona angle into 3 outputs:
-- English-ready ad phrasing
-- Hindi-ready ad phrasing
-- Hinglish-ready ad phrasing
-
-USE RULE
-- Do not write ads directly from raw lines.
-- First identify the emotional angle from Layer 1.
-- Then choose the mechanism and proof from Layer 2.
-- Then render the final copy in the requested language using Layer 3.
 
 =====================================================================
 PERSONA 1: CRAVING-CONTROL STRUGGLER (FORUM-GROUNDED)
@@ -100,23 +88,6 @@ LAYER 2 - MESSAGE STRATEGY
 - https://www.reddit.com/r/GLP1India/comments/1sm0ldy/day_4_of_being_on_mj_but/
 - https://www.reddit.com/r/GLP1India/comments/1sly528/first_week_progress/
 
-LAYER 3 - OUTPUT LANGUAGE RENDERING
-
-10. ENGLISH-READY AD PHRASING
-- If cravings keep hijacking your week, the fix starts with fewer urge spikes, not more guilt.
-- Less food noise. Fewer random snacks. More consistent fat-loss days.
-- Control the in-between eating moments where progress usually breaks.
-
-11. HINDI-READY AD PHRASING
-- Agar cravings har hafte aapki diet tod deti hain, to samadhan guilt nahi, kam urge spikes hai.
-- Kam food noise, kam random snacking, zyada consistent progress.
-- Wahi beech-beech ke khane wale moments theek karein jahan progress rukti hai.
-
-12. HINGLISH-READY AD PHRASING
-- Cravings week ko hijack kar rahi hain? Guilt nahi, urge spikes control karo.
-- Less food noise. Less random snacking. More consistency.
-- Jahan progress break hoti hai, beech beech ka eating wahi fix karo.
-
 =====================================================================
 PERSONA 2: BUSY PROFESSIONAL (FORUM-GROUNDED)
 =====================================================================
@@ -185,23 +156,6 @@ LAYER 2 - MESSAGE STRATEGY
 - https://www.reddit.com/r/loseit/comments/1slsqkw/just_a_reminder_about_vacations/
 - https://www.reddit.com/r/loseit/comments/1sm9jik/anyone_diagnosed_with_adhd_successfully_lost/
 - https://www.reddit.com/r/loseit/comments/1sm8g9m/how_are_yall_eating_100_grams_of_protein_every_day/
-
-LAYER 3 - OUTPUT LANGUAGE RENDERING
-
-10. ENGLISH-READY AD PHRASING
-- If life keeps breaking your routine, use a system that survives imperfect weeks.
-- Not a second job. Just a simpler daily weight-loss protocol.
-- More executable days, fewer restarts, steadier progress.
-
-11. HINDI-READY AD PHRASING
-- Agar life bar-bar routine tod deti hai, to aisa system chunen jo imperfect hafton mein bhi chale.
-- Yeh doosri naukri nahi, ek simple daily weight-loss protocol hai.
-- Kam restarts, zyada follow-through, steady progress.
-
-12. HINGLISH-READY AD PHRASING
-- Life routine tod deti hai? Aisa system lo jo imperfect weeks mein bhi chale.
-- Second job nahi, simple daily protocol.
-- Less restart. More follow-through. Better progress.
 
 =====================================================================
 PERSONA 3: EMOTIONAL EATER / STRESS SNACKER (FORUM-GROUNDED)
@@ -274,23 +228,6 @@ LAYER 2 - MESSAGE STRATEGY
 - https://www.reddit.com/r/loseit/comments/1smagwt/starting_again/
 - https://www.reddit.com/r/loseit/comments/1sme6m4/storytimeperhaps_a_tale_as_old_as_time_lol/
 
-LAYER 3 - OUTPUT LANGUAGE RENDERING
-
-10. ENGLISH-READY AD PHRASING
-- When stress turns your day into a food battle, start by reducing the urge pressure.
-- Less food chaos. Less guilt spiral. More day-to-day control.
-- Support that helps you continue, even after a rough day.
-
-11. HINDI-READY AD PHRASING
-- Jab tanav din ko khane ki ladai bana de, to shuruaat urge pressure kam karne se karein.
-- Kam food chaos, kam guilt spiral, zyada daily control.
-- Aisa support jo kharab din ke baad bhi aapko jari rakhne mein madad kare.
-
-12. HINGLISH-READY AD PHRASING
-- Jab stress day ko food battle bana de, urge pressure kam karo.
-- Less food chaos. Less guilt spiral. More control.
-- Rough day ke baad bhi continue karne wala support.
-
 =====================================================================
 PERSONA 4: PLATEAU VICTIM (FORUM-GROUNDED)
 =====================================================================
@@ -357,23 +294,6 @@ LAYER 2 - MESSAGE STRATEGY
 - https://www.reddit.com/r/loseit/comments/1smaw6k/why_is_it_taking_me_longer_to_lose_water_weight/
 - https://www.reddit.com/r/loseit/comments/1sm3204/i_hit_my_goal_and_honestly_it_was_not_worth_it/
 - https://www.reddit.com/r/loseit/comments/1smavor/do_i_have_to_keep_tracking_calories_till_i_die/
-
-LAYER 3 - OUTPUT LANGUAGE RENDERING
-
-10. ENGLISH-READY AD PHRASING
-- If your scale is stuck despite effort, fix the daily leak points, not just your motivation.
-- Not harsher dieting. Better adherence mechanics.
-- A practical reset for plateau-phase consistency.
-
-11. HINDI-READY AD PHRASING
-- Agar mehnat ke baad bhi wazan atka hai, to motivation nahi daily leak points theek karein.
-- Aur sakht diet nahi, behtar adherence mechanics.
-- Plateau phase mein consistency ke liye practical reset.
-
-12. HINGLISH-READY AD PHRASING
-- Effort ke baad bhi scale stuck? Motivation nahi, daily leak points fix karo.
-- More punishment nahi. Better adherence mechanics.
-- Plateau phase ke liye practical reset.
 
 =====================================================================
 PERSONA 5: PCOD SUPPORT SEEKER (NO CURE CLAIMS) (FORUM-GROUNDED)
@@ -445,23 +365,6 @@ LAYER 2 - MESSAGE STRATEGY
 - https://www.reddit.com/r/GLP1India/comments/1sidxti/mounjaro_2nd_dose_no_effects/
 - https://www.reddit.com/r/GLP1India/comments/1skbb7i/trustified_misleading_viewers_purpose/
 
-LAYER 3 - OUTPUT LANGUAGE RENDERING
-
-10. ENGLISH-READY AD PHRASING
-- Not a PCOD or thyroid cure claim. Practical weight-loss support you can actually follow.
-- When hormonal-context weight loss feels confusing, start with a clear behavior-first routine.
-- Simple appetite and digestion support, with realistic expectations.
-
-11. HINDI-READY AD PHRASING
-- Yeh PCOD ya thyroid cure claim nahi hai. Yeh ek practical weight-loss support hai jise follow karna aasaan ho.
-- Jab hormonal-context weight loss confusing lage, behavior-first routine se shuruaat karein.
-- Saaf mechanism, realistic expectations, aur daily support.
-
-12. HINGLISH-READY AD PHRASING
-- PCOD ya thyroid cure claim nahi. Bas practical weight-loss support.
-- Hormonal-context confusion mein, behavior-first routine se start karo.
-- Simple appetite + digestion support, realistic expectations ke saath.
-
 =====================================================================
 PERSONA 6: THYROID WEIGHT-GAIN STRUGGLER (NO CURE CLAIMS) (FORUM-GROUNDED)
 =====================================================================
@@ -531,23 +434,6 @@ LAYER 2 - MESSAGE STRATEGY
 - https://www.reddit.com/r/loseit/comments/1scj0j0/incompetent_gp_thought_weight_loss_would_cure_my/
 - https://www.reddit.com/r/loseit/comments/1nira82/hello/
 
-LAYER 3 - OUTPUT LANGUAGE RENDERING
-
-10. ENGLISH-READY AD PHRASING
-- Not a thyroid cure claim, practical support when progress feels unusually hard.
-- If you are tired of being dismissed, start with a consistency-first routine.
-- Simple appetite and digestion support with realistic expectations.
-
-11. HINDI-READY AD PHRASING
-- Yeh thyroid ilaaj ka daava nahi hai, yeh practical support hai jab progress mushkil lage.
-- Agar aapko baar-baar dismiss kiya gaya hai, to consistency-first routine chuniye.
-- Bhookh aur pachan ka simple support, realistic expectations ke saath.
-
-12. HINGLISH-READY AD PHRASING
-- Thyroid cure claim nahi, practical support.
-- Dismiss feel kar rahe ho? Consistency-first routine se start karo.
-- Simple appetite plus digestion support, no hype.
-
 =====================================================================
 PERSONA 7: POST-FAILURE RE-STARTER (FORUM-GROUNDED)
 =====================================================================
@@ -615,23 +501,6 @@ LAYER 2 - MESSAGE STRATEGY
 - https://www.reddit.com/r/loseit/comments/1rhmyha/restarting_again/
 - https://www.reddit.com/r/loseit/comments/1jzwwg9/day_1_starts_again/
 - https://www.reddit.com/r/loseit/comments/1mgxeoq/gained_all_my_weight_back/
-
-LAYER 3 - OUTPUT LANGUAGE RENDERING
-
-10. ENGLISH-READY AD PHRASING
-- Starting again should feel doable, not defeating.
-- Build more executable days, not perfect days.
-- Less restart chaos and steadier follow-through.
-
-11. HINDI-READY AD PHRASING
-- Dobara shuruaat doable lagni chahiye, haar jaisi nahi.
-- Perfect din nahi, zyada executable din banaiye.
-- Kam restart chaos, zyada steady follow-through.
-
-12. HINGLISH-READY AD PHRASING
-- Phir se start karna doable hona chahiye.
-- Perfect days nahi, executable days count hote hain.
-- Less restart chaos, more follow-through.
 
 =====================================================================
 PERSONA 8: NO-WEAKNESS SKEPTIC (FORUM-GROUNDED)
@@ -701,23 +570,6 @@ LAYER 2 - MESSAGE STRATEGY
 - https://www.reddit.com/r/loseit/comments/1ogpcy0/feeling_stressed_and_hopeless_about_losing_weight/
 - https://www.reddit.com/r/loseit/comments/1sm8g9m/how_are_yall_eating_100_grams_of_protein_every_day/
 
-LAYER 3 - OUTPUT LANGUAGE RENDERING
-
-10. ENGLISH-READY AD PHRASING
-- Weight loss should not mean feeling weak all day.
-- Control random intake without crash-style routines.
-- Practical support you can work with.
-
-11. HINDI-READY AD PHRASING
-- Weight loss ka matlab din bhar weak feel karna nahi hona chahiye.
-- Crash-style routine ke bina random intake control kijiye.
-- Aisa practical support jo kaam ke saath chale.
-
-12. HINGLISH-READY AD PHRASING
-- Result chahiye but drained feel nahi?
-- Crash routine hatao, random eating control karo.
-- Simple, workable support for normal days.
-
 =====================================================================
 PERSONA 9: TIME-STARVED PARENT (FORUM-GROUNDED)
 =====================================================================
@@ -786,23 +638,6 @@ LAYER 2 - MESSAGE STRATEGY
 - https://www.reddit.com/r/loseit/comments/1opm7da/how_are_we_losing_weight_as_parents_with_young/
 - https://www.reddit.com/r/loseit/comments/1lfu25s/losing_weight_and_working_night_shift/
 
-LAYER 3 - OUTPUT LANGUAGE RENDERING
-
-10. ENGLISH-READY AD PHRASING
-- No time for perfect routines? Use one that survives imperfect weeks.
-- More executable days and fewer restarts.
-- Practical support for busy, sleep-deprived parents.
-
-11. HINDI-READY AD PHRASING
-- Perfect routine ka time nahi? Aisa system chuniye jo imperfect hafton mein bhi chale.
-- Zyada executable din, kam restarts.
-- Busy aur low-sleep parents ke liye practical support.
-
-12. HINGLISH-READY AD PHRASING
-- Perfect routine ka time nahi? Low-friction system lo.
-- Less restart, more executable days.
-- Busy parents ke liye practical support.
-
 =====================================================================
 PERSONA 10: HOMEMAKER, SELF-CARE DEPRIORITIZED (FORUM-GROUNDED)
 =====================================================================
@@ -870,23 +705,6 @@ LAYER 2 - MESSAGE STRATEGY
 - https://www.reddit.com/r/loseit/comments/1rqdlv7/wanting_to_begin_my_weight_loss_journey_as_a_stay/
 - https://www.reddit.com/r/loseit/comments/1s3bbz3/struggling_to_find_my_deficit_as_a_breastfeeding/
 - https://www.reddit.com/r/loseit/comments/1os8mdh/please_help_cant_lose_weight_been_trying_over_a/
-
-LAYER 3 - OUTPUT LANGUAGE RENDERING
-
-10. ENGLISH-READY AD PHRASING
-- Taking care of everyone else should not erase your own routine.
-- Less food chaos, less guilt spiral, and more manageable control.
-- Support that works on overloaded home days.
-
-11. HINDI-READY AD PHRASING
-- Sabka dhyan rakhte hue apni routine poori tarah khona zaroori nahi.
-- Kam food chaos, kam guilt spiral, zyada manageable control.
-- Aisa support jo overloaded ghar wale dinon mein bhi chale.
-
-12. HINGLISH-READY AD PHRASING
-- Sabka dhyan rakhte hue khud ko lose mat karo.
-- Less chaos, less guilt, better control.
-- Overloaded home days mein bhi chalne wala support.
 
 =====================================================================
 PERSONA 11: OFFICE SNACKER (TEA-TIME / JUNK CYCLE) (FORUM-GROUNDED)
@@ -957,24 +775,6 @@ LAYER 2 - MESSAGE STRATEGY
 - https://www.reddit.com/r/loseit/comments/1q5rtll/is_walking_enough_to_drop_some_weight/
 - https://www.reddit.com/r/loseit/comments/1pnjo0z/intense_constant_appetite_with_boring_wfh_job/
 - https://www.reddit.com/r/loseit/comments/1qyk0d6/how_do_i_stop_messing_up_the_evening/
-
-LAYER 3 - OUTPUT LANGUAGE RENDERING
-
-10. ENGLISH-READY AD PHRASING
-- Your meals may not be the issue
-- your office snacking loop might be.
-- Less desk grazing, less tea-time damage, more control.
-- For people gaining weight in small office moments.
-
-11. HINDI-READY AD PHRASING
-- Samasya meals nahi, office ki baar-baar snacking bhi ho sakti hai.
-- Kam desk snacking, kam tea-time damage, aur zyada control.
-- Office ke chhote moments wale weight gain ke liye.
-
-12. HINGLISH-READY AD PHRASING
-- Problem meals nahi, office snacking loop ho sakta hai.
-- Less desk grazing, less tea-time damage, more control.
-- Small office moments mein gain karne walon ke liye practical routine.
 
 =====================================================================
 PERSONA 12: LATE-NIGHT EATER (FORUM-GROUNDED)
@@ -1050,23 +850,6 @@ LAYER 2 - MESSAGE STRATEGY
 - https://www.reddit.com/r/loseit/comments/1l2ghr7/late_night_snacks_are_my_demon/
 - https://www.reddit.com/r/loseit/comments/1kcfyyq/advice_for_late_night_snacking/
 
-LAYER 3 - OUTPUT LANGUAGE RENDERING
-
-10. ENGLISH-READY AD PHRASING
-- If your day goes well and your night ruins it, fix the night loop first.
-- Less post-dinner snacking and less next-morning regret.
-- For people whose hardest food decisions happen after dark.
-
-11. HINDI-READY AD PHRASING
-- Agar din theek aur raat kharab, to night loop pe pehle kaam karein.
-- Kam post-dinner snacking, kam next-morning regret.
-- Jinki mushkil raat mein start hoti hai unke liye.
-
-12. HINGLISH-READY AD PHRASING
-- Din theek, raat kharab? Night loop fix karo.
-- Less post-dinner snacking, less next-morning regret.
-- After-dark cravings walon ke liye practical support.
-
 =====================================================================
 PERSONA 13: FESTIVE / TRAVEL WEIGHT REGAINER (FORUM-GROUNDED)
 =====================================================================
@@ -1140,23 +923,6 @@ LAYER 2 - MESSAGE STRATEGY
 - https://www.reddit.com/r/loseit/comments/1lusgms/lost_my_weight_loss_drive_after_holiday_and/
 - https://www.reddit.com/r/loseit/comments/1k9b8it/vacation_holiday_tips/
 
-LAYER 3 - OUTPUT LANGUAGE RENDERING
-
-10. ENGLISH-READY AD PHRASING
-- Trips and festivals should not erase your progress this easily.
-- A practical reset for people who keep regaining after real-life events.
-- Less post-trip heaviness and less restart fatigue.
-
-11. HINDI-READY AD PHRASING
-- Travel aur festivals har baar progress erase na karein.
-- Real-life events ke baad regain walon ke liye practical reset.
-- Kam post-trip heaviness aur kam restart fatigue.
-
-12. HINGLISH-READY AD PHRASING
-- Travel/festive phase ke baad practical reset chahiye?
-- Less post-trip heaviness, less restart fatigue.
-- Regain loop se nikalne ke liye structured support.
-
 =====================================================================
 PERSONA 14: METABOLISM-WORRY BUYER (FORUM-GROUNDED)
 =====================================================================
@@ -1229,23 +995,6 @@ LAYER 2 - MESSAGE STRATEGY
 - https://www.reddit.com/r/loseit/comments/1n67hka/stuck_at_1300_calories_did_i_slow_my_metabolism/
 - https://www.reddit.com/r/loseit/comments/1rc486t/it_feels_like_i_cant_lose_weight_no_matter_what_i/
 - https://www.reddit.com/r/loseit/comments/1mszcx0/50yearold_female_here_trying_to_lose_weighthelp/
-
-LAYER 3 - OUTPUT LANGUAGE RENDERING
-
-10. ENGLISH-READY AD PHRASING
-- If slow metabolism is your story, start with practical daily control not hype.
-- Less random hunger, less heaviness, more consistent routine response.
-- No fake metabolism promises, just executable support.
-
-11. HINDI-READY AD PHRASING
-- Agar metabolism slow lagta hai to hype nahi practical daily control se start karein.
-- Kam random bhookh, kam heaviness, zyada consistent response.
-- Fake boost claims nahi, clear support.
-
-12. HINGLISH-READY AD PHRASING
-- Slow metabolism feel ho raha hai? Hype chhodo, practical routine lo.
-- Less random hunger, less heaviness, more consistency.
-- Fake boost claims nahi.
 
 =====================================================================
 PERSONA 15: DIGESTION-ISSUE + WEIGHT COMBO SEEKER (FORUM-GROUNDED)
@@ -1321,23 +1070,6 @@ LAYER 2 - MESSAGE STRATEGY
 - https://www.reddit.com/r/loseit/comments/1lyrugu/face_bloating_not_going_away_even_after_weight/
 - https://www.reddit.com/r/loseit/comments/1sb3fsy/it_literally_took_getting_my_wisdom_teeth_out_to/
 
-LAYER 3 - OUTPUT LANGUAGE RENDERING
-
-10. ENGLISH-READY AD PHRASING
-- When weight struggle comes with bloating and gut discomfort, scale-only advice is not enough.
-- A practical routine for lighter digestion and lighter intake.
-- Less stomach heaviness and less random overeating.
-
-11. HINDI-READY AD PHRASING
-- Jab weight issue ke saath bloating aur gut discomfort ho to scale-only advice kaafi nahi.
-- Lighter digestion aur lighter intake ke liye practical routine.
-- Kam pet heaviness aur kam random overeating.
-
-12. HINGLISH-READY AD PHRASING
-- Weight issue plus gut discomfort? Scale-only approach enough nahi.
-- Lighter digestion plus lighter intake ke liye practical routine.
-- Less stomach heaviness, less random overeating.
-
 =====================================================================
 PERSONA 16: BUDGET-CONSCIOUS RESULT SEEKER (FORUM-GROUNDED)
 =====================================================================
@@ -1412,23 +1144,6 @@ LAYER 2 - MESSAGE STRATEGY
 - https://www.reddit.com/r/loseit/comments/1scl3ms/trying_meal_prepping_for_the_first_time_my_pros/
 - https://www.reddit.com/r/loseit/comments/1kbgmmr/new_here_lost_78lbs_in_133_years_trying_to/
 
-LAYER 3 - OUTPUT LANGUAGE RENDERING
-
-10. ENGLISH-READY AD PHRASING
-- If you are paying for weight loss, you deserve visible value not vague promises.
-- Less random eating, less heaviness, more testable progress.
-- For people who ask first: is this worth it.
-
-11. HINDI-READY AD PHRASING
-- Agar aap paisa de rahe hain to clear value milni chahiye, vague promise nahi.
-- Kam random eating, kam heaviness, zyada testable progress.
-- Jo pehle puchte hain: kya yeh worth hai.
-
-12. HINGLISH-READY AD PHRASING
-- Paisa de rahe ho to visible value chahiye, hype nahi.
-- Less random eating, less heaviness, more testable progress.
-- Worth-first logon ke liye.
-
 =====================================================================
 PERSONA 17: WEDDING / EVENT DEADLINE PERSONA (FORUM-GROUNDED)
 =====================================================================
@@ -1501,23 +1216,6 @@ LAYER 2 - MESSAGE STRATEGY
 - https://www.reddit.com/r/loseit/comments/1sd1vov/50lbs_down/
 - https://www.reddit.com/r/loseit/comments/1lpj13w/just_downloaded_lose_it/
 - https://www.reddit.com/r/loseit/comments/1rl0e75/what_to_do_to_help_this_area/
-
-LAYER 3 - OUTPUT LANGUAGE RENDERING
-
-10. ENGLISH-READY AD PHRASING
-- A fixed date changes everything, your routine should respect that.
-- Less bloating, less random eating, more visible control before the day.
-- Event-ready confidence without crash dieting.
-
-11. HINDI-READY AD PHRASING
-- Jab date fixed ho to routine bhi deadline-smart hona chahiye.
-- Kam bloating, kam random eating, aur event se pehle visible control.
-- Crash nahi, consistency chuniye.
-
-12. HINGLISH-READY AD PHRASING
-- Date fixed hai? Routine bhi practical hona chahiye.
-- Less bloating, less random eating, more visible control.
-- Outfit ke liye crash nahi, consistency.
 
 =====================================================================
 PERSONA 18: CONFIDENCE-FIRST PERSONA (APPEARANCE + ENERGY) (FORUM-GROUNDED)
@@ -1592,23 +1290,6 @@ LAYER 2 - MESSAGE STRATEGY
 - https://www.reddit.com/r/loseit/comments/1lbrmfj/how_do_people_lose_weight_without_developing_an/
 - https://www.reddit.com/r/loseit/comments/1kgmhd7/will_walking_help_me_lose_fat/
 
-LAYER 3 - OUTPUT LANGUAGE RENDERING
-
-10. ENGLISH-READY AD PHRASING
-- Sometimes the problem is not just the number, it is how you feel in your body.
-- Less heaviness, less random eating, more day-to-day confidence.
-- For people who want body-feel back, not just lower scale.
-
-11. HINDI-READY AD PHRASING
-- Kabhi problem number nahi, apni body mein heavy feel karna hota hai.
-- Kam heaviness, kam random eating, zyada daily confidence.
-- Jinko scale se zyada body-feel chahiye unke liye.
-
-12. HINGLISH-READY AD PHRASING
-- Problem sirf number ki nahi, body-feel ki bhi hoti hai.
-- Less heaviness, less random eating, more daily confidence.
-- Scale se zyada apna feel wapas chahiye?
-
 =====================================================================
 PERSONA 19: TRUST-FIRST BUYER (DOCTOR-BACKED ONLY) (FORUM-GROUNDED)
 =====================================================================
@@ -1678,23 +1359,6 @@ LAYER 2 - MESSAGE STRATEGY
 - https://www.reddit.com/r/GLP1India/comments/1s7p807/started_my_journey_with_generic/
 - https://www.reddit.com/r/GLP1India/comments/1p80scv/the_difference_mounjaro_makes/
 - https://www.reddit.com/r/loseit/comments/1s2lb6d/need_honest_perspectives_from_people_whove_been/
-
-LAYER 3 - OUTPUT LANGUAGE RENDERING
-
-10. ENGLISH-READY AD PHRASING
-- No hype and no self-medication culture, just a clear guided system.
-- If trust is your first filter, start with transparent mechanism and realistic expectations.
-- Doctor-backed confidence with practical daily routine.
-
-11. HINDI-READY AD PHRASING
-- Na hype na self-medication, bas clear guided system.
-- Agar trust pehle aata hai to transparent mechanism se start karein.
-- Doctor-backed confidence aur practical routine.
-
-12. HINGLISH-READY AD PHRASING
-- Hype nahi, self-medicate nahi, clear guided system chahiye.
-- Trust-first ho to transparent mechanism chuno.
-- Doctor-backed confidence plus practical execution.
 
 =====================================================================
 PERSONA 20: SUPPORT-DEPENDENT PERSONA (NEEDS ACCOUNTABILITY) (FORUM-GROUNDED)
@@ -1769,23 +1433,6 @@ LAYER 2 - MESSAGE STRATEGY
 - https://www.reddit.com/r/loseit/comments/1skaq38/getting_back_on_track_after_trauma/
 - https://www.reddit.com/r/GLP1India/comments/1lddvas/on_mounjaro_25mg_for_10_days_in_and_not_seeing/
 
-LAYER 3 - OUTPUT LANGUAGE RENDERING
-
-10. ENGLISH-READY AD PHRASING
-- If you keep restarting, you need continuity support more than motivation.
-- Less relapse chaos and faster recovery after off days.
-- Accountability-first practical routine.
-
-11. HINDI-READY AD PHRASING
-- Agar bar-bar restart ho raha hai to motivation se zyada continuity support chahiye.
-- Kam relapse chaos, off-day ke baad faster recovery.
-- Accountability-first practical routine.
-
-12. HINGLISH-READY AD PHRASING
-- Bar-bar restart? Motivation nahi, continuity support chahiye.
-- Less relapse chaos, faster recovery.
-- Accountability-first practical routine.
-
 =====================================================================
 PERSONA 21: BEGINNER WHO HATES COMPLEX PLANS (FORUM-GROUNDED)
 =====================================================================
@@ -1859,23 +1506,6 @@ LAYER 2 - MESSAGE STRATEGY
 - https://www.reddit.com/r/loseit/comments/1mkykf2/day_1/
 - https://www.reddit.com/r/loseit/comments/1lyq22p/96_kg_at_21m_171_cm_need_help_with_weight_loss/
 - https://www.reddit.com/r/loseit/comments/1pyrwpd/wanting_to_get_started_with_losing_weight_but/
-
-LAYER 3 - OUTPUT LANGUAGE RENDERING
-
-10. ENGLISH-READY AD PHRASING
-- If complex plans overwhelm you, start with a simpler system.
-- Less confusion, less random eating, more doable beginning.
-- For beginners who want clear steps not fitness homework.
-
-11. HINDI-READY AD PHRASING
-- Agar complex plans overwhelm karte hain to simpler system se start karein.
-- Kam confusion, kam random eating, zyada doable shuruaat.
-- Beginners ke liye clear steps, fitness homework nahi.
-
-12. HINGLISH-READY AD PHRASING
-- Overwhelmed ho jaate ho? Start simpler.
-- Less confusion, less random eating, more doable start.
-- Beginner-friendly routine, overcomplication nahi.
 
 =====================================================================
 PERSONA 22: 35+ SLOW-PROGRESS PERSONA (FORUM-GROUNDED)
@@ -1952,23 +1582,3 @@ LAYER 2 - MESSAGE STRATEGY
 - https://www.reddit.com/r/loseit/comments/1lrn2jv/how_i_finally_started_losing_weight_after_years/
 - https://www.reddit.com/r/loseit/comments/1p0zoe1/struggling_to_lose_weight_in_my_30s_keep/
 
-LAYER 3 - OUTPUT LANGUAGE RENDERING
-
-10. ENGLISH-READY AD PHRASING
-- If progress feels slower now, routine must be steadier and realistic.
-- Less random eating, less heaviness, more believable progress.
-- For people who want sustainable movement not dramatic promises.
-
-11. HINDI-READY AD PHRASING
-- Agar progress slow lage to routine ko steady aur realistic banaiye.
-- Kam random eating, kam heaviness, zyada believable progress.
-- Sustainable movement chahiye, dramatic promises nahi.
-
-12. HINGLISH-READY AD PHRASING
-- Progress slow lag rahi hai? Routine ko steadier aur realistic banao.
-- Less random eating, less heaviness, more believable progress.
-- Sustainable push chahiye, dramatic promises nahi.
-
-END OF COVERAGE
-- Included personas: 1-22
-- Structure supports English, Hindi, and Hinglish ad rendering from the same persona brief

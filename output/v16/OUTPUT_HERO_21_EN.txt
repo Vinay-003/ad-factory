@@ -1,0 +1,58 @@
+PRODUCT LOCK BLOCK
+- Use the uploaded Obesity Killer product packshot images as absolute visual truth.
+- Do not redesign, redraw, relabel, or alter any product or packaging.
+- Do not change brand name, label colors, illustrations, proportions, or any text.
+
+OUTPUT SPEC
+- Canvas: 1080 x 1350 pixels. Portrait. 4:5 ratio.
+- Style: HERO — polished for paid ad deployment.
+- All 5 products present, proportionally sized, unmodified.
+- Text policy: Low-text, mobile-readable at 375px.
+
+FORMAT LAYOUT INSTRUCTIONS
+- HERO: strong headline, one support line, CTA.
+- Background: early soft sun, railing silhouette on pale wood surface.
+
+PERSONA INPUT BLOCK
+- Persona: 21 - Beginner Who Hates Complex Plans
+- Pain: "constantly overwhelmed with how involved tracking is", "it should not be this overwhelming", "decision fatigue easily", "calorie counting puts me in horrible state of mind", "overwhelmed with where to begin", "how can I start without overwhelming myself"
+- Desire: Simple steps, no complex tracking, easy start
+- Friction: App setup and macro tracking overload, too many methods create paralysis
+- Proof needed: Simplicity-first, beginner-friendly tone
+- Tone cue: Encouraging, simple, non-overwhelming
+
+EXACT ON-IMAGE COPY — DO NOT ALTER ANYTHING
+- Headline: Complex plans se thakte hain? Simple solution try karein.
+- Support line: Koi tracking nahi, koi counting nahi. Bas 15 din.
+- CTA: Start Karein
+
+NEGATIVE CONSTRAINTS
+- Do not recreate/redraw any product
+- No sale badges or stickers
+- No body transformations
+- No colors outside palette
+- No medical cure claims
+
+QUALITY BAR
+- All 5 products present
+- All text sharp and readable
+- Section 8 contains seeded background and safe-zone fields
+
+VISUAL DIRECTION BLOCK
+- Background slot: BG-016
+- Seed: 16501
+- Scene: Early soft sun, railing silhouette on pale wood surface with smooth sanded texture, lit by warm early-day directional sun, conveying calm optimistic health-forward atmosphere.
+- composition: symmetrical commercial framing with stable side spacing
+- layout_intent: prioritize central hierarchy
+- cta_safe_space: maintain subtle low-contrast space near lower edge
+- crop_safety: ensure all critical information within center
+
+TYPOGRAPHY SHARPNESS BLOCK
+- Headline: Poppins Bold
+- Support/CTA: Poppins Medium/Regular
+- Forbidden: thin fonts, script fonts, glow effects
+- Mandatory: crisp hard text edges
+
+Keep on-image text minimal.
+Typography must be pin-sharp.
+Use provided product references as exact appearance truth.

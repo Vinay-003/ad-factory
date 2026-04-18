@@ -1,0 +1,54 @@
+PRODUCT LOCK BLOCK
+- Use the uploaded Obesity Killer product packshot images as absolute visual truth.
+- Do not redesign, redraw, relabel, or alter any product or packaging.
+- Do not change brand name, label colors, illustrations, proportions, or any text.
+
+OUTPUT SPEC
+- Canvas: 1080 x 1350 pixels. Portrait. 4:5 ratio.
+- Style: FEAT (Features/benefits) — polished for paid ad deployment.
+- All 5 products present, proportionally sized, unmodified.
+
+FORMAT LAYOUT INSTRUCTIONS
+- FEAT: headline + 3-4 benefit bullets + CTA.
+- Background: white marble shelf, folded towel.
+
+PERSONA INPUT BLOCK
+- Persona: 12 - Late-Night Eater (रात को खाने वाला)
+- Pain: रात की स्नैकिंग दिन भर की मेहनत खराब कर देती है
+- Desire: रात को कंट्रोल, feel in control
+
+EXACT ON-IMAGE COPY — DO NOT ALTER ANYTHING
+- Headline: रात की क्रेविंग्स का सॉल्यूशन?
+- Bullet 1: सुबह की लिक्विड से रात की क्रेविंग्स कंट्रोल
+- Bullet 2: रात के पाउडर से डाइजेशन सपोर्ट, सुबह लाइट फील
+- Bullet 3: 15 दिन की सिम्पल रूटीन, कोई कॉम्प्लेक्स प्लान नहीं
+- CTA: देखें कैसे
+
+Render in Devanagari script.
+
+NEGATIVE CONSTRAINTS
+- Do not recreate/redraw any product
+- No sale badges, stickers
+- No body transformations
+- No colors outside palette
+
+QUALITY BAR
+- All 5 products present
+- All text sharp and readable
+- Section 8 contains seeded background and safe-zone fields
+
+VISUAL DIRECTION BLOCK
+- Background slot: BG-004
+- Seed: 16031
+- composition: subject centered with slight above-center lift
+- layout_intent: maintain controlled negative space around subject
+- cta_safe_space: preserve quiet footer zone
+- crop_safety: ensure all critical information within center
+
+TYPOGRAPHY SHARPNESS BLOCK
+- Headline: Poppins Bold
+- Bullets/CTA: Poppins Medium/Regular
+- Forbidden: thin fonts, script fonts, glow effects
+
+Keep on-image text minimal.
+Typography must be pin-sharp.

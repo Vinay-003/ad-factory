@@ -1,0 +1,38 @@
+PRODUCT LOCK BLOCK
+- Use the uploaded Obesity Killer product packshot images as absolute visual truth.
+- Do not redesign, redraw, relabel, or alter any product or packaging.
+
+OUTPUT SPEC
+- Canvas: 1080 x 1350 pixels. Portrait. 4:5 ratio.
+- Style: BA — Before/After journey style.
+- All 5 products present, unmodified.
+
+PERSONA INPUT BLOCK
+- Persona: 21 - Beginner Who Hates Complex Plans
+
+EXACT ON-IMAGE COPY
+- Headline: ट्रैकिंग से पारे? सिंपल जर्नी शुरू करें।
+- Bullet 1: नो कैलोरी काउंटिंग
+- Bullet 2: नो मैक्रो ट्रैकिंग
+- Bullet 3: बस 15 दिन की सिंपल रूटीन
+- CTA: ट्राई करें
+
+Render in Devanagari script.
+
+QUALITY BAR
+- All 5 products present, all text sharp and readable
+
+VISUAL DIRECTION BLOCK
+- Background slot: BG-017
+- Seed: 16511
+- composition: core subject contained within inner 80%
+- layout_intent: prioritize central hierarchy
+- cta_safe_space: maintain subtle low-contrast space
+- crop_safety: avoid edge-dependent framing
+
+TYPOGRAPHY SHARPNESS BLOCK
+- Headline: Poppins Bold
+- Bullets/CTA: Poppins Medium/Regular
+
+Keep on-image text minimal.
+Typography must be pin-sharp.
