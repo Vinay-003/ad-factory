@@ -76,8 +76,26 @@ def strip_ansi(text: str) -> str:
     return re.sub(r"\x1B\[[0-?]*[ -/]*[@-~]", "", text)
 
 
+def opencode_discovery_env() -> dict[str, str]:
+    env = os.environ.copy()
+    default_xdg = Path.home() / ".local" / "share"
+    default_auth = default_xdg / "opencode" / "auth.json"
+
+    raw_xdg = env.get("XDG_DATA_HOME", "").strip()
+    current_xdg = Path(raw_xdg).expanduser() if raw_xdg else default_xdg
+    current_auth = current_xdg / "opencode" / "auth.json"
+
+    if default_auth.exists() and not current_auth.exists():
+        env["XDG_DATA_HOME"] = str(default_xdg)
+    return env
+
+
+def run_opencode_discovery_cmd(cmd: list[str]) -> subprocess.CompletedProcess[str]:
+    return subprocess.run(cmd, cwd=str(ROOT), text=True, capture_output=True, check=False, env=opencode_discovery_env())
+
+
 def list_opencode_models() -> list[str]:
-    result = run_cmd(["opencode", "models"], cwd=ROOT)
+    result = run_opencode_discovery_cmd(["opencode", "models"])
     if result.returncode != 0:
         return []
     lines = [line.strip() for line in strip_ansi(result.stdout).splitlines()]
@@ -85,16 +103,20 @@ def list_opencode_models() -> list[str]:
 
 
 def list_opencode_provider_labels() -> list[str]:
-    result = run_cmd(["opencode", "providers", "list"], cwd=ROOT)
+    result = run_opencode_discovery_cmd(["opencode", "providers", "list"])
     if result.returncode != 0:
         return []
     lines = [line.strip() for line in strip_ansi(result.stdout).splitlines()]
     labels: list[str] = []
     for line in lines:
         match = re.search(r"[●•]\s+(.+?)\s+(oauth|api|token|key)\b", line, flags=re.IGNORECASE)
-        if not match:
-            continue
-        value = match.group(1).strip()
+        if match:
+            value = match.group(1).strip()
+        else:
+            fallback = re.search(r"^[│\s]*[●•]\s+(.+)$", line)
+            if not fallback:
+                continue
+            value = re.sub(r"\s+(oauth|api|token|key)\b.*$", "", fallback.group(1), flags=re.IGNORECASE).strip()
         if value:
             labels.append(value)
     return labels
@@ -103,6 +125,7 @@ def list_opencode_provider_labels() -> list[str]:
 def provider_id_from_label(label: str) -> str:
     known = {
         "github copilot": "github-copilot",
+        "github-copilot": "github-copilot",
         "opencode": "opencode",
     }
     key = label.strip().lower()
@@ -112,7 +135,7 @@ def provider_id_from_label(label: str) -> str:
 
 
 def list_models_for_provider(provider: str) -> list[str]:
-    result = run_cmd(["opencode", "models", provider], cwd=ROOT)
+    result = run_opencode_discovery_cmd(["opencode", "models", provider])
     if result.returncode != 0:
         return []
     lines = [line.strip() for line in strip_ansi(result.stdout).splitlines()]
@@ -137,8 +160,8 @@ def build_opencode_catalog() -> dict[str, Any]:
             continue
         models.extend(list_models_for_provider(provider))
 
-    providers_from_models = sorted({line.split("/", 1)[0] for line in models})
-    grouped: dict[str, list[str]] = {}
+    providers = sorted(provider_ids)
+    grouped: dict[str, list[str]] = {provider: [] for provider in providers}
     for model in models:
         provider = model.split("/", 1)[0]
         grouped.setdefault(provider, []).append(model)
@@ -149,7 +172,7 @@ def build_opencode_catalog() -> dict[str, Any]:
         default_model = "github-copilot/gpt-5.3-codex" if "github-copilot/gpt-5.3-codex" in models else models[0]
     return {
         "api_url": DEFAULT_OPENCODE_API_URL,
-        "providers": providers_from_models,
+        "providers": providers,
         "provider_labels": provider_labels,
         "models_by_provider": grouped,
         "default_model": default_model,

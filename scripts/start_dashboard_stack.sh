@@ -13,6 +13,15 @@ DASHBOARD_HOST="127.0.0.1"
 DASHBOARD_PORT="8787"
 OPENCODE_PASSWORD="${OPENCODE_SERVER_PASSWORD:-opencode-local-pass}"
 
+DEFAULT_XDG_DATA_HOME="${HOME}/.local/share"
+if [[ -f "$DEFAULT_XDG_DATA_HOME/opencode/auth.json" ]]; then
+  CURRENT_XDG_DATA_HOME="${XDG_DATA_HOME:-$DEFAULT_XDG_DATA_HOME}"
+  if [[ ! -f "$CURRENT_XDG_DATA_HOME/opencode/auth.json" ]]; then
+    export XDG_DATA_HOME="$DEFAULT_XDG_DATA_HOME"
+    echo "Using OpenCode credentials from $XDG_DATA_HOME/opencode/auth.json"
+  fi
+fi
+
 OPENCODE_PID_FILE="$PID_DIR/opencode.pid"
 DASHBOARD_PID_FILE="$PID_DIR/dashboard.pid"
 OPENCODE_LOG="$LOG_DIR/opencode.log"
