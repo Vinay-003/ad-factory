@@ -1,3 +1,24 @@
+CONTEXT SNAPSHOT (FOR EXTRACTION)
+- Product: Obesity Killer Kit (doctor-formulated Ayurvedic weight-loss system).
+- Core promise: 3 to 5 kg weight loss in 15 days when course is followed.
+- Brand truths: fast results, all-natural Ayurvedic formulation, no side effects, easy to follow, sustainable.
+- Who it is for: adults with BMI > 25; users struggling with cravings, inconsistency, emotional eating, low energy, slow progress.
+- Harder cases where it is still used: PCOD/PCOS, thyroid imbalance, high BP, fatty liver, diabetes, IBS (not a cure claim).
+- Not for: pregnancy, up to 6 months postpartum, active insulin users.
+- Doctor-review caution: multiple psychiatric meds, multiple surgeries.
+- Kit components: OK Liquid (morning), OK Powder (night), OK Tablet (night), dried amla, tracker, booklet, support.
+- OK Liquid protocol: empty stomach, warm pouch, then 4-hour no-solid-food window; zero-calorie drinks allowed.
+- OK Liquid nutrition: approximately 350 to 400 kcal support.
+- Powder + Tablet protocol: take at night, around 15 minutes before sleep (and typically after dinner gap).
+- Formulation facts: 31 unique ingredients, 44 total entries; 20 Liquid, 12 Powder, 12 Tablet.
+- Composition claim: no synthetic ingredients and no chemical preservatives.
+- Guarantee: if no weight-loss start within 7 days, full refund subject to course-following + daily tracker sharing.
+- Continuation rule: can continue till target/BMI 25; after each 30 days keep 7 to 10 day break.
+- Maintenance basics: BMR-based intake, daily activity, macro order (protein -> fiber -> fats -> carbs), booklet guidance.
+- Trust proof: founder Dr. Arun Tyagi, Arogyam backing, 70,000+ users served, 200 video testimonials.
+- Safety handling note: public line is "no side effects"; internal handling includes first 3 days as adjustment phase.
+- Messaging guardrails: no body-shaming, no cure-all claims, no anti-gym/anti-diet statements, no competitor bashing.
+
 Single Source of Truth: Product Foundation Document
 1. What is Obesity Killer Kit?
 Obesity Killer Kit is a doctor-formulated Ayurvedic weight-loss system designed for
@@ -560,5 +581,4 @@ Flush Orange
 800 973015
 900 7A3314
 950 421808
-
 

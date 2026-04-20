@@ -3,7 +3,7 @@
     "phase": "production",
     "write_enabled": true,
     "note": "Production mode active. Read before generation and append one entry after every generation.",
-    "last_updated": "2026-04-20T17:51:17Z"
+    "last_updated": "2026-04-20T18:30:36Z"
   },
   "rules": {
     "dedupe_scope": [
@@ -118,6 +118,33 @@
       "language": "BOTH",
       "output_quality": "pending",
       "notes": "assembled_from=copy_batch.json; batch=v1; aspect_ratio=4:5; seed=1752553023"
+    },
+    {
+      "id": "entry_003",
+      "timestamp": "2026-04-20T18:30:36Z",
+      "format": "HERO",
+      "persona_number": 1,
+      "persona_name": "CRAVING-CONTROL STRUGGLER (FORUM-GROUNDED)",
+      "headline_angle": "mechanism",
+      "headline_en": "Cravings hit? Keep your plan on track. - new angle",
+      "headline_hi": "जब cravings बढ़ती हैं, आपका प्लान टूट जाता।",
+      "support_line_en": "Ayurvedic hunger and digestion support helps weight control consistency. for sustained consistency",
+      "support_line_hi": "आयुर्वेदिक भूख और पाचन सहायता से वजन नियंत्रण में निरंतरता बनती है, cravings घटते हैं और...",
+      "cta_en": "Start your guided 15-day routine.",
+      "cta_hi": "अपना guided 15-दिन का routine शुरू करें।",
+      "disclaimer_en": "",
+      "disclaimer_hi": "",
+      "caption_en": "",
+      "caption_hi": "",
+      "bullets_en": [],
+      "bullets_hi": [],
+      "background_slot": "BG-256",
+      "background_name": "Pale cream velvet backdrop",
+      "background_source": "catalog",
+      "fresh_background_signature": null,
+      "language": "BOTH",
+      "output_quality": "pending",
+      "notes": "assembled_from=copy_batch.json; batch=v2; aspect_ratio=4:5; seed=1813528294"
     }
   ],
   "indexes": {
@@ -127,6 +154,12 @@
           "entry_id": "entry_001",
           "timestamp": "2026-04-20T17:51:17Z",
           "background_slot": "BG-494",
+          "background_source": "catalog"
+        },
+        {
+          "entry_id": "entry_003",
+          "timestamp": "2026-04-20T18:30:36Z",
+          "background_slot": "BG-256",
           "background_source": "catalog"
         }
       ],
@@ -142,25 +175,31 @@
     "used_text": {
       "headline_en": [
         "When cravings rise, your plan breaks.",
-        "From “I lose control” to “I can stay on track.”"
+        "From “I lose control” to “I can stay on track.”",
+        "Cravings hit? Keep your plan on track. - new angle"
       ],
       "headline_hi": [
         "जब cravings बढ़ती हैं, आपका प्लान टूट जाता है।",
-        "“मैं control खो देता/देती हूं” से “मैं track पर रह सकता/सकती हूं” तक।"
+        "“मैं control खो देता/देती हूं” से “मैं track पर रह सकता/सकती हूं” तक।",
+        "जब cravings बढ़ती हैं, आपका प्लान टूट जाता।"
       ],
       "cta_en": [
         "Start your guided 15-day routine.",
-        "Try the Obesity Killer Kit system."
+        "Try the Obesity Killer Kit system.",
+        "Start your guided 15-day routine."
       ],
       "cta_hi": [
         "अपना guided 15-दिन का routine शुरू करें।",
-        "Obesity Killer Kit system आज़माएं।"
+        "Obesity Killer Kit system आज़माएं।",
+        "अपना guided 15-दिन का routine शुरू करें।"
       ],
       "support_line_en": [
-        "Ayurvedic hunger and digestion support helps weight control consistency."
+        "Ayurvedic hunger and digestion support helps weight control consistency.",
+        "Ayurvedic hunger and digestion support helps weight control consistency. for sustained consistency"
       ],
       "support_line_hi": [
-        "यह किट पेट भरा महसूस कराने और cravings कम करने में मदद करती है, जिससे extra खाना घटता है..."
+        "यह किट पेट भरा महसूस कराने और cravings कम करने में मदद करती है, जिससे extra खाना घटता है...",
+        "आयुर्वेदिक भूख और पाचन सहायता से वजन नियंत्रण में निरंतरता बनती है, cravings घटते हैं और..."
       ],
       "bullets_en": [
         "Morning step supports calmer appetite control.",
@@ -178,10 +217,10 @@
       "HERO": {
         "cycle_number": 1,
         "used": [
-          "BG-494"
+          "BG-494",
+          "BG-256"
         ],
         "remaining": [
-          "BG-256",
           "BG-382",
           "BG-112",
           "BG-102",
