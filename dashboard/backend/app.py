@@ -208,6 +208,7 @@ def strip_internal_marker(text: str) -> str:
     if not isinstance(text, str):
         return ""
     cleaned = re.sub(r"\s*\b\d{4}-\d{2}-(hero|ba|test|feat|ugc)\.?\b", "", text, flags=re.IGNORECASE)
+    cleaned = re.sub(r"\s*\(\s*\d+[_-]\d+\s*\)", "", cleaned)
     cleaned = re.sub(r"\s{2,}", " ", cleaned).strip()
     return cleaned
 
@@ -233,6 +234,168 @@ def strip_internal_markers_from_payload(payload: dict[str, Any]) -> dict[str, An
             if isinstance(block.get("bullets"), list):
                 block["bullets"] = [strip_internal_marker(x) for x in block["bullets"] if isinstance(x, str)]
     return payload
+
+
+def parse_uniqueness_collisions(error_text: str) -> list[dict[str, Any]]:
+    collisions: list[dict[str, Any]] = []
+    for raw_line in error_text.splitlines():
+        line = raw_line.strip()
+        match = re.search(r"ads\[(\d+)\]\.copy\.(EN|HI)\.([a-z_]+)", line)
+        if not match:
+            continue
+        collisions.append(
+            {
+                "ad_index": int(match.group(1)),
+                "language": match.group(2),
+                "field": match.group(3),
+                "line": line,
+            }
+        )
+    return collisions
+
+
+def apply_local_collision_patch(copy_json: dict[str, Any], collisions: list[dict[str, Any]], tag: str) -> dict[str, Any]:
+    ads = copy_json.get("ads")
+    if not isinstance(ads, list):
+        return copy_json
+    for item in collisions:
+        idx = item.get("ad_index")
+        lang = item.get("language")
+        field = item.get("field")
+        if not isinstance(idx, int) or idx < 0 or idx >= len(ads):
+            continue
+        ad = ads[idx]
+        if not isinstance(ad, dict):
+            continue
+        copy = ad.get("copy")
+        if not isinstance(copy, dict):
+            continue
+        block = copy.get(lang)
+        if not isinstance(block, dict):
+            continue
+
+        if field == "bullets" and isinstance(block.get("bullets"), list):
+            patched = []
+            for i, bullet in enumerate(block.get("bullets", []), start=1):
+                if isinstance(bullet, str) and bullet.strip():
+                    if lang == "HI":
+                        patched.append(f"{bullet.strip()} और निरंतरता बेहतर रहे")
+                    else:
+                        patched.append(f"{bullet.strip()} for steadier consistency")
+            if patched:
+                block["bullets"] = patched
+            continue
+
+        if field in {"headline", "support_line", "trust_line", "attribution"}:
+            current = block.get(field)
+            if isinstance(current, str) and current.strip():
+                current_text = current.strip()
+                if field == "support_line":
+                    if lang == "HI":
+                        block[field] = f"{current_text} जिससे निरंतरता बनी रहे"
+                    else:
+                        block[field] = f"{current_text} for sustained consistency"
+                elif field == "trust_line":
+                    if lang == "HI":
+                        block[field] = f"{current_text} ताकि प्रगति टिक सके"
+                    else:
+                        block[field] = f"{current_text} to sustain progress"
+                elif field == "attribution":
+                    if lang == "HI":
+                        block[field] = f"{current_text} (सत्यापित)"
+                    else:
+                        block[field] = f"{current_text} (verified)"
+                else:
+                    if lang == "HI":
+                        block[field] = f"{current_text} - नया एंगल"
+                    else:
+                        block[field] = f"{current_text} - new angle"
+    return copy_json
+
+
+def call_opencode_repair_copy(
+    config: dict[str, Any],
+    context: dict[str, Any],
+    current_copy: dict[str, Any],
+    collisions: list[dict[str, Any]],
+    run_dir: Path,
+) -> dict[str, Any] | None:
+    api_url = (config.get("opencode_api_url") or "").strip()
+    model = (config.get("opencode_model") or "gpt-5.3-codex").strip()
+    if not api_url:
+        return None
+
+    payload = {
+        "task": "Repair uniqueness collisions only",
+        "rules": [
+            "Return valid JSON only",
+            "Keep existing structure and fields",
+            "Only change collided fields",
+            "Do not use generic repeated support lines",
+            "Do not add internal tags or IDs",
+        ],
+        "collisions": collisions,
+        "current_copy": current_copy,
+        "context": context,
+    }
+    prompt = (
+        "You are fixing ad copy JSON after uniqueness collisions. "
+        "Return only corrected JSON object with keys default_aspect_ratio and ads.\n\n"
+        + json.dumps(payload, ensure_ascii=False)
+    )
+
+    cmd = [
+        "opencode",
+        "run",
+        "--attach",
+        api_url,
+        "--model",
+        model,
+        "--format",
+        "json",
+        prompt,
+    ]
+    password = (config.get("opencode_api_key") or "").strip() or os.getenv("OPENCODE_SERVER_PASSWORD", "").strip()
+    if password:
+        cmd.extend(["--password", password])
+
+    result = run_cmd(cmd, cwd=ROOT)
+    if result.returncode != 0:
+        (run_dir / "logs" / "opencode_repair_error.txt").write_text(
+            f"Repair command failed\nSTDOUT:\n{result.stdout}\n\nSTDERR:\n{result.stderr}", encoding="utf-8"
+        )
+        return None
+
+    text_chunks: list[str] = []
+    for raw_line in result.stdout.splitlines():
+        line = raw_line.strip()
+        if not line:
+            continue
+        try:
+            event = json.loads(line)
+        except json.JSONDecodeError:
+            continue
+        if event.get("type") != "text":
+            continue
+        part = event.get("part") or {}
+        text = part.get("text")
+        if isinstance(text, str) and text.strip():
+            text_chunks.append(text.strip())
+
+    if not text_chunks:
+        return None
+
+    content = "\n".join(text_chunks)
+    try:
+        return json.loads(content)
+    except json.JSONDecodeError:
+        match = re.search(r"\{.*\}", content, flags=re.DOTALL)
+        if not match:
+            return None
+        try:
+            return json.loads(match.group(0))
+        except json.JSONDecodeError:
+            return None
 
 
 def _clean_str(value: Any) -> str:
@@ -822,8 +985,35 @@ async def api_run_execute(
     if assembler_result.returncode != 0:
         assembler_error = assembler_result.stderr or assembler_result.stdout
         (run_dir / "logs" / "assembler_error.txt").write_text(assembler_error, encoding="utf-8")
-        short_error = "\n".join([line for line in assembler_error.splitlines() if line.strip()][-10:])
-        raise HTTPException(status_code=500, detail=f"Prompt assembly failed: {short_error}")
+
+        collisions = parse_uniqueness_collisions(assembler_error)
+        if collisions:
+            repaired = call_opencode_repair_copy(cfg, full_context, copy_json, collisions, run_dir)
+            if repaired:
+                copy_json = normalize_generated_copy(repaired, full_context, run_id)
+                copy_json = strip_internal_markers_from_payload(copy_json)
+                copy_file.write_text(json.dumps(copy_json, ensure_ascii=False, indent=2) + "\n", encoding="utf-8")
+
+                retry = run_cmd(["python3", "scripts/generate_ads.py", "--copy-file", str(copy_file)], cwd=ROOT)
+                if retry.returncode == 0:
+                    assembler_result = retry
+                else:
+                    retry_error = retry.stderr or retry.stdout
+                    (run_dir / "logs" / "assembler_retry_error.txt").write_text(retry_error, encoding="utf-8")
+
+            if assembler_result.returncode != 0:
+                copy_json = apply_local_collision_patch(copy_json, collisions, tag=run_id[-6:])
+                copy_json = strip_internal_markers_from_payload(copy_json)
+                copy_file.write_text(json.dumps(copy_json, ensure_ascii=False, indent=2) + "\n", encoding="utf-8")
+                retry2 = run_cmd(["python3", "scripts/generate_ads.py", "--copy-file", str(copy_file)], cwd=ROOT)
+                if retry2.returncode == 0:
+                    assembler_result = retry2
+                else:
+                    retry2_error = retry2.stderr or retry2.stdout
+                    (run_dir / "logs" / "assembler_retry2_error.txt").write_text(retry2_error, encoding="utf-8")
+
+        if assembler_result.returncode != 0:
+            raise HTTPException(status_code=500, detail="Prompt assembly failed after automatic retry. Check run logs.")
 
     batch_match = re.search(r"Batch:\s*(v\d+)", assembler_result.stdout)
     if not batch_match:
