@@ -1,0 +1,77 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Ad Dashboard</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600;700&family=Sora:wght@500;600;700&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="/styles.css" />
+</head>
+<body>
+  <div class="page">
+    <header class="hero">
+      <div>
+        <p class="eyebrow">Local-first creative pipeline</p>
+        <h1>Ad Generation Dashboard</h1>
+        <p>Token-optimized pipeline: scripts for retrieval, LLM for generation, local files only.</p>
+      </div>
+      <button id="themeToggle" class="theme-toggle" type="button">Dark mode</button>
+    </header>
+
+    <section class="card">
+      <h2>1) Persona + Formats</h2>
+      <div id="personaList" class="grid"></div>
+      <label>Apply these formats to all selected personas</label>
+      <div id="globalFormats" class="chips"></div>
+    </section>
+
+    <section class="card">
+      <h2>2) Active Images</h2>
+      <textarea id="activeImages" rows="6"></textarea>
+      <p class="hint">One URL per line. Defaults prefilled from input/activeimages.txt</p>
+    </section>
+
+    <section class="card">
+      <h2>3) Optional File Uploads</h2>
+      <div class="uploads">
+        <label>Product Info <input id="productFile" type="file" /></label>
+        <label>Mechanism <input id="mechanismFile" type="file" /></label>
+        <label>FAQ <input id="faqFile" type="file" /></label>
+        <label>Persona TXT <input id="personaTxtFile" type="file" /></label>
+        <label>Persona CSV <input id="personaCsvFile" type="file" /></label>
+        <label>Active Images TXT <input id="activeImagesFile" type="file" /></label>
+      </div>
+      <div id="defaultsInfo" class="hint"></div>
+    </section>
+
+    <section class="card">
+      <h2>4) Execution</h2>
+      <label>OpenCode API URL (auto-wired by launcher; editable)</label>
+      <input id="opencodeApiUrl" type="text" placeholder="http://127.0.0.1:4090" />
+      <label>OpenCode API Key (optional)</label>
+      <input id="opencodeApiKey" type="password" placeholder="sk-..." />
+      <label>Provider</label>
+      <select id="opencodeProvider"></select>
+      <label>Model</label>
+      <select id="opencodeModel"></select>
+
+      <label><input id="generateImages" type="checkbox" /> Generate images after prompt creation</label>
+      <label>KIE API key (required only if generate images checked)</label>
+      <input id="kieApiKey" type="password" placeholder="kie-..." />
+
+      <button id="runBtn">Run Pipeline</button>
+      <pre id="status" class="status"></pre>
+    </section>
+
+    <section class="card">
+      <h2>5) Latest Runs</h2>
+      <button id="refreshRuns">Refresh</button>
+      <div id="runs"></div>
+    </section>
+  </div>
+
+  <script src="/app.js"></script>
+</body>
+</html>

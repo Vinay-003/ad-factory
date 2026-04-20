@@ -589,7 +589,6 @@ def main() -> int:
 
             # Registry uniqueness checks (exact string match).
             uniqueness_check(used, "headline_en" if lang == "EN" else "headline_hi", cb.headline, collisions, f"{ctx}.copy.{lang}.headline")
-            uniqueness_check(used, "cta_en" if lang == "EN" else "cta_hi", cb.cta, collisions, f"{ctx}.copy.{lang}.cta")
 
             if fmt in {"HERO", "UGC"}:
                 uniqueness_check(used, "support_line_en" if lang == "EN" else "support_line_hi", cb.support_line, collisions, f"{ctx}.copy.{lang}.support_line")
@@ -702,4 +701,3 @@ def main() -> int:
 
 if __name__ == "__main__":
     raise SystemExit(main())
-

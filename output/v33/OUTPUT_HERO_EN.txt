@@ -1,0 +1,94 @@
+PRODUCT LOCK BLOCK
+- Use the uploaded Obesity Killer product packshot images as absolute visual truth.
+- Use provided product references as exact appearance truth for pack shape, label, and color.
+- Do not redesign, redraw, relabel, or alter any product or packaging in any way.
+- Do not change brand name, label colors, illustrations, proportions, or any text (Hindi or English).
+- If any label text is unclear, preserve the original image as-is. Do not reinterpret it.
+- Only permitted: placement, scaling, subtle drop shadows, mild warm lighting correction.
+
+OUTPUT SPEC
+- Canvas: 1080 x 1350 pixels. Portrait. 4:5 ratio.
+- Style: HERO, polished enough for paid ad deployment.
+- Text policy: low text by default; all copy minimal and mobile-readable at 375px width.
+- Rendering: no compression artifacts; no soft edges on text or product labels.
+- All 5 products present, proportionally sized per reference dimensions, unmodified.
+- Readability: maintain high-contrast foreground/background treatment for ad-platform legibility.
+
+FORMAT LAYOUT INSTRUCTIONS
+- HERO format: strong headline, one support line, and one CTA.
+- Composition: keep the product cluster inside the central safe field, slightly above center, with clean margin protection.
+- Focal hierarchy: product dominant, text secondary, background tertiary.
+- Product zone: central containment only, with all key pack details away from edge-risk zones.
+- Text zones: flat uncluttered areas only; never over busy background detail.
+- Camera framing: eye-level medium shot with natural perspective and stable horizon.
+- Lighting: soft, directional, premium, and clean enough to preserve label readability.
+- Spacing: strong whitespace between product and copy blocks; clear grid alignment; no floating elements.
+
+PERSONA INPUT BLOCK
+- Persona: CRAVING-CONTROL STRUGGLER (FORUM-GROUNDED) (Persona 1)
+- Pain: some foods are too addictive for me
+- Desire: Main pain is recurring craving-led failure
+- Friction: I tried control before, it came back
+- Proof needed: Mechanism clarity over hype
+- Tone cue: Practical, empathetic, and confidence-building
+
+EXACT ON-IMAGE COPY - DO NOT ALTER ANYTHING
+- Headline: Cravings hit less, consistency lasts longer.
+- Support line: Ayurvedic hunger and digestion support helps weight control consistency.
+- CTA: Start Your 15-Day Reset
+Render every character exactly as written. No paraphrasing, no punctuation changes, no autocorrection.
+
+NEGATIVE CONSTRAINTS
+- Do not recreate or redraw any product.
+- Do not blur, approximate, or rewrite any label text.
+- Do not use sale badges, burst graphics, or stickers.
+- Do not show body transformations or weight-loss visuals.
+- Do not use colors outside the defined palette.
+- Do not use more than 2 font weights.
+- Do not overcrowd the layout.
+- Do not make medical cure claims of any kind.
+- Do not use ring light, studio flash, or overproduced lighting.
+
+QUALITY BAR - verify before accepting output
+- All 5 products present, correctly proportioned, and completely unmodified.
+- All on-image text sharp and readable at 375px mobile size.
+- Product labels accurate, unmodified, and fully readable.
+- Layout calm, balanced, and premium.
+- No clutter, no hype, and no forbidden elements.
+- Single clear focal hierarchy with product dominance throughout.
+- If any item above fails, regenerate immediately without compromise.
+
+VISUAL DIRECTION BLOCK
+- Background slot: BG-264 - Studio light gray sweep
+- Background seed: 1318452576
+- Seeded background direction (single sentence, exact): Clean mid-gray studio sweep, neutral professional product display on a clean premium composite surface with restrained texture and ad-ready clarity, with subtle background blur with layered depth separation and low visual noise, lit by soft natural side daylight with gentle diffusion and polished tonal balance, conveying modern everyday self-care discipline; 45-degree three-quarter close framing, soft focus falloff, crisp subject plane and clean edge definition, clean central stack with subject emphasis above midpoint and strong lower-third simplicity for overlays, prioritize central hierarchy and avoid any composition that relies on top, bottom, or side edge information, keep bottom-frame textures soft and unobtrusive, with no key content entering the CTA band, keep focal hierarchy compact and central so multi-placement crops preserve premium readability, slightly cool clean tone with smooth highlight handling, designed for 4:5 feed framing with key content held inside the central safe field, centered to slightly above center, while top 10 percent, bottom 15 percent, and side edge zones remain low-priority, clean premium studio ad photography, ultra-detailed, flawless commercial finish.
+- Subject: No human subject, products only.
+- Action: Arrange all 5 products as a cohesive premium cluster; kit box acts as anchor.
+- Camera: Eye-level medium framing with clean edge discipline.
+- Lighting: Warm, soft, directional (top-left) and label-safe.
+- Props: Minimal, non-competing; keep edge zones quiet.
+- Surfaces: Premium, clean texture; avoid busy patterns under text.
+- Mood: Calm confidence and practical consistency; no hype.
+- Realism: True-to-life proportions; no stock-template look.
+
+TYPOGRAPHY SHARPNESS BLOCK
+- Headline: Poppins Bold with high contrast against clean background area.
+- Support and CTA: Poppins Medium/Regular, same family.
+- Size: readable on a 375px mobile screen without zooming.
+- Placement: flat uncluttered zones only; avoid noisy textures.
+- Forbidden: thin fonts, script fonts, decorative typefaces, glow effects, outlined text, drop shadows on copy.
+- Mandatory: crisp hard text edges, zero softness, zero anti-alias blur on any character.
+- If any text is soft, blurry, or illegible, discard and regenerate immediately.
+
+Keep on-image text minimal and mobile-readable. Avoid dense copy blocks.
+Typography must be pin-sharp. If any text appears soft, blurry, or smeared, regenerate.
+Keep text count minimal and increase font size rather than packing more copy.
+Use clean sans typography with strong stroke clarity; no thin/light weights for body text.
+Use Poppins only for on-image text: Headline in Poppins Bold, support/CTA in Poppins Medium or Regular.
+
+SAFE-ZONE ENFORCEMENT (NON-NEGOTIABLE)
+- Frame: 1080x1350 (4:5).
+- Restricted bands: top 10% (0-135px), bottom 15% (1148-1350px), side edges outer 8% (0-86px and 994-1080px).
+- Keep all products and all on-image text fully inside the central safe field: x=86-994 and y=135-1148.
+- Keep the entire product cluster in a centered core with mild upward bias; do not touch any restricted band.
+- Reject and regenerate if any headline, CTA, or product detail crosses restricted zones.

@@ -1,1 +1,5 @@
 scripts/.env
+dashboard_storage/
+__pycache__/
+*.pyc
+.venv/
