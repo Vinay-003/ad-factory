@@ -25,17 +25,17 @@ FORMAT LAYOUT INSTRUCTIONS
 - Spacing: strong whitespace between product and copy blocks; clear grid alignment; no floating elements.
 
 PERSONA INPUT BLOCK
-- Persona: CRAVING-CONTROL STRUGGLER (FORUM-GROUNDED) (Persona 1)
-- Pain: रूटीन निभाना मुश्किल लग रहा है।
-- Desire: ऐसा आसान सिस्टम जो रोज निभ सके।
-- Friction: पहले के प्लान बहुत सख्त और मुश्किल थे।
-- Proof needed: साफ तरीका, भरोसेमंद सपोर्ट और व्यावहारिक प्रूफ चाहिए।
-- Tone cue: सरल, भरोसेमंद, और व्यावहारिक
+- Persona: TIME-STARVED PARENT (FORUM-GROUNDED) (Persona 9)
+- Pain: I am struggling to find a way to fit an hour of gym time in the schedule
+- Desire: Main pain is schedule chaos and low sleep breaking most plans.
+- Friction: I do not have time for complex plans
+- Proof needed: Real-life feasibility framing
+- Tone cue: Practical, empathetic, and confidence-building
 
 EXACT ON-IMAGE COPY - DO NOT ALTER ANYTHING
-- Headline: जब cravings बढ़ती हैं, आपका प्लान टूट जाता।
-- Support line: आयुर्वेदिक भूख और पाचन सहायता से वजन नियंत्रण में निरंतरता बनती है, cravings घटते हैं और...
-- CTA: अपना guided 15-दिन का routine शुरू करें।
+- Headline: No time for the gym? Start with hunger control.
+- Support line: Morning appetite support and night digestion support can reduce random eating, making...
+- CTA: Check the Kit
 Render every character exactly as written. No paraphrasing, no punctuation changes, no autocorrection.
 
 NEGATIVE CONSTRAINTS
@@ -59,9 +59,9 @@ QUALITY BAR - verify before accepting output
 - If any item above fails, regenerate immediately without compromise.
 
 VISUAL DIRECTION BLOCK
-- Background slot: BG-256 - Pale cream velvet backdrop
-- Background seed: 997250231
-- Seeded background direction (single sentence, exact): Cream velvet fabric backdrop, product on matching riser on a minimal matte neutral platform with crisp silhouette separation, with minimal contextual backdrop with elegant bokeh falloff and clean negative space, lit by soft top-side illumination with refined contrast and clean edge transitions, conveying natural polished habit-first setting; medium-wide ad framing with restrained depth blur and stable natural perspective, stable mid-column framing that keeps key elements in the safe middle while preserving unobtrusive bottom space, enforce central placement lock so all high-importance detail remains away from frame boundaries, avoid any high-importance object detail in the lower region to protect conversion UI legibility, avoid edge-dependent framing; composition must survive moderate side and vertical trimming, warm natural tones with commercial polish, designed for 4:5 feed framing with key content held inside the central safe field, centered to slightly above center, while top 10 percent, bottom 15 percent, and side edge zones remain low-priority, clean premium studio ad photography, ultra-detailed, flawless commercial finish.
+- Background slot: BG-331 - Cold stone tabletop
+- Background seed: 649942417
+- Seeded background direction (single sentence, exact): Cold white stone or granite tabletop, clean neutral wall on a minimal matte neutral platform with crisp silhouette separation, with minimal contextual backdrop with elegant bokeh falloff and clean negative space, lit by gentle daylight-balanced side key with minimal hard shadow and precise definition, conveying clean clinical confidence with premium trust signals; slightly elevated medium shot, balanced depth layering, gentle blur in rear context, clean central stack with subject emphasis above midpoint and strong lower-third simplicity for overlays, bias the focal center slightly upward while keeping the lower region open for captions and CTA overlays, avoid any high-importance object detail in the lower region to protect conversion UI legibility, maintain protected margin buffers so alternate crops do not clip meaningful scene structure, soft desaturated clean tone with precise highlight control, designed for 4:5 feed framing with key content held inside the central safe field, centered to slightly above center, while top 10 percent, bottom 15 percent, and side edge zones remain low-priority, clean premium studio ad photography, ultra-detailed, flawless commercial finish.
 - Subject: No human subject, products only.
 - Action: Arrange all 5 products as a cohesive premium cluster; kit box acts as anchor.
 - Camera: Eye-level medium framing with clean edge discipline.

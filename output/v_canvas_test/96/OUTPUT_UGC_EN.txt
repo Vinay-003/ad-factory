@@ -1,0 +1,99 @@
+PRODUCT LOCK BLOCK
+- Use the uploaded Obesity Killer product packshot images as absolute visual truth.
+- Use provided product references as exact appearance truth for pack shape, label, and color.
+- Do not redesign, redraw, relabel, or alter any product or packaging in any way.
+- Do not change brand name, label colors, illustrations, proportions, or any text (Hindi or English).
+- If any label text is unclear, preserve the original image as-is. Do not reinterpret it.
+- Only permitted: placement, scaling, subtle drop shadows, mild warm lighting correction.
+
+OUTPUT SPEC
+- Canvas: 1080 x 1920 pixels. Portrait. 9:16 ratio.
+- Style: UGC (creator-style authenticity, premium and clean).
+- Text policy: low text by default; all copy minimal and mobile-readable at 375px width.
+- Rendering: no compression artifacts; no soft edges on text or product labels.
+- All 5 products present, proportionally sized per reference dimensions, unmodified.
+- Readability: maintain high-contrast foreground/background treatment for ad-platform legibility.
+
+FORMAT LAYOUT INSTRUCTIONS
+- Format: UGC.
+- Creator-style authenticity with premium cleanliness; avoid stock-template look.
+- Subject holds the kit toward camera while remaining natural and unposed; all 5 products still visible.
+- Headline top, support line mid, CTA bottom; keep on-image text minimal but meaningful.
+- UGC copy density: headline should feel complete (about 6-12 words), support line should carry a clear mechanism + outcome phrase (about 8-16 words).
+- Hands must look anatomically correct; no extra fingers or warped nails.
+- Camera framing: handheld close-to-medium, phone-like realism with stable focus on product labels.
+- Lighting: soft indoor daylight or warm ambient; avoid ring-light glow.
+- Background props minimal and non-competing; keep text zones flat and clean.
+
+PERSONA INPUT BLOCK
+- Persona: CRAVING-CONTROL STRUGGLER (FORUM-GROUNDED) (Persona 1)
+- Pain: some foods are too addictive for me
+- Desire: Main pain is recurring craving-led failure
+- Friction: I tried control before, it came back
+- Proof needed: Mechanism clarity over hype
+- Tone cue: Practical, empathetic, and confidence-building
+
+EXACT ON-IMAGE COPY - DO NOT ALTER ANYTHING
+- Headline: No time for the gym? Start with hunger control. - revised focus
+- Support line: Doctor-formulated morning and night system helps reduce random eating so weight stays... to lower craving pressure through the day
+- CTA: Start Now
+Render every character exactly as written. No paraphrasing, no punctuation changes, no autocorrection.
+
+NEGATIVE CONSTRAINTS
+- Do not recreate or redraw any product.
+- Do not blur, approximate, or rewrite any label text.
+- Do not use sale badges, burst graphics, or stickers.
+- Do not show body transformations or weight-loss visuals.
+- Do not use colors outside the defined palette.
+- Do not use more than 2 font weights.
+- Do not overcrowd the layout.
+- Do not add edge glows, tinted borders, amber/orange side casts, or decorative vignette frames.
+- Do not render unnatural or anatomically incorrect hands.
+- Do not place any translucent white panel behind or below the product cluster.
+- Do not make medical cure claims of any kind.
+- Do not use ring light, studio flash, or overproduced lighting.
+
+QUALITY BAR - verify before accepting output
+- All 5 products present, correctly proportioned, and completely unmodified.
+- All on-image text sharp and readable at 375px mobile size.
+- Product labels accurate, unmodified, and fully readable.
+- Layout calm, balanced, and premium.
+- No clutter, no hype, and no forbidden elements.
+- Single clear focal hierarchy with product dominance throughout.
+- If any item above fails, regenerate immediately without compromise.
+
+VISUAL DIRECTION BLOCK
+- Background slot: BG-144 - Rooftop table morning
+- Background seed: 2041691454
+- Seeded background direction (single sentence, exact): Rooftop table with city haze backdrop, chai mug prop on a minimal matte neutral platform with crisp silhouette separation, with soft foreground-to-background depth transition preserving premium focus hierarchy, lit by soft morning daylight from the left with gentle wrap and clean shadow edges, conveying calm optimistic health-forward atmosphere; 45-degree three-quarter close framing, soft focus falloff, crisp subject plane and clean edge definition, subject centered with a slight above-center lift, maintaining equal margin breathing room across all edges, keep visual weight centered with mild upward lift and balanced side margins for feed-safe framing, preserve a quiet footer zone while keeping the subject comfortably within central margins, ensure all critical visual information remains within the center so 1:1 center crop retains full message, use a soft top-down gradient overlay for headline readability, but stop the panel above products; never continue behind or below product packshots, keep all frame edges tonally neutral with no orange, amber, or sepia cast; no border glow and no vignette halo, soft golden morning tint with controlled saturation, designed for 9:16 vertical placement with key subject content constrained to the 14-65 percent safe band, positioned slightly above center, and with the lower 35 percent kept visually quiet for overlays; avoid edge glow frames and tinted border gradients, clean premium studio ad photography, ultra-detailed, flawless commercial finish.
+- Subject: Indian woman 24-29, calm confident expression, minimal blouse, natural shoulder-length hair; natural and unposed.
+- Action: Hold the kit box toward camera with one hand; the other products arranged on a clean surface in-frame.
+- Camera: Handheld close-to-medium framing, phone-like realism, stable focus on labels.
+- Lighting: Warm, soft, directional (top-left) and label-safe.
+- Props: Minimal, non-competing; keep edge zones quiet.
+- Surfaces: Premium, clean texture; avoid busy patterns under text.
+- Text panel treatment: if used, keep panel in upper text zone only with vertical fade to transparent before products; never place white panel behind or below product cluster.
+- Edge color control: keep border tones neutral and natural; no orange/amber edge tint and no ornamental frame glow.
+- Mood: Calm confidence and practical consistency; no hype.
+- Realism: True-to-life proportions; no stock-template look; natural skin and correct hand anatomy.
+
+TYPOGRAPHY SHARPNESS BLOCK
+- Headline: Poppins Bold with high contrast against clean background area.
+- Support and CTA: Poppins Medium/Regular, same family.
+- Size: readable on a 375px mobile screen without zooming.
+- Placement: flat uncluttered zones only; avoid noisy textures.
+- Forbidden: thin fonts, script fonts, decorative typefaces, glow effects, outlined text, drop shadows on copy.
+- Mandatory: crisp hard text edges, zero softness, zero anti-alias blur on any character.
+- If any text is soft, blurry, or illegible, discard and regenerate immediately.
+
+Keep on-image text minimal and mobile-readable. Avoid dense copy blocks.
+Typography must be pin-sharp. If any text appears soft, blurry, or smeared, regenerate.
+Keep text count minimal and increase font size rather than packing more copy.
+Use clean sans typography with strong stroke clarity; no thin/light weights for body text.
+Use Poppins only for on-image text: Headline in Poppins Bold, support/CTA in Poppins Medium or Regular.
+
+SAFE-ZONE ENFORCEMENT (NON-NEGOTIABLE)
+- Keep all critical content inside the 14%-65% vertical safe band.
+- Reserve the lower 35% as quiet space; no product labels or headline copy in this band.
+- Keep side margins clean; no key content touching left or right frame edges.
+- Reject and regenerate if any headline, CTA, or product detail crosses restricted zones.

@@ -2,6 +2,12 @@
   "version": "3.2-safezone",
   "source": "BACKGROUND_VARIANTS.JSON",
   "total_variants": 500,
+  "default_text_overlay_treatment": [
+    "if a readability panel is needed, keep it in the upper text region only, with a top-anchored vertical fade to transparent before the product cluster",
+    "use a soft top-down gradient overlay for headline readability, but stop the panel above products; never continue behind or below product packshots",
+    "prefer narrow upper-half text haze with feathered lower edge; zero opaque overlay under the product shelf or CTA base",
+    "text-contrast aid must be upper-zone only, fading out smoothly before product silhouettes begin"
+  ],
   "variants": [
     {
       "id": "BG-001",

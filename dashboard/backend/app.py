@@ -35,6 +35,22 @@ FORMATS = ["HERO", "BA", "TEST", "FEAT", "UGC"]
 DEFAULT_OPENCODE_API_URL = os.getenv("OPENCODE_API_URL", "http://127.0.0.1:4090")
 
 
+def resolve_language_mode(config: dict[str, Any]) -> str:
+    mode = str(config.get("language_mode") or "ALL").strip().upper()
+    if mode in {"EN", "HI", "HINGLISH", "ALL"}:
+        return mode
+    return "ALL"
+
+
+def assembler_language_mode(config: dict[str, Any]) -> str:
+    mode = resolve_language_mode(config)
+    if mode == "EN":
+        return "EN"
+    if mode == "HI":
+        return "HI"
+    return "BOTH"
+
+
 def now_iso() -> str:
     return datetime.now(timezone.utc).replace(microsecond=0).isoformat().replace("+00:00", "Z")
 
@@ -227,6 +243,65 @@ def shorten_copy_line(text: str, limit: int = 92) -> str:
     return clipped + "..."
 
 
+def polish_ba_headline(headline: str, lang: str, persona: dict[str, Any]) -> str:
+    clean = " ".join((headline or "").split()).strip()
+    if not clean:
+        return ""
+
+    low = clean.lower()
+    looks_literal_ba = (
+        ("before" in low and "after" in low)
+        or low.startswith("before:")
+        or low.startswith("after:")
+        or "before/after" in low
+    )
+
+    if not looks_literal_ba:
+        return clean
+
+    if lang == "EN":
+        pain = _clean_str(persona.get("pain_en"))
+        desire = _clean_str(persona.get("desire_en"))
+        if pain and desire:
+            return shorten_copy_line(f"From {pain.rstrip('.')} to {desire.rstrip('.')}.", limit=86)
+        return "From craving chaos to consistent daily control."
+
+    pain_hi = _clean_str(persona.get("pain_hi"))
+    desire_hi = _clean_str(persona.get("desire_hi"))
+    if pain_hi and desire_hi:
+        return shorten_copy_line(f"{pain_hi.rstrip('।')} से {desire_hi.rstrip('।')} तक।", limit=86)
+    return "बिखरे खाने की आदत से रोज़ाना बेहतर नियंत्रण तक।"
+
+
+def _word_count(text: str) -> int:
+    return len([x for x in re.split(r"\s+", (text or "").strip()) if x])
+
+
+def strengthen_ugc_copy(headline: str, support: str, lang: str, persona: dict[str, Any]) -> tuple[str, str]:
+    head = " ".join((headline or "").split()).strip()
+    sup = " ".join((support or "").split()).strip()
+
+    if lang == "EN":
+        if _word_count(head) < 6:
+            desire = _clean_str(persona.get("desire_en"))
+            base = desire if desire else "Build steadier daily control that actually lasts"
+            head = shorten_copy_line(base.rstrip(".") + ".", limit=90)
+        if _word_count(sup) < 8:
+            proof = _clean_str(persona.get("proof_needed_en"))
+            fallback = "Morning appetite support helps reduce urge spikes so consistency stays easier each day."
+            sup = shorten_copy_line((proof + "; " + fallback) if proof else fallback, limit=92)
+        return head, sup
+
+    if _word_count(head) < 6:
+        desire_hi = _clean_str(persona.get("desire_hi"))
+        base_hi = desire_hi if desire_hi else "रोज़मर्रा नियंत्रण को टिकाऊ बनाने वाला सरल बदलाव"
+        head = shorten_copy_line(base_hi.rstrip("।") + "।", limit=90)
+    if _word_count(sup) < 8:
+        fallback_hi = "सुबह की appetite support urge spikes कम करके रोज़ाना consistency बनाए रखने में मदद करती है।"
+        sup = shorten_copy_line(fallback_hi, limit=92)
+    return head, sup
+
+
 def strip_internal_marker(text: str) -> str:
     if not isinstance(text, str):
         return ""
@@ -277,6 +352,52 @@ def parse_uniqueness_collisions(error_text: str) -> list[dict[str, Any]]:
     return collisions
 
 
+def parse_json_object_from_text(content: str) -> dict[str, Any] | None:
+    text = (content or "").strip()
+    if not text:
+        return None
+
+    try:
+        parsed = json.loads(text)
+        if isinstance(parsed, dict):
+            return parsed
+    except json.JSONDecodeError:
+        pass
+
+    fence = re.search(r"```(?:json)?\s*(\{.*?\})\s*```", text, flags=re.DOTALL | re.IGNORECASE)
+    if fence:
+        try:
+            parsed = json.loads(fence.group(1))
+            if isinstance(parsed, dict):
+                return parsed
+        except json.JSONDecodeError:
+            pass
+
+    decoder = json.JSONDecoder()
+    best: dict[str, Any] | None = None
+    best_span = -1
+    for match in re.finditer(r"\{", text):
+        start = match.start()
+        try:
+            parsed, end = decoder.raw_decode(text[start:])
+        except json.JSONDecodeError:
+            continue
+        if not isinstance(parsed, dict):
+            continue
+        span = end
+        if span > best_span:
+            best = parsed
+            best_span = span
+    return best
+
+
+def _deterministic_variant(options: list[str], key: str) -> str:
+    if not options:
+        return ""
+    score = sum((i + 1) * ord(ch) for i, ch in enumerate(key))
+    return options[score % len(options)]
+
+
 def apply_local_collision_patch(copy_json: dict[str, Any], collisions: list[dict[str, Any]], tag: str) -> dict[str, Any]:
     ads = copy_json.get("ads")
     if not isinstance(ads, list):
@@ -301,10 +422,29 @@ def apply_local_collision_patch(copy_json: dict[str, Any], collisions: list[dict
             patched = []
             for i, bullet in enumerate(block.get("bullets", []), start=1):
                 if isinstance(bullet, str) and bullet.strip():
+                    variant_key = f"{tag}:{idx}:{lang}:{field}:{i}"
                     if lang == "HI":
-                        patched.append(f"{bullet.strip()} और निरंतरता बेहतर रहे")
+                        tail = _deterministic_variant(
+                            [
+                                "ताकि दिनभर नियंत्रण आसान रहे",
+                                "जिससे प्लान लगातार निभे",
+                                "और भूख के उतार-चढ़ाव कम रहें",
+                                "जिससे रूटीन स्थिर बना रहे",
+                            ],
+                            variant_key,
+                        )
+                        patched.append(f"{bullet.strip()} {tail}")
                     else:
-                        patched.append(f"{bullet.strip()} for steadier consistency")
+                        tail = _deterministic_variant(
+                            [
+                                "to keep daily control easier",
+                                "so adherence stays steady",
+                                "to reduce appetite swings through the day",
+                                "so routine compliance remains stable",
+                            ],
+                            variant_key,
+                        )
+                        patched.append(f"{bullet.strip()} {tail}")
             if patched:
                 block["bullets"] = patched
             continue
@@ -313,26 +453,57 @@ def apply_local_collision_patch(copy_json: dict[str, Any], collisions: list[dict
             current = block.get(field)
             if isinstance(current, str) and current.strip():
                 current_text = current.strip()
+                variant_key = f"{tag}:{idx}:{lang}:{field}"
                 if field == "support_line":
                     if lang == "HI":
-                        block[field] = f"{current_text} जिससे निरंतरता बनी रहे"
+                        tail = _deterministic_variant(
+                            [
+                                "जिससे निरंतरता बनी रहे",
+                                "ताकि रोज़ाना नियंत्रण आसान बने",
+                                "और भूख का दबाव कम महसूस हो",
+                                "ताकि प्लान पर टिके रहना सरल हो",
+                            ],
+                            variant_key,
+                        )
+                        block[field] = f"{current_text} {tail}"
                     else:
-                        block[field] = f"{current_text} for sustained consistency"
+                        tail = _deterministic_variant(
+                            [
+                                "for steadier day-to-day consistency",
+                                "so appetite control stays easier daily",
+                                "to lower craving pressure through the day",
+                                "for more reliable routine adherence",
+                            ],
+                            variant_key,
+                        )
+                        block[field] = f"{current_text} {tail}"
                 elif field == "trust_line":
                     if lang == "HI":
-                        block[field] = f"{current_text} ताकि प्रगति टिक सके"
+                        tail = _deterministic_variant(
+                            ["ताकि प्रगति टिक सके", "जिससे परिणाम बने रहें", "ताकि रूटीन लंबे समय तक चले"],
+                            variant_key,
+                        )
+                        block[field] = f"{current_text} {tail}"
                     else:
-                        block[field] = f"{current_text} to sustain progress"
+                        tail = _deterministic_variant(
+                            ["to sustain progress", "to keep progress stable", "for lasting follow-through"],
+                            variant_key,
+                        )
+                        block[field] = f"{current_text} {tail}"
                 elif field == "attribution":
                     if lang == "HI":
-                        block[field] = f"{current_text} (सत्यापित)"
+                        tail = _deterministic_variant(["(सत्यापित)", "(मार्गदर्शित)", "(प्रोटोकॉल-आधारित)"], variant_key)
+                        block[field] = f"{current_text} {tail}"
                     else:
-                        block[field] = f"{current_text} (verified)"
+                        tail = _deterministic_variant(["(verified)", "(guided)", "(protocol-based)"], variant_key)
+                        block[field] = f"{current_text} {tail}"
                 else:
                     if lang == "HI":
-                        block[field] = f"{current_text} - नया एंगल"
+                        tail = _deterministic_variant(["- नया एंगल", "- अलग दृष्टिकोण", "- नया फोकस"], variant_key)
+                        block[field] = f"{current_text} {tail}"
                     else:
-                        block[field] = f"{current_text} - new angle"
+                        tail = _deterministic_variant(["- new angle", "- fresh perspective", "- revised focus"], variant_key)
+                        block[field] = f"{current_text} {tail}"
     return copy_json
 
 
@@ -409,16 +580,7 @@ def call_opencode_repair_copy(
         return None
 
     content = "\n".join(text_chunks)
-    try:
-        return json.loads(content)
-    except json.JSONDecodeError:
-        match = re.search(r"\{.*\}", content, flags=re.DOTALL)
-        if not match:
-            return None
-        try:
-            return json.loads(match.group(0))
-        except json.JSONDecodeError:
-            return None
+    return parse_json_object_from_text(content)
 
 
 def _clean_str(value: Any) -> str:
@@ -510,25 +672,32 @@ def normalize_generated_copy(
             headline = _clean_str(src_lang.get("headline"))
             cta = _clean_str(src_lang.get("cta"))
             if headline:
-                base_lang["headline"] = headline
+                if fmt == "BA":
+                    headline = polish_ba_headline(headline, lang, persona)
+                base_lang["headline"] = shorten_copy_line(headline, limit=90)
             if cta:
                 base_lang["cta"] = cta
 
-        if fmt in {"HERO", "UGC"}:
-            support = _clean_str(src_lang.get("support_line"))
-            if support:
-                base_lang["support_line"] = shorten_copy_line(support)
-        elif fmt in {"BA", "FEAT"}:
-            bullets = _clean_bullets(src_lang.get("bullets"))
-            if len(bullets) >= 2:
-                base_lang["bullets"] = [shorten_copy_line(b, limit=88) for b in bullets]
-        else:
-            attribution = _clean_str(src_lang.get("attribution"))
-            trust = _clean_str(src_lang.get("trust_line"))
-            if attribution:
-                base_lang["attribution"] = shorten_copy_line(attribution, limit=86)
-            if trust:
-                base_lang["trust_line"] = shorten_copy_line(trust)
+            if fmt in {"HERO", "UGC"}:
+                support = _clean_str(src_lang.get("support_line"))
+                if support:
+                    if fmt == "UGC":
+                        tuned_headline, tuned_support = strengthen_ugc_copy(base_lang.get("headline", ""), support, lang, persona)
+                        base_lang["headline"] = shorten_copy_line(tuned_headline, limit=90)
+                        base_lang["support_line"] = shorten_copy_line(tuned_support)
+                    else:
+                        base_lang["support_line"] = shorten_copy_line(support)
+            elif fmt in {"BA", "FEAT"}:
+                bullets = _clean_bullets(src_lang.get("bullets"))
+                if len(bullets) >= 2:
+                    base_lang["bullets"] = [shorten_copy_line(b, limit=88) for b in bullets]
+            else:
+                attribution = _clean_str(src_lang.get("attribution"))
+                trust = _clean_str(src_lang.get("trust_line"))
+                if attribution:
+                    base_lang["attribution"] = shorten_copy_line(attribution, limit=86)
+                if trust:
+                    base_lang["trust_line"] = shorten_copy_line(trust)
 
     return base
 
@@ -555,8 +724,12 @@ def build_template_copy(context: dict[str, Any], run_id: str) -> dict[str, Any]:
         proof_hi = "साफ तरीका, भरोसेमंद सपोर्ट और व्यावहारिक प्रूफ चाहिए।"
         tone_hi = "सरल, भरोसेमंद, और व्यावहारिक"
 
-        headline_en = f"{persona_name}: build a simpler weight routine today {unique}."
-        headline_hi = f"{persona_name}: आज से सरल वजन रूटीन शुरू करें {unique}।"
+        if fmt == "BA":
+            headline_en = f"From craving-led eating to steadier daily control {unique}."
+            headline_hi = f"बार-बार cravings से रोज़ाना बेहतर नियंत्रण तक {unique}।"
+        else:
+            headline_en = f"{persona_name}: build a simpler weight routine today {unique}."
+            headline_hi = f"{persona_name}: आज से सरल वजन रूटीन शुरू करें {unique}।"
         cta_en = f"Start Now {unique}"
         cta_hi = f"अभी शुरू करें {unique}"
 
@@ -626,15 +799,27 @@ def call_opencode_compatible(config: dict[str, Any], context: dict[str, Any], ru
     if not api_url:
         return None
 
+    language_mode = resolve_language_mode(config)
+    language_notes = {
+        "ALL": "Provide natural EN and HI copy.",
+        "EN": "Prioritize EN clarity; keep HI accurate and concise.",
+        "HI": "Prioritize HI clarity; keep EN accurate and concise.",
+        "HINGLISH": "Use Hinglish (Roman Hindi mix) style in EN fields; keep HI fields in Devanagari Hindi.",
+    }
+
     system = (
         "You generate ad copy JSON only. Return valid JSON with keys default_aspect_ratio and ads. "
-        "Each ads item must include format, headline_angle, persona fields and copy.EN/copy.HI fields compatible with assembler."
+        "Each ads item must include format, headline_angle, persona fields and copy.EN/copy.HI fields compatible with assembler. "
+        "For BA headline, do not output literal 'Before: ... After: ...' construction; use a natural transformation hook. "
+        "For UGC: avoid ultra-short copy fragments; headline should read like a complete thought and support line must include mechanism + outcome in natural language. "
+        + language_notes.get(language_mode, language_notes["ALL"])
     )
     user_payload = {
         "task": "Generate fresh ad copy JSON for provided context.",
         "context": context,
         "constraints": {
             "language": ["EN", "HI"],
+            "language_mode": language_mode,
             "formats": FORMATS,
             "return_json_only": True,
         },
@@ -691,15 +876,9 @@ def call_opencode_compatible(config: dict[str, Any], context: dict[str, Any], ru
 
         if text_chunks:
             content = "\n".join(text_chunks).strip()
-            try:
-                return json.loads(content)
-            except json.JSONDecodeError:
-                match = re.search(r"\{.*\}", content, flags=re.DOTALL)
-                if match:
-                    try:
-                        return json.loads(match.group(0))
-                    except json.JSONDecodeError:
-                        pass
+            parsed = parse_json_object_from_text(content)
+            if parsed is not None:
+                return parsed
 
         (run_dir / "logs" / "opencode_error.txt").write_text(
             "OpenCode CLI returned no parseable JSON text block.\n"
@@ -731,13 +910,7 @@ def call_opencode_compatible(config: dict[str, Any], context: dict[str, Any], ru
         content = parsed.get("choices", [{}])[0].get("message", {}).get("content", "")
         if not content:
             return None
-        try:
-            return json.loads(content)
-        except json.JSONDecodeError:
-            match = re.search(r"\{.*\}", content, flags=re.DOTALL)
-            if not match:
-                return None
-            return json.loads(match.group(0))
+        return parse_json_object_from_text(content)
     except Exception as exc:
         (run_dir / "logs" / "opencode_error.txt").write_text(
             cli_error + "\n\nOpenAI-style HTTP fallback failed:\n" + str(exc),
@@ -750,7 +923,7 @@ def collect_run_result(run_dir: Path, batch_name: str, image_generated: bool) ->
     output_dir = ROOT / "output" / batch_name
     prompt_files = []
     if output_dir.exists():
-        for file in sorted(output_dir.glob("OUTPUT_*.txt")):
+        for file in sorted(output_dir.glob("**/OUTPUT_*.txt")):
             prompt_files.append(str(file.relative_to(ROOT)))
 
     image_files: list[str] = []
@@ -771,6 +944,88 @@ def collect_run_result(run_dir: Path, batch_name: str, image_generated: bool) ->
     }
     (run_dir / "manifest.json").write_text(json.dumps(result, ensure_ascii=False, indent=2) + "\n", encoding="utf-8")
     return result
+
+
+def force_aspect_ratio(copy_json: dict[str, Any], aspect_ratio: str) -> dict[str, Any]:
+    cloned = json.loads(json.dumps(copy_json, ensure_ascii=False))
+    cloned["default_aspect_ratio"] = aspect_ratio
+    ads = cloned.get("ads")
+    if isinstance(ads, list):
+        for ad in ads:
+            if isinstance(ad, dict):
+                ad["aspect_ratio"] = aspect_ratio
+    return cloned
+
+
+def _parse_prompt_field(prompt_text: str, label: str) -> str:
+    match = re.search(rf"^\s*-\s*{re.escape(label)}:\s*(.+)$", prompt_text, flags=re.MULTILINE)
+    return (match.group(1).strip() if match else "")
+
+
+def parse_background_lock_from_prompt(prompt_text: str) -> tuple[str, int] | None:
+    slot_match = re.search(r"^\s*-\s*Background\s+slot:\s*(BG-\d{3})\b", prompt_text, flags=re.MULTILINE | re.IGNORECASE)
+    seed_match = re.search(r"^\s*-\s*Background\s+seed:\s*(\d+)\s*$", prompt_text, flags=re.MULTILINE | re.IGNORECASE)
+    if not slot_match or not seed_match:
+        return None
+    return (slot_match.group(1).upper(), int(seed_match.group(1)))
+
+
+def collect_45_visual_locks(batch: str) -> dict[str, dict[str, Any]]:
+    out: dict[str, dict[str, Any]] = {}
+    ratio_dir = ROOT / "output" / batch / "45"
+    if not ratio_dir.exists():
+        return out
+    for prompt_file in sorted(ratio_dir.glob("OUTPUT_*_EN.txt")) + sorted(ratio_dir.glob("OUTPUT_*_HI.txt")):
+        match = re.match(r"^OUTPUT_([A-Z]+)_(EN|HI)\.txt$", prompt_file.name)
+        if not match:
+            continue
+        fmt = match.group(1)
+        current = out.get(fmt, {})
+        text = prompt_file.read_text(encoding="utf-8", errors="ignore")
+        lock = parse_background_lock_from_prompt(text)
+        if lock:
+            current["background_slot"] = lock[0]
+            current["background_seed"] = lock[1]
+
+        visual_lock = {
+            "seeded_background_direction": _parse_prompt_field(text, "Seeded background direction (single sentence, exact)"),
+            "subject": _parse_prompt_field(text, "Subject"),
+            "action": _parse_prompt_field(text, "Action"),
+            "camera": _parse_prompt_field(text, "Camera"),
+            "lighting": _parse_prompt_field(text, "Lighting"),
+            "props": _parse_prompt_field(text, "Props"),
+            "surfaces": _parse_prompt_field(text, "Surfaces"),
+            "mood": _parse_prompt_field(text, "Mood"),
+            "realism": _parse_prompt_field(text, "Realism"),
+        }
+        visual_lock = {k: v for k, v in visual_lock.items() if v}
+        if visual_lock:
+            current["visual_lock"] = visual_lock
+
+        if current:
+            out[fmt] = current
+    return out
+
+
+def apply_visual_locks(copy_json: dict[str, Any], locks: dict[str, dict[str, Any]]) -> dict[str, Any]:
+    cloned = json.loads(json.dumps(copy_json, ensure_ascii=False))
+    ads = cloned.get("ads")
+    if not isinstance(ads, list):
+        return cloned
+    for ad in ads:
+        if not isinstance(ad, dict):
+            continue
+        fmt = str(ad.get("format") or "").strip().upper()
+        lock = locks.get(fmt) or {}
+        if not lock:
+            continue
+        if isinstance(lock.get("background_slot"), str):
+            ad["background_slot"] = lock["background_slot"]
+        if isinstance(lock.get("background_seed"), int):
+            ad["background_seed"] = lock["background_seed"]
+        if isinstance(lock.get("visual_lock"), dict):
+            ad["visual_lock"] = lock["visual_lock"]
+    return cloned
 
 
 def resolve_format_plan(config: dict[str, Any]) -> list[dict[str, Any]]:
@@ -852,6 +1107,70 @@ def api_run(run_id: str) -> dict[str, Any]:
     if not manifest.exists():
         raise HTTPException(status_code=404, detail="Run not found")
     return json.loads(manifest.read_text(encoding="utf-8"))
+
+
+@app.post("/api/runs/{run_id}/generate-916")
+def api_run_generate_916(run_id: str) -> dict[str, Any]:
+    run_dir = RUNS_ROOT / run_id
+    manifest_path = run_dir / "manifest.json"
+    copy_path = run_dir / "context" / "copy_batch.json"
+
+    if not manifest_path.exists():
+        raise HTTPException(status_code=404, detail="Run not found")
+    if not copy_path.exists():
+        raise HTTPException(status_code=404, detail="copy_batch.json not found for run")
+
+    manifest = json.loads(manifest_path.read_text(encoding="utf-8"))
+    batch = (manifest.get("batch") or "").strip()
+    if not batch:
+        raise HTTPException(status_code=400, detail="Run has no batch folder")
+
+    copy_json = json.loads(copy_path.read_text(encoding="utf-8"))
+    copy_916 = force_aspect_ratio(copy_json, "9:16")
+    visual_locks = collect_45_visual_locks(batch)
+    if visual_locks:
+        copy_916 = apply_visual_locks(copy_916, visual_locks)
+    copy_916_path = run_dir / "context" / "copy_batch_916.json"
+    copy_916_path.write_text(json.dumps(copy_916, ensure_ascii=False, indent=2) + "\n", encoding="utf-8")
+
+    run_context_path = run_dir / "context" / "run_context.json"
+    assembler_mode = "BOTH"
+    if run_context_path.exists():
+        try:
+            run_context = json.loads(run_context_path.read_text(encoding="utf-8"))
+            lang_mode = str(run_context.get("language_mode") or "ALL").upper()
+            if lang_mode == "EN":
+                assembler_mode = "EN"
+            elif lang_mode == "HI":
+                assembler_mode = "HI"
+        except Exception:
+            pass
+
+    result = run_cmd(
+        [
+            "python3",
+            "scripts/generate_ads.py",
+            "--copy-file",
+            str(copy_916_path),
+            "--batch",
+            batch,
+            "--language-mode",
+            assembler_mode,
+            "--no-registry-write",
+            "--skip-uniqueness-check",
+        ],
+        cwd=ROOT,
+    )
+
+    if result.returncode != 0:
+        error_text = result.stderr or result.stdout
+        (run_dir / "logs" / "assembler_916_error.txt").write_text(error_text, encoding="utf-8")
+        short_error = "\n".join([line for line in error_text.splitlines() if line.strip()][-12:])
+        raise HTTPException(status_code=500, detail=f"9:16 generation failed: {short_error}")
+
+    updated = collect_run_result(run_dir, batch, bool(manifest.get("image_generated", False)))
+    updated["generated_variant"] = "9:16"
+    return updated
 
 
 @app.get("/api/file-content")
@@ -988,6 +1307,7 @@ async def api_run_execute(
     full_context = {
         "generated_at": now_iso(),
         "run_id": run_id,
+        "language_mode": resolve_language_mode(cfg),
         "ads": ads_context,
         "product_context": product_ctx,
         "banlist": banlist_payload,
@@ -1004,7 +1324,17 @@ async def api_run_execute(
     copy_file = run_dir / "context" / "copy_batch.json"
     copy_file.write_text(json.dumps(copy_json, ensure_ascii=False, indent=2) + "\n", encoding="utf-8")
 
-    assembler_result = run_cmd(["python3", "scripts/generate_ads.py", "--copy-file", str(copy_file)], cwd=ROOT)
+    assembler_result = run_cmd(
+        [
+            "python3",
+            "scripts/generate_ads.py",
+            "--copy-file",
+            str(copy_file),
+            "--language-mode",
+            assembler_language_mode(cfg),
+        ],
+        cwd=ROOT,
+    )
     if assembler_result.returncode != 0:
         assembler_error = assembler_result.stderr or assembler_result.stdout
         (run_dir / "logs" / "assembler_error.txt").write_text(assembler_error, encoding="utf-8")
@@ -1017,7 +1347,17 @@ async def api_run_execute(
                 copy_json = strip_internal_markers_from_payload(copy_json)
                 copy_file.write_text(json.dumps(copy_json, ensure_ascii=False, indent=2) + "\n", encoding="utf-8")
 
-                retry = run_cmd(["python3", "scripts/generate_ads.py", "--copy-file", str(copy_file)], cwd=ROOT)
+                retry = run_cmd(
+                    [
+                        "python3",
+                        "scripts/generate_ads.py",
+                        "--copy-file",
+                        str(copy_file),
+                        "--language-mode",
+                        assembler_language_mode(cfg),
+                    ],
+                    cwd=ROOT,
+                )
                 if retry.returncode == 0:
                     assembler_result = retry
                 else:
@@ -1028,7 +1368,17 @@ async def api_run_execute(
                 copy_json = apply_local_collision_patch(copy_json, collisions, tag=run_id[-6:])
                 copy_json = strip_internal_markers_from_payload(copy_json)
                 copy_file.write_text(json.dumps(copy_json, ensure_ascii=False, indent=2) + "\n", encoding="utf-8")
-                retry2 = run_cmd(["python3", "scripts/generate_ads.py", "--copy-file", str(copy_file)], cwd=ROOT)
+                retry2 = run_cmd(
+                    [
+                        "python3",
+                        "scripts/generate_ads.py",
+                        "--copy-file",
+                        str(copy_file),
+                        "--language-mode",
+                        assembler_language_mode(cfg),
+                    ],
+                    cwd=ROOT,
+                )
                 if retry2.returncode == 0:
                     assembler_result = retry2
                 else:

@@ -52,7 +52,9 @@ def parse_args() -> argparse.Namespace:
     parser.add_argument("--copy-file", required=True, help="Path to copy batch JSON (produced by your LLM/operator step)")
     parser.add_argument("--batch", help="Output batch folder name like v8 (default: next available)")
     parser.add_argument("--seed", type=int, help="Deterministic seed for background rotation order + background sentence sampling")
+    parser.add_argument("--language-mode", choices=["BOTH", "EN", "HI"], default="BOTH", help="Which prompt languages to assemble")
     parser.add_argument("--no-registry-write", action="store_true", help="Skip writing AD_GENERATION_REGISTRY.JSON updates")
+    parser.add_argument("--skip-uniqueness-check", action="store_true", help="Allow duplicate copy values against registry")
     parser.add_argument("--dry-run", action="store_true", help="Validate and print plan without writing files")
     return parser.parse_args()
 
@@ -136,7 +138,28 @@ def pick_background_slot(
     chosen = next((v for v in pool if v.get("id") == chosen_id), None)
     if not chosen:
         chosen = pool[0]
+    default_overlay = backgrounds.get("default_text_overlay_treatment")
+    if isinstance(default_overlay, list) and default_overlay and "text_overlay_treatment" not in chosen:
+        chosen = dict(chosen)
+        chosen["text_overlay_treatment"] = default_overlay
     return chosen
+
+
+def get_background_by_id(backgrounds: dict[str, Any], fmt: str, bg_id: str) -> dict[str, Any]:
+    variants: list[dict[str, Any]] = backgrounds.get("variants", [])
+    wanted = bg_id.strip().upper()
+    for item in variants:
+        if str(item.get("id") or "").strip().upper() != wanted:
+            continue
+        formats = item.get("formats") or []
+        if fmt not in formats:
+            raise RuntimeError(f"Background {wanted} is not allowed for format {fmt}")
+        default_overlay = backgrounds.get("default_text_overlay_treatment")
+        if isinstance(default_overlay, list) and default_overlay and "text_overlay_treatment" not in item:
+            item = dict(item)
+            item["text_overlay_treatment"] = default_overlay
+        return item
+    raise RuntimeError(f"Background id not found: {wanted}")
 
 
 def build_seeded_background_sentence(bg: dict[str, Any], seed: int, aspect_ratio: str) -> str:
@@ -152,21 +175,52 @@ def build_seeded_background_sentence(bg: dict[str, Any], seed: int, aspect_ratio
     layout_intent = rng.choice(bg.get("layout_intent") or ["preserve a stable center-of-interest corridor with consistent margin protection on every side"])
     cta_safe_space = rng.choice(bg.get("cta_safe_space") or ["maintain subtle low-contrast space near the lower edge to protect feed overlay readability"])
     crop_safety = rng.choice(bg.get("crop_safety") or ["maintain protected margin buffers so alternate crops do not clip meaningful scene structure"])
+    text_overlay_treatment = rng.choice(
+        bg.get("text_overlay_treatment")
+        or [
+            "if a text readability panel is used, keep it in the upper text zone only as a soft vertical fade (high opacity near top, fading to transparent before the product cluster), never behind or below products"
+        ]
+    )
+    edge_tone_control = rng.choice(
+        bg.get("edge_tone_control")
+        or [
+            "keep all frame edges tonally neutral with no orange, amber, or sepia cast; no border glow and no vignette halo"
+        ]
+    )
 
     if aspect_ratio == "9:16":
         format_clause = (
-            "designed for 9:16 vertical placement with key subject content constrained to the 14-65 percent safe band, positioned slightly above center, and with the lower 35 percent kept visually quiet for overlays"
+            "designed for 9:16 vertical placement with key subject content constrained to the 14-65 percent safe band, positioned slightly above center, and with the lower 35 percent kept visually quiet for overlays; avoid edge glow frames and tinted border gradients"
         )
     else:
         format_clause = (
-            "designed for 4:5 feed framing with key content held inside the central safe field, centered to slightly above center, while top 10 percent, bottom 15 percent, and side edge zones remain low-priority"
+            "designed for 4:5 feed framing with key content held inside the central safe field, centered to slightly above center, while top 10 percent, bottom 15 percent, and side edge zones remain low-priority; avoid edge glow frames and tinted border gradients"
         )
 
     return (
         f"{base} on a {surface}, with {environment}, lit by {lighting}, conveying {mood}; "
-        f"{camera}, {composition}, {layout_intent}, {cta_safe_space}, {crop_safety}, {color_tone}, "
+        f"{camera}, {composition}, {layout_intent}, {cta_safe_space}, {crop_safety}, {text_overlay_treatment}, {edge_tone_control}, {color_tone}, "
         f"{format_clause}, clean premium studio ad photography, ultra-detailed, flawless commercial finish."
     )
+
+
+def build_ugc_subject_line(seed: int) -> str:
+    rng = random.Random(seed)
+    age_band = rng.choice(["24-29", "27-33", "30-36", "32-38"])
+    tone = rng.choice(["calm confident", "warm assured", "focused optimistic", "grounded and practical"])
+    attire = rng.choice([
+        "solid kurta",
+        "casual cotton shirt",
+        "minimal blouse",
+        "everyday premium casual wear",
+    ])
+    hair = rng.choice([
+        "neat tied-back hair",
+        "simple ponytail",
+        "natural shoulder-length hair",
+        "clean center-part tied style",
+    ])
+    return f"Indian woman {age_band}, {tone} expression, {attire}, {hair}; natural and unposed."
 
 
 def safezone_enforcement_block(aspect_ratio: str) -> str:
@@ -280,6 +334,7 @@ def render_prompt(
     bg: dict[str, Any],
     bg_seed: int,
     seeded_sentence: str,
+    visual_lock: dict[str, Any] | None = None,
 ) -> str:
     if fmt == "HERO":
         style = "HERO, polished enough for paid ad deployment."
@@ -361,7 +416,8 @@ def render_prompt(
             "- Format: UGC.",
             "- Creator-style authenticity with premium cleanliness; avoid stock-template look.",
             "- Subject holds the kit toward camera while remaining natural and unposed; all 5 products still visible.",
-            "- Headline top, support line mid, CTA bottom; keep on-image text minimal.",
+            "- Headline top, support line mid, CTA bottom; keep on-image text minimal but meaningful.",
+            "- UGC copy density: headline should feel complete (about 6-12 words), support line should carry a clear mechanism + outcome phrase (about 8-16 words).",
             "- Hands must look anatomically correct; no extra fingers or warped nails.",
             "- Camera framing: handheld close-to-medium, phone-like realism with stable focus on product labels.",
             "- Lighting: soft indoor daylight or warm ambient; avoid ring-light glow.",
@@ -390,20 +446,30 @@ def render_prompt(
             f"- CTA: {copy.cta}",
         ]
 
-    subject_line = "Indian woman 27-35, natural unposed expression." if fmt == "UGC" else "No human subject, products only."
+    lock = visual_lock if isinstance(visual_lock, dict) else {}
+    subject_line = (lock.get("subject") or "").strip() if isinstance(lock.get("subject"), str) else ""
+    if not subject_line:
+        subject_line = build_ugc_subject_line(bg_seed) if fmt == "UGC" else "No human subject, products only."
     action_line = (
         "Hold the kit box toward camera with one hand; the other products arranged on a clean surface in-frame."
         if fmt == "UGC"
         else "Arrange all 5 products as a cohesive premium cluster; kit box acts as anchor."
     )
+    if isinstance(lock.get("action"), str) and lock.get("action").strip():
+        action_line = lock.get("action").strip()
     camera_line = "Handheld close-to-medium framing, phone-like realism, stable focus on labels." if fmt == "UGC" else "Eye-level medium framing with clean edge discipline."
+    if isinstance(lock.get("camera"), str) and lock.get("camera").strip():
+        camera_line = lock.get("camera").strip()
     realism_line = (
         "True-to-life proportions; no stock-template look; natural skin and correct hand anatomy."
         if fmt == "UGC"
         else "True-to-life proportions; no stock-template look."
     )
+    if isinstance(lock.get("realism"), str) and lock.get("realism").strip():
+        realism_line = lock.get("realism").strip()
 
     lines: list[str] = []
+    canvas_spec = "1080 x 1920" if aspect_ratio == "9:16" else "1080 x 1350"
     lines.append("PRODUCT LOCK BLOCK")
     lines.extend(
         [
@@ -419,8 +485,9 @@ def render_prompt(
     lines.append("OUTPUT SPEC")
     lines.extend(
         [
-            f"- Canvas: 1080 x 1350 pixels. Portrait. {aspect_ratio} ratio.",
+            f"- Canvas: {canvas_spec} pixels. Portrait. {aspect_ratio} ratio.",
             f"- Style: {style}",
+            "- Full-bleed requirement: scene must reach all canvas edges; no inset poster card, no inner frame, no side matte bands, no faux border margins.",
             "- Text policy: low text by default; all copy minimal and mobile-readable at 375px width.",
             "- Rendering: no compression artifacts; no soft edges on text or product labels.",
             "- All 5 products present, proportionally sized per reference dimensions, unmodified.",
@@ -456,6 +523,10 @@ def render_prompt(
         "- Do not use colors outside the defined palette.",
         "- Do not use more than 2 font weights.",
         "- Do not overcrowd the layout.",
+        "- Do not add edge glows, tinted borders, amber/orange side casts, or decorative vignette frames.",
+        "- Do not create inset-canvas look: no white frame border, no inner-card composition, no side fade bands, no outer padding effect.",
+        "- Do not shrink main scene inside margins; composition must remain full-bleed to all four edges.",
+        "- Do not place any translucent white panel behind or below the product cluster.",
         "- Do not make medical cure claims of any kind.",
         "- Do not use ring light, studio flash, or overproduced lighting.",
     ]
@@ -485,13 +556,20 @@ def render_prompt(
             f"- Subject: {subject_line}",
             f"- Action: {action_line}",
             f"- Camera: {camera_line}",
-            "- Lighting: Warm, soft, directional (top-left) and label-safe.",
-            "- Props: Minimal, non-competing; keep edge zones quiet.",
-            "- Surfaces: Premium, clean texture; avoid busy patterns under text.",
-            "- Mood: Calm confidence and practical consistency; no hype.",
+            f"- Lighting: {(lock.get('lighting') or 'Warm, soft, directional (top-left) and label-safe.')}",
+            f"- Props: {(lock.get('props') or 'Minimal, non-competing; keep edge zones quiet.')}",
+            f"- Surfaces: {(lock.get('surfaces') or 'Premium, clean texture; avoid busy patterns under text.')}",
+            "- Text panel treatment: if used, keep panel in upper text zone only with vertical fade to transparent before products; never place white panel behind or below product cluster.",
+            "- Edge color control: keep border tones neutral and natural; no orange/amber edge tint and no ornamental frame glow.",
+            "- Edge structure control: enforce full-bleed composition to edges; reject outputs with visible inset border, side matte strip, or inner-frame card look.",
+            f"- Mood: {(lock.get('mood') or 'Calm confidence and practical consistency; no hype.')}",
             f"- Realism: {realism_line}",
         ]
     )
+    if lock:
+        lines.append("- VISUAL MATCH LOCK (from base 4:5): keep same subject identity, camera feel, lighting direction, prop family, and product arrangement; only adjust spacing/scale for aspect-ratio fit.")
+        if aspect_ratio == "9:16":
+            lines.append("- For 9:16 conversion: preserve the same product left-right order and relative layering as base 4:5; allow only vertical re-spacing and minor scale adaptation.")
     lines.append("")
     lines.append("TYPOGRAPHY SHARPNESS BLOCK")
     lines.extend(
@@ -529,6 +607,10 @@ def validate_prompt_text(text: str, out_path: Path) -> None:
         raise RuntimeError(f"Prompt too short ({len(non_empty_lines)} non-empty lines): {out_path}")
 
 
+def aspect_ratio_folder(aspect_ratio: str) -> str:
+    return "96" if aspect_ratio == "9:16" else "45"
+
+
 def main() -> int:
     args = parse_args()
     copy_path = Path(args.copy_file)
@@ -543,6 +625,7 @@ def main() -> int:
 
     seed = args.seed if args.seed is not None else random.SystemRandom().randint(10_000_000, 2_147_483_647)
     used = registry_used_text(registry)
+    render_langs = ["EN", "HI"] if args.language_mode == "BOTH" else [args.language_mode]
 
     # Validate copy payload + uniqueness against registry BEFORE consuming background slots.
     collisions: list[str] = []
@@ -570,7 +653,7 @@ def main() -> int:
         copy = ad.get("copy")
         if not isinstance(copy, dict):
             raise RuntimeError(f"{ctx}.copy must be an object with EN/HI blocks")
-        for lang in ["EN", "HI"]:
+        for lang in render_langs:
             if lang not in copy or not isinstance(copy[lang], dict):
                 raise RuntimeError(f"{ctx}.copy must include {lang} object")
             cb = parse_copy_block(fmt, lang, copy[lang])
@@ -599,7 +682,7 @@ def main() -> int:
             if fmt == "TEST":
                 uniqueness_check(used, "support_line_en" if lang == "EN" else "support_line_hi", cb.trust_line, collisions, f"{ctx}.copy.{lang}.trust_line")
 
-    if collisions:
+    if collisions and not args.skip_uniqueness_check:
         msg = "Copy batch failed uniqueness checks against registry (regenerate via your LLM step):\n- " + "\n- ".join(collisions[:50])
         if len(collisions) > 50:
             msg += f"\n... and {len(collisions)-50} more collisions"
@@ -620,18 +703,41 @@ def main() -> int:
     for i, ad in enumerate(ads):
         fmt = str(ad["format"]).upper()
         aspect_ratio = (ad.get("aspect_ratio") or payload.get("default_aspect_ratio") or "4:5").strip()
+        ratio_dir = batch_dir / aspect_ratio_folder(aspect_ratio)
+        ratio_dir.mkdir(parents=True, exist_ok=True)
         persona = ad["persona"]
         angle = (ad.get("headline_angle") or "").strip()
 
-        bg = pick_background_slot(registry, backgrounds, fmt, seed)
-        bg_seed = random.Random(seed + i * 101).randint(1, 2_147_483_647)
+        for stale_lang in ["EN", "HI"]:
+            if stale_lang in render_langs:
+                continue
+            stale_path = ratio_dir / f"OUTPUT_{fmt}_{stale_lang}.txt"
+            if stale_path.exists():
+                stale_path.unlink()
+
+        forced_bg = ad.get("background_slot") or ad.get("background_slot_id")
+        if isinstance(forced_bg, str) and forced_bg.strip():
+            bg = get_background_by_id(backgrounds, fmt, forced_bg)
+        else:
+            bg = pick_background_slot(registry, backgrounds, fmt, seed)
+
+        forced_seed = ad.get("background_seed")
+        if isinstance(forced_seed, int) and forced_seed > 0:
+            bg_seed = forced_seed
+        else:
+            bg_seed = random.Random(seed + i * 101).randint(1, 2_147_483_647)
+        visual_lock = ad.get("visual_lock") if isinstance(ad.get("visual_lock"), dict) else {}
         seeded_sentence = build_seeded_background_sentence(bg, bg_seed, aspect_ratio)
+        if isinstance(visual_lock.get("seeded_background_direction"), str) and visual_lock.get("seeded_background_direction").strip():
+            seeded_sentence = visual_lock.get("seeded_background_direction").strip()
+            if aspect_ratio == "9:16":
+                seeded_sentence += "; maintain base scene identity and arrangement, only adapt spacing for 9:16 safe bands"
 
         rendered: dict[str, str] = {}
-        for lang in ["EN", "HI"]:
+        for lang in render_langs:
             cb = parse_copy_block(fmt, lang, ad["copy"][lang])
-            out_text = render_prompt(fmt, lang, aspect_ratio, persona, cb, bg, bg_seed, seeded_sentence)
-            out_path = batch_dir / f"OUTPUT_{fmt}_{lang}.txt"
+            out_text = render_prompt(fmt, lang, aspect_ratio, persona, cb, bg, bg_seed, seeded_sentence, visual_lock=visual_lock)
+            out_path = ratio_dir / f"OUTPUT_{fmt}_{lang}.txt"
             validate_prompt_text(out_text, out_path)
             out_path.write_text(out_text, encoding="utf-8")
             rendered[lang] = out_text
@@ -672,20 +778,28 @@ def main() -> int:
         append_background_index(registry, fmt, entry_id, timestamp, bg["id"])
 
         # used_text updates
-        add_used_text(registry, "headline_en", [ad["copy"]["EN"]["headline"]])
-        add_used_text(registry, "headline_hi", [ad["copy"]["HI"]["headline"]])
-        add_used_text(registry, "cta_en", [ad["copy"]["EN"]["cta"]])
-        add_used_text(registry, "cta_hi", [ad["copy"]["HI"]["cta"]])
+        if "EN" in render_langs:
+            add_used_text(registry, "headline_en", [ad["copy"]["EN"]["headline"]])
+            add_used_text(registry, "cta_en", [ad["copy"]["EN"]["cta"]])
+        if "HI" in render_langs:
+            add_used_text(registry, "headline_hi", [ad["copy"]["HI"]["headline"]])
+            add_used_text(registry, "cta_hi", [ad["copy"]["HI"]["cta"]])
 
         if fmt in {"HERO", "UGC"}:
-            add_used_text(registry, "support_line_en", [ad["copy"]["EN"]["support_line"]])
-            add_used_text(registry, "support_line_hi", [ad["copy"]["HI"]["support_line"]])
+            if "EN" in render_langs:
+                add_used_text(registry, "support_line_en", [ad["copy"]["EN"]["support_line"]])
+            if "HI" in render_langs:
+                add_used_text(registry, "support_line_hi", [ad["copy"]["HI"]["support_line"]])
         elif fmt in {"BA", "FEAT"}:
-            add_used_text(registry, "bullets_en", ad["copy"]["EN"]["bullets"])
-            add_used_text(registry, "bullets_hi", ad["copy"]["HI"]["bullets"])
+            if "EN" in render_langs:
+                add_used_text(registry, "bullets_en", ad["copy"]["EN"]["bullets"])
+            if "HI" in render_langs:
+                add_used_text(registry, "bullets_hi", ad["copy"]["HI"]["bullets"])
         else:  # TEST trust_line stored in support_line_* buckets for dedupe parity
-            add_used_text(registry, "support_line_en", [ad["copy"]["EN"]["trust_line"]])
-            add_used_text(registry, "support_line_hi", [ad["copy"]["HI"]["trust_line"]])
+            if "EN" in render_langs:
+                add_used_text(registry, "support_line_en", [ad["copy"]["EN"]["trust_line"]])
+            if "HI" in render_langs:
+                add_used_text(registry, "support_line_hi", [ad["copy"]["HI"]["trust_line"]])
 
         if isinstance(registry.get("mode"), dict):
             registry["mode"]["last_updated"] = timestamp

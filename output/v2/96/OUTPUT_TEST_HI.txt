@@ -7,35 +7,36 @@ PRODUCT LOCK BLOCK
 - Only permitted: placement, scaling, subtle drop shadows, mild warm lighting correction.
 
 OUTPUT SPEC
-- Canvas: 1080 x 1350 pixels. Portrait. 4:5 ratio.
-- Style: HERO, polished enough for paid ad deployment.
+- Canvas: 1080 x 1350 pixels. Portrait. 9:16 ratio.
+- Style: TEST (trust-first proof framing, no fabricated quotes).
 - Text policy: low text by default; all copy minimal and mobile-readable at 375px width.
 - Rendering: no compression artifacts; no soft edges on text or product labels.
 - All 5 products present, proportionally sized per reference dimensions, unmodified.
 - Readability: maintain high-contrast foreground/background treatment for ad-platform legibility.
 
 FORMAT LAYOUT INSTRUCTIONS
-- HERO format: strong headline, one support line, and one CTA.
-- Composition: keep the product cluster inside the central safe field, slightly above center, with clean margin protection.
-- Focal hierarchy: product dominant, text secondary, background tertiary.
-- Product zone: central containment only, with all key pack details away from edge-risk zones.
-- Text zones: flat uncluttered areas only; never over busy background detail.
-- Camera framing: eye-level medium shot with natural perspective and stable horizon.
-- Lighting: soft, directional, premium, and clean enough to preserve label readability.
-- Spacing: strong whitespace between product and copy blocks; clear grid alignment; no floating elements.
+- Format: TEST.
+- Do not fabricate customer quotes. Use proof framing (user volume, protocol clarity, support structure).
+- Layout: headline at top, trust line mid, CTA at bottom.
+- Attribution line under headline to ground credibility.
+- Product cluster anchored bottom-center with kit box as primary; keep all labels readable.
+- Text zones must be flat and low-noise; prioritize legibility over decoration.
+- Camera framing: editorial product clarity shot with gentle lifestyle context.
+- Lighting: clean, warm, premium; no harsh shadows; preserve label sharpness.
 
 PERSONA INPUT BLOCK
-- Persona: CRAVING-CONTROL STRUGGLER (FORUM-GROUNDED) (Persona 1)
-- Pain: some foods are too addictive for me
-- Desire: Main pain is recurring craving-led failure
-- Friction: I tried control before, it came back
-- Proof needed: Mechanism clarity over hype
-- Tone cue: Practical, empathetic, and confidence-building
+- Persona: TIME-STARVED PARENT (FORUM-GROUNDED) (Persona 9)
+- Pain: रूटीन निभाना मुश्किल लग रहा है।
+- Desire: ऐसा आसान सिस्टम जो रोज निभ सके।
+- Friction: पहले के प्लान बहुत सख्त और मुश्किल थे।
+- Proof needed: साफ तरीका, भरोसेमंद सपोर्ट और व्यावहारिक प्रूफ चाहिए।
+- Tone cue: सरल, भरोसेमंद, और व्यावहारिक
 
 EXACT ON-IMAGE COPY - DO NOT ALTER ANYTHING
-- Headline: Cravings hit? Keep your plan on track. - new angle
-- Support line: Ayurvedic hunger and digestion support helps weight control consistency. for sustained consistency
-- CTA: Start your guided 15-day routine.
+- Headline: Cravings, कम समय और टूटी routine वालों के लिए बनाया गया
+- Attribution: 70,000+ users served
+- Trust line: Doctor-formulated appetite और digestion support व्यस्त adults के लिए weight loss follow...
+- CTA: विवरण देखें
 Render every character exactly as written. No paraphrasing, no punctuation changes, no autocorrection.
 
 NEGATIVE CONSTRAINTS
@@ -59,9 +60,9 @@ QUALITY BAR - verify before accepting output
 - If any item above fails, regenerate immediately without compromise.
 
 VISUAL DIRECTION BLOCK
-- Background slot: BG-256 - Pale cream velvet backdrop
-- Background seed: 997250231
-- Seeded background direction (single sentence, exact): Cream velvet fabric backdrop, product on matching riser on a minimal matte neutral platform with crisp silhouette separation, with minimal contextual backdrop with elegant bokeh falloff and clean negative space, lit by soft top-side illumination with refined contrast and clean edge transitions, conveying natural polished habit-first setting; medium-wide ad framing with restrained depth blur and stable natural perspective, stable mid-column framing that keeps key elements in the safe middle while preserving unobtrusive bottom space, enforce central placement lock so all high-importance detail remains away from frame boundaries, avoid any high-importance object detail in the lower region to protect conversion UI legibility, avoid edge-dependent framing; composition must survive moderate side and vertical trimming, warm natural tones with commercial polish, designed for 4:5 feed framing with key content held inside the central safe field, centered to slightly above center, while top 10 percent, bottom 15 percent, and side edge zones remain low-priority, clean premium studio ad photography, ultra-detailed, flawless commercial finish.
+- Background slot: BG-293 - Woven wall hanging bg
+- Background seed: 180175747
+- Seeded background direction (single sentence, exact): Woven macrame or textile wall hanging softly blurred behind, warm shelf below on a neatly laid woven textile with soft tactile texture and premium cleanliness, with minimal contextual backdrop with elegant bokeh falloff and clean negative space, lit by soft natural side daylight with gentle diffusion and polished tonal balance, conveying minimal clean lifestyle confidence; 45-degree three-quarter close framing, soft focus falloff, crisp subject plane and clean edge definition, hybrid-safe middle composition with strong vertical containment and balanced side margins for feed and stories, prioritize central hierarchy and avoid any composition that relies on top, bottom, or side edge information, protect lower-frame clarity with soft texture and low contrast in overlay-prone space, keep focal hierarchy compact and central so multi-placement crops preserve premium readability, neutral balanced grading with clean tonal hierarchy, designed for 9:16 vertical placement with key subject content constrained to the 14-65 percent safe band, positioned slightly above center, and with the lower 35 percent kept visually quiet for overlays, clean premium studio ad photography, ultra-detailed, flawless commercial finish.
 - Subject: No human subject, products only.
 - Action: Arrange all 5 products as a cohesive premium cluster; kit box acts as anchor.
 - Camera: Eye-level medium framing with clean edge discipline.
@@ -87,8 +88,7 @@ Use clean sans typography with strong stroke clarity; no thin/light weights for 
 Use Poppins only for on-image text: Headline in Poppins Bold, support/CTA in Poppins Medium or Regular.
 
 SAFE-ZONE ENFORCEMENT (NON-NEGOTIABLE)
-- Frame: 1080x1350 (4:5).
-- Restricted bands: top 10% (0-135px), bottom 15% (1148-1350px), side edges outer 8% (0-86px and 994-1080px).
-- Keep all products and all on-image text fully inside the central safe field: x=86-994 and y=135-1148.
-- Keep the entire product cluster in a centered core with mild upward bias; do not touch any restricted band.
+- Keep all critical content inside the 14%-65% vertical safe band.
+- Reserve the lower 35% as quiet space; no product labels or headline copy in this band.
+- Keep side margins clean; no key content touching left or right frame edges.
 - Reject and regenerate if any headline, CTA, or product detail crosses restricted zones.

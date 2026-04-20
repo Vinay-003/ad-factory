@@ -7,22 +7,22 @@ PRODUCT LOCK BLOCK
 - Only permitted: placement, scaling, subtle drop shadows, mild warm lighting correction.
 
 OUTPUT SPEC
-- Canvas: 1080 x 1350 pixels. Portrait. 4:5 ratio.
-- Style: BA (before/after journey without body-shaming visuals).
+- Canvas: 1080 x 1350 pixels. Portrait. 9:16 ratio.
+- Style: HERO, polished enough for paid ad deployment.
 - Text policy: low text by default; all copy minimal and mobile-readable at 375px width.
 - Rendering: no compression artifacts; no soft edges on text or product labels.
 - All 5 products present, proportionally sized per reference dimensions, unmodified.
 - Readability: maintain high-contrast foreground/background treatment for ad-platform legibility.
 
 FORMAT LAYOUT INSTRUCTIONS
-- Format: BA.
-- Build a split behavior story: left side = struggle context, right side = control/routine clarity.
-- Keep products grouped near lower center bridging both halves (inside safe field).
-- Place headline at top center; keep it large and simple.
-- Place 2 to 3 short bullets on the right panel only; keep left panel mostly visual.
-- Put CTA under bullets; keep footer area clean for platform overlays.
-- Camera framing: medium lifestyle-product hybrid; premium and realistic.
-- Lighting: left side slightly messier/dimmer, right side cleaner/brighter (subtle, not dramatic).
+- HERO format: strong headline, one support line, and one CTA.
+- Composition: keep the product cluster inside the central safe field, slightly above center, with clean margin protection.
+- Focal hierarchy: product dominant, text secondary, background tertiary.
+- Product zone: central containment only, with all key pack details away from edge-risk zones.
+- Text zones: flat uncluttered areas only; never over busy background detail.
+- Camera framing: eye-level medium shot with natural perspective and stable horizon.
+- Lighting: soft, directional, premium, and clean enough to preserve label readability.
+- Spacing: strong whitespace between product and copy blocks; clear grid alignment; no floating elements.
 
 PERSONA INPUT BLOCK
 - Persona: CRAVING-CONTROL STRUGGLER (FORUM-GROUNDED) (Persona 1)
@@ -33,11 +33,9 @@ PERSONA INPUT BLOCK
 - Tone cue: सरल, भरोसेमंद, और व्यावहारिक
 
 EXACT ON-IMAGE COPY - DO NOT ALTER ANYTHING
-- Headline: “मैं control खो देता/देती हूं” से “मैं track पर रह सकता/सकती हूं” तक।
-- Bullet 1: दिन में अचानक cravings के spikes कम
-- Bullet 2: impulsive snacking कम, total intake नीचे
-- Bullet 3: रात में बेहतर digestion, अगले दिन consistency आसान
-- CTA: Obesity Killer Kit system आज़माएं।
+- Headline: CRAVING-CONTROL STRUGGLER (FORUM-GROUNDED): आज से सरल वजन रूटीन शुरू करें।
+- Support line: आयुर्वेदिक भूख और पाचन सपोर्ट वजन नियंत्रण की निरंतरता में सहायक है।
+- CTA: अभी शुरू करें
 Render every character exactly as written. No paraphrasing, no punctuation changes, no autocorrection.
 
 NEGATIVE CONSTRAINTS
@@ -48,6 +46,8 @@ NEGATIVE CONSTRAINTS
 - Do not use colors outside the defined palette.
 - Do not use more than 2 font weights.
 - Do not overcrowd the layout.
+- Do not add edge glows, tinted borders, amber/orange side casts, or decorative vignette frames.
+- Do not place any translucent white panel behind or below the product cluster.
 - Do not make medical cure claims of any kind.
 - Do not use ring light, studio flash, or overproduced lighting.
 
@@ -61,15 +61,17 @@ QUALITY BAR - verify before accepting output
 - If any item above fails, regenerate immediately without compromise.
 
 VISUAL DIRECTION BLOCK
-- Background slot: BG-371 - Natural clay surface
-- Background seed: 1369404770
-- Seeded background direction (single sentence, exact): Raw natural clay-textured surface, earthy Ayurvedic premium authenticity on a minimal matte neutral platform with crisp silhouette separation, with soft foreground-to-background depth transition preserving premium focus hierarchy, lit by soft natural side daylight with gentle diffusion and polished tonal balance, conveying calm premium wellness routine; eye-level medium framing, 50mm-equivalent perspective, shallow depth of field with smooth background blur, key visual locked to the central safe core, keeping top, bottom, and side edges low priority and uncluttered, keep the subject mass fully inside the central safe region with no edge-anchored focal detail, protect lower-frame clarity with soft texture and low contrast in overlay-prone space, ensure all critical visual information remains within the center so 1:1 center crop retains full message, soft golden tint with restrained premium saturation, designed for 4:5 feed framing with key content held inside the central safe field, centered to slightly above center, while top 10 percent, bottom 15 percent, and side edge zones remain low-priority, clean premium studio ad photography, ultra-detailed, flawless commercial finish.
+- Background slot: BG-498 - Morning sunlight on tiles
+- Background seed: 1744747797
+- Seeded background direction (single sentence, exact): vibrant natural start on a smooth concrete-style base with clean tonal variation and modern premium feel, with minimal contextual backdrop with elegant bokeh falloff and clean negative space, lit by soft top-side illumination with refined contrast and clean edge transitions, conveying modern everyday self-care discipline; tight product-forward crop with subtle macro feel and premium shallow focus, clean ad layout using central containment and controlled surrounding negative space for multi-placement reliability, keep the subject mass fully inside the central safe region with no edge-anchored focal detail, avoid bottom-heavy composition to ensure robust story and feed CTA compatibility, keep focal hierarchy compact and central so multi-placement crops preserve premium readability, prefer narrow upper-half text haze with feathered lower edge; zero opaque overlay under the product shelf or CTA base, keep all frame edges tonally neutral with no orange, amber, or sepia cast; no border glow and no vignette halo, slightly cool clean tone with smooth highlight handling, designed for 9:16 vertical placement with key subject content constrained to the 14-65 percent safe band, positioned slightly above center, and with the lower 35 percent kept visually quiet for overlays; avoid edge glow frames and tinted border gradients, clean premium studio ad photography, ultra-detailed, flawless commercial finish.
 - Subject: No human subject, products only.
 - Action: Arrange all 5 products as a cohesive premium cluster; kit box acts as anchor.
 - Camera: Eye-level medium framing with clean edge discipline.
 - Lighting: Warm, soft, directional (top-left) and label-safe.
 - Props: Minimal, non-competing; keep edge zones quiet.
 - Surfaces: Premium, clean texture; avoid busy patterns under text.
+- Text panel treatment: if used, keep panel in upper text zone only with vertical fade to transparent before products; never place white panel behind or below product cluster.
+- Edge color control: keep border tones neutral and natural; no orange/amber edge tint and no ornamental frame glow.
 - Mood: Calm confidence and practical consistency; no hype.
 - Realism: True-to-life proportions; no stock-template look.
 
@@ -89,8 +91,7 @@ Use clean sans typography with strong stroke clarity; no thin/light weights for 
 Use Poppins only for on-image text: Headline in Poppins Bold, support/CTA in Poppins Medium or Regular.
 
 SAFE-ZONE ENFORCEMENT (NON-NEGOTIABLE)
-- Frame: 1080x1350 (4:5).
-- Restricted bands: top 10% (0-135px), bottom 15% (1148-1350px), side edges outer 8% (0-86px and 994-1080px).
-- Keep all products and all on-image text fully inside the central safe field: x=86-994 and y=135-1148.
-- Keep the entire product cluster in a centered core with mild upward bias; do not touch any restricted band.
+- Keep all critical content inside the 14%-65% vertical safe band.
+- Reserve the lower 35% as quiet space; no product labels or headline copy in this band.
+- Keep side margins clean; no key content touching left or right frame edges.
 - Reject and regenerate if any headline, CTA, or product detail crosses restricted zones.

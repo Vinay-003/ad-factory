@@ -5,12 +5,15 @@ const defaultsInfoEl = document.getElementById("defaultsInfo");
 const statusEl = document.getElementById("status");
 const runsEl = document.getElementById("runs");
 const themeToggleEl = document.getElementById("themeToggle");
+const languageModesEl = document.getElementById("languageModes");
 const providerSelectEl = document.getElementById("opencodeProvider");
 const modelSelectEl = document.getElementById("opencodeModel");
 
 const formats = ["HERO", "BA", "TEST", "FEAT", "UGC"];
+const languageModes = ["ALL", "EN", "HI", "HINGLISH"];
 let defaultData = null;
 let selectedGlobalFormats = new Set(["HERO"]);
+let selectedLanguageMode = "ALL";
 let modelsByProvider = {};
 
 function setSelectOptions(selectEl, values, selectedValue) {
@@ -104,6 +107,17 @@ function renderGlobalFormats() {
   globalFormatsEl.appendChild(applyBtn);
 }
 
+function renderLanguageModes() {
+  if (!languageModesEl) return;
+  languageModesEl.innerHTML = "";
+  languageModes.forEach((mode) => {
+    languageModesEl.appendChild(chip(mode, selectedLanguageMode === mode, () => {
+      selectedLanguageMode = mode;
+      renderLanguageModes();
+    }));
+  });
+}
+
 function renderPersonas() {
   personaListEl.innerHTML = "";
   defaultData.personas.forEach((p) => {
@@ -124,6 +138,15 @@ function renderPersonas() {
     });
     card.appendChild(chips);
 
+    card.addEventListener("click", (event) => {
+      const target = event.target;
+      if (!(target instanceof Element)) return;
+      if (target.closest("input") || target.closest("button") || target.closest("label")) return;
+      const checkbox = card.querySelector(".persona-check");
+      if (!(checkbox instanceof HTMLInputElement)) return;
+      checkbox.checked = !checkbox.checked;
+    });
+
     personaListEl.appendChild(card);
   });
 }
@@ -134,6 +157,7 @@ async function fetchDefaults() {
   defaultData = await res.json();
   renderPersonas();
   renderGlobalFormats();
+  renderLanguageModes();
   activeImagesEl.value = (defaultData.active_images || []).join("\n");
   defaultsInfoEl.textContent = `Using defaults: product=${defaultData.default_files.product_info}, mechanism=${defaultData.default_files.mechanism}, faq=${defaultData.default_files.faq}, persona_txt=${defaultData.default_files.persona_txt}`;
 
@@ -163,6 +187,7 @@ async function runPipeline() {
   const generateImages = document.getElementById("generateImages").checked;
   const cfg = {
     selected_personas: selectedPersonas,
+    language_mode: selectedLanguageMode,
     global_formats: [...selectedGlobalFormats],
     formats_by_persona: getFormatsByPersona(),
     active_image_urls: activeImagesEl.value.split("\n").map((x) => x.trim()).filter(Boolean),
@@ -211,6 +236,30 @@ function renderRun(run) {
   const llm = document.createElement("div");
   llm.textContent = `Updated: ${run.updated_at || "-"}`;
   div.appendChild(llm);
+
+   const has916 = (run.prompt_files || []).some((path) => path.includes("/96/"));
+   const variantBtn = document.createElement("button");
+   variantBtn.type = "button";
+   variantBtn.textContent = has916 ? "Regenerate 9:16 from same copy" : "Create 9:16 from same copy";
+   variantBtn.onclick = async () => {
+     variantBtn.disabled = true;
+     setStatus(`Generating 9:16 prompts for ${run.run_id}...`);
+     try {
+       const res = await fetch(`/api/runs/${run.run_id}/generate-916`, { method: "POST" });
+       const data = await res.json();
+       if (!res.ok) {
+         setStatus(`Failed: ${data.detail || "9:16 generation error"}`);
+         return;
+       }
+       setStatus(`Done\nRun: ${data.run_id}\nBatch: ${data.batch}\nGenerated: 9:16`);
+       await loadRuns();
+     } catch (err) {
+       setStatus(String(err));
+     } finally {
+       variantBtn.disabled = false;
+     }
+   };
+   div.appendChild(variantBtn);
 
   if (run.prompt_files && run.prompt_files.length) {
     const p = document.createElement("div");

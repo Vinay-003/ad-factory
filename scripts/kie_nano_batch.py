@@ -176,7 +176,7 @@ def build_image_inputs_from_file(url_file: Path) -> list[str]:
 def parse_prompt_files(batch_dir: Path, language_mode: str) -> list[PromptFile]:
     pattern = re.compile(r"^OUTPUT_([A-Z]+)_(EN|HI)(?:_V(\d+))?\.txt$")
     picked: list[PromptFile] = []
-    for item in sorted(batch_dir.iterdir()):
+    for item in sorted(batch_dir.rglob("OUTPUT_*.txt")):
         if not item.is_file():
             continue
         match = pattern.match(item.name)
