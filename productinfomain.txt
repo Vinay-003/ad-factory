@@ -1,4 +1,22 @@
 CONTEXT SNAPSHOT (FOR EXTRACTION)
+- CANONICAL OVERRIDES (2026-04-21) - if any lower section conflicts, this block wins.
+- Core positioning: doctor-formulated Ayurvedic weight-loss system; structured guided protocol, not a loose supplement.
+- Core promise: 3 to 5 kg weight loss in 15 days when protocol is followed.
+- Target user: adults (18+) with BMI > 25; especially users with cravings, inconsistency, emotional eating, low energy, or slow progress.
+- Harder-case relevance (not cure claim): PCOD/PCOS, thyroid imbalance, high BP, fatty liver, diabetes, IBS, menopause-related weight gain.
+- Exclusions: pregnancy, within 6 months postpartum, active insulin users.
+- Caution: multi-psychiatric-medication and multiple-surgery cases require doctor review.
+- Kit structure: OK Liquid (morning), OK Powder (night), OK Tablet (night), dried amla, tracker, booklet, guided support.
+- Protocol: morning liquid on empty stomach, then 4-hour no-solid-food window; zero-calorie drinks allowed.
+- Protocol: night powder + tablet ~15 minutes before bed; digestion/gut comfort support.
+- Formulation standard (latest): 31 unique ingredients, 44 total entries (20 liquid, 12 powder, 12 tablet).
+- Composition truth: no synthetic ingredients and no chemical preservatives.
+- Guarantee: if weight-loss start is not observed in first 7 days, refund applies when protocol + daily tracker conditions are met.
+- Safety framing: public line "no side effects"; internal line "first 3 days can be adjustment phase".
+- Continuation: continue until target/BMI 25; after each 30 days keep 7 to 10 day break.
+- Maintenance: BMR-based intake, daily activity, macro order (protein -> fiber -> fats -> carbs), booklet guidance.
+- Proof stack: real customer outcomes, 70,000+ users served, 200 video testimonials, founder credibility, tracker-led support.
+- Messaging guardrails: no body-shaming, no cure-all claims, no anti-gym or anti-diet messaging, no competitor bashing.
 - Product: Obesity Killer Kit (doctor-formulated Ayurvedic weight-loss system).
 - Core promise: 3 to 5 kg weight loss in 15 days when course is followed.
 - Brand truths: fast results, all-natural Ayurvedic formulation, no side effects, easy to follow, sustainable.
@@ -581,4 +599,3 @@ Flush Orange
 800 973015
 900 7A3314
 950 421808
-

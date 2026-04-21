@@ -21,6 +21,7 @@ from fastapi.staticfiles import StaticFiles
 ROOT = Path(__file__).resolve().parents[2]
 STORAGE_ROOT = ROOT / "dashboard_storage"
 RUNS_ROOT = STORAGE_ROOT / "runs"
+RUNTIME_ROOT = ROOT / "runtime"
 
 DEFAULT_PRODUCT_INFO = ROOT / "productinfomain.txt"
 DEFAULT_MECHANISM = ROOT / "PRODUCT_MECHANISM_V1.txt"
@@ -59,6 +60,7 @@ def make_run_id() -> str:
 
 def ensure_dirs() -> None:
     RUNS_ROOT.mkdir(parents=True, exist_ok=True)
+    RUNTIME_ROOT.mkdir(parents=True, exist_ok=True)
 
 
 def parse_persona_library(playbook_path: Path) -> list[dict[str, Any]]:
@@ -217,6 +219,28 @@ def build_opencode_catalog() -> dict[str, Any]:
     }
 
 
+def choose_extractor_model(config: dict[str, Any]) -> str:
+    explicit = (config.get("opencode_extractor_model") or "").strip()
+    if explicit:
+        return explicit
+
+    models = list_opencode_models()
+    if models:
+        preferred_checks = [
+            lambda m: "bigpickle" in m,
+            lambda m: "minimax" in m and "free" in m,
+            lambda m: "minimax" in m,
+        ]
+        lowered = [m.lower() for m in models]
+        for check in preferred_checks:
+            for idx, lower in enumerate(lowered):
+                if check(lower):
+                    return models[idx]
+
+    selected = (config.get("opencode_model") or "").strip()
+    return selected or "gpt-5.3-codex"
+
+
 def parse_json_stdout(result: subprocess.CompletedProcess[str], context: str) -> Any:
     if result.returncode != 0:
         raise RuntimeError(f"{context} failed: {result.stderr.strip() or result.stdout.strip()}")
@@ -255,14 +279,8 @@ def choose_text(items: list[str], fallback: str) -> str:
 
 
 def shorten_copy_line(text: str, limit: int = 92) -> str:
-    clean = " ".join((text or "").split())
-    if len(clean) <= limit:
-        return clean
-    clipped = clean[:limit].rstrip(" ,;:-")
-    last_space = clipped.rfind(" ")
-    if last_space > 24:
-        clipped = clipped[:last_space]
-    return clipped + "..."
+    _ = limit
+    return " ".join((text or "").split()).strip()
 
 
 def strip_internal_marker(text: str) -> str:
@@ -1058,21 +1076,76 @@ async def api_run_execute(
     except RuntimeError as exc:
         raise HTTPException(status_code=400, detail=str(exc)) from exc
 
-    product_ctx_result = run_cmd(
-        [
-            "python3",
-            "scripts/extract_product_context.py",
-            "--product",
-            str(product_file),
-            "--mechanism",
-            str(mechanism_file_path),
-            "--faq",
-            str(faq_file_path),
-            "--json",
-        ],
-        cwd=ROOT,
-    )
-    product_ctx = parse_json_stdout(product_ctx_result, "extract_product_context")
+    product_ctx: dict[str, Any]
+    product_ctx_source = "extract_product_context"
+    extractor_model = choose_extractor_model(cfg)
+    canonical_path = RUNTIME_ROOT / "context_canonical.json"
+    canonical_cmd = [
+        "python3",
+        "scripts/build_canonical_context.py",
+        "--product",
+        str(product_file),
+        "--mechanism",
+        str(mechanism_file_path),
+        "--faq",
+        str(faq_file_path),
+        "--output",
+        str(canonical_path),
+        "--api-url",
+        str((cfg.get("opencode_api_url") or DEFAULT_OPENCODE_API_URL)).strip(),
+        "--model",
+        extractor_model,
+    ]
+    extractor_key = (cfg.get("opencode_api_key") or "").strip() or os.getenv("OPENCODE_SERVER_PASSWORD", "").strip()
+    if extractor_key:
+        canonical_cmd.extend(["--api-key", extractor_key])
+
+    canonical_result = run_cmd(canonical_cmd, cwd=ROOT)
+    if canonical_result.returncode == 0 and canonical_path.exists():
+        try:
+            canonical_payload = json.loads(canonical_path.read_text(encoding="utf-8"))
+            generated_ctx = canonical_payload.get("generation_context")
+            if isinstance(generated_ctx, dict):
+                product_ctx = {
+                    "product_info": generated_ctx.get("product_info") if isinstance(generated_ctx.get("product_info"), list) else [],
+                    "mechanism": generated_ctx.get("mechanism") if isinstance(generated_ctx.get("mechanism"), list) else [],
+                    "faq": generated_ctx.get("faq") if isinstance(generated_ctx.get("faq"), list) else [],
+                }
+                product_ctx_source = "canonical_llm"
+                (run_dir / "context" / "context_canonical.json").write_text(
+                    json.dumps(canonical_payload, ensure_ascii=False, indent=2) + "\n", encoding="utf-8"
+                )
+            else:
+                raise RuntimeError("Missing generation_context in canonical payload")
+        except Exception as exc:
+            (run_dir / "logs" / "canonical_context_error.txt").write_text(
+                f"Canonical context parse failed: {exc}\nSTDOUT:\n{canonical_result.stdout}\n\nSTDERR:\n{canonical_result.stderr}",
+                encoding="utf-8",
+            )
+            product_ctx = {}
+    else:
+        (run_dir / "logs" / "canonical_context_error.txt").write_text(
+            f"Canonical context generation failed\nSTDOUT:\n{canonical_result.stdout}\n\nSTDERR:\n{canonical_result.stderr}",
+            encoding="utf-8",
+        )
+        product_ctx = {}
+
+    if not product_ctx:
+        product_ctx_result = run_cmd(
+            [
+                "python3",
+                "scripts/extract_product_context.py",
+                "--product",
+                str(product_file),
+                "--mechanism",
+                str(mechanism_file_path),
+                "--faq",
+                str(faq_file_path),
+                "--json",
+            ],
+            cwd=ROOT,
+        )
+        product_ctx = parse_json_stdout(product_ctx_result, "extract_product_context")
 
     persona_library = parse_persona_library(DEFAULT_PLAYBOOK)
     ads_context: list[dict[str, Any]] = []
@@ -1103,6 +1176,8 @@ async def api_run_execute(
         "generated_at": now_iso(),
         "run_id": run_id,
         "language_mode": resolve_language_mode(cfg),
+        "context_source": product_ctx_source,
+        "context_extractor_model": extractor_model,
         "ads": ads_context,
         "product_context": product_ctx,
         "banlist": banlist_payload,
@@ -1200,6 +1275,8 @@ async def api_run_execute(
 
     manifest = collect_run_result(run_dir, batch_name, image_generated)
     manifest["llm_mode"] = llm_mode
+    manifest["context_source"] = product_ctx_source
+    manifest["context_extractor_model"] = extractor_model
     manifest["active_images_file"] = str(active_images_file_path)
     (run_dir / "manifest.json").write_text(json.dumps(manifest, ensure_ascii=False, indent=2) + "\n", encoding="utf-8")
     return manifest

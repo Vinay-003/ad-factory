@@ -1,4 +1,11 @@
 MECHANISM SNAPSHOT (FOR EXTRACTION)
+- CANONICAL OVERRIDES (2026-04-21) - if any lower section conflicts, this block wins.
+- Positioning: protocol-based appetite regulation + eating-behavior correction + digestion/gut-comfort support.
+- Core flow: lower unnecessary intake -> better caloric-deficit adherence -> gradual stored-fat usage.
+- This is NOT a standalone fat-burner claim product.
+- OK Liquid: satiety support + craving reduction + easier true-hunger eating.
+- OK Powder + OK Tablet: digestion support + reduced heaviness + improved next-day compliance.
+- Allowed claim posture: supports weight-loss efforts by making adherence easier; avoid exaggerated metabolic/fat-melting language.
 - Mechanism type: appetite regulation + eating behavior correction + digestion support.
 - Core flow: less unnecessary eating -> lower daily intake -> body uses stored fat.
 - OK Liquid (morning): fullness support, reduced cravings, fewer impulse meals.

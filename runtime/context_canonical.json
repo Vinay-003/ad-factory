@@ -1,0 +1,298 @@
+{
+  "metadata": {
+    "generated_at": "2026-04-21T15:08:27Z",
+    "extractor_model": "opencode/minimax-m2.5-free",
+    "source_files": [
+      "/home/mylappy/myspace/info/productinfomain.txt",
+      "/home/mylappy/myspace/info/PRODUCT_MECHANISM_V1.txt",
+      "/home/mylappy/myspace/info/faq.txt"
+    ],
+    "source_sizes": {
+      "product_chars": 37003,
+      "mechanism_chars": 9776,
+      "faq_chars": 61799
+    }
+  },
+  "canonical": {
+    "positioning": [
+      "doctor-formulated Ayurvedic weight-loss system; structured guided protocol, not a loose supplement",
+      "appetite regulation + eating behavior correction + digestion/gut-comfort support system"
+    ],
+    "promise_claims": [
+      "3 to 5 kg weight loss in 15 days when protocol is followed",
+      "supports weight-loss efforts by making adherence easier",
+      "helps reduce hunger and cravings",
+      "supports digestion"
+    ],
+    "eligibility": [
+      "adults (18+) with BMI > 25",
+      "users with cravings, inconsistency, emotional eating, low energy, or slow progress",
+      "PCOD/PCOS, thyroid imbalance, high BP, fatty liver, diabetes, IBS (not a cure claim)"
+    ],
+    "exclusions": [
+      "pregnancy",
+      "within 6 months postpartum",
+      "active insulin users"
+    ],
+    "caution_conditions": [
+      "multi-psychiatric-medication cases require doctor review",
+      "multiple-surgery cases require doctor review"
+    ],
+    "protocol_morning": [
+      "OK Liquid on empty stomach",
+      "warm pouch in hot water",
+      "then 4-hour no-solid-food window",
+      "zero-calorie drinks allowed (tea, coffee, lemon water)"
+    ],
+    "protocol_night": [
+      "OK Powder + Tablet ~15 minutes before bed",
+      "typically after dinner gap with 2-hour gap before bedtime",
+      "with warm water"
+    ],
+    "fasting_rules": [
+      "4-hour no-solid-food window after OK Liquid in morning",
+      "eat only when true hunger is felt",
+      "no fixed meal timing"
+    ],
+    "allowed_items": [
+      "vegetables",
+      "salads",
+      "soups",
+      "fruits",
+      "millets (up to 30g)",
+      "oats",
+      "tea/coffee with milk"
+    ],
+    "restricted_items": [
+      "non-vegetarian food",
+      "alcohol",
+      "dairy products (except milk in tea/coffee)",
+      "rice",
+      "wheat chapati",
+      "dal",
+      "nuts",
+      "simple carbohydrates"
+    ],
+    "mechanism_allowed_claims": [
+      "helps reduce hunger",
+      "helps control cravings",
+      "supports digestion",
+      "helps reduce overall intake",
+      "helps you feel full for longer",
+      "helps reduce random snacking",
+      "can support more stable daily energy",
+      "can make a simpler routine easier to follow"
+    ],
+    "mechanism_disallowed_claims": [
+      "burns fat rapidly",
+      "boosts metabolism drastically",
+      "melts fat without effort",
+      "works without diet awareness",
+      "lets you eat unlimited junk",
+      "overrides overeating completely"
+    ],
+    "safety_public_line": [],
+    "safety_internal_handling": [],
+    "pricing": [],
+    "guarantee": [],
+    "continuation": [],
+    "maintenance": [],
+    "proof_points": [
+      "70,000+ users served",
+      "200 video testimonials",
+      "3 to 5 kg in 15 days claim",
+      "founder Dr. Arun Tyagi credibility",
+      "daily tracker-led support"
+    ],
+    "messaging_guardrails": [
+      "no body-shaming",
+      "no cure-all claims",
+      "no anti-gym or anti-diet messaging",
+      "no competitor bashing"
+    ]
+  },
+  "conflicts": [
+    {
+      "conflict_id": "C1",
+      "bucket": "formulation_count",
+      "claim_a": {
+        "text": "31 unique ingredients, 44 total entries (20 liquid, 12 powder, 12 tablet)",
+        "source_file": "productinfomain.txt",
+        "line_start": 1,
+        "line_end": 1
+      },
+      "claim_b": {
+        "text": "39 Ayurvedic herbs broken across three key components",
+        "source_file": "productinfomain.txt",
+        "line_start": 1,
+        "line_end": 1
+      },
+      "resolution_status": "resolved",
+      "chosen_claim": {
+        "text": "31 unique ingredients, 44 total entries (20 liquid, 12 powder, 12 tablet)",
+        "source_file": "productinfomain.txt",
+        "line_start": 1,
+        "line_end": 1
+      },
+      "resolution_reason": "PRODUCT_MECHANISM_V1.txt specifies info/productinfomain.txt as source for approved claims; CANONICAL OVERRIDES block in productinfomain.txt explicitly states 31 unique ingredients as the latest internal standard",
+      "risk_level": "medium"
+    },
+    {
+      "conflict_id": "C2",
+      "bucket": "eligibility_age",
+      "claim_a": {
+        "text": "adults (18+) with BMI > 25",
+        "source_file": "productinfomain.txt",
+        "line_start": 1,
+        "line_end": 1
+      },
+      "claim_b": {
+        "text": "Age group 10-80 years",
+        "source_file": "productinfomain.txt",
+        "line_start": 1,
+        "line_end": 1
+      },
+      "resolution_status": "resolved",
+      "chosen_claim": {
+        "text": "adults (18+) with BMI > 25",
+        "source_file": "productinfomain.txt",
+        "line_start": 1,
+        "line_end": 1
+      },
+      "resolution_reason": "PRODUCT_MECHANISM_V1.txt specifies info/productinfomain.txt as source for approved claims; CANONICAL OVERRIDES block explicitly states adults 18+; encyclopedia/training fragment is legacy material that conflicts with higher-priority source",
+      "risk_level": "high"
+    },
+    {
+      "conflict_id": "C3",
+      "bucket": "mechanism_positioning",
+      "claim_a": {
+        "text": "This is NOT a standalone fat-burner. This product is a: appetite regulation + eating behavior correction system with digestion support for sustainability",
+        "source_file": "PRODUCT_MECHANISM_V1.txt",
+        "line_start": 1,
+        "line_end": 1
+      },
+      "claim_b": {
+        "text": "The kit enables safe and visible weight loss—3 to 5 kg on average every 15 days—without requiring crash diets or intense workouts",
+        "source_file": "productinfomain.txt",
+        "line_start": 1,
+        "line_end": 1
+      },
+      "resolution_status": "resolved",
+      "chosen_claim": {
+        "text": "This is NOT a standalone fat-burner. Primary mechanism: appetite regulation + eating behavior correction + digestion support",
+        "source_file": "PRODUCT_MECHANISM_V1.txt",
+        "line_start": 1,
+        "line_end": 1
+      },
+      "resolution_reason": "PRODUCT_MECHANISM_V1.txt explicitly defines mechanism boundaries; claim B is a benefit claim that doesn't conflict with the mechanism positioning but is incomplete - the product works by reducing intake not by fat burning directly",
+      "risk_level": "low"
+    }
+  ],
+  "dropped_claims": [
+    {
+      "text": "39 herbs in internal training material",
+      "reason": "legacy_override_blocked",
+      "source_file": "productinfomain.txt",
+      "line_start": 1,
+      "line_end": 1
+    },
+    {
+      "text": "Age group 10-80 years",
+      "reason": "legacy_override_blocked",
+      "source_file": "productinfomain.txt",
+      "line_start": 1,
+      "line_end": 1
+    },
+    {
+      "text": "no separate meal prep as center of brand positioning",
+      "reason": "low_confidence",
+      "source_file": "faq.txt",
+      "line_start": 1,
+      "line_end": 1
+    }
+  ],
+  "coverage_check": {
+    "required_present": {
+      "3_to_5kg_15days": true,
+      "adults_18_plus_bmi_gt_25": true,
+      "insulin_exclusion": true,
+      "pregnancy_postpartum_exclusion": true,
+      "morning_liquid_4h_no_solids": true,
+      "night_powder_tablet": true,
+      "31_unique_44_total": true,
+      "refund_7day_with_tracker": true,
+      "not_fat_burner_positioning": true
+    },
+    "missing_required": []
+  },
+  "generation_context": {
+    "product_info": [
+      "doctor-formulated Ayurvedic weight-loss system; structured guided protocol, not a loose supplement",
+      "appetite regulation + eating behavior correction + digestion/gut-comfort support system",
+      "3 to 5 kg weight loss in 15 days when protocol is followed",
+      "supports weight-loss efforts by making adherence easier",
+      "helps reduce hunger and cravings",
+      "supports digestion",
+      "adults (18+) with BMI > 25",
+      "users with cravings, inconsistency, emotional eating, low energy, or slow progress",
+      "PCOD/PCOS, thyroid imbalance, high BP, fatty liver, diabetes, IBS (not a cure claim)",
+      "pregnancy",
+      "within 6 months postpartum",
+      "active insulin users",
+      "multi-psychiatric-medication cases require doctor review",
+      "multiple-surgery cases require doctor review",
+      "70,000+ users served",
+      "200 video testimonials",
+      "3 to 5 kg in 15 days claim",
+      "founder Dr. Arun Tyagi credibility",
+      "daily tracker-led support"
+    ],
+    "mechanism": [
+      "helps reduce hunger",
+      "helps control cravings",
+      "supports digestion",
+      "helps reduce overall intake",
+      "helps you feel full for longer",
+      "helps reduce random snacking",
+      "can support more stable daily energy",
+      "can make a simpler routine easier to follow",
+      "OK Liquid on empty stomach",
+      "warm pouch in hot water",
+      "then 4-hour no-solid-food window",
+      "zero-calorie drinks allowed (tea, coffee, lemon water)",
+      "OK Powder + Tablet ~15 minutes before bed",
+      "typically after dinner gap with 2-hour gap before bedtime",
+      "with warm water",
+      "4-hour no-solid-food window after OK Liquid in morning",
+      "eat only when true hunger is felt",
+      "no fixed meal timing"
+    ],
+    "faq": [
+      "vegetables",
+      "salads",
+      "soups",
+      "fruits",
+      "millets (up to 30g)",
+      "oats",
+      "tea/coffee with milk",
+      "non-vegetarian food",
+      "alcohol",
+      "dairy products (except milk in tea/coffee)",
+      "rice",
+      "wheat chapati",
+      "dal",
+      "nuts",
+      "simple carbohydrates",
+      "no body-shaming",
+      "no cure-all claims",
+      "no anti-gym or anti-diet messaging",
+      "no competitor bashing",
+      "Do not claim: burns fat rapidly",
+      "Do not claim: boosts metabolism drastically",
+      "Do not claim: melts fat without effort",
+      "Do not claim: works without diet awareness",
+      "Do not claim: lets you eat unlimited junk",
+      "Do not claim: overrides overeating completely"
+    ]
+  }
+}

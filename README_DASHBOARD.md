@@ -69,8 +69,9 @@ Bootstrap does all of this:
    - `input/activeimages.txt`
 
 2. Retrieval scripts extract only required slices:
+   - `scripts/build_canonical_context.py` (LLM reconciliation, primary)
    - `scripts/extract_format_rules.py`
-   - `scripts/extract_product_context.py`
+   - `scripts/extract_product_context.py` (fallback only if canonical build fails)
 
 3. Backend builds compact context JSON and tries OpenCode-compatible chat API (optional).
 
@@ -95,9 +96,10 @@ Bootstrap does all of this:
 The dashboard does deterministic retrieval first, then generation.
 
 1. User selects persona + format in UI.
-2. Backend runs extraction scripts (no full-file LLM reads):
-   - `scripts/extract_format_rules.py` from `AD_CREATIVE_SYSTEM_PLAYBOOK.md`
-   - `scripts/extract_product_context.py` from product files
+2. Backend runs context-building scripts:
+   - `scripts/build_canonical_context.py` (product + mechanism + FAQ reconciliation)
+    - `scripts/extract_format_rules.py` from `AD_CREATIVE_SYSTEM_PLAYBOOK.md`
+    - `scripts/extract_product_context.py` as fallback
 3. Backend builds compact `run_context.json` in run storage.
 4. OpenCode generates copy JSON only.
 5. Backend normalizes schema and trims long copy lines.
