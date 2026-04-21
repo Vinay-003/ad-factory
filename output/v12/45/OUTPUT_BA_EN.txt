@@ -8,21 +8,25 @@ PRODUCT LOCK BLOCK
 
 OUTPUT SPEC
 - Canvas: 1080 x 1350 pixels. Portrait. 4:5 ratio.
-- Style: HERO, polished enough for paid ad deployment.
+- Style: BA (before/after journey without body-shaming visuals).
+- Full-bleed requirement: scene must reach all canvas edges; no inset poster card, no inner frame, no side matte bands, no faux border margins.
 - Text policy: low text by default; all copy minimal and mobile-readable at 375px width.
 - Rendering: no compression artifacts; no soft edges on text or product labels.
 - All 5 products present, proportionally sized per reference dimensions, unmodified.
 - Readability: maintain high-contrast foreground/background treatment for ad-platform legibility.
 
 FORMAT LAYOUT INSTRUCTIONS
-- HERO format: strong headline, one support line, and one CTA.
-- Composition: keep the product cluster inside the central safe field, slightly above center, with clean margin protection.
-- Focal hierarchy: product dominant, text secondary, background tertiary.
-- Product zone: central containment only, with all key pack details away from edge-risk zones.
-- Text zones: flat uncluttered areas only; never over busy background detail.
-- Camera framing: eye-level medium shot with natural perspective and stable horizon.
-- Lighting: soft, directional, premium, and clean enough to preserve label readability.
-- Spacing: strong whitespace between product and copy blocks; clear grid alignment; no floating elements.
+- Format: BA.
+- Build a strict split contrast story: left panel = BEFORE struggle, right panel = AFTER first meaningful win.
+- Add explicit micro labels: BEFORE on left and AFTER on right (small but readable).
+- Keep a visible vertical divider between panels; contrast must be obvious even on quick scroll.
+- Left side expression/context should feel frustrated or stuck; right side should feel relieved/confident.
+- Keep products grouped near lower center bridging both halves (inside safe field).
+- Place headline at top across both panels; make pain-to-progress transition unmistakable.
+- Place 2 to 3 short bullets favoring right panel outcomes; avoid generic motivational bullets.
+- CTA must be rendered as a filled rounded button chip centered in lower safe band, never plain text.
+- Camera framing: medium lifestyle-product hybrid; premium and realistic.
+- Lighting: left side slightly flatter/dimmer, right side cleaner/brighter (subtle, not dramatic).
 
 PERSONA INPUT BLOCK
 - Persona: TIME-STARVED PARENT (FORUM-GROUNDED) (Persona 9)
@@ -33,9 +37,11 @@ PERSONA INPUT BLOCK
 - Tone cue: Practical, empathetic, and confidence-building
 
 EXACT ON-IMAGE COPY - DO NOT ALTER ANYTHING
-- Headline: Too tired to track everything?
-- Support line: Morning fullness + night digestion support helps cut random snacking, so a calorie deficit.
-- CTA: Check Eligibility
+- Headline: From sleep-hit, comfort-led eating to calmer days with measurable control.
+- Bullet 1: Morning hunger feels steadier, so impulse bites drop.
+- Bullet 2: Night digestion feels lighter, making next-day restart easier.
+- Bullet 3: Simple tracking keeps progress moving after chaotic days.
+- CTA: Get My Fit Plan
 Render every character exactly as written. No paraphrasing, no punctuation changes, no autocorrection.
 
 NEGATIVE CONSTRAINTS
@@ -46,6 +52,10 @@ NEGATIVE CONSTRAINTS
 - Do not use colors outside the defined palette.
 - Do not use more than 2 font weights.
 - Do not overcrowd the layout.
+- Do not add edge glows, tinted borders, amber/orange side casts, or decorative vignette frames.
+- Do not create inset-canvas look: no white frame border, no inner-card composition, no side fade bands, no outer padding effect.
+- Do not shrink main scene inside margins; composition must remain full-bleed to all four edges.
+- Do not place any translucent white panel behind or below the product cluster.
 - Do not make medical cure claims of any kind.
 - Do not use ring light, studio flash, or overproduced lighting.
 
@@ -59,15 +69,18 @@ QUALITY BAR - verify before accepting output
 - If any item above fails, regenerate immediately without compromise.
 
 VISUAL DIRECTION BLOCK
-- Background slot: BG-050 - Muted olive wall
-- Background seed: 1032735997
-- Seeded background direction (single sentence, exact): Muted olive background, soft warm key on a clean premium composite surface with restrained texture and ad-ready clarity, with soft foreground-to-background depth transition preserving premium focus hierarchy, lit by soft top-side illumination with refined contrast and clean edge transitions, conveying minimal clean lifestyle confidence; 45-degree three-quarter close framing, soft focus falloff, crisp subject plane and clean edge definition, primary subject held in the upper-middle 14-65% band, avoiding top UI overlap and maintaining quiet visual weight below, preserve a stable center-of-interest corridor with consistent margin protection on every side, avoid any high-importance object detail in the lower region to protect conversion UI legibility, maintain protected margin buffers so alternate crops do not clip meaningful scene structure, warm natural tones with commercial polish, designed for 4:5 feed framing with key content held inside the central safe field, centered to slightly above center, while top 10 percent, bottom 15 percent, and side edge zones remain low-priority, clean premium studio ad photography, ultra-detailed, flawless commercial finish.
+- Background slot: BG-021 - Breakfast nook
+- Background seed: 404276521
+- Seeded background direction (single sentence, exact): Sunlit breakfast corner, ceramic bowl prop on a clean premium composite surface with restrained texture and ad-ready clarity, with minimal contextual backdrop with elegant bokeh falloff and clean negative space, lit by warm natural daylight from the left with soft diffusion and realistic countertop shadow, conveying healthy everyday habit and nourishment context; slightly elevated medium shot, balanced depth layering, gentle blur in rear context, center-weighted layout with soft upward emphasis, ensuring no important detail touches edge risk zones, preserve a stable center-of-interest corridor with consistent margin protection on every side, preserve a quiet footer zone while keeping the subject comfortably within central margins, keep focal hierarchy compact and central so multi-placement crops preserve premium readability, use a soft top-down gradient overlay for headline readability, but stop the panel above products; never continue behind or below product packshots, keep all frame edges tonally neutral with no orange, amber, or sepia cast; no border glow and no vignette halo, soft golden tint with restrained premium saturation, designed for 4:5 feed framing with key content held inside the central safe field, centered to slightly above center, while top 10 percent, bottom 15 percent, and side edge zones remain low-priority; avoid edge glow frames and tinted border gradients, clean premium studio ad photography, ultra-detailed, flawless commercial finish.
 - Subject: No human subject, products only.
 - Action: Arrange all 5 products as a cohesive premium cluster; kit box acts as anchor.
 - Camera: Eye-level medium framing with clean edge discipline.
 - Lighting: Warm, soft, directional (top-left) and label-safe.
 - Props: Minimal, non-competing; keep edge zones quiet.
 - Surfaces: Premium, clean texture; avoid busy patterns under text.
+- Text panel treatment: if used, keep panel in upper text zone only with vertical fade to transparent before products; never place white panel behind or below product cluster.
+- Edge color control: keep border tones neutral and natural; no orange/amber edge tint and no ornamental frame glow.
+- Edge structure control: enforce full-bleed composition to edges; reject outputs with visible inset border, side matte strip, or inner-frame card look.
 - Mood: Calm confidence and practical consistency; no hype.
 - Realism: True-to-life proportions; no stock-template look.
 
@@ -81,6 +94,7 @@ TYPOGRAPHY SHARPNESS BLOCK
 - If any text is soft, blurry, or illegible, discard and regenerate immediately.
 
 Keep on-image text minimal and mobile-readable. Avoid dense copy blocks.
+Render CTA as a real filled button chip with rounded corners and strong contrast; never show CTA as standalone plain text.
 Typography must be pin-sharp. If any text appears soft, blurry, or smeared, regenerate.
 Keep text count minimal and increase font size rather than packing more copy.
 Use clean sans typography with strong stroke clarity; no thin/light weights for body text.

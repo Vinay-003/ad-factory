@@ -7,23 +7,23 @@ PRODUCT LOCK BLOCK
 - Only permitted: placement, scaling, subtle drop shadows, mild warm lighting correction.
 
 OUTPUT SPEC
-- Canvas: 1080 x 1350 pixels. Portrait. 9:16 ratio.
-- Style: UGC (creator-style authenticity, premium and clean).
+- Canvas: 1080 x 1920 pixels. Portrait. 9:16 ratio.
+- Style: TEST (trust-first proof framing, no fabricated quotes).
+- Full-bleed requirement: scene must reach all canvas edges; no inset poster card, no inner frame, no side matte bands, no faux border margins.
 - Text policy: low text by default; all copy minimal and mobile-readable at 375px width.
 - Rendering: no compression artifacts; no soft edges on text or product labels.
 - All 5 products present, proportionally sized per reference dimensions, unmodified.
 - Readability: maintain high-contrast foreground/background treatment for ad-platform legibility.
 
 FORMAT LAYOUT INSTRUCTIONS
-- Format: UGC.
-- Creator-style authenticity with premium cleanliness; avoid stock-template look.
-- Subject holds the kit toward camera while remaining natural and unposed; all 5 products still visible.
-- Headline top, support line mid, CTA bottom; keep on-image text minimal but meaningful.
-- UGC copy density: headline should feel complete (about 6-12 words), support line should carry a clear mechanism + outcome phrase (about 8-16 words).
-- Hands must look anatomically correct; no extra fingers or warped nails.
-- Camera framing: handheld close-to-medium, phone-like realism with stable focus on product labels.
-- Lighting: soft indoor daylight or warm ambient; avoid ring-light glow.
-- Background props minimal and non-competing; keep text zones flat and clean.
+- Format: TEST.
+- Do not fabricate customer quotes. Use proof framing (user volume, protocol clarity, support structure).
+- Layout: headline at top, trust line mid, CTA at bottom.
+- Attribution line under headline to ground credibility.
+- Product cluster anchored bottom-center with kit box as primary; keep all labels readable.
+- Text zones must be flat and low-noise; prioritize legibility over decoration.
+- Camera framing: editorial product clarity shot with gentle lifestyle context.
+- Lighting: clean, warm, premium; no harsh shadows; preserve label sharpness.
 
 PERSONA INPUT BLOCK
 - Persona: TIME-STARVED PARENT (FORUM-GROUNDED) (Persona 9)
@@ -34,9 +34,10 @@ PERSONA INPUT BLOCK
 - Tone cue: Practical, empathetic, and confidence-building
 
 EXACT ON-IMAGE COPY - DO NOT ALTER ANYTHING
-- Headline: My mornings feel lighter
-- Support line: Less snacking supports steadier weight loss.
-- CTA: See How
+- Headline: Used by 70,000+ people who needed a simpler way to lose weight.
+- Attribution: Doctor-formulated Ayurvedic system by Dr. Arun Tyagi
+- Trust line: Morning appetite support and night digestion support help reduce random eating and improve consistency.
+- CTA: View Proof
 Render every character exactly as written. No paraphrasing, no punctuation changes, no autocorrection.
 
 NEGATIVE CONSTRAINTS
@@ -48,7 +49,8 @@ NEGATIVE CONSTRAINTS
 - Do not use more than 2 font weights.
 - Do not overcrowd the layout.
 - Do not add edge glows, tinted borders, amber/orange side casts, or decorative vignette frames.
-- Do not render unnatural or anatomically incorrect hands.
+- Do not create inset-canvas look: no white frame border, no inner-card composition, no side fade bands, no outer padding effect.
+- Do not shrink main scene inside margins; composition must remain full-bleed to all four edges.
 - Do not place any translucent white panel behind or below the product cluster.
 - Do not make medical cure claims of any kind.
 - Do not use ring light, studio flash, or overproduced lighting.
@@ -63,19 +65,20 @@ QUALITY BAR - verify before accepting output
 - If any item above fails, regenerate immediately without compromise.
 
 VISUAL DIRECTION BLOCK
-- Background slot: BG-123 - Evening balcony city glow
-- Background seed: 454565801
-- Seeded background direction (single sentence, exact): small balcony table, urban lifestyle context on a minimal matte neutral platform with crisp silhouette separation, with airy outdoor depth cues with calm natural bokeh and tidy framing, lit by mild overcast-style daylight with smooth tonal transitions and airy depth, conveying premium organic living moment; top-down flat-lay framing with controlled spacing and soft planar depth separation, clean ad layout using central containment and controlled surrounding negative space for multi-placement reliability, keep the subject mass fully inside the central safe region with no edge-anchored focal detail, keep bottom visual activity restrained so overlays remain legible across placements, ensure all critical visual information remains within the center so 1:1 center crop retains full message, soft golden morning tint with controlled saturation, designed for 4:5 feed framing with key content held inside the central safe field, centered to slightly above center, while top 10 percent, bottom 15 percent, and side edge zones remain low-priority, clean premium studio ad photography, ultra-detailed, flawless commercial finish.; maintain base scene identity and arrangement, only adapt spacing for 9:16 safe bands
-- Subject: Indian woman 27-35, natural unposed expression.
-- Action: Hold the kit box toward camera with one hand; the other products arranged on a clean surface in-frame.
-- Camera: Handheld close-to-medium framing, phone-like realism, stable focus on labels.
-- Lighting: soft indoor daylight or warm ambient; avoid ring-light glow.
+- Background slot: BG-091 - Home library side table
+- Background seed: 1430826037
+- Seeded background direction (single sentence, exact): Book spine blur, side table placement on a clean premium composite surface with restrained texture and ad-ready clarity, with subtle background blur with layered depth separation and low visual noise, lit by soft natural side daylight with gentle diffusion and polished tonal balance, conveying minimal clean lifestyle confidence; slightly elevated medium shot, balanced depth layering, gentle blur in rear context, cross-format centered arrangement with gentle upward weighting and protected lower-frame emptiness, prioritize central hierarchy and avoid any composition that relies on top, bottom, or side edge information, avoid bottom-heavy composition to ensure robust story and feed CTA compatibility, ensure all critical visual information remains within the center so 1:1 center crop retains full message, prefer narrow upper-half text haze with feathered lower edge; zero opaque overlay under the product shelf or CTA base, keep all frame edges tonally neutral with no orange, amber, or sepia cast; no border glow and no vignette halo, soft golden tint with restrained premium saturation, designed for 4:5 feed framing with key content held inside the central safe field, centered to slightly above center, while top 10 percent, bottom 15 percent, and side edge zones remain low-priority; avoid edge glow frames and tinted border gradients, clean premium studio ad photography, ultra-detailed, flawless commercial finish.; maintain base scene identity and arrangement, only adapt spacing for 9:16 safe bands
+- Subject: No human subject, products only.
+- Action: Arrange all 5 products as a cohesive premium cluster; kit box acts as anchor.
+- Camera: Eye-level medium framing with clean edge discipline.
+- Lighting: clean, warm, premium; no harsh shadows; preserve label sharpness.
 - Props: Minimal, non-competing; keep edge zones quiet.
 - Surfaces: Premium, clean texture; avoid busy patterns under text.
 - Text panel treatment: if used, keep panel in upper text zone only with vertical fade to transparent before products; never place white panel behind or below product cluster.
 - Edge color control: keep border tones neutral and natural; no orange/amber edge tint and no ornamental frame glow.
+- Edge structure control: enforce full-bleed composition to edges; reject outputs with visible inset border, side matte strip, or inner-frame card look.
 - Mood: Calm confidence and practical consistency; no hype.
-- Realism: True-to-life proportions; no stock-template look; natural skin and correct hand anatomy.
+- Realism: True-to-life proportions; no stock-template look.
 - VISUAL MATCH LOCK (from base 4:5): keep same subject identity, camera feel, lighting direction, prop family, and product arrangement; only adjust spacing/scale for aspect-ratio fit.
 - For 9:16 conversion: preserve the same product left-right order and relative layering as base 4:5; allow only vertical re-spacing and minor scale adaptation.
 

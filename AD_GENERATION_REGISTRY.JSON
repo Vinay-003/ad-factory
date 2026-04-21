@@ -3,7 +3,7 @@
     "phase": "production",
     "write_enabled": true,
     "note": "Production mode active. Read before generation and append one entry after every generation.",
-    "last_updated": "2026-04-20T21:00:40Z"
+    "last_updated": "2026-04-21T10:56:59Z"
   },
   "rules": {
     "dedupe_scope": [
@@ -536,6 +536,416 @@
       "language": "BOTH",
       "output_quality": "pending",
       "notes": "assembled_from=copy_batch.json; batch=v7; aspect_ratio=4:5; seed=642980559"
+    },
+    {
+      "id": "entry_017",
+      "timestamp": "2026-04-20T21:16:18Z",
+      "format": "HERO",
+      "persona_number": 9,
+      "persona_name": "TIME-STARVED PARENT (FORUM-GROUNDED)",
+      "headline_angle": "Busy-schedule relief with appetite control",
+      "headline_en": "When your day is packed, your weight plan can still stay on track.",
+      "headline_hi": "दिन भरा हो तब भी आपका वेट प्लान पटरी पर रह सकता है।",
+      "support_line_en": "Morning appetite support plus night digestion support helps cut reactive eating, so weight...",
+      "support_line_hi": "सुबह का appetite support और रात का digestion support reactive eating कम करके weight loss...",
+      "cta_en": "See If It Fits",
+      "cta_hi": "देखें यह आपके लिए है?",
+      "disclaimer_en": "",
+      "disclaimer_hi": "",
+      "caption_en": "",
+      "caption_hi": "",
+      "bullets_en": [],
+      "bullets_hi": [],
+      "background_slot": "BG-321",
+      "background_name": "Warm wood and brick",
+      "background_source": "catalog",
+      "fresh_background_signature": null,
+      "language": "BOTH",
+      "output_quality": "pending",
+      "notes": "assembled_from=copy_batch.json; batch=v8; aspect_ratio=4:5; seed=1829080577"
+    },
+    {
+      "id": "entry_018",
+      "timestamp": "2026-04-20T21:16:18Z",
+      "format": "BA",
+      "persona_number": 9,
+      "persona_name": "TIME-STARVED PARENT (FORUM-GROUNDED)",
+      "headline_angle": "From scattered eating to steadier control",
+      "headline_en": "From exhausted, all-day nibbling to a calmer routine that feels doable.",
+      "headline_hi": "थकान और बार-बार खाने से एक शांत, doable routine की ओर।",
+      "support_line_en": "",
+      "support_line_hi": "",
+      "cta_en": "See The Routine",
+      "cta_hi": "रूटीन देखें",
+      "disclaimer_en": "",
+      "disclaimer_hi": "",
+      "caption_en": "",
+      "caption_hi": "",
+      "bullets_en": [
+        "Morning hunger feels steadier",
+        "Stress snacking drops through the day",
+        "Nights feel lighter and easier to restart"
+      ],
+      "bullets_hi": [
+        "सुबह भूख ज्यादा steady लगती है",
+        "दिनभर stress snacking कम होती है",
+        "रात हल्की लगती है, अगला दिन फिर आसान होता है"
+      ],
+      "background_slot": "BG-024",
+      "background_name": "Kitchen island clean",
+      "background_source": "catalog",
+      "fresh_background_signature": null,
+      "language": "BOTH",
+      "output_quality": "pending",
+      "notes": "assembled_from=copy_batch.json; batch=v8; aspect_ratio=4:5; seed=1829080577"
+    },
+    {
+      "id": "entry_019",
+      "timestamp": "2026-04-20T21:16:18Z",
+      "format": "TEST",
+      "persona_number": 9,
+      "persona_name": "TIME-STARVED PARENT (FORUM-GROUNDED)",
+      "headline_angle": "Trust through scale and mechanism",
+      "headline_en": "Used by 70,000+ people who needed a simpler way to lose weight.",
+      "headline_hi": "70,000+ लोगों ने इसे तब चुना जब उन्हें वजन घटाने का आसान तरीका चाहिए था।",
+      "support_line_en": "Morning appetite support and night digestion support help reduce random eating and improve...",
+      "support_line_hi": "सुबह का appetite support और रात का digestion support random eating कम करके व्यस्त दिनों...",
+      "cta_en": "View Proof",
+      "cta_hi": "प्रूफ देखें",
+      "disclaimer_en": "",
+      "disclaimer_hi": "",
+      "caption_en": "",
+      "caption_hi": "",
+      "bullets_en": [],
+      "bullets_hi": [],
+      "background_slot": "BG-091",
+      "background_name": "Home library side table",
+      "background_source": "catalog",
+      "fresh_background_signature": null,
+      "language": "BOTH",
+      "output_quality": "pending",
+      "notes": "assembled_from=copy_batch.json; batch=v8; aspect_ratio=4:5; seed=1829080577"
+    },
+    {
+      "id": "entry_020",
+      "timestamp": "2026-04-20T21:16:18Z",
+      "format": "FEAT",
+      "persona_number": 9,
+      "persona_name": "TIME-STARVED PARENT (FORUM-GROUNDED)",
+      "headline_angle": "What makes it practical for parents",
+      "headline_en": "Why this works even when life stays messy",
+      "headline_hi": "जब life messy हो तब भी यह क्यों काम करता है",
+      "support_line_en": "",
+      "support_line_hi": "",
+      "cta_en": "Explore The Kit",
+      "cta_hi": "किट जानें",
+      "disclaimer_en": "",
+      "disclaimer_hi": "",
+      "caption_en": "",
+      "caption_hi": "",
+      "bullets_en": [
+        "OK Liquid in the morning supports fullness during the hardest part of the day",
+        "Night Powder and Tablet support digestion for a cleaner next-day reset",
+        "Tracker and booklet reduce planning load when you are already exhausted"
+      ],
+      "bullets_hi": [
+        "सुबह का OK Liquid दिन के toughest हिस्से में fullness support देता है",
+        "रात का Powder और Tablet digestion support देकर next-day reset आसान करते हैं",
+        "Tracker और booklet planning load कम करते हैं जब आप पहले से थके हों"
+      ],
+      "background_slot": "BG-487",
+      "background_name": "Modern clinic entrance",
+      "background_source": "catalog",
+      "fresh_background_signature": null,
+      "language": "BOTH",
+      "output_quality": "pending",
+      "notes": "assembled_from=copy_batch.json; batch=v8; aspect_ratio=4:5; seed=1829080577"
+    },
+    {
+      "id": "entry_021",
+      "timestamp": "2026-04-20T21:16:18Z",
+      "format": "UGC",
+      "persona_number": 9,
+      "persona_name": "TIME-STARVED PARENT (FORUM-GROUNDED)",
+      "headline_angle": "First-person relief without gym pressure",
+      "headline_en": "I needed something that fit parent life.",
+      "headline_hi": "मुझे parent life में fit होने वाला कुछ चाहिए था।",
+      "support_line_en": "The morning step curbed random cravings and the night step helped me stay lighter the next...",
+      "support_line_hi": "सुबह वाले step ने random cravings घटाईं और रात वाले step ने अगले दिन हल्का महसूस करने में...",
+      "cta_en": "See My Routine",
+      "cta_hi": "मेरी routine देखें",
+      "disclaimer_en": "",
+      "disclaimer_hi": "",
+      "caption_en": "",
+      "caption_hi": "",
+      "bullets_en": [],
+      "bullets_hi": [],
+      "background_slot": "BG-194",
+      "background_name": "Bedroom floor rug",
+      "background_source": "catalog",
+      "fresh_background_signature": null,
+      "language": "BOTH",
+      "output_quality": "pending",
+      "notes": "assembled_from=copy_batch.json; batch=v8; aspect_ratio=4:5; seed=1829080577"
+    },
+    {
+      "id": "entry_022",
+      "timestamp": "2026-04-21T10:32:27Z",
+      "format": "HERO",
+      "persona_number": 9,
+      "persona_name": "TIME-STARVED PARENT (FORUM-GROUNDED)",
+      "headline_angle": "Sleep-chaos to appetite control",
+      "headline_en": "Even with a packed day, your weight-loss routine can stay steady.",
+      "headline_hi": "दिन कितना भी भरा हो, आपका weight-loss routine steady रह सकता है।",
+      "support_line_en": "A morning appetite anchor with night digestion support helps reduce reactive snacking and excess portions, lowering daily intake so stored fat is used more consistently.",
+      "support_line_hi": "सुबह का appetite anchor और रात का digestion support reactive snacking व extra portions कम करने में मदद करता है, जिससे daily intake घटता है और stored fat use होना आसान बनता है।",
+      "cta_en": "Begin Your Plan",
+      "cta_hi": "अपना प्लान शुरू करें",
+      "disclaimer_en": "",
+      "disclaimer_hi": "",
+      "caption_en": "",
+      "caption_hi": "",
+      "bullets_en": [],
+      "bullets_hi": [],
+      "background_slot": "BG-300",
+      "background_name": "Clean slate tile floor",
+      "background_source": "catalog",
+      "fresh_background_signature": null,
+      "language": "BOTH",
+      "output_quality": "pending",
+      "notes": "assembled_from=copy_batch.json; batch=v9; aspect_ratio=4:5; seed=1229855859"
+    },
+    {
+      "id": "entry_023",
+      "timestamp": "2026-04-21T10:45:58Z",
+      "format": "HERO",
+      "persona_number": 9,
+      "persona_name": "TIME-STARVED PARENT (FORUM-GROUNDED)",
+      "headline_angle": "chaos-to-control weight consistency",
+      "headline_en": "Even with a packed day, your weight-loss progress can stay steady.",
+      "headline_hi": "दिन कितना भी भरा हो, आपका weight-loss progress स्थिर रह सकता है।",
+      "support_line_en": "A morning appetite anchor plus night digestion support helps reduce stress snacking and extra portions, so daily intake drops and weight reduction is easier to sustain.",
+      "support_line_hi": "सुबह का appetite anchor और रात का digestion support तनाव में होने वाली snacking व extra portions कम करने में मदद करता है, जिससे daily intake घटता है और वजन घटाना टिकाऊ बनता है।",
+      "cta_en": "Check Your Fit",
+      "cta_hi": "अपना फिट देखें",
+      "disclaimer_en": "",
+      "disclaimer_hi": "",
+      "caption_en": "",
+      "caption_hi": "",
+      "bullets_en": [],
+      "bullets_hi": [],
+      "background_slot": "BG-041",
+      "background_name": "Muted terracotta wall",
+      "background_source": "catalog",
+      "fresh_background_signature": null,
+      "language": "BOTH",
+      "output_quality": "pending",
+      "notes": "assembled_from=copy_batch.json; batch=v10; aspect_ratio=4:5; seed=947983350"
+    },
+    {
+      "id": "entry_024",
+      "timestamp": "2026-04-21T10:49:04Z",
+      "format": "HERO",
+      "persona_number": 9,
+      "persona_name": "TIME-STARVED PARENT (FORUM-GROUNDED)",
+      "headline_angle": "Pain-led, fast-believable restart",
+      "headline_en": "No gym hour in your day? Weight loss can still begin.",
+      "headline_hi": "दिन में जिम का समय नहीं? फिर भी वजन घटाना शुरू हो सकता है।",
+      "support_line_en": "For parents juggling school drop-offs, work, and late nights, morning appetite support plus night digestion support cuts stress snacking, lowers daily intake, and keeps weight loss moving.",
+      "support_line_hi": "स्कूल ड्रॉप, काम और देर रात संभालने वाले parents के लिए सुबह का appetite support और रात का digestion support stress snacking कम करता है, daily intake घटाता है, और वजन घटाना आगे बढ़ाता है।",
+      "cta_en": "Get My Plan",
+      "cta_hi": "मेरा प्लान देखें",
+      "disclaimer_en": "",
+      "disclaimer_hi": "",
+      "caption_en": "",
+      "caption_hi": "",
+      "bullets_en": [],
+      "bullets_hi": [],
+      "background_slot": "BG-353",
+      "background_name": "Warm studio taupe riser",
+      "background_source": "catalog",
+      "fresh_background_signature": null,
+      "language": "BOTH",
+      "output_quality": "pending",
+      "notes": "assembled_from=copy_batch.json; batch=v11; aspect_ratio=4:5; seed=1130845489"
+    },
+    {
+      "id": "entry_025",
+      "timestamp": "2026-04-21T10:50:17Z",
+      "format": "HERO",
+      "persona_number": 9,
+      "persona_name": "TIME-STARVED PARENT (FORUM-GROUNDED)",
+      "headline_angle": "Pain-to-control with a realistic routine",
+      "headline_en": "No gym hour and no perfect day, yet your weight-loss start can still be real.",
+      "headline_hi": "जिम का घंटा नहीं और दिन परफेक्ट नहीं, फिर भी वजन घटाने की शुरुआत सच में हो सकती है।",
+      "support_line_en": "Between school runs, work calls, and broken sleep, a morning appetite anchor plus night digestion support helps parents cut stress snacking and extra portions so daily intake drops and weight-loss progress can start.",
+      "support_line_hi": "स्कूल ड्रॉप, काम की कॉल्स और टूटी नींद वाले parent-days में सुबह का appetite anchor और रात का digestion support stress snacking व extra portions घटाने में मदद करता है, जिससे daily intake कम होता है और वजन घटाने की शुरुआत टिकाऊ बनती है।",
+      "cta_en": "Start Smart Today",
+      "cta_hi": "स्मार्ट शुरुआत करें",
+      "disclaimer_en": "",
+      "disclaimer_hi": "",
+      "caption_en": "",
+      "caption_hi": "",
+      "bullets_en": [],
+      "bullets_hi": [],
+      "background_slot": "BG-085",
+      "background_name": "Window curtain glow",
+      "background_source": "catalog",
+      "fresh_background_signature": null,
+      "language": "BOTH",
+      "output_quality": "pending",
+      "notes": "assembled_from=copy_batch.json; batch=v12; aspect_ratio=4:5; seed=2064607323"
+    },
+    {
+      "id": "entry_026",
+      "timestamp": "2026-04-21T10:50:17Z",
+      "format": "BA",
+      "persona_number": 9,
+      "persona_name": "TIME-STARVED PARENT (FORUM-GROUNDED)",
+      "headline_angle": "From chaos eating to first control wins",
+      "headline_en": "From sleep-hit, comfort-led eating to calmer days with measurable control.",
+      "headline_hi": "टूटी नींद और comfort-eating वाली हालत से शांत, कंट्रोल वाले दिनों की तरफ साफ बदलाव।",
+      "support_line_en": "",
+      "support_line_hi": "",
+      "cta_en": "Get My Fit Plan",
+      "cta_hi": "मेरा फिट प्लान लें",
+      "disclaimer_en": "",
+      "disclaimer_hi": "",
+      "caption_en": "",
+      "caption_hi": "",
+      "bullets_en": [
+        "Morning hunger feels steadier, so impulse bites drop.",
+        "Night digestion feels lighter, making next-day restart easier.",
+        "Simple tracking keeps progress moving after chaotic days."
+      ],
+      "bullets_hi": [
+        "सुबह भूख ज्यादा stable लगती है, इसलिए impulse snacking कम होती है।",
+        "रात का digestion हल्का लगता है, इसलिए अगला दिन दोबारा शुरू करना आसान होता है।",
+        "Simple tracking से chaotic दिनों के बाद भी प्रोग्रेस चलती रहती है।"
+      ],
+      "background_slot": "BG-021",
+      "background_name": "Breakfast nook",
+      "background_source": "catalog",
+      "fresh_background_signature": null,
+      "language": "BOTH",
+      "output_quality": "pending",
+      "notes": "assembled_from=copy_batch.json; batch=v12; aspect_ratio=4:5; seed=2064607323"
+    },
+    {
+      "id": "entry_027",
+      "timestamp": "2026-04-21T10:50:17Z",
+      "format": "TEST",
+      "persona_number": 9,
+      "persona_name": "TIME-STARVED PARENT (FORUM-GROUNDED)",
+      "headline_angle": "First-person reassurance with proof framing",
+      "headline_en": "\"I could finally stay consistent, even on broken-sleep days.\"",
+      "headline_hi": "\"टूटी नींद वाले दिनों में भी मैं आखिरकार consistency रख पाया/पाई।\"",
+      "support_line_en": "Backed by 70,000+ guided users: morning appetite support and night digestion support help reduce random intake, supporting steady weight-loss progress.",
+      "support_line_hi": "70,000+ guided users के अनुभव से समर्थित: सुबह का appetite support और रात का digestion support random intake कम करने में मदद करते हैं, जिससे वजन घटाने की प्रगति steady रहती है।",
+      "cta_en": "See Parent Results",
+      "cta_hi": "Parent Results देखें",
+      "disclaimer_en": "",
+      "disclaimer_hi": "",
+      "caption_en": "",
+      "caption_hi": "",
+      "bullets_en": [],
+      "bullets_hi": [],
+      "background_slot": "BG-449",
+      "background_name": "Warm cedar sauna adjacent",
+      "background_source": "catalog",
+      "fresh_background_signature": null,
+      "language": "BOTH",
+      "output_quality": "pending",
+      "notes": "assembled_from=copy_batch.json; batch=v12; aspect_ratio=4:5; seed=2064607323"
+    },
+    {
+      "id": "entry_028",
+      "timestamp": "2026-04-21T10:56:59Z",
+      "format": "HERO",
+      "persona_number": 9,
+      "persona_name": "TIME-STARVED PARENT (FORUM-GROUNDED)",
+      "headline_angle": "Schedule-fit start without gym-hour dependency",
+      "headline_en": "No gym hour in your day? Weight-loss progress can still begin.",
+      "headline_hi": "दिन में जिम का घंटा नहीं? फिर भी वजन घटाने की शुरुआत हो सकती है।",
+      "support_line_en": "Morning appetite support with night digestion support helps curb stress snacking, lowering daily intake for steadier weight-loss progress.",
+      "support_line_hi": "सुबह का appetite support और रात का digestion support stress snacking घटाकर daily intake कम करने में मदद करता है, जिससे वजन घटाने की प्रगति ज्यादा steady रहती है।",
+      "cta_en": "Start 15-Day Reset",
+      "cta_hi": "15-दिन रीसेट शुरू करें",
+      "disclaimer_en": "",
+      "disclaimer_hi": "",
+      "caption_en": "",
+      "caption_hi": "",
+      "bullets_en": [],
+      "bullets_hi": [],
+      "background_slot": "BG-173",
+      "background_name": "Pale yellow accent wall",
+      "background_source": "catalog",
+      "fresh_background_signature": null,
+      "language": "BOTH",
+      "output_quality": "pending",
+      "notes": "assembled_from=copy_batch.json; batch=v13; aspect_ratio=4:5; seed=257500872"
+    },
+    {
+      "id": "entry_029",
+      "timestamp": "2026-04-21T10:56:59Z",
+      "format": "BA",
+      "persona_number": 9,
+      "persona_name": "TIME-STARVED PARENT (FORUM-GROUNDED)",
+      "headline_angle": "Chaos-to-control transition for parent schedules",
+      "headline_en": "From exhausted all-day nibbling to calmer, controlled eating that fits parent life.",
+      "headline_hi": "दिनभर की थकान-भरी nibbling से निकलकर अब parent-life में controlled eating possible लगती है।",
+      "support_line_en": "",
+      "support_line_hi": "",
+      "cta_en": "Plan My Busy-Day Flow",
+      "cta_hi": "मेरा Busy-Day Flow",
+      "disclaimer_en": "",
+      "disclaimer_hi": "",
+      "caption_en": "",
+      "caption_hi": "",
+      "bullets_en": [
+        "Morning anchor steadies hunger during school-drop and work-rush hours.",
+        "Night digestion step keeps evenings lighter, so next-day restart is quicker.",
+        "One chaotic day no longer wipes out your weekly momentum."
+      ],
+      "bullets_hi": [
+        "सुबह का anchor school-drop और work-rush के समय तेज भूख को stable रखता है।",
+        "रात का digestion step शाम हल्की रखता है, इसलिए अगला दिन जल्दी reset होता है।",
+        "एक chaotic दिन आने पर भी हफ्ते की progress पूरी तरह नहीं टूटती।"
+      ],
+      "background_slot": "BG-258",
+      "background_name": "Kitchen herb water",
+      "background_source": "catalog",
+      "fresh_background_signature": null,
+      "language": "BOTH",
+      "output_quality": "pending",
+      "notes": "assembled_from=copy_batch.json; batch=v13; aspect_ratio=4:5; seed=257500872"
+    },
+    {
+      "id": "entry_030",
+      "timestamp": "2026-04-21T10:56:59Z",
+      "format": "TEST",
+      "persona_number": 9,
+      "persona_name": "TIME-STARVED PARENT (FORUM-GROUNDED)",
+      "headline_angle": "First-person trust signal with proof-led backing",
+      "headline_en": "I stopped waiting for perfect days, and this routine finally fit my parent schedule.",
+      "headline_hi": "मैंने perfect दिन का इंतजार छोड़ दिया, और यह routine मेरे parent schedule में सच में चल गया।",
+      "support_line_en": "Structured protocol with simple AM-PM steps designed for chaotic parent routines.",
+      "support_line_hi": "सुबह और रात के साफ स्टेप्स के साथ भरोसेमंद रूटीन।",
+      "cta_en": "Read Real Journeys",
+      "cta_hi": "असली अनुभव देखें",
+      "disclaimer_en": "",
+      "disclaimer_hi": "",
+      "caption_en": "",
+      "caption_hi": "",
+      "bullets_en": [],
+      "bullets_hi": [],
+      "background_slot": "BG-263",
+      "background_name": "Evening lamp cushion blur",
+      "background_source": "catalog",
+      "fresh_background_signature": null,
+      "language": "BOTH",
+      "output_quality": "pending",
+      "notes": "assembled_from=copy_batch.json; batch=v13; aspect_ratio=4:5; seed=257500872"
     }
   ],
   "indexes": {
@@ -564,6 +974,42 @@
           "timestamp": "2026-04-20T19:39:23Z",
           "background_slot": "BG-050",
           "background_source": "catalog"
+        },
+        {
+          "entry_id": "entry_017",
+          "timestamp": "2026-04-20T21:16:18Z",
+          "background_slot": "BG-321",
+          "background_source": "catalog"
+        },
+        {
+          "entry_id": "entry_022",
+          "timestamp": "2026-04-21T10:32:27Z",
+          "background_slot": "BG-300",
+          "background_source": "catalog"
+        },
+        {
+          "entry_id": "entry_023",
+          "timestamp": "2026-04-21T10:45:58Z",
+          "background_slot": "BG-041",
+          "background_source": "catalog"
+        },
+        {
+          "entry_id": "entry_024",
+          "timestamp": "2026-04-21T10:49:04Z",
+          "background_slot": "BG-353",
+          "background_source": "catalog"
+        },
+        {
+          "entry_id": "entry_025",
+          "timestamp": "2026-04-21T10:50:17Z",
+          "background_slot": "BG-085",
+          "background_source": "catalog"
+        },
+        {
+          "entry_id": "entry_028",
+          "timestamp": "2026-04-21T10:56:59Z",
+          "background_slot": "BG-173",
+          "background_source": "catalog"
         }
       ],
       "BA": [
@@ -590,6 +1036,24 @@
           "timestamp": "2026-04-20T21:00:40Z",
           "background_slot": "BG-280",
           "background_source": "catalog"
+        },
+        {
+          "entry_id": "entry_018",
+          "timestamp": "2026-04-20T21:16:18Z",
+          "background_slot": "BG-024",
+          "background_source": "catalog"
+        },
+        {
+          "entry_id": "entry_026",
+          "timestamp": "2026-04-21T10:50:17Z",
+          "background_slot": "BG-021",
+          "background_source": "catalog"
+        },
+        {
+          "entry_id": "entry_029",
+          "timestamp": "2026-04-21T10:56:59Z",
+          "background_slot": "BG-258",
+          "background_source": "catalog"
         }
       ],
       "TEST": [
@@ -604,6 +1068,24 @@
           "timestamp": "2026-04-20T19:39:23Z",
           "background_slot": "BG-293",
           "background_source": "catalog"
+        },
+        {
+          "entry_id": "entry_019",
+          "timestamp": "2026-04-20T21:16:18Z",
+          "background_slot": "BG-091",
+          "background_source": "catalog"
+        },
+        {
+          "entry_id": "entry_027",
+          "timestamp": "2026-04-21T10:50:17Z",
+          "background_slot": "BG-449",
+          "background_source": "catalog"
+        },
+        {
+          "entry_id": "entry_030",
+          "timestamp": "2026-04-21T10:56:59Z",
+          "background_slot": "BG-263",
+          "background_source": "catalog"
         }
       ],
       "FEAT": [
@@ -617,6 +1099,12 @@
           "entry_id": "entry_011",
           "timestamp": "2026-04-20T19:39:23Z",
           "background_slot": "BG-475",
+          "background_source": "catalog"
+        },
+        {
+          "entry_id": "entry_020",
+          "timestamp": "2026-04-20T21:16:18Z",
+          "background_slot": "BG-487",
           "background_source": "catalog"
         }
       ],
@@ -644,6 +1132,12 @@
           "timestamp": "2026-04-20T21:00:40Z",
           "background_slot": "BG-029",
           "background_source": "catalog"
+        },
+        {
+          "entry_id": "entry_021",
+          "timestamp": "2026-04-20T21:16:18Z",
+          "background_slot": "BG-194",
+          "background_source": "catalog"
         }
       ]
     },
@@ -654,15 +1148,15 @@
           "BG-498",
           "BG-331",
           "BG-044",
-          "BG-050"
-        ],
-        "remaining": [
+          "BG-050",
           "BG-321",
           "BG-300",
           "BG-041",
           "BG-353",
           "BG-085",
-          "BG-173",
+          "BG-173"
+        ],
+        "remaining": [
           "BG-237",
           "BG-399",
           "BG-248",
@@ -840,12 +1334,12 @@
           "BG-376",
           "BG-448",
           "BG-080",
-          "BG-280"
-        ],
-        "remaining": [
+          "BG-280",
           "BG-024",
           "BG-021",
-          "BG-258",
+          "BG-258"
+        ],
+        "remaining": [
           "BG-136",
           "BG-222",
           "BG-437",
@@ -1070,12 +1564,12 @@
         "cycle_number": 1,
         "used": [
           "BG-189",
-          "BG-293"
-        ],
-        "remaining": [
+          "BG-293",
           "BG-091",
           "BG-449",
-          "BG-263",
+          "BG-263"
+        ],
+        "remaining": [
           "BG-140",
           "BG-155",
           "BG-175",
@@ -1261,10 +1755,10 @@
         "cycle_number": 1,
         "used": [
           "BG-273",
-          "BG-475"
+          "BG-475",
+          "BG-487"
         ],
         "remaining": [
-          "BG-487",
           "BG-237",
           "BG-393",
           "BG-261",
@@ -1491,10 +1985,10 @@
           "BG-066",
           "BG-123",
           "BG-144",
-          "BG-029"
+          "BG-029",
+          "BG-194"
         ],
         "remaining": [
-          "BG-194",
           "BG-003",
           "BG-358",
           "BG-439",
@@ -1700,7 +2194,21 @@
         "CRAVING-CONTROL STRUGGLER (FORUM-GROUNDED): build a simpler weight routine today. - fresh perspective",
         "No time for the gym? Start with hunger control. - revised focus",
         "When sleep is broken, my eating stays steadier.",
-        "I finally have a doable morning reset."
+        "I finally have a doable morning reset.",
+        "When your day is packed, your weight plan can still stay on track.",
+        "From exhausted, all-day nibbling to a calmer routine that feels doable.",
+        "Used by 70,000+ people who needed a simpler way to lose weight.",
+        "Why this works even when life stays messy",
+        "I needed something that fit parent life.",
+        "Even with a packed day, your weight-loss routine can stay steady.",
+        "Even with a packed day, your weight-loss progress can stay steady.",
+        "No gym hour in your day? Weight loss can still begin.",
+        "No gym hour and no perfect day, yet your weight-loss start can still be real.",
+        "From sleep-hit, comfort-led eating to calmer days with measurable control.",
+        "\"I could finally stay consistent, even on broken-sleep days.\"",
+        "No gym hour in your day? Weight-loss progress can still begin.",
+        "From exhausted all-day nibbling to calmer, controlled eating that fits parent life.",
+        "I stopped waiting for perfect days, and this routine finally fit my parent schedule."
       ],
       "headline_hi": [
         "CRAVING-CONTROL STRUGGLER (FORUM-GROUNDED): आज से सरल वजन रूटीन शुरू करें।",
@@ -1710,7 +2218,16 @@
         "इसे follow करना आसान क्यों है",
         "दिन वैसे ही व्यस्त रहे।",
         "नींद टूटे तब भी, मेरा खाना ज्यादा स्थिर रहा।",
-        "मुझे सुबह का आसान रीसेट मिल गया।"
+        "मुझे सुबह का आसान रीसेट मिल गया।",
+        "दिन कितना भी भरा हो, आपका weight-loss routine steady रह सकता है।",
+        "दिन कितना भी भरा हो, आपका weight-loss progress स्थिर रह सकता है।",
+        "दिन में जिम का समय नहीं? फिर भी वजन घटाना शुरू हो सकता है।",
+        "जिम का घंटा नहीं और दिन परफेक्ट नहीं, फिर भी वजन घटाने की शुरुआत सच में हो सकती है।",
+        "टूटी नींद और comfort-eating वाली हालत से शांत, कंट्रोल वाले दिनों की तरफ साफ बदलाव।",
+        "\"टूटी नींद वाले दिनों में भी मैं आखिरकार consistency रख पाया/पाई।\"",
+        "दिन में जिम का घंटा नहीं? फिर भी वजन घटाने की शुरुआत हो सकती है।",
+        "दिनभर की थकान-भरी nibbling से निकलकर अब parent-life में controlled eating possible लगती है।",
+        "मैंने perfect दिन का इंतजार छोड़ दिया, और यह routine मेरे parent schedule में सच में चल गया।"
       ],
       "support_line_en": [
         "Ayurvedic hunger and digestion support helps weight control consistency.",
@@ -1722,14 +2239,31 @@
         "Trusted framework with clear morning and night usage steps.",
         "Less snacking, steadier weight loss",
         "Doctor-formulated morning and night system helps reduce random eating so weight stays... to lower craving pressure through the day",
-        "Real-life feasibility framing; Morning appetite support helps reduce urge spikes so..."
+        "Real-life feasibility framing; Morning appetite support helps reduce urge spikes so...",
+        "Morning appetite support plus night digestion support helps cut reactive eating, so weight...",
+        "Morning appetite support and night digestion support help reduce random eating and improve...",
+        "The morning step curbed random cravings and the night step helped me stay lighter the next...",
+        "A morning appetite anchor with night digestion support helps reduce reactive snacking and excess portions, lowering daily intake so stored fat is used more consistently.",
+        "A morning appetite anchor plus night digestion support helps reduce stress snacking and extra portions, so daily intake drops and weight reduction is easier to sustain.",
+        "For parents juggling school drop-offs, work, and late nights, morning appetite support plus night digestion support cuts stress snacking, lowers daily intake, and keeps weight loss moving.",
+        "Between school runs, work calls, and broken sleep, a morning appetite anchor plus night digestion support helps parents cut stress snacking and extra portions so daily intake drops and weight-loss progress can start.",
+        "Backed by 70,000+ guided users: morning appetite support and night digestion support help reduce random intake, supporting steady weight-loss progress.",
+        "Morning appetite support with night digestion support helps curb stress snacking, lowering daily intake for steadier weight-loss progress.",
+        "Structured protocol with simple AM-PM steps designed for chaotic parent routines."
       ],
       "support_line_hi": [
         "आयुर्वेदिक भूख और पाचन सपोर्ट वजन नियंत्रण की निरंतरता में सहायक है।",
         "सुबह का appetite support और रात का digestion support अनियमित खाने को घटाकर वजन घटाने की...",
         "Doctor-formulated appetite और digestion support व्यस्त adults के लिए weight loss follow...",
         "खाना ज्यादा कंट्रोल में लगा।",
-        "सुबह की appetite support urge spikes कम करके रोज़ाना consistency बनाए रखने में मदद करती है।"
+        "सुबह की appetite support urge spikes कम करके रोज़ाना consistency बनाए रखने में मदद करती है।",
+        "सुबह का appetite anchor और रात का digestion support reactive snacking व extra portions कम करने में मदद करता है, जिससे daily intake घटता है और stored fat use होना आसान बनता है।",
+        "सुबह का appetite anchor और रात का digestion support तनाव में होने वाली snacking व extra portions कम करने में मदद करता है, जिससे daily intake घटता है और वजन घटाना टिकाऊ बनता है।",
+        "स्कूल ड्रॉप, काम और देर रात संभालने वाले parents के लिए सुबह का appetite support और रात का digestion support stress snacking कम करता है, daily intake घटाता है, और वजन घटाना आगे बढ़ाता है।",
+        "स्कूल ड्रॉप, काम की कॉल्स और टूटी नींद वाले parent-days में सुबह का appetite anchor और रात का digestion support stress snacking व extra portions घटाने में मदद करता है, जिससे daily intake कम होता है और वजन घटाने की शुरुआत टिकाऊ बनती है।",
+        "70,000+ guided users के अनुभव से समर्थित: सुबह का appetite support और रात का digestion support random intake कम करने में मदद करते हैं, जिससे वजन घटाने की प्रगति steady रहती है।",
+        "सुबह का appetite support और रात का digestion support stress snacking घटाकर daily intake कम करने में मदद करता है, जिससे वजन घटाने की प्रगति ज्यादा steady रहती है।",
+        "सुबह और रात के साफ स्टेप्स के साथ भरोसेमंद रूटीन।"
       ],
       "cta_en": [
         "Start Now",
@@ -1747,7 +2281,21 @@
         "Start Now",
         "Start Now",
         "Get protocol",
-        "See routine"
+        "See routine",
+        "See If It Fits",
+        "See The Routine",
+        "View Proof",
+        "Explore The Kit",
+        "See My Routine",
+        "Begin Your Plan",
+        "Check Your Fit",
+        "Get My Plan",
+        "Start Smart Today",
+        "Get My Fit Plan",
+        "See Parent Results",
+        "Start 15-Day Reset",
+        "Plan My Busy-Day Flow",
+        "Read Real Journeys"
       ],
       "cta_hi": [
         "अभी शुरू करें",
@@ -1757,7 +2305,16 @@
         "सिस्टम जानें",
         "Try It",
         "प्रोटोकॉल लें",
-        "रूटीन देखें"
+        "रूटीन देखें",
+        "अपना प्लान शुरू करें",
+        "अपना फिट देखें",
+        "मेरा प्लान देखें",
+        "स्मार्ट शुरुआत करें",
+        "मेरा फिट प्लान लें",
+        "Parent Results देखें",
+        "15-दिन रीसेट शुरू करें",
+        "मेरा Busy-Day Flow",
+        "असली अनुभव देखें"
       ],
       "disclaimer_en": [],
       "disclaimer_hi": [],
@@ -1781,7 +2338,19 @@
         "No crash diet, no heavy workout pressure.",
         "Morning anchor, less nibbling",
         "Night digestion feels lighter",
-        "No gym hour needed"
+        "No gym hour needed",
+        "Morning hunger feels steadier",
+        "Stress snacking drops through the day",
+        "Nights feel lighter and easier to restart",
+        "OK Liquid in the morning supports fullness during the hardest part of the day",
+        "Night Powder and Tablet support digestion for a cleaner next-day reset",
+        "Tracker and booklet reduce planning load when you are already exhausted",
+        "Morning hunger feels steadier, so impulse bites drop.",
+        "Night digestion feels lighter, making next-day restart easier.",
+        "Simple tracking keeps progress moving after chaotic days.",
+        "Morning anchor steadies hunger during school-drop and work-rush hours.",
+        "Night digestion step keeps evenings lighter, so next-day restart is quicker.",
+        "One chaotic day no longer wipes out your weekly momentum."
       ],
       "bullets_hi": [
         "तनाव में कम snacking",
@@ -1792,7 +2361,13 @@
         "tracker और guidance planning stress कम करते हैं",
         "सुबह का एंकर, कम nibbling",
         "रात में पाचन हल्का लगे",
-        "जिम का एक घंटा जरूरी नहीं"
+        "जिम का एक घंटा जरूरी नहीं",
+        "सुबह भूख ज्यादा stable लगती है, इसलिए impulse snacking कम होती है।",
+        "रात का digestion हल्का लगता है, इसलिए अगला दिन दोबारा शुरू करना आसान होता है।",
+        "Simple tracking से chaotic दिनों के बाद भी प्रोग्रेस चलती रहती है।",
+        "सुबह का anchor school-drop और work-rush के समय तेज भूख को stable रखता है।",
+        "रात का digestion step शाम हल्की रखता है, इसलिए अगला दिन जल्दी reset होता है।",
+        "एक chaotic दिन आने पर भी हफ्ते की progress पूरी तरह नहीं टूटती।"
       ]
     }
   }

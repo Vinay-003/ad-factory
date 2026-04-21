@@ -35,7 +35,7 @@ PERSONA INPUT BLOCK
 
 EXACT ON-IMAGE COPY - DO NOT ALTER ANYTHING
 - Headline: No time for the gym? Start with hunger control. - revised focus
-- Support line: Doctor-formulated morning and night system helps reduce random eating so weight stays... to lower craving pressure through the day
+- Support line: Doctor-formulated morning and night system helps reduce random eating so weight stays to lower craving pressure through the day.
 - CTA: Start Now
 Render every character exactly as written. No paraphrasing, no punctuation changes, no autocorrection.
 

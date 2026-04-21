@@ -34,7 +34,7 @@ PERSONA INPUT BLOCK
 
 EXACT ON-IMAGE COPY - DO NOT ALTER ANYTHING
 - Headline: My mornings feel lighter
-- Support line: Less snacking, steadier weight loss
+- Support line: Less snacking supports steadier weight loss.
 - CTA: See How
 Render every character exactly as written. No paraphrasing, no punctuation changes, no autocorrection.
 

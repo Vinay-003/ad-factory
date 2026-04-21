@@ -9,6 +9,7 @@ PRODUCT LOCK BLOCK
 OUTPUT SPEC
 - Canvas: 1080 x 1350 pixels. Portrait. 4:5 ratio.
 - Style: HERO, polished enough for paid ad deployment.
+- Full-bleed requirement: scene must reach all canvas edges; no inset poster card, no inner frame, no side matte bands, no faux border margins.
 - Text policy: low text by default; all copy minimal and mobile-readable at 375px width.
 - Rendering: no compression artifacts; no soft edges on text or product labels.
 - All 5 products present, proportionally sized per reference dimensions, unmodified.
@@ -26,16 +27,16 @@ FORMAT LAYOUT INSTRUCTIONS
 
 PERSONA INPUT BLOCK
 - Persona: TIME-STARVED PARENT (FORUM-GROUNDED) (Persona 9)
-- Pain: I am struggling to find a way to fit an hour of gym time in the schedule
-- Desire: Main pain is schedule chaos and low sleep breaking most plans.
-- Friction: I do not have time for complex plans
-- Proof needed: Real-life feasibility framing
-- Tone cue: Practical, empathetic, and confidence-building
+- Pain: रूटीन निभाना मुश्किल लग रहा है।
+- Desire: ऐसा आसान सिस्टम जो रोज निभ सके।
+- Friction: पहले के प्लान बहुत सख्त और मुश्किल थे।
+- Proof needed: साफ तरीका, भरोसेमंद सपोर्ट और व्यावहारिक प्रूफ चाहिए।
+- Tone cue: सरल, भरोसेमंद, और व्यावहारिक
 
 EXACT ON-IMAGE COPY - DO NOT ALTER ANYTHING
-- Headline: Too tired to track everything?
-- Support line: Morning fullness + night digestion support helps cut random snacking, so a calorie deficit.
-- CTA: Check Eligibility
+- Headline: दिन कितना भी भरा हो, आपका weight-loss routine steady रह सकता है।
+- Support line: सुबह का appetite anchor और रात का digestion support reactive snacking व extra portions कम करने में मदद करता है, जिससे daily intake घटता है और stored fat use होना आसान बनता है।
+- CTA: अपना प्लान शुरू करें
 Render every character exactly as written. No paraphrasing, no punctuation changes, no autocorrection.
 
 NEGATIVE CONSTRAINTS
@@ -46,6 +47,10 @@ NEGATIVE CONSTRAINTS
 - Do not use colors outside the defined palette.
 - Do not use more than 2 font weights.
 - Do not overcrowd the layout.
+- Do not add edge glows, tinted borders, amber/orange side casts, or decorative vignette frames.
+- Do not create inset-canvas look: no white frame border, no inner-card composition, no side fade bands, no outer padding effect.
+- Do not shrink main scene inside margins; composition must remain full-bleed to all four edges.
+- Do not place any translucent white panel behind or below the product cluster.
 - Do not make medical cure claims of any kind.
 - Do not use ring light, studio flash, or overproduced lighting.
 
@@ -59,15 +64,18 @@ QUALITY BAR - verify before accepting output
 - If any item above fails, regenerate immediately without compromise.
 
 VISUAL DIRECTION BLOCK
-- Background slot: BG-050 - Muted olive wall
-- Background seed: 1032735997
-- Seeded background direction (single sentence, exact): Muted olive background, soft warm key on a clean premium composite surface with restrained texture and ad-ready clarity, with soft foreground-to-background depth transition preserving premium focus hierarchy, lit by soft top-side illumination with refined contrast and clean edge transitions, conveying minimal clean lifestyle confidence; 45-degree three-quarter close framing, soft focus falloff, crisp subject plane and clean edge definition, primary subject held in the upper-middle 14-65% band, avoiding top UI overlap and maintaining quiet visual weight below, preserve a stable center-of-interest corridor with consistent margin protection on every side, avoid any high-importance object detail in the lower region to protect conversion UI legibility, maintain protected margin buffers so alternate crops do not clip meaningful scene structure, warm natural tones with commercial polish, designed for 4:5 feed framing with key content held inside the central safe field, centered to slightly above center, while top 10 percent, bottom 15 percent, and side edge zones remain low-priority, clean premium studio ad photography, ultra-detailed, flawless commercial finish.
+- Background slot: BG-300 - Clean slate tile floor
+- Background seed: 394220650
+- Seeded background direction (single sentence, exact): Dark slate tile floor, low wide shot on a warm natural wood tabletop with fine grain continuity and premium matte seal, with soft foreground-to-background depth transition preserving premium focus hierarchy, lit by gentle low-intensity ambient warmth with balanced soft fill and no harsh hotspots, conveying calm evening self-care wind-down; slightly elevated medium shot, balanced depth layering, gentle blur in rear context, clean central stack with subject emphasis above midpoint and strong lower-third simplicity for overlays, bias the focal center slightly upward while keeping the lower region open for captions and CTA overlays, avoid any high-importance object detail in the lower region to protect conversion UI legibility, keep focal hierarchy compact and central so multi-placement crops preserve premium readability, if a readability panel is needed, keep it in the upper text region only, with a top-anchored vertical fade to transparent before the product cluster, keep all frame edges tonally neutral with no orange, amber, or sepia cast; no border glow and no vignette halo, clean low-contrast warm grade for calm ad-ready mood, designed for 4:5 feed framing with key content held inside the central safe field, centered to slightly above center, while top 10 percent, bottom 15 percent, and side edge zones remain low-priority; avoid edge glow frames and tinted border gradients, clean premium studio ad photography, ultra-detailed, flawless commercial finish.
 - Subject: No human subject, products only.
 - Action: Arrange all 5 products as a cohesive premium cluster; kit box acts as anchor.
 - Camera: Eye-level medium framing with clean edge discipline.
 - Lighting: Warm, soft, directional (top-left) and label-safe.
 - Props: Minimal, non-competing; keep edge zones quiet.
 - Surfaces: Premium, clean texture; avoid busy patterns under text.
+- Text panel treatment: if used, keep panel in upper text zone only with vertical fade to transparent before products; never place white panel behind or below product cluster.
+- Edge color control: keep border tones neutral and natural; no orange/amber edge tint and no ornamental frame glow.
+- Edge structure control: enforce full-bleed composition to edges; reject outputs with visible inset border, side matte strip, or inner-frame card look.
 - Mood: Calm confidence and practical consistency; no hype.
 - Realism: True-to-life proportions; no stock-template look.
 

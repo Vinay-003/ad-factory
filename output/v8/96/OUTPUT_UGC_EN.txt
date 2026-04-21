@@ -7,8 +7,9 @@ PRODUCT LOCK BLOCK
 - Only permitted: placement, scaling, subtle drop shadows, mild warm lighting correction.
 
 OUTPUT SPEC
-- Canvas: 1080 x 1350 pixels. Portrait. 9:16 ratio.
+- Canvas: 1080 x 1920 pixels. Portrait. 9:16 ratio.
 - Style: UGC (creator-style authenticity, premium and clean).
+- Full-bleed requirement: scene must reach all canvas edges; no inset poster card, no inner frame, no side matte bands, no faux border margins.
 - Text policy: low text by default; all copy minimal and mobile-readable at 375px width.
 - Rendering: no compression artifacts; no soft edges on text or product labels.
 - All 5 products present, proportionally sized per reference dimensions, unmodified.
@@ -34,9 +35,9 @@ PERSONA INPUT BLOCK
 - Tone cue: Practical, empathetic, and confidence-building
 
 EXACT ON-IMAGE COPY - DO NOT ALTER ANYTHING
-- Headline: My mornings feel lighter
-- Support line: Less snacking supports steadier weight loss.
-- CTA: See How
+- Headline: I needed something that fit parent life.
+- Support line: The morning step curbed random cravings and the night step helped me stay lighter the next day.
+- CTA: See My Routine
 Render every character exactly as written. No paraphrasing, no punctuation changes, no autocorrection.
 
 NEGATIVE CONSTRAINTS
@@ -49,6 +50,8 @@ NEGATIVE CONSTRAINTS
 - Do not overcrowd the layout.
 - Do not add edge glows, tinted borders, amber/orange side casts, or decorative vignette frames.
 - Do not render unnatural or anatomically incorrect hands.
+- Do not create inset-canvas look: no white frame border, no inner-card composition, no side fade bands, no outer padding effect.
+- Do not shrink main scene inside margins; composition must remain full-bleed to all four edges.
 - Do not place any translucent white panel behind or below the product cluster.
 - Do not make medical cure claims of any kind.
 - Do not use ring light, studio flash, or overproduced lighting.
@@ -63,10 +66,10 @@ QUALITY BAR - verify before accepting output
 - If any item above fails, regenerate immediately without compromise.
 
 VISUAL DIRECTION BLOCK
-- Background slot: BG-123 - Evening balcony city glow
-- Background seed: 454565801
-- Seeded background direction (single sentence, exact): small balcony table, urban lifestyle context on a minimal matte neutral platform with crisp silhouette separation, with airy outdoor depth cues with calm natural bokeh and tidy framing, lit by mild overcast-style daylight with smooth tonal transitions and airy depth, conveying premium organic living moment; top-down flat-lay framing with controlled spacing and soft planar depth separation, clean ad layout using central containment and controlled surrounding negative space for multi-placement reliability, keep the subject mass fully inside the central safe region with no edge-anchored focal detail, keep bottom visual activity restrained so overlays remain legible across placements, ensure all critical visual information remains within the center so 1:1 center crop retains full message, soft golden morning tint with controlled saturation, designed for 4:5 feed framing with key content held inside the central safe field, centered to slightly above center, while top 10 percent, bottom 15 percent, and side edge zones remain low-priority, clean premium studio ad photography, ultra-detailed, flawless commercial finish.; maintain base scene identity and arrangement, only adapt spacing for 9:16 safe bands
-- Subject: Indian woman 27-35, natural unposed expression.
+- Background slot: BG-194 - Bedroom floor rug
+- Background seed: 1146478055
+- Seeded background direction (single sentence, exact): Soft bedroom rug texture foreground, product on low side table on a clean premium composite surface with restrained texture and ad-ready clarity, with quiet evening ambience in the background with restrained practical glow, lit by gentle low-intensity ambient warmth with balanced soft fill and no harsh hotspots, conveying cozy premium ritual with low-stress energy; tight product-forward crop with subtle macro feel and premium shallow focus, balanced feed composition inside the central safe field, with top and bottom risk bands kept visually quiet, keep the subject mass fully inside the central safe region with no edge-anchored focal detail, maintain subtle low-contrast space near the lower edge to protect feed overlay readability, keep focal hierarchy compact and central so multi-placement crops preserve premium readability, prefer narrow upper-half text haze with feathered lower edge; zero opaque overlay under the product shelf or CTA base, keep all frame edges tonally neutral with no orange, amber, or sepia cast; no border glow and no vignette halo, clean low-contrast warm grade for calm ad-ready mood, designed for 4:5 feed framing with key content held inside the central safe field, centered to slightly above center, while top 10 percent, bottom 15 percent, and side edge zones remain low-priority; avoid edge glow frames and tinted border gradients, clean premium studio ad photography, ultra-detailed, flawless commercial finish.; maintain base scene identity and arrangement, only adapt spacing for 9:16 safe bands
+- Subject: Indian woman 27-33, grounded and practical expression, everyday premium casual wear, simple ponytail; natural and unposed.
 - Action: Hold the kit box toward camera with one hand; the other products arranged on a clean surface in-frame.
 - Camera: Handheld close-to-medium framing, phone-like realism, stable focus on labels.
 - Lighting: soft indoor daylight or warm ambient; avoid ring-light glow.
@@ -74,6 +77,7 @@ VISUAL DIRECTION BLOCK
 - Surfaces: Premium, clean texture; avoid busy patterns under text.
 - Text panel treatment: if used, keep panel in upper text zone only with vertical fade to transparent before products; never place white panel behind or below product cluster.
 - Edge color control: keep border tones neutral and natural; no orange/amber edge tint and no ornamental frame glow.
+- Edge structure control: enforce full-bleed composition to edges; reject outputs with visible inset border, side matte strip, or inner-frame card look.
 - Mood: Calm confidence and practical consistency; no hype.
 - Realism: True-to-life proportions; no stock-template look; natural skin and correct hand anatomy.
 - VISUAL MATCH LOCK (from base 4:5): keep same subject identity, camera feel, lighting direction, prop family, and product arrangement; only adjust spacing/scale for aspect-ratio fit.

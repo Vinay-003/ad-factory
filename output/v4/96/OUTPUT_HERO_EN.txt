@@ -34,7 +34,7 @@ PERSONA INPUT BLOCK
 
 EXACT ON-IMAGE COPY - DO NOT ALTER ANYTHING
 - Headline: Too tired to track everything?
-- Support line: Morning fullness + night digestion support helps cut random snacking, so a calorie deficit...
+- Support line: Morning fullness + night digestion support helps cut random snacking, so a calorie deficit.
 - CTA: Check Eligibility
 Render every character exactly as written. No paraphrasing, no punctuation changes, no autocorrection.
 

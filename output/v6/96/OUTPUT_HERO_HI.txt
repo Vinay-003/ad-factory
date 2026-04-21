@@ -34,7 +34,7 @@ PERSONA INPUT BLOCK
 
 EXACT ON-IMAGE COPY - DO NOT ALTER ANYTHING
 - Headline: Workout का time नहीं? Appetite control से शुरू करें।
-- Support line: सुबह की fullness support stress-snacking कम करने में मदद करती है, जिससे weight loss...
+- Support line: सुबह की fullness support stress-snacking कम करने में मदद करती है, जिससे weight loss.
 - CTA: 15-day kit देखें
 Render every character exactly as written. No paraphrasing, no punctuation changes, no autocorrection.
 

@@ -374,6 +374,8 @@ def render_prompt(
             "- Focal hierarchy: product dominant, text secondary, background tertiary.",
             "- Product zone: central containment only, with all key pack details away from edge-risk zones.",
             "- Text zones: flat uncluttered areas only; never over busy background detail.",
+            "- CTA must be rendered as a filled rounded button chip (high-contrast), never as plain text.",
+            "- CTA button sits in lower safe band below support line with clear breathing room.",
             "- Camera framing: eye-level medium shot with natural perspective and stable horizon.",
             "- Lighting: soft, directional, premium, and clean enough to preserve label readability.",
             "- Spacing: strong whitespace between product and copy blocks; clear grid alignment; no floating elements.",
@@ -381,23 +383,29 @@ def render_prompt(
     elif fmt == "BA":
         layout_lines = [
             "- Format: BA.",
-            "- Build a split behavior story: left side = struggle context, right side = control/routine clarity.",
+            "- Build a strict split contrast story: left panel = BEFORE struggle, right panel = AFTER first meaningful win.",
+            "- Add explicit micro labels: BEFORE on left and AFTER on right (small but readable).",
+            "- Keep a visible vertical divider between panels; contrast must be obvious even on quick scroll.",
+            "- Left side expression/context should feel frustrated or stuck; right side should feel relieved/confident.",
             "- Keep products grouped near lower center bridging both halves (inside safe field).",
-            "- Place headline at top center; keep it large and simple.",
-            "- Place 2 to 3 short bullets on the right panel only; keep left panel mostly visual.",
-            "- Put CTA under bullets; keep footer area clean for platform overlays.",
+            "- Place headline at top across both panels; make pain-to-progress transition unmistakable.",
+            "- Place 2 to 3 short bullets favoring right panel outcomes; avoid generic motivational bullets.",
+            "- CTA must be rendered as a filled rounded button chip centered in lower safe band, never plain text.",
             "- Camera framing: medium lifestyle-product hybrid; premium and realistic.",
-            "- Lighting: left side slightly messier/dimmer, right side cleaner/brighter (subtle, not dramatic).",
+            "- Lighting: left side slightly flatter/dimmer, right side cleaner/brighter (subtle, not dramatic).",
         ]
     elif fmt == "TEST":
         layout_lines = [
             "- Format: TEST.",
-            "- Do not fabricate customer quotes. Use proof framing (user volume, protocol clarity, support structure).",
-            "- Layout: headline at top, trust line mid, CTA at bottom.",
-            "- Attribution line under headline to ground credibility.",
+            "- This must look evidently testimonial-first, not HERO with a person.",
+            "- Use a clear quote card or quote block as primary element with opening quote mark and first-person statement.",
+            "- Attribution must sit directly under quote (for example: Verified user / persona-matched user type).",
+            "- Trust line sits as a separate proof strip below quote card; keep hierarchy quote -> attribution -> trust proof.",
+            "- Human subject supports credibility but remains secondary to quote card; do not let product or headline dominate like HERO.",
             "- Product cluster anchored bottom-center with kit box as primary; keep all labels readable.",
+            "- CTA must be rendered as a filled rounded button chip in lower safe band, never plain text.",
             "- Text zones must be flat and low-noise; prioritize legibility over decoration.",
-            "- Camera framing: editorial product clarity shot with gentle lifestyle context.",
+            "- Camera framing: editorial testimonial scene with believable home/work context.",
             "- Lighting: clean, warm, premium; no harsh shadows; preserve label sharpness.",
         ]
     elif fmt == "FEAT":
@@ -407,6 +415,7 @@ def render_prompt(
             "- Product cluster stays center-right with kit box as anchor; all 5 products visible.",
             "- Keep spacing generous and grid aligned; avoid dense paragraphs.",
             "- Bullets must be functional benefits only; short, concrete, and readable.",
+            "- CTA must be rendered as a filled rounded button chip, never plain text.",
             "- Camera framing: medium editorial product shot with crisp detail.",
             "- Lighting: neutral-warm, confidence-led, label-safe highlights.",
             "- Background stays premium and low-noise; never compete with text.",
@@ -418,6 +427,7 @@ def render_prompt(
             "- Subject holds the kit toward camera while remaining natural and unposed; all 5 products still visible.",
             "- Headline top, support line mid, CTA bottom; keep on-image text minimal but meaningful.",
             "- UGC copy density: headline should feel complete (about 6-12 words), support line should carry a clear mechanism + outcome phrase (about 8-16 words).",
+            "- CTA must be rendered as a filled rounded button chip, never plain text.",
             "- Hands must look anatomically correct; no extra fingers or warped nails.",
             "- Camera framing: handheld close-to-medium, phone-like realism with stable focus on product labels.",
             "- Lighting: soft indoor daylight or warm ambient; avoid ring-light glow.",
@@ -585,6 +595,7 @@ def render_prompt(
     )
     lines.append("")
     lines.append("Keep on-image text minimal and mobile-readable. Avoid dense copy blocks.")
+    lines.append("Render CTA as a real filled button chip with rounded corners and strong contrast; never show CTA as standalone plain text.")
     lines.append("Typography must be pin-sharp. If any text appears soft, blurry, or smeared, regenerate.")
     lines.append("Keep text count minimal and increase font size rather than packing more copy.")
     lines.append("Use clean sans typography with strong stroke clarity; no thin/light weights for body text.")

@@ -9,6 +9,7 @@ PRODUCT LOCK BLOCK
 OUTPUT SPEC
 - Canvas: 1080 x 1350 pixels. Portrait. 4:5 ratio.
 - Style: HERO, polished enough for paid ad deployment.
+- Full-bleed requirement: scene must reach all canvas edges; no inset poster card, no inner frame, no side matte bands, no faux border margins.
 - Text policy: low text by default; all copy minimal and mobile-readable at 375px width.
 - Rendering: no compression artifacts; no soft edges on text or product labels.
 - All 5 products present, proportionally sized per reference dimensions, unmodified.
@@ -20,22 +21,24 @@ FORMAT LAYOUT INSTRUCTIONS
 - Focal hierarchy: product dominant, text secondary, background tertiary.
 - Product zone: central containment only, with all key pack details away from edge-risk zones.
 - Text zones: flat uncluttered areas only; never over busy background detail.
+- CTA must be rendered as a filled rounded button chip (high-contrast), never as plain text.
+- CTA button sits in lower safe band below support line with clear breathing room.
 - Camera framing: eye-level medium shot with natural perspective and stable horizon.
 - Lighting: soft, directional, premium, and clean enough to preserve label readability.
 - Spacing: strong whitespace between product and copy blocks; clear grid alignment; no floating elements.
 
 PERSONA INPUT BLOCK
 - Persona: TIME-STARVED PARENT (FORUM-GROUNDED) (Persona 9)
-- Pain: I am struggling to find a way to fit an hour of gym time in the schedule
-- Desire: Main pain is schedule chaos and low sleep breaking most plans.
-- Friction: I do not have time for complex plans
-- Proof needed: Real-life feasibility framing
-- Tone cue: Practical, empathetic, and confidence-building
+- Pain: रूटीन निभाना मुश्किल लग रहा है।
+- Desire: ऐसा आसान सिस्टम जो रोज निभ सके।
+- Friction: पहले के प्लान बहुत सख्त और मुश्किल थे।
+- Proof needed: साफ तरीका, भरोसेमंद सपोर्ट और व्यावहारिक प्रूफ चाहिए।
+- Tone cue: सरल, भरोसेमंद, और व्यावहारिक
 
 EXACT ON-IMAGE COPY - DO NOT ALTER ANYTHING
-- Headline: Too tired to track everything?
-- Support line: Morning fullness + night digestion support helps cut random snacking, so a calorie deficit.
-- CTA: Check Eligibility
+- Headline: दिन में जिम का घंटा नहीं? फिर भी वजन घटाने की शुरुआत हो सकती है।
+- Support line: सुबह का appetite support और रात का digestion support stress snacking घटाकर daily intake कम करने में मदद करता है, जिससे वजन घटाने की प्रगति ज्यादा steady रहती है।
+- CTA: 15-दिन रीसेट शुरू करें
 Render every character exactly as written. No paraphrasing, no punctuation changes, no autocorrection.
 
 NEGATIVE CONSTRAINTS
@@ -46,6 +49,10 @@ NEGATIVE CONSTRAINTS
 - Do not use colors outside the defined palette.
 - Do not use more than 2 font weights.
 - Do not overcrowd the layout.
+- Do not add edge glows, tinted borders, amber/orange side casts, or decorative vignette frames.
+- Do not create inset-canvas look: no white frame border, no inner-card composition, no side fade bands, no outer padding effect.
+- Do not shrink main scene inside margins; composition must remain full-bleed to all four edges.
+- Do not place any translucent white panel behind or below the product cluster.
 - Do not make medical cure claims of any kind.
 - Do not use ring light, studio flash, or overproduced lighting.
 
@@ -59,15 +66,18 @@ QUALITY BAR - verify before accepting output
 - If any item above fails, regenerate immediately without compromise.
 
 VISUAL DIRECTION BLOCK
-- Background slot: BG-050 - Muted olive wall
-- Background seed: 1032735997
-- Seeded background direction (single sentence, exact): Muted olive background, soft warm key on a clean premium composite surface with restrained texture and ad-ready clarity, with soft foreground-to-background depth transition preserving premium focus hierarchy, lit by soft top-side illumination with refined contrast and clean edge transitions, conveying minimal clean lifestyle confidence; 45-degree three-quarter close framing, soft focus falloff, crisp subject plane and clean edge definition, primary subject held in the upper-middle 14-65% band, avoiding top UI overlap and maintaining quiet visual weight below, preserve a stable center-of-interest corridor with consistent margin protection on every side, avoid any high-importance object detail in the lower region to protect conversion UI legibility, maintain protected margin buffers so alternate crops do not clip meaningful scene structure, warm natural tones with commercial polish, designed for 4:5 feed framing with key content held inside the central safe field, centered to slightly above center, while top 10 percent, bottom 15 percent, and side edge zones remain low-priority, clean premium studio ad photography, ultra-detailed, flawless commercial finish.
+- Background slot: BG-173 - Pale yellow accent wall
+- Background seed: 86330544
+- Seeded background direction (single sentence, exact): Muted warm yellow accent wall, white shelf on a clean premium composite surface with restrained texture and ad-ready clarity, with minimal contextual backdrop with elegant bokeh falloff and clean negative space, lit by neutral indoor daylight blend with smooth fill and controlled shadow detail, conveying natural polished habit-first setting; eye-level medium framing, 50mm-equivalent perspective, shallow depth of field with smooth background blur, stable mid-column framing that keeps key elements in the safe middle while preserving unobtrusive bottom space, prioritize central hierarchy and avoid any composition that relies on top, bottom, or side edge information, keep bottom-frame textures soft and unobtrusive, with no key content entering the CTA band, maintain protected margin buffers so alternate crops do not clip meaningful scene structure, if a readability panel is needed, keep it in the upper text region only, with a top-anchored vertical fade to transparent before the product cluster, keep all frame edges tonally neutral with no orange, amber, or sepia cast; no border glow and no vignette halo, soft golden tint with restrained premium saturation, designed for 4:5 feed framing with key content held inside the central safe field, centered to slightly above center, while top 10 percent, bottom 15 percent, and side edge zones remain low-priority; avoid edge glow frames and tinted border gradients, clean premium studio ad photography, ultra-detailed, flawless commercial finish.
 - Subject: No human subject, products only.
 - Action: Arrange all 5 products as a cohesive premium cluster; kit box acts as anchor.
 - Camera: Eye-level medium framing with clean edge discipline.
 - Lighting: Warm, soft, directional (top-left) and label-safe.
 - Props: Minimal, non-competing; keep edge zones quiet.
 - Surfaces: Premium, clean texture; avoid busy patterns under text.
+- Text panel treatment: if used, keep panel in upper text zone only with vertical fade to transparent before products; never place white panel behind or below product cluster.
+- Edge color control: keep border tones neutral and natural; no orange/amber edge tint and no ornamental frame glow.
+- Edge structure control: enforce full-bleed composition to edges; reject outputs with visible inset border, side matte strip, or inner-frame card look.
 - Mood: Calm confidence and practical consistency; no hype.
 - Realism: True-to-life proportions; no stock-template look.
 
@@ -81,6 +91,7 @@ TYPOGRAPHY SHARPNESS BLOCK
 - If any text is soft, blurry, or illegible, discard and regenerate immediately.
 
 Keep on-image text minimal and mobile-readable. Avoid dense copy blocks.
+Render CTA as a real filled button chip with rounded corners and strong contrast; never show CTA as standalone plain text.
 Typography must be pin-sharp. If any text appears soft, blurry, or smeared, regenerate.
 Keep text count minimal and increase font size rather than packing more copy.
 Use clean sans typography with strong stroke clarity; no thin/light weights for body text.

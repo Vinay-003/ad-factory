@@ -199,7 +199,7 @@ PERSONA INPUT BLOCK
 
 EXACT ON-IMAGE COPY - DO NOT ALTER ANYTHING
 - Headline: I finally have a doable morning reset.
-- Support line: Real-life feasibility framing; Morning appetite support helps reduce urge spikes so...
+- Support line: Real-life feasibility framing; Morning appetite support helps reduce urge spikes so daily consistency is easier.
 - CTA: See routine
 Render every character exactly as written. No paraphrasing, no punctuation changes, no autocorrection.
 
