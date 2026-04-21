@@ -66,11 +66,9 @@ Bootstrap does all of this:
    - `productinfomain.txt`
    - `PRODUCT_MECHANISM_V1.txt`
    - `faq.txt`
-   - `PERSONA_DEEP_DIVE_01_05.txt`
    - `input/activeimages.txt`
 
 2. Retrieval scripts extract only required slices:
-   - `scripts/extract_persona.py`
    - `scripts/extract_format_rules.py`
    - `scripts/extract_product_context.py`
 
@@ -98,7 +96,6 @@ The dashboard does deterministic retrieval first, then generation.
 
 1. User selects persona + format in UI.
 2. Backend runs extraction scripts (no full-file LLM reads):
-   - `scripts/extract_persona.py` from `PERSONA_DEEP_DIVE_01_05.txt`
    - `scripts/extract_format_rules.py` from `AD_CREATIVE_SYSTEM_PLAYBOOK.md`
    - `scripts/extract_product_context.py` from product files
 3. Backend builds compact `run_context.json` in run storage.
@@ -116,5 +113,4 @@ This removes token-heavy "read whole docs" behavior and sends only relevant slic
 
 ## Notes
 
-- `PERSONA_DEEP_DIVE_01_05.txt` remains source of truth for persona text.
-- If CSV is uploaded without TXT, backend converts CSV to TXT using `scripts/generate_persona_txt.py` inside run storage.
+- Persona selection now uses the persona library embedded in `AD_CREATIVE_SYSTEM_PLAYBOOK.md`.

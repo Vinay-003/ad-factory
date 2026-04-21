@@ -25,8 +25,6 @@ RUNS_ROOT = STORAGE_ROOT / "runs"
 DEFAULT_PRODUCT_INFO = ROOT / "productinfomain.txt"
 DEFAULT_MECHANISM = ROOT / "PRODUCT_MECHANISM_V1.txt"
 DEFAULT_FAQ = ROOT / "faq.txt"
-DEFAULT_PERSONA_TXT = ROOT / "PERSONA_DEEP_DIVE_01_05.txt"
-DEFAULT_PERSONA_CSV = ROOT / "PERSONA_DEEP_DIVE_FIRST5_FORUM_GROUNDED.csv"
 DEFAULT_PLAYBOOK = ROOT / "AD_CREATIVE_SYSTEM_PLAYBOOK.md"
 DEFAULT_ACTIVE_IMAGES = ROOT / "input" / "activeimages.txt"
 
@@ -75,6 +73,30 @@ def parse_persona_library(playbook_path: Path) -> list[dict[str, Any]]:
     for m in pattern.finditer(block):
         out.append({"number": int(m.group(1)), "name": m.group(2).strip()})
     return out
+
+
+def build_persona_payload(persona_number: int, personas: list[dict[str, Any]]) -> dict[str, Any]:
+    persona_name = f"Persona {persona_number}"
+    for item in personas:
+        if int(item.get("number") or 0) == persona_number:
+            name = str(item.get("name") or "").strip()
+            if name:
+                persona_name = name
+            break
+    return {
+        "persona_number": persona_number,
+        "persona_name": persona_name,
+        "pain_points": [],
+        "trigger_scenarios": [],
+        "objections": [],
+        "language_bank": [],
+        "core_message": [],
+        "grounded_mechanism_map": [],
+        "how_kit_solves": [],
+        "trust_anchors": [],
+        "english_ready": [],
+        "hindi_ready": [],
+    }
 
 
 def read_active_images(path: Path) -> list[str]:
@@ -233,454 +255,14 @@ def choose_text(items: list[str], fallback: str) -> str:
 
 
 def shorten_copy_line(text: str, limit: int = 92) -> str:
-    _ = limit
-    return " ".join((text or "").split()).strip()
-
-
-def polish_ba_headline(headline: str, lang: str, persona: dict[str, Any]) -> str:
-    clean = " ".join((headline or "").split()).strip()
-    if not clean:
-        return ""
-
-    low = clean.lower()
-    looks_literal_ba = (
-        ("before" in low and "after" in low)
-        or low.startswith("before:")
-        or low.startswith("after:")
-        or "before/after" in low
-    )
-
-    if not looks_literal_ba:
+    clean = " ".join((text or "").split())
+    if len(clean) <= limit:
         return clean
-
-    if lang == "EN":
-        pain = _clean_str(persona.get("pain_en"))
-        desire = _clean_str(persona.get("desire_en"))
-        if pain and desire:
-            return shorten_copy_line(f"From {pain.rstrip('.')} to {desire.rstrip('.')}.", limit=86)
-        return "From craving chaos to consistent daily control."
-
-    pain_hi = _clean_str(persona.get("pain_hi"))
-    desire_hi = _clean_str(persona.get("desire_hi"))
-    if pain_hi and desire_hi:
-        return shorten_copy_line(f"{pain_hi.rstrip('।')} से {desire_hi.rstrip('।')} तक।", limit=86)
-    return "बिखरे खाने की आदत से रोज़ाना बेहतर नियंत्रण तक।"
-
-
-def _word_count(text: str) -> int:
-    return len([x for x in re.split(r"\s+", (text or "").strip()) if x])
-
-
-def finalize_copy_sentence(text: str, lang: str, field: str = "support_line") -> str:
-    line = " ".join((text or "").split()).strip()
-    if not line:
-        return ""
-
-    if lang == "EN":
-        line = re.sub(r"\bthe next\.$", "the next day.", line, flags=re.IGNORECASE)
-        line = re.sub(r"\band improve\.$", "and improve consistency.", line, flags=re.IGNORECASE)
-        line = re.sub(r"\bso weight\.$", "so weight-loss consistency stays on track.", line, flags=re.IGNORECASE)
-        line = re.sub(r"\bmaking\.$", "making adherence easier to sustain.", line, flags=re.IGNORECASE)
-        line = re.sub(r"\bfollow weight loss more\.$", "follow weight-loss guidance more consistently.", line, flags=re.IGNORECASE)
-        bare = re.sub(r"[.!?]+$", "", line).strip()
-        if bare:
-            last_word = bare.split()[-1].lower()
-            dangling_words = {
-                "and",
-                "or",
-                "so",
-                "to",
-                "for",
-                "with",
-                "without",
-                "in",
-                "on",
-                "at",
-                "of",
-                "than",
-                "then",
-                "because",
-                "while",
-                "through",
-            }
-            if last_word in dangling_words:
-                line = bare.rstrip(",;:")
-                if field == "trust_line":
-                    line += " to support steadier long-term consistency."
-                else:
-                    line += " so consistency stays easier each day."
-            elif last_word in {"weight", "improve", "next"}:
-                repair_map = {
-                    "weight": "weight-loss consistency stays on track.",
-                    "improve": "improve consistency.",
-                    "next": "next day.",
-                }
-                line = bare + " " + repair_map[last_word]
-    else:
-        line = re.sub(r"\bऔर सुधार\.$", "और सुधार में मदद करती है।", line)
-
-    if line and line[-1] not in ".!?।":
-        line += "।" if lang == "HI" else "."
-    return line
-
-
-def strengthen_ugc_copy(headline: str, support: str, lang: str, persona: dict[str, Any]) -> tuple[str, str]:
-    head = " ".join((headline or "").split()).strip()
-    sup = " ".join((support or "").split()).strip()
-
-    if lang == "EN":
-        if _word_count(head) < 6:
-            desire = _clean_str(persona.get("desire_en"))
-            base = desire if desire else "Build steadier daily control that actually lasts"
-            head = shorten_copy_line(base.rstrip(".") + ".", limit=90)
-        if _word_count(sup) < 8:
-            proof = _clean_str(persona.get("proof_needed_en"))
-            fallback = "Morning appetite support helps reduce urge spikes so consistency stays easier each day."
-            sup = shorten_copy_line((proof + "; " + fallback) if proof else fallback, limit=92)
-        return head, sup
-
-    if _word_count(head) < 6:
-        desire_hi = _clean_str(persona.get("desire_hi"))
-        base_hi = desire_hi if desire_hi else "रोज़मर्रा नियंत्रण को टिकाऊ बनाने वाला सरल बदलाव"
-        head = shorten_copy_line(base_hi.rstrip("।") + "।", limit=90)
-    if _word_count(sup) < 8:
-        fallback_hi = "सुबह की appetite support urge spikes कम करके रोज़ाना consistency बनाए रखने में मदद करती है।"
-        sup = shorten_copy_line(fallback_hi, limit=92)
-    return head, sup
-
-
-GENERIC_BROKEN_PHRASES = {
-    "- new angle",
-    "- fresh perspective",
-    "- revised focus",
-    "- नया एंगल",
-    "- अलग दृष्टिकोण",
-    "- नया फोकस",
-    "for steadier day-to-day consistency",
-    "so appetite control stays easier daily",
-    "to lower craving pressure through the day",
-    "for more reliable routine adherence",
-    "for sustained consistency",
-    "जिससे निरंतरता बनी रहे",
-}
-
-
-EN_STOPWORDS = {
-    "a",
-    "an",
-    "and",
-    "are",
-    "as",
-    "at",
-    "be",
-    "by",
-    "for",
-    "from",
-    "how",
-    "if",
-    "in",
-    "into",
-    "is",
-    "it",
-    "of",
-    "on",
-    "or",
-    "so",
-    "still",
-    "that",
-    "the",
-    "this",
-    "to",
-    "we",
-    "when",
-    "with",
-    "your",
-    "you",
-}
-
-
-HI_STOPWORDS = {
-    "और",
-    "एक",
-    "का",
-    "की",
-    "के",
-    "को",
-    "पर",
-    "में",
-    "यह",
-    "जो",
-    "से",
-    "तक",
-    "तो",
-    "भी",
-    "या",
-    "है",
-    "हैं",
-    "था",
-    "थी",
-    "थे",
-    "कर",
-    "करें",
-    "करे",
-    "लिए",
-    "अपना",
-    "अपने",
-    "अपनी",
-    "आप",
-    "अब",
-    "आज",
-    "रोज़",
-}
-
-
-def _is_generic_or_broken_line(text: str, lang: str) -> bool:
-    line = " ".join((text or "").split()).strip()
-    if not line:
-        return True
-
-    low = line.lower()
-    for phrase in GENERIC_BROKEN_PHRASES:
-        if phrase in low:
-            return True
-
-    if lang == "EN":
-        if re.search(r"\b(and|or|so|to|for|with|because|while|through|than|then)$", low):
-            return True
-    return False
-
-
-def collect_copy_quality_issues(copy_json: dict[str, Any]) -> list[dict[str, Any]]:
-    issues: list[dict[str, Any]] = []
-    ads = copy_json.get("ads")
-    if not isinstance(ads, list):
-        return issues
-
-    for idx, ad in enumerate(ads):
-        if not isinstance(ad, dict):
-            continue
-        fmt = _clean_str(ad.get("format")).upper()
-        copy = ad.get("copy")
-        if not isinstance(copy, dict):
-            continue
-
-        for lang in ["EN", "HI"]:
-            block = copy.get(lang)
-            if not isinstance(block, dict):
-                continue
-
-            headline = _clean_str(block.get("headline"))
-            if _is_generic_or_broken_line(headline, lang):
-                issues.append(
-                    {
-                        "ad_index": idx,
-                        "language": lang,
-                        "field": "headline",
-                        "reason": "Headline is generic, broken, or contains banned filler.",
-                    }
-                )
-
-            if fmt in {"HERO", "UGC"}:
-                support = _clean_str(block.get("support_line"))
-                if _is_generic_or_broken_line(support, lang):
-                    issues.append(
-                        {
-                            "ad_index": idx,
-                            "language": lang,
-                            "field": "support_line",
-                            "reason": "Support line is generic, broken, or contains banned filler.",
-                        }
-                    )
-                    continue
-
-                if lang == "EN":
-                    if _word_count(headline) < 5:
-                        issues.append(
-                            {
-                                "ad_index": idx,
-                                "language": lang,
-                                "field": "headline",
-                                "reason": "Headline is too short and reads like a fragment.",
-                            }
-                        )
-                    if _word_count(support) < 8:
-                        issues.append(
-                            {
-                                "ad_index": idx,
-                                "language": lang,
-                                "field": "support_line",
-                                "reason": "Support line is too short and likely non-explanatory.",
-                            }
-                        )
-
-            elif fmt == "TEST":
-                trust_line = _clean_str(block.get("trust_line"))
-                if _is_generic_or_broken_line(trust_line, lang):
-                    issues.append(
-                        {
-                            "ad_index": idx,
-                            "language": lang,
-                            "field": "trust_line",
-                            "reason": "Trust line is generic, broken, or contains banned filler.",
-                        }
-                    )
-
-                if lang == "EN":
-                    first_person = bool(re.search(r"\b(i|i'm|i’ve|my|me)\b", headline.lower()))
-                    quote_style = '"' in headline or "'" in headline
-                    if not first_person and not quote_style:
-                        issues.append(
-                            {
-                                "ad_index": idx,
-                                "language": lang,
-                                "field": "headline",
-                                "reason": "TEST headline should read like a testimonial voice, not hero-style claim.",
-                            }
-                        )
-                else:
-                    first_person_hi = bool(re.search(r"(मैं|मेरी|मेरे|मुझे)", headline))
-                    quote_style_hi = '"' in headline or "'" in headline
-                    if not first_person_hi and not quote_style_hi:
-                        issues.append(
-                            {
-                                "ad_index": idx,
-                                "language": lang,
-                                "field": "headline",
-                                "reason": "TEST headline should sound testimonial in first-person voice.",
-                            }
-                        )
-
-    return issues
-
-
-def call_opencode_repair_quality(
-    config: dict[str, Any],
-    context: dict[str, Any],
-    current_copy: dict[str, Any],
-    quality_issues: list[dict[str, Any]],
-    run_dir: Path,
-) -> dict[str, Any] | None:
-    api_url = (config.get("opencode_api_url") or "").strip()
-    model = (config.get("opencode_model") or "gpt-5.3-codex").strip()
-    if not api_url:
-        return None
-
-    payload = {
-        "task": "Repair copy coherence and quality issues only",
-        "rules": [
-            "Return valid JSON only",
-            "Keep existing structure and fields",
-            "Only change flagged fields",
-            "Support line must directly answer the headline angle for same ad/language",
-            "For time-starved/busy context, support must explain why routine fits hectic schedule",
-            "Use concrete persona language; avoid generic filler and broken phrases",
-            "Never append mechanical suffixes like new angle/fresh perspective",
-        ],
-        "issues": quality_issues,
-        "current_copy": current_copy,
-        "context": context,
-    }
-
-    prompt = (
-        "You are fixing ad copy JSON quality failures. "
-        "Return only corrected JSON object with keys default_aspect_ratio and ads.\n\n"
-        + json.dumps(payload, ensure_ascii=False)
-    )
-
-    cmd = [
-        "opencode",
-        "run",
-        "--attach",
-        api_url,
-        "--model",
-        model,
-        "--format",
-        "json",
-        prompt,
-    ]
-    password = (config.get("opencode_api_key") or "").strip() or os.getenv("OPENCODE_SERVER_PASSWORD", "").strip()
-    if password:
-        cmd.extend(["--password", password])
-
-    result = run_cmd(cmd, cwd=ROOT)
-    if result.returncode != 0:
-        (run_dir / "logs" / "opencode_quality_repair_error.txt").write_text(
-            f"Quality repair command failed\nSTDOUT:\n{result.stdout}\n\nSTDERR:\n{result.stderr}", encoding="utf-8"
-        )
-        return None
-
-    text_chunks: list[str] = []
-    for raw_line in result.stdout.splitlines():
-        line = raw_line.strip()
-        if not line:
-            continue
-        try:
-            event = json.loads(line)
-        except json.JSONDecodeError:
-            continue
-        if event.get("type") != "text":
-            continue
-        part = event.get("part") or {}
-        text = part.get("text")
-        if isinstance(text, str) and text.strip():
-            text_chunks.append(text.strip())
-
-    if not text_chunks:
-        return None
-
-    content = "\n".join(text_chunks)
-    return parse_json_object_from_text(content)
-
-
-def apply_local_quality_fixes(copy_json: dict[str, Any], quality_issues: list[dict[str, Any]]) -> dict[str, Any]:
-    cloned = json.loads(json.dumps(copy_json, ensure_ascii=False))
-    ads = cloned.get("ads")
-    if not isinstance(ads, list):
-        return cloned
-
-    for issue in quality_issues:
-        if not isinstance(issue, dict):
-            continue
-        idx = issue.get("ad_index")
-        lang = issue.get("language")
-        field = issue.get("field")
-        reason = _clean_str(issue.get("reason"))
-        if not isinstance(idx, int) or idx < 0 or idx >= len(ads):
-            continue
-        if lang not in {"EN", "HI"}:
-            continue
-
-        ad = ads[idx]
-        if not isinstance(ad, dict):
-            continue
-        copy = ad.get("copy")
-        if not isinstance(copy, dict):
-            continue
-        block = copy.get(lang)
-        if not isinstance(block, dict):
-            continue
-
-        if field == "support_line" and "time-starved/busy schedule" in reason:
-            support = _clean_str(block.get("support_line"))
-            if not support:
-                continue
-            if lang == "EN":
-                if not re.search(r"\b(busy|hectic|packed|schedule|day)\b", support.lower()):
-                    block["support_line"] = f"Built for hectic schedules, {support[0].lower() + support[1:]}"
-            else:
-                if not re.search(r"(व्यस्त|शेड्यूल|दिन|समय)", support):
-                    block["support_line"] = f"व्यस्त दिनों में भी निभ सके, {support}"
-
-        if field == "headline" and "testimonial" in reason.lower():
-            headline = _clean_str(block.get("headline"))
-            if not headline:
-                continue
-            if lang == "EN" and not re.search(r"\b(i|i'm|i’ve|my|me)\b", headline.lower()):
-                block["headline"] = f'"{headline}"'
-            if lang == "HI" and not re.search(r"(मैं|मेरी|मेरे|मुझे)", headline):
-                block["headline"] = f'"{headline}"'
-
-    return cloned
+    clipped = clean[:limit].rstrip(" ,;:-")
+    last_space = clipped.rfind(" ")
+    if last_space > 24:
+        clipped = clipped[:last_space]
+    return clipped + "..."
 
 
 def strip_internal_marker(text: str) -> str:
@@ -937,8 +519,6 @@ def normalize_generated_copy(
             headline = _clean_str(src_lang.get("headline"))
             cta = _clean_str(src_lang.get("cta"))
             if headline:
-                if fmt == "BA":
-                    headline = polish_ba_headline(headline, lang, persona)
                 base_lang["headline"] = shorten_copy_line(headline, limit=90)
             if cta:
                 base_lang["cta"] = cta
@@ -946,12 +526,7 @@ def normalize_generated_copy(
             if fmt in {"HERO", "UGC"}:
                 support = _clean_str(src_lang.get("support_line"))
                 if support:
-                    if fmt == "UGC":
-                        tuned_headline, tuned_support = strengthen_ugc_copy(base_lang.get("headline", ""), support, lang, persona)
-                        base_lang["headline"] = shorten_copy_line(tuned_headline, limit=90)
-                        base_lang["support_line"] = finalize_copy_sentence(shorten_copy_line(tuned_support), lang, field="support_line")
-                    else:
-                        base_lang["support_line"] = finalize_copy_sentence(shorten_copy_line(support), lang, field="support_line")
+                    base_lang["support_line"] = shorten_copy_line(support)
             elif fmt in {"BA", "FEAT"}:
                 bullets = _clean_bullets(src_lang.get("bullets"))
                 if len(bullets) >= 2:
@@ -962,7 +537,7 @@ def normalize_generated_copy(
                 if attribution:
                     base_lang["attribution"] = shorten_copy_line(attribution, limit=86)
                 if trust:
-                    base_lang["trust_line"] = finalize_copy_sentence(shorten_copy_line(trust), lang, field="trust_line")
+                    base_lang["trust_line"] = shorten_copy_line(trust)
 
     return base
 
@@ -1065,25 +640,9 @@ def call_opencode_compatible(config: dict[str, Any], context: dict[str, Any], ru
         return None
 
     language_mode = resolve_language_mode(config)
-    language_notes = {
-        "ALL": "Provide natural EN and HI copy.",
-        "EN": "Prioritize EN clarity; keep HI accurate and concise.",
-        "HI": "Prioritize HI clarity; keep EN accurate and concise.",
-        "HINGLISH": "Use Hinglish (Roman Hindi mix) style in EN fields; keep HI fields in Devanagari Hindi.",
-    }
-
     system = (
         "You generate ad copy JSON only. Return valid JSON with keys default_aspect_ratio and ads. "
-        "Each ads item must include format, headline_angle, persona fields and copy.EN/copy.HI fields compatible with assembler. "
-        "For BA headline, do not output literal 'Before: ... After: ...' construction; use a natural transformation hook. "
-        "For UGC: avoid ultra-short copy fragments; headline should read like a complete thought and support line must include mechanism + outcome in natural language. "
-        "For all formats with support lines, make support explicitly answer the headline promise for that persona (why it is doable in their real life), not a generic mechanism line. "
-        "For HERO/UGC support lines, use 3-part logic in one sentence: persona-life constraint -> mechanism step -> practical outcome, and mirror at least one phrase from persona pain/friction. "
-        "When headline/persona implies time pressure, support must explain schedule-fit (why this is doable on busy days), not just generic mechanism. "
-        "For TEST: headline must sound like a testimonial (first-person or quote-led), not a generic hero claim. "
-        "For BA: ensure clear before-vs-after contrast language, not a generic single-state line. "
-        "CTA text should be concise and button-ready action language (2-5 words). "
-        + language_notes.get(language_mode, language_notes["ALL"])
+        "Each ads item must include format, headline_angle, persona fields and copy.EN/copy.HI fields compatible with assembler."
     )
     user_payload = {
         "task": "Generate fresh ad copy JSON for provided context.",
@@ -1347,8 +906,6 @@ def api_defaults() -> dict[str, Any]:
             "product_info": str(DEFAULT_PRODUCT_INFO.relative_to(ROOT)),
             "mechanism": str(DEFAULT_MECHANISM.relative_to(ROOT)),
             "faq": str(DEFAULT_FAQ.relative_to(ROOT)),
-            "persona_txt": str(DEFAULT_PERSONA_TXT.relative_to(ROOT)),
-            "persona_csv": str(DEFAULT_PERSONA_CSV.relative_to(ROOT)),
             "playbook": str(DEFAULT_PLAYBOOK.relative_to(ROOT)),
         },
         "opencode": opencode,
@@ -1465,8 +1022,6 @@ async def api_run_execute(
     product_info_file: UploadFile | None = File(None),
     mechanism_file: UploadFile | None = File(None),
     faq_file: UploadFile | None = File(None),
-    persona_txt_file: UploadFile | None = File(None),
-    persona_csv_file: UploadFile | None = File(None),
     active_images_file: UploadFile | None = File(None),
 ) -> dict[str, Any]:
     ensure_dirs()
@@ -1484,30 +1039,11 @@ async def api_run_execute(
     product_path = save_upload(run_dir / "inputs" / "productinfomain.txt", product_info_file)
     mechanism_path = save_upload(run_dir / "inputs" / "PRODUCT_MECHANISM_V1.txt", mechanism_file)
     faq_path = save_upload(run_dir / "inputs" / "faq.txt", faq_file)
-    persona_txt_path = save_upload(run_dir / "inputs" / "PERSONA_DEEP_DIVE_01_05.txt", persona_txt_file)
-    persona_csv_path = save_upload(run_dir / "inputs" / "PERSONA_DEEP_DIVE_FIRST5_FORUM_GROUNDED.csv", persona_csv_file)
     active_images_path = save_upload(run_dir / "inputs" / "activeimages.txt", active_images_file)
-
-    if persona_csv_path and not persona_txt_path:
-        result = run_cmd(
-            [
-                "python3",
-                "scripts/generate_persona_txt.py",
-                "--csv",
-                str(persona_csv_path),
-                "--output",
-                str(run_dir / "inputs" / "PERSONA_DEEP_DIVE_01_05.txt"),
-            ],
-            cwd=ROOT,
-        )
-        if result.returncode != 0:
-            raise HTTPException(status_code=500, detail=f"persona conversion failed: {result.stderr.strip()}")
-        persona_txt_path = run_dir / "inputs" / "PERSONA_DEEP_DIVE_01_05.txt"
 
     product_file = coalesce_path(product_path, DEFAULT_PRODUCT_INFO)
     mechanism_file_path = coalesce_path(mechanism_path, DEFAULT_MECHANISM)
     faq_file_path = coalesce_path(faq_path, DEFAULT_FAQ)
-    persona_file = coalesce_path(persona_txt_path, DEFAULT_PERSONA_TXT)
 
     if not active_images_path:
         override_urls = cfg.get("active_image_urls") or []
@@ -1538,24 +1074,12 @@ async def api_run_execute(
     )
     product_ctx = parse_json_stdout(product_ctx_result, "extract_product_context")
 
+    persona_library = parse_persona_library(DEFAULT_PLAYBOOK)
     ads_context: list[dict[str, Any]] = []
     for item in plan:
         persona_no = item["persona"]
         fmt = item["format"]
-
-        persona_result = run_cmd(
-            [
-                "python3",
-                "scripts/extract_persona.py",
-                "--input",
-                str(persona_file),
-                "--persona",
-                str(persona_no),
-                "--json",
-            ],
-            cwd=ROOT,
-        )
-        persona_payload = parse_json_stdout(persona_result, f"extract_persona({persona_no})")
+        persona_payload = build_persona_payload(persona_no, persona_library)
 
         format_result = run_cmd(
             [
@@ -1592,24 +1116,6 @@ async def api_run_execute(
     copy_json = normalize_generated_copy(copy_json, full_context, run_id)
     copy_json = strip_internal_markers_from_payload(copy_json)
 
-    quality_issues = collect_copy_quality_issues(copy_json)
-    if quality_issues:
-        copy_json = apply_local_quality_fixes(copy_json, quality_issues)
-        quality_issues = collect_copy_quality_issues(copy_json)
-
-    if quality_issues:
-        repaired_quality = call_opencode_repair_quality(cfg, full_context, copy_json, quality_issues, run_dir)
-        if repaired_quality:
-            copy_json = normalize_generated_copy(repaired_quality, full_context, run_id)
-            copy_json = strip_internal_markers_from_payload(copy_json)
-            quality_issues = collect_copy_quality_issues(copy_json)
-
-    if quality_issues:
-        (run_dir / "logs" / "copy_quality_error.json").write_text(
-            json.dumps({"issues": quality_issues}, ensure_ascii=False, indent=2) + "\n",
-            encoding="utf-8",
-        )
-
     copy_file = run_dir / "context" / "copy_batch.json"
     copy_file.write_text(json.dumps(copy_json, ensure_ascii=False, indent=2) + "\n", encoding="utf-8")
 
@@ -1634,23 +1140,6 @@ async def api_run_execute(
             if repaired:
                 copy_json = normalize_generated_copy(repaired, full_context, run_id)
                 copy_json = strip_internal_markers_from_payload(copy_json)
-                quality_issues = collect_copy_quality_issues(copy_json)
-                if quality_issues:
-                    copy_json = apply_local_quality_fixes(copy_json, quality_issues)
-                    quality_issues = collect_copy_quality_issues(copy_json)
-
-                if quality_issues:
-                    repaired_quality = call_opencode_repair_quality(cfg, full_context, copy_json, quality_issues, run_dir)
-                    if repaired_quality:
-                        copy_json = normalize_generated_copy(repaired_quality, full_context, run_id)
-                        copy_json = strip_internal_markers_from_payload(copy_json)
-                        quality_issues = collect_copy_quality_issues(copy_json)
-
-                if quality_issues:
-                    (run_dir / "logs" / "copy_quality_retry_error.json").write_text(
-                        json.dumps({"issues": quality_issues}, ensure_ascii=False, indent=2) + "\n",
-                        encoding="utf-8",
-                    )
                 copy_file.write_text(json.dumps(copy_json, ensure_ascii=False, indent=2) + "\n", encoding="utf-8")
 
                 retry = run_cmd(

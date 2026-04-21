@@ -55,12 +55,10 @@ Use only approved claims and context from `productinfomain.txt`.
 Use `PRODUCT_MECHANISM_V1.txt` as the mechanism-model file derived from `productinfomain.txt`.
 
 Persona language source:
-- Use `PERSONA_DEEP_DIVE_01_05.txt` as the active bridge file for persona-specific ad language.
-- This file adds: raw pain lines, trigger scenarios, objections, language bank, mechanism match, and trust anchors.
-- Operational generation mode is L1+L2 only: use Layer 1 (Raw Persona Truth) + Layer 2 (Message Strategy) as the copy source.
-- When a covered persona is selected, pull wording and proof angles from Layer 1 and Layer 2 before writing headlines, captions, hooks, or testimonial-style language.
-- Do not invent generic persona language when a deep-dive entry already exists.
-- Current coverage in the deep-dive file: personas 1-22.
+- Use the persona library in this playbook as the source of persona identity and intent.
+- For each selected persona, define copy inputs using the 5-field model: pain, desire, friction, proof needed, tone cue.
+- Compose fresh copy each run from those fields and product/mechanism constraints.
+- Do not depend on external deep-dive persona files during runtime.
 
 Mechanism grounding rules:
 - Use `productinfomain.txt`, `faq.txt`, and `PRODUCT_MECHANISM_V1.txt` together.
@@ -192,27 +190,23 @@ For each persona, define these 5 fields before writing copy:
 - Proof needed: what makes them believe
 - Tone cue: how the voice should feel
 
-Deep-dive expansion rule:
-- If the selected persona exists in `PERSONA_DEEP_DIVE_01_05.txt`, treat that file as the working persona brief.
-- Pull ad inputs from these blocks when present: Pain Points, Trigger Scenarios, Objections, Language Bank, Mechanism Match, Trust Anchors.
-- Use the exact natural phrasing style from the deep-dive file to avoid generic copy.
+Persona construction rule:
+- Build persona context directly from the selected persona number/name plus the 5 required fields.
 - Mechanism lines must explain the product in simple relatable terms, not abstract health language.
-- Trust angles must match the persona-specific proof preferences from the deep-dive file.
+- Trust angles must map to the selected persona's proof-needed field.
 
-L1+L2 rendering workflow (mandatory):
-- Step 1: Read Layer 1 - Raw Persona Truth to understand how the person actually thinks and speaks.
-- Step 2: Read `productinfomain.txt` for approved claims and product boundaries.
-- Step 2b: Read `faq.txt` for protocol details, restrictions, and edge-case usage rules.
-- Step 3: Read `PRODUCT_MECHANISM_V1.txt` to lock the allowed product behavior.
-- Step 4: Read Layer 2 - Message Strategy to choose the right pain angle, mechanism angle, and trust angle.
-- Step 5: Compose all final ad copy freshly from Layer 1 + Layer 2 only in the requested language.
-- Do not translate raw Hinglish lines word-for-word into ad copy. Use them to understand emotion first, then render cleanly in the target language.
-- Keep the underlying pain, mechanism, and trust angle consistent across all language outputs.
-- When using persona mechanism sections, map the persona's eating behavior to the product's approved behavior change from `PRODUCT_MECHANISM_V1.txt`.
-- When protocol-specific details are needed, such as timing, fasting window, support, restrictions, or usage caveats, pull them from `faq.txt` rather than inventing them.
+Rendering workflow (mandatory):
+- Step 1: Read selected persona from the playbook persona library.
+- Step 2: Define pain/desire/friction/proof needed/tone cue for that persona.
+- Step 3: Read `productinfomain.txt` for approved claims and product boundaries.
+- Step 3b: Read `faq.txt` for protocol details, restrictions, and edge-case usage rules.
+- Step 4: Read `PRODUCT_MECHANISM_V1.txt` to lock the allowed product behavior.
+- Step 5: Compose all final ad copy freshly in the requested language.
+- Keep pain, mechanism, and trust angle consistent across language outputs.
+- When protocol-specific details are needed (timing, fasting window, restrictions, caveats), pull them from `faq.txt` rather than inventing them.
 
 Fresh composition rule (mandatory):
-- Every headline/support/CTA/bullet must be freshly composed from Layer 1 + Layer 2 strategy.
+- Every headline/support/CTA/bullet must be freshly composed from persona fields + mechanism strategy.
 - Keep mechanism truth constant, but vary sentence rhythm, opening pattern, and proof framing.
 - In one batch, avoid repeating the same opening pattern across formats (for example, repeated "When...", "If...", "No..." starts).
 - Scale rule for high-volume production: rotate at least one major copy axis per ad (hook structure, proof style, sacrifice framing, or CTA voice), while keeping claims compliant.
@@ -824,7 +818,7 @@ Decision policy (mandatory):
 - Do not narrate internal workflow steps (for example: "reading files", "extracting sections", "checking patterns"). Return only final outputs and blockers.
 
 Read-scope rule for `create ads` (mandatory):
-- Read only required sources: this playbook, `productinfomain.txt`, `faq.txt`, `PRODUCT_MECHANISM_V1.txt`, `PERSONA_DEEP_DIVE_01_05.txt`, `BACKGROUND_VARIANTS.JSON`, `background_variant.json`, `AD_GENERATION_REGISTRY.JSON`.
+- Read only required sources: this playbook, `productinfomain.txt`, `faq.txt`, `PRODUCT_MECHANISM_V1.txt`, `BACKGROUND_VARIANTS.JSON`, `background_variant.json`, `AD_GENERATION_REGISTRY.JSON`.
 - Do not mine old `output/v*` prompt files for style or structure unless user explicitly asks to replicate a specific past batch.
 - Historical checks must use registry indexes first; do not crawl old output folders by default.
 - Forbidden sources for normal create-ad runs: `generated_image/v*/prompt_task_*.txt`, `generated_image/v*/task_*.json`, `generated_image/v*/batch_run_summary.json`.
@@ -1152,8 +1146,7 @@ Follow these rules strictly:
 - Use uploaded Obesity Killer product packshot images as absolute visual truth. I will upload 6 images each session.
 - Create ads in 5 formats: HERO, BA, TEST, FEAT, UGC.
 - For each ad, use one persona input block (pain, desire, friction, proof needed, tone cue).
-- If the persona is covered in `PERSONA_DEEP_DIVE_01_05.txt`, also use that file for objections, trigger moments, mirrored phrases, mechanism framing, and trust selection.
-- If the persona is covered in `PERSONA_DEEP_DIVE_01_05.txt`, generate final copy through the 2-layer workflow: raw truth -> strategy -> fresh target-language copy.
+- Build persona inputs from the selected persona and the 5-field model (pain, desire, friction, proof needed, tone cue).
 - Headline must do two things: scroll stop + pain-solution fit.
 - Caption must increase Value = (Dream Outcome x Likelihood) / (Time Delay x Sacrifice).
 - Keep language simple, active, specific, and short.

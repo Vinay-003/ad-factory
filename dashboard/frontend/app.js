@@ -159,7 +159,7 @@ async function fetchDefaults() {
   renderGlobalFormats();
   renderLanguageModes();
   activeImagesEl.value = (defaultData.active_images || []).join("\n");
-  defaultsInfoEl.textContent = `Using defaults: product=${defaultData.default_files.product_info}, mechanism=${defaultData.default_files.mechanism}, faq=${defaultData.default_files.faq}, persona_txt=${defaultData.default_files.persona_txt}`;
+  defaultsInfoEl.textContent = `Using defaults: product=${defaultData.default_files.product_info}, mechanism=${defaultData.default_files.mechanism}, faq=${defaultData.default_files.faq}`;
 
   const opencode = defaultData.opencode || {};
   modelsByProvider = opencode.models_by_provider || {};
@@ -205,8 +205,6 @@ async function runPipeline() {
     ["product_info_file", fileInput("productFile")],
     ["mechanism_file", fileInput("mechanismFile")],
     ["faq_file", fileInput("faqFile")],
-    ["persona_txt_file", fileInput("personaTxtFile")],
-    ["persona_csv_file", fileInput("personaCsvFile")],
     ["active_images_file", fileInput("activeImagesFile")],
   ];
 
