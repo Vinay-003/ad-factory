@@ -3,7 +3,7 @@
     "phase": "production",
     "write_enabled": true,
     "note": "Production mode active. Read before generation and append one entry after every generation.",
-    "last_updated": "2026-04-21T15:09:36Z"
+    "last_updated": "2026-04-21T15:15:15Z"
   },
   "rules": {
     "dedupe_scope": [
@@ -813,6 +813,159 @@
       "language": "BOTH",
       "output_quality": "pending",
       "notes": "assembled_from=copy_batch.json; batch=v20; aspect_ratio=4:5; seed=492110486"
+    },
+    {
+      "id": "entry_026",
+      "timestamp": "2026-04-21T15:15:15Z",
+      "format": "HERO",
+      "persona_number": 9,
+      "persona_name": "Time-Starved Parent",
+      "headline_angle": "pain_to_control",
+      "headline_en": "When did eating become something you hide?",
+      "headline_hi": "खाना कब से छुपाने लगे आप?",
+      "support_line_en": "Morning-liquid + night-capsule protocol helps you feel full longer so weight loss happens without the daily food battle.",
+      "support_line_hi": "सुबह-liquid + रात-capsule प्रोटोकॉल आपको लंबे समय तक तृप्त रखता है ताकि रोज़ाना के food battle के बिना वजन कम हो।",
+      "cta_en": "Start Now",
+      "cta_hi": "अभी शुरू करें",
+      "disclaimer_en": "",
+      "disclaimer_hi": "",
+      "caption_en": "",
+      "caption_hi": "",
+      "bullets_en": [],
+      "bullets_hi": [],
+      "background_slot": "BG-128",
+      "background_name": "Pale concrete surface",
+      "background_source": "catalog",
+      "fresh_background_signature": null,
+      "language": "BOTH",
+      "output_quality": "pending",
+      "notes": "assembled_from=copy_batch.json; batch=v21; aspect_ratio=4:5; seed=1584173575"
+    },
+    {
+      "id": "entry_027",
+      "timestamp": "2026-04-21T15:15:15Z",
+      "format": "BA",
+      "persona_number": 9,
+      "persona_name": "Time-Starved Parent",
+      "headline_angle": "before_after",
+      "headline_en": "From stress-snacking to steady control",
+      "headline_hi": "stress-snacking से स्थिर नियंत्रण तक",
+      "support_line_en": "",
+      "support_line_hi": "",
+      "cta_en": "Start Now",
+      "cta_hi": "अभी शुरू करें",
+      "disclaimer_en": "",
+      "disclaimer_hi": "",
+      "caption_en": "",
+      "caption_hi": "",
+      "bullets_en": [
+        "Morning OK Liquid curbs sudden hunger before it starts",
+        "Night OK Tablet supports digestion while you rest",
+        "No crash diets—just simple 5-min protocol"
+      ],
+      "bullets_hi": [
+        "सुबह का OK Liquid अचानक भूख शुरू होने से पहले कम करता है",
+        "रात का OK Tablet आराम करते समय पाचन को सपोर्ट करता है",
+        "कोई crash diet नहीं—बस 5 मिनट का सरल प्रोटोकॉल"
+      ],
+      "background_slot": "BG-292",
+      "background_name": "Morning first light counter",
+      "background_source": "catalog",
+      "fresh_background_signature": null,
+      "language": "BOTH",
+      "output_quality": "pending",
+      "notes": "assembled_from=copy_batch.json; batch=v21; aspect_ratio=4:5; seed=1584173575"
+    },
+    {
+      "id": "entry_028",
+      "timestamp": "2026-04-21T15:15:15Z",
+      "format": "TEST",
+      "persona_number": 9,
+      "persona_name": "Time-Starved Parent",
+      "headline_angle": "social_proof",
+      "headline_en": "\"My kids noticed I stopped obsessing over snacks.\"",
+      "headline_hi": "\"मेरे बच्चों ने देखा मैं snacks के बारे में ओब्सेस नहीं रहा।\"",
+      "support_line_en": "Protocol-based hunger support helps parents maintain control without feeling deprived.",
+      "support_line_hi": "प्रोटोकॉल-आधारित भूख सपोर्ट अभिभावकों को बिना खुद को वंचित महसूस किए नियंत्रण बनाए रखने में मदद करता है।",
+      "cta_en": "Start Now",
+      "cta_hi": "अभी शुरू करें",
+      "disclaimer_en": "",
+      "disclaimer_hi": "",
+      "caption_en": "",
+      "caption_hi": "",
+      "bullets_en": [],
+      "bullets_hi": [],
+      "background_slot": "BG-430",
+      "background_name": "Evening clinic close",
+      "background_source": "catalog",
+      "fresh_background_signature": null,
+      "language": "BOTH",
+      "output_quality": "pending",
+      "notes": "assembled_from=copy_batch.json; batch=v21; aspect_ratio=4:5; seed=1584173575"
+    },
+    {
+      "id": "entry_029",
+      "timestamp": "2026-04-21T15:15:15Z",
+      "format": "FEAT",
+      "persona_number": 9,
+      "persona_name": "Time-Starved Parent",
+      "headline_angle": "mechanism_benefit",
+      "headline_en": "What makes this weight system actually work:",
+      "headline_hi": "यह weight system कैसे काम करता है:",
+      "support_line_en": "",
+      "support_line_hi": "",
+      "cta_en": "Start Now",
+      "cta_hi": "अभी शुरू करें",
+      "disclaimer_en": "",
+      "disclaimer_hi": "",
+      "caption_en": "",
+      "caption_hi": "",
+      "bullets_en": [
+        "OK Liquid on empty stomach reduces morning hunger spikes",
+        "OK Tablet before bed supports overnight digestion",
+        "Daily tracker keeps your progress visible and simple",
+        "Doctor-formulated Ayurvedic approach—no side effects"
+      ],
+      "bullets_hi": [
+        "खाली पेट OK Liquid सुबह की भूख को कम करता है",
+        "OK Tablet रात में पाचन क्रिया को सुस्त बनाता है",
+        "रोज़ाना ट्रैकर आपकी प्रगति को सरल और दिखाऊ रखता है",
+        "डॉक्टर-फॉर्मूलेटेड आयुर्वेदिक तरीका—कोई side effects नहीं"
+      ],
+      "background_slot": "BG-467",
+      "background_name": "Clean Montessori shelf",
+      "background_source": "catalog",
+      "fresh_background_signature": null,
+      "language": "BOTH",
+      "output_quality": "pending",
+      "notes": "assembled_from=copy_batch.json; batch=v21; aspect_ratio=4:5; seed=1584173575"
+    },
+    {
+      "id": "entry_030",
+      "timestamp": "2026-04-21T15:15:15Z",
+      "format": "UGC",
+      "persona_number": 9,
+      "persona_name": "Time-Starved Parent",
+      "headline_angle": "first_person_story",
+      "headline_en": "My chaotic mornings finally work for me",
+      "headline_hi": "मेरे chaotic mornings आखिरकार मेरे लिए काम करते हैं",
+      "support_line_en": "5 min morning, 5 min night. Lost 3 kg without counting calories.",
+      "support_line_hi": "5 मिनट सुबह, 5 मिनट रात। calories गिने बिना 3 kg कम किए।",
+      "cta_en": "Try Now",
+      "cta_hi": "अभी आजमाएं",
+      "disclaimer_en": "",
+      "disclaimer_hi": "",
+      "caption_en": "",
+      "caption_hi": "",
+      "bullets_en": [],
+      "bullets_hi": [],
+      "background_slot": "BG-223",
+      "background_name": "Home office bookshelf",
+      "background_source": "catalog",
+      "fresh_background_signature": null,
+      "language": "BOTH",
+      "output_quality": "pending",
+      "notes": "assembled_from=copy_batch.json; batch=v21; aspect_ratio=4:5; seed=1584173575"
     }
   ],
   "indexes": {
@@ -847,6 +1000,12 @@
           "timestamp": "2026-04-21T15:09:36Z",
           "background_slot": "BG-079",
           "background_source": "catalog"
+        },
+        {
+          "entry_id": "entry_026",
+          "timestamp": "2026-04-21T15:15:15Z",
+          "background_slot": "BG-128",
+          "background_source": "catalog"
         }
       ],
       "BA": [
@@ -878,6 +1037,12 @@
           "entry_id": "entry_022",
           "timestamp": "2026-04-21T15:09:36Z",
           "background_slot": "BG-330",
+          "background_source": "catalog"
+        },
+        {
+          "entry_id": "entry_027",
+          "timestamp": "2026-04-21T15:15:15Z",
+          "background_slot": "BG-292",
           "background_source": "catalog"
         }
       ],
@@ -911,6 +1076,12 @@
           "timestamp": "2026-04-21T15:09:36Z",
           "background_slot": "BG-469",
           "background_source": "catalog"
+        },
+        {
+          "entry_id": "entry_028",
+          "timestamp": "2026-04-21T15:15:15Z",
+          "background_slot": "BG-430",
+          "background_source": "catalog"
         }
       ],
       "FEAT": [
@@ -942,6 +1113,12 @@
           "entry_id": "entry_024",
           "timestamp": "2026-04-21T15:09:36Z",
           "background_slot": "BG-070",
+          "background_source": "catalog"
+        },
+        {
+          "entry_id": "entry_029",
+          "timestamp": "2026-04-21T15:15:15Z",
+          "background_slot": "BG-467",
           "background_source": "catalog"
         }
       ],
@@ -975,6 +1152,12 @@
           "timestamp": "2026-04-21T15:09:36Z",
           "background_slot": "BG-252",
           "background_source": "catalog"
+        },
+        {
+          "entry_id": "entry_030",
+          "timestamp": "2026-04-21T15:15:15Z",
+          "background_slot": "BG-223",
+          "background_source": "catalog"
         }
       ]
     },
@@ -1004,7 +1187,12 @@
         "From chaotic eating to steady weight control",
         "Time-Starved Parent: a simpler weight routine that fits your life.",
         "What makes this weight system work for busy parents",
-        "Finally a routine that works"
+        "Finally a routine that works",
+        "When did eating become something you hide?",
+        "From stress-snacking to steady control",
+        "\"My kids noticed I stopped obsessing over snacks.\"",
+        "What makes this weight system actually work:",
+        "My chaotic mornings finally work for me"
       ],
       "cta_en": [
         "Start Now",
@@ -1017,6 +1205,11 @@
         "Start Now",
         "Start Now",
         "Start Now",
+        "Start Now",
+        "Start Now",
+        "Start Now",
+        "Start Now",
+        "Try Now",
         "Start Now",
         "Start Now",
         "Start Now",
@@ -1058,7 +1251,12 @@
         "अस्तव्यस्त खाने से स्थिर वजन नियंत्रण तक",
         "Time-Starved Parent: एक सरल वजन रूटीन जो आपकी ज़िंदगी में फिट हो।",
         "व्यस्त अभिभावकों के लिए यह वजन सिस्टम कैसे काम करता है",
-        "आखिरकार एक routine जो काम करता है"
+        "आखिरकार एक routine जो काम करता है",
+        "खाना कब से छुपाने लगे आप?",
+        "stress-snacking से स्थिर नियंत्रण तक",
+        "\"मेरे बच्चों ने देखा मैं snacks के बारे में ओब्सेस नहीं रहा।\"",
+        "यह weight system कैसे काम करता है:",
+        "मेरे chaotic mornings आखिरकार मेरे लिए काम करते हैं"
       ],
       "cta_hi": [
         "अभी शुरू करें",
@@ -1071,6 +1269,11 @@
         "अभी शुरू करें",
         "अभी शुरू करें",
         "अभी शुरू करें",
+        "अभी शुरू करें",
+        "अभी शुरू करें",
+        "अभी शुरू करें",
+        "अभी शुरू करें",
+        "अभी आजमाएं",
         "अभी शुरू करें",
         "अभी शुरू करें",
         "अभी शुरू करें",
@@ -1102,7 +1305,10 @@
         "Lost 4 kg in 15 days. Finally fits my schedule.",
         "OK Liquid curbs morning hunger so weight loss feels easier to sustain.",
         "Join 70,000+ parents seeing real results with this guided system.",
-        "5 min morning, 5 min night. Lost 4 kg."
+        "5 min morning, 5 min night. Lost 4 kg.",
+        "Morning-liquid + night-capsule protocol helps you feel full longer so weight loss happens without the daily food battle.",
+        "Protocol-based hunger support helps parents maintain control without feeling deprived.",
+        "5 min morning, 5 min night. Lost 3 kg without counting calories."
       ],
       "support_line_hi": [
         "आयुर्वेदिक भूख और पाचन सपोर्ट वजन नियंत्रण की निरंतरता में सहायक है।",
@@ -1119,7 +1325,10 @@
         "15 दिन में 4 किलो वजन कम किया। आखिरकार मेरे schedule में फिट है।",
         "OK Liquid सुबह की भूख को कम करता है तो वजन कम करना आसान लगे।",
         "इस गाइडेड सिस्टम से 70,000+ अभिभावकों ने असली परिणाम देखे।",
-        "5 मिनट सुबह, 5 मिनट रात। 4 kg कम किए।"
+        "5 मिनट सुबह, 5 मिनट रात। 4 kg कम किए।",
+        "सुबह-liquid + रात-capsule प्रोटोकॉल आपको लंबे समय तक तृप्त रखता है ताकि रोज़ाना के food battle के बिना वजन कम हो।",
+        "प्रोटोकॉल-आधारित भूख सपोर्ट अभिभावकों को बिना खुद को वंचित महसूस किए नियंत्रण बनाए रखने में मदद करता है।",
+        "5 मिनट सुबह, 5 मिनट रात। calories गिने बिना 3 kg कम किए।"
       ],
       "bullets_en": [
         "Morning step supports calmer appetite control.",
@@ -1152,7 +1361,14 @@
         "5-minute protocol fits any schedule",
         "OK Liquid on empty stomach reduces sudden hunger",
         "OK Tablet before bed supports nighttime digestion",
-        "Daily tracker keeps your progress clear and organized"
+        "Daily tracker keeps your progress clear and organized",
+        "Morning OK Liquid curbs sudden hunger before it starts",
+        "Night OK Tablet supports digestion while you rest",
+        "No crash diets—just simple 5-min protocol",
+        "OK Liquid on empty stomach reduces morning hunger spikes",
+        "OK Tablet before bed supports overnight digestion",
+        "Daily tracker keeps your progress visible and simple",
+        "Doctor-formulated Ayurvedic approach—no side effects"
       ],
       "bullets_hi": [
         "सुबह का स्टेप भूख को अधिक स्थिर रखने में सहायक है।",
@@ -1185,7 +1401,14 @@
         "5 मिनट का प्रोटोकॉल किसी भी schedule में फिट",
         "खाली पेट OK Liquid अचानक भूख को कम करता है",
         "सोने से पहले OK Tablet रात के पाचन को सपोर्ट करता है",
-        "रोज़ाना ट्रैकर आपकी प्रगति को स्पष्ट और व्यवस्थित रखता है"
+        "रोज़ाना ट्रैकर आपकी प्रगति को स्पष्ट और व्यवस्थित रखता है",
+        "सुबह का OK Liquid अचानक भूख शुरू होने से पहले कम करता है",
+        "रात का OK Tablet आराम करते समय पाचन को सपोर्ट करता है",
+        "कोई crash diet नहीं—बस 5 मिनट का सरल प्रोटोकॉल",
+        "खाली पेट OK Liquid सुबह की भूख को कम करता है",
+        "OK Tablet रात में पाचन क्रिया को सुस्त बनाता है",
+        "रोज़ाना ट्रैकर आपकी प्रगति को सरल और दिखाऊ रखता है",
+        "डॉक्टर-फॉर्मूलेटेड आयुर्वेदिक तरीका—कोई side effects नहीं"
       ]
     },
     "used_combinations": [],
@@ -1197,10 +1420,10 @@
           "BG-272",
           "BG-260",
           "BG-401",
-          "BG-079"
+          "BG-079",
+          "BG-128"
         ],
         "remaining": [
-          "BG-128",
           "BG-218",
           "BG-222",
           "BG-061",
@@ -1383,10 +1606,10 @@
           "BG-499",
           "BG-244",
           "BG-320",
-          "BG-330"
+          "BG-330",
+          "BG-292"
         ],
         "remaining": [
-          "BG-292",
           "BG-261",
           "BG-415",
           "BG-368",
@@ -1615,10 +1838,10 @@
           "BG-085",
           "BG-205",
           "BG-263",
-          "BG-469"
+          "BG-469",
+          "BG-430"
         ],
         "remaining": [
-          "BG-430",
           "BG-447",
           "BG-139",
           "BG-245",
@@ -1806,10 +2029,10 @@
           "BG-468",
           "BG-059",
           "BG-369",
-          "BG-070"
+          "BG-070",
+          "BG-467"
         ],
         "remaining": [
-          "BG-467",
           "BG-278",
           "BG-455",
           "BG-135",
@@ -2034,10 +2257,10 @@
           "BG-450",
           "BG-344",
           "BG-391",
-          "BG-252"
+          "BG-252",
+          "BG-223"
         ],
         "remaining": [
-          "BG-223",
           "BG-211",
           "BG-202",
           "BG-034",

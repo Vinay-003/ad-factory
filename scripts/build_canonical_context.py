@@ -145,7 +145,6 @@ def build_generation_context(canonical: dict[str, list[str]]) -> dict[str, list[
         + canonical["caution_conditions"]
         + canonical["safety_public_line"]
         + canonical["safety_internal_handling"]
-        + canonical["pricing"]
         + canonical["guarantee"]
         + canonical["continuation"]
         + canonical["maintenance"]

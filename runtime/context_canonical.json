@@ -1,6 +1,6 @@
 {
   "metadata": {
-    "generated_at": "2026-04-21T15:08:27Z",
+    "generated_at": "2026-04-21T15:14:00Z",
     "extractor_model": "opencode/minimax-m2.5-free",
     "source_files": [
       "/home/mylappy/myspace/info/productinfomain.txt",
@@ -16,18 +16,16 @@
   "canonical": {
     "positioning": [
       "doctor-formulated Ayurvedic weight-loss system; structured guided protocol, not a loose supplement",
-      "appetite regulation + eating behavior correction + digestion/gut-comfort support system"
+      "protocol-based appetite regulation + eating-behavior correction + digestion/gut-comfort support"
     ],
     "promise_claims": [
       "3 to 5 kg weight loss in 15 days when protocol is followed",
-      "supports weight-loss efforts by making adherence easier",
-      "helps reduce hunger and cravings",
-      "supports digestion"
+      "6 to 10 kg weight loss in 30 days when protocol is followed"
     ],
     "eligibility": [
       "adults (18+) with BMI > 25",
       "users with cravings, inconsistency, emotional eating, low energy, or slow progress",
-      "PCOD/PCOS, thyroid imbalance, high BP, fatty liver, diabetes, IBS (not a cure claim)"
+      "relevant for PCOD/PCOS, thyroid imbalance, high BP, fatty liver, diabetes, IBS, menopause-related weight gain (not a cure claim)"
     ],
     "exclusions": [
       "pregnancy",
@@ -42,36 +40,39 @@
       "OK Liquid on empty stomach",
       "warm pouch in hot water",
       "then 4-hour no-solid-food window",
-      "zero-calorie drinks allowed (tea, coffee, lemon water)"
+      "zero-calorie drinks (tea, coffee, lemon water) allowed"
     ],
     "protocol_night": [
-      "OK Powder + Tablet ~15 minutes before bed",
-      "typically after dinner gap with 2-hour gap before bedtime",
-      "with warm water"
+      "OK Powder + OK Tablet 15 minutes before bed",
+      "typically after dinner gap",
+      "with warm water guidance"
     ],
     "fasting_rules": [
-      "4-hour no-solid-food window after OK Liquid in morning",
-      "eat only when true hunger is felt",
-      "no fixed meal timing"
+      "4-hour no-solid-food window after morning liquid",
+      "zero-calorie drinks allowed during fasting window",
+      "eat only when true hunger is felt"
     ],
     "allowed_items": [
       "vegetables",
       "salads",
       "soups",
       "fruits",
-      "millets (up to 30g)",
+      "millets (up to 30g/day)",
       "oats",
-      "tea/coffee with milk"
+      "tea/coffee (max 3 cups)",
+      "OK Liquid",
+      "OK Powder",
+      "OK Tablet",
+      "dried amla"
     ],
     "restricted_items": [
       "non-vegetarian food",
       "alcohol",
-      "dairy products (except milk in tea/coffee)",
-      "rice",
-      "wheat chapati",
-      "dal",
       "nuts",
-      "simple carbohydrates"
+      "dairy products (except milk in tea/coffee)",
+      "simple carbohydrates (rice, wheat chapati, dal)",
+      "coconut water",
+      "curd/buttermilk"
     ],
     "mechanism_allowed_claims": [
       "helps reduce hunger",
@@ -81,134 +82,152 @@
       "helps you feel full for longer",
       "helps reduce random snacking",
       "can support more stable daily energy",
-      "can make a simpler routine easier to follow"
+      "can make a simpler routine easier to follow",
+      "appetite regulation + eating behavior correction + digestion support"
     ],
     "mechanism_disallowed_claims": [
+      "rapid fat melting",
+      "unlimited junk food",
+      "zero-discipline outcomes",
       "burns fat rapidly",
       "boosts metabolism drastically",
       "melts fat without effort",
       "works without diet awareness",
       "lets you eat unlimited junk",
-      "overrides overeating completely"
+      "overrides overeating completely",
+      "standalone fat-burner"
     ],
-    "safety_public_line": [],
-    "safety_internal_handling": [],
-    "pricing": [],
-    "guarantee": [],
-    "continuation": [],
-    "maintenance": [],
+    "safety_public_line": [
+      "no side effects"
+    ],
+    "safety_internal_handling": [
+      "first 3 days can be adjustment phase"
+    ],
+    "pricing": [
+      "15-day: INR 5,800",
+      "30-day: INR 10,000",
+      "60-day: INR 17,000"
+    ],
+    "guarantee": [
+      "if weight-loss start is not observed in first 7 days, refund applies when protocol + daily tracker conditions are met"
+    ],
+    "continuation": [
+      "continue until target/BMI 25 is reached",
+      "after each 30 days keep 7 to 10 day break"
+    ],
+    "maintenance": [
+      "BMR-based intake (1200-1400 kcal female, 1400-1600 kcal male)",
+      "daily activity (45-60 minutes)",
+      "macro order: protein -> fiber -> fats -> carbs",
+      "balanced diet and activity post-course"
+    ],
     "proof_points": [
       "70,000+ users served",
       "200 video testimonials",
       "3 to 5 kg in 15 days claim",
-      "founder Dr. Arun Tyagi credibility",
+      "founder Dr. Arun Tyagi (34 years experience, BAMS, M.D.)",
+      "Arogyam Ayurvedic Hospital backing",
       "daily tracker-led support"
     ],
     "messaging_guardrails": [
       "no body-shaming",
       "no cure-all claims",
       "no anti-gym or anti-diet messaging",
-      "no competitor bashing"
+      "no competitor bashing",
+      "not for users below 18 years old"
     ]
   },
   "conflicts": [
     {
-      "conflict_id": "C1",
-      "bucket": "formulation_count",
+      "conflict_id": "C001",
+      "bucket": "formulation_ingredients",
       "claim_a": {
+        "text": "39 Ayurvedic herbs",
+        "source_file": "productinfomain.txt - Encyclopedia section",
+        "line_start": 0,
+        "line_end": 0
+      },
+      "claim_b": {
         "text": "31 unique ingredients, 44 total entries (20 liquid, 12 powder, 12 tablet)",
-        "source_file": "productinfomain.txt",
-        "line_start": 1,
-        "line_end": 1
-      },
-      "claim_b": {
-        "text": "39 Ayurvedic herbs broken across three key components",
-        "source_file": "productinfomain.txt",
-        "line_start": 1,
-        "line_end": 1
+        "source_file": "productinfomain.txt - CONTEXT SNAPSHOT",
+        "line_start": 0,
+        "line_end": 0
       },
       "resolution_status": "resolved",
       "chosen_claim": {
-        "text": "31 unique ingredients, 44 total entries (20 liquid, 12 powder, 12 tablet)",
-        "source_file": "productinfomain.txt",
-        "line_start": 1,
-        "line_end": 1
+        "text": "31 unique ingredients, 44 total entries (20 in OK Liquid, 12 in OK Powder, 12 in OK Tablet)",
+        "source_file": "productinfomain.txt - CONTEXT SNAPSHOT",
+        "line_start": 0,
+        "line_end": 0
       },
-      "resolution_reason": "PRODUCT_MECHANISM_V1.txt specifies info/productinfomain.txt as source for approved claims; CANONICAL OVERRIDES block in productinfomain.txt explicitly states 31 unique ingredients as the latest internal standard",
-      "risk_level": "medium"
-    },
-    {
-      "conflict_id": "C2",
-      "bucket": "eligibility_age",
-      "claim_a": {
-        "text": "adults (18+) with BMI > 25",
-        "source_file": "productinfomain.txt",
-        "line_start": 1,
-        "line_end": 1
-      },
-      "claim_b": {
-        "text": "Age group 10-80 years",
-        "source_file": "productinfomain.txt",
-        "line_start": 1,
-        "line_end": 1
-      },
-      "resolution_status": "resolved",
-      "chosen_claim": {
-        "text": "adults (18+) with BMI > 25",
-        "source_file": "productinfomain.txt",
-        "line_start": 1,
-        "line_end": 1
-      },
-      "resolution_reason": "PRODUCT_MECHANISM_V1.txt specifies info/productinfomain.txt as source for approved claims; CANONICAL OVERRIDES block explicitly states adults 18+; encyclopedia/training fragment is legacy material that conflicts with higher-priority source",
-      "risk_level": "high"
-    },
-    {
-      "conflict_id": "C3",
-      "bucket": "mechanism_positioning",
-      "claim_a": {
-        "text": "This is NOT a standalone fat-burner. This product is a: appetite regulation + eating behavior correction system with digestion support for sustainability",
-        "source_file": "PRODUCT_MECHANISM_V1.txt",
-        "line_start": 1,
-        "line_end": 1
-      },
-      "claim_b": {
-        "text": "The kit enables safe and visible weight loss—3 to 5 kg on average every 15 days—without requiring crash diets or intense workouts",
-        "source_file": "productinfomain.txt",
-        "line_start": 1,
-        "line_end": 1
-      },
-      "resolution_status": "resolved",
-      "chosen_claim": {
-        "text": "This is NOT a standalone fat-burner. Primary mechanism: appetite regulation + eating behavior correction + digestion support",
-        "source_file": "PRODUCT_MECHANISM_V1.txt",
-        "line_start": 1,
-        "line_end": 1
-      },
-      "resolution_reason": "PRODUCT_MECHANISM_V1.txt explicitly defines mechanism boundaries; claim B is a benefit claim that doesn't conflict with the mechanism positioning but is incomplete - the product works by reducing intake not by fat burning directly",
+      "resolution_reason": "CONTEXT SNAPSHOT states 'CANONICAL OVERRIDES (2026-04-21) - if any lower section conflicts, this block wins' and explicitly notes 'The live site still uses an older public number for herbs, so the internal training version should use the updated formulation count above'",
       "risk_level": "low"
+    },
+    {
+      "conflict_id": "C002",
+      "bucket": "positioning_mechanism",
+      "claim_a": {
+        "text": "not positioned as a fat-burner; it is a protocol-based, behavior-led weight-loss system",
+        "source_file": "PRODUCT_MECHANISM_V1.txt",
+        "line_start": 0,
+        "line_end": 0
+      },
+      "claim_b": {
+        "text": "the kit is not positioned merely as an appetite-control product, but as a more holistic weight-loss system",
+        "source_file": "productinfomain.txt - Single Source of Truth section",
+        "line_start": 0,
+        "line_end": 0
+      },
+      "resolution_status": "resolved",
+      "chosen_claim": {
+        "text": "protocol-based appetite regulation + eating-behavior correction + digestion/gut-comfort support; NOT a standalone fat-burner",
+        "source_file": "PRODUCT_MECHANISM_V1.txt",
+        "line_start": 0,
+        "line_end": 0
+      },
+      "resolution_reason": "PRODUCT_MECHANISM_V1 takes priority for mechanism boundaries per user instruction; both claims align on holistic approach but M1 explicitly clarifies NOT a fat-burner which resolves apparent contradiction",
+      "risk_level": "low"
+    },
+    {
+      "conflict_id": "C003",
+      "bucket": "age_range_eligibility",
+      "claim_a": {
+        "text": "Age group 10-80 years",
+        "source_file": "productinfomain.txt - Encyclopedia section",
+        "line_start": 0,
+        "line_end": 0
+      },
+      "claim_b": {
+        "text": "adults (18+) with BMI above 25",
+        "source_file": "productinfomain.txt - CONTEXT SNAPSHOT",
+        "line_start": 0,
+        "line_end": 0
+      },
+      "resolution_status": "resolved",
+      "chosen_claim": {
+        "text": "adults (18+) with BMI above 25",
+        "source_file": "productinfomain.txt - CONTEXT SNAPSHOT",
+        "line_start": 0,
+        "line_end": 0
+      },
+      "resolution_reason": "CONTEXT SNAPSHOT is canonical and explicitly states: 'The final document should not state that the product is for users below 18 years of age' - this is a hard exclusion boundary",
+      "risk_level": "medium"
     }
   ],
   "dropped_claims": [
     {
-      "text": "39 herbs in internal training material",
-      "reason": "legacy_override_blocked",
-      "source_file": "productinfomain.txt",
-      "line_start": 1,
-      "line_end": 1
-    },
-    {
       "text": "Age group 10-80 years",
       "reason": "legacy_override_blocked",
-      "source_file": "productinfomain.txt",
-      "line_start": 1,
-      "line_end": 1
+      "source_file": "productinfomain.txt - Encyclopedia section",
+      "line_start": 0,
+      "line_end": 0
     },
     {
-      "text": "no separate meal prep as center of brand positioning",
-      "reason": "low_confidence",
-      "source_file": "faq.txt",
-      "line_start": 1,
-      "line_end": 1
+      "text": "39 Ayurvedic herbs",
+      "reason": "legacy_override_blocked",
+      "source_file": "productinfomain.txt - Encyclopedia section",
+      "line_start": 0,
+      "line_end": 0
     }
   ],
   "coverage_check": {
@@ -228,23 +247,34 @@
   "generation_context": {
     "product_info": [
       "doctor-formulated Ayurvedic weight-loss system; structured guided protocol, not a loose supplement",
-      "appetite regulation + eating behavior correction + digestion/gut-comfort support system",
+      "protocol-based appetite regulation + eating-behavior correction + digestion/gut-comfort support",
       "3 to 5 kg weight loss in 15 days when protocol is followed",
-      "supports weight-loss efforts by making adherence easier",
-      "helps reduce hunger and cravings",
-      "supports digestion",
+      "6 to 10 kg weight loss in 30 days when protocol is followed",
       "adults (18+) with BMI > 25",
       "users with cravings, inconsistency, emotional eating, low energy, or slow progress",
-      "PCOD/PCOS, thyroid imbalance, high BP, fatty liver, diabetes, IBS (not a cure claim)",
+      "relevant for PCOD/PCOS, thyroid imbalance, high BP, fatty liver, diabetes, IBS, menopause-related weight gain (not a cure claim)",
       "pregnancy",
       "within 6 months postpartum",
       "active insulin users",
       "multi-psychiatric-medication cases require doctor review",
       "multiple-surgery cases require doctor review",
+      "no side effects",
+      "first 3 days can be adjustment phase",
+      "15-day: INR 5,800",
+      "30-day: INR 10,000",
+      "60-day: INR 17,000",
+      "if weight-loss start is not observed in first 7 days, refund applies when protocol + daily tracker conditions are met",
+      "continue until target/BMI 25 is reached",
+      "after each 30 days keep 7 to 10 day break",
+      "BMR-based intake (1200-1400 kcal female, 1400-1600 kcal male)",
+      "daily activity (45-60 minutes)",
+      "macro order: protein -> fiber -> fats -> carbs",
+      "balanced diet and activity post-course",
       "70,000+ users served",
       "200 video testimonials",
       "3 to 5 kg in 15 days claim",
-      "founder Dr. Arun Tyagi credibility",
+      "founder Dr. Arun Tyagi (34 years experience, BAMS, M.D.)",
+      "Arogyam Ayurvedic Hospital backing",
       "daily tracker-led support"
     ],
     "mechanism": [
@@ -256,43 +286,52 @@
       "helps reduce random snacking",
       "can support more stable daily energy",
       "can make a simpler routine easier to follow",
+      "appetite regulation + eating behavior correction + digestion support",
       "OK Liquid on empty stomach",
       "warm pouch in hot water",
       "then 4-hour no-solid-food window",
-      "zero-calorie drinks allowed (tea, coffee, lemon water)",
-      "OK Powder + Tablet ~15 minutes before bed",
-      "typically after dinner gap with 2-hour gap before bedtime",
-      "with warm water",
-      "4-hour no-solid-food window after OK Liquid in morning",
-      "eat only when true hunger is felt",
-      "no fixed meal timing"
+      "zero-calorie drinks (tea, coffee, lemon water) allowed",
+      "OK Powder + OK Tablet 15 minutes before bed",
+      "typically after dinner gap",
+      "with warm water guidance",
+      "4-hour no-solid-food window after morning liquid",
+      "zero-calorie drinks allowed during fasting window",
+      "eat only when true hunger is felt"
     ],
     "faq": [
       "vegetables",
       "salads",
       "soups",
       "fruits",
-      "millets (up to 30g)",
+      "millets (up to 30g/day)",
       "oats",
-      "tea/coffee with milk",
+      "tea/coffee (max 3 cups)",
+      "OK Liquid",
+      "OK Powder",
+      "OK Tablet",
+      "dried amla",
       "non-vegetarian food",
       "alcohol",
-      "dairy products (except milk in tea/coffee)",
-      "rice",
-      "wheat chapati",
-      "dal",
       "nuts",
-      "simple carbohydrates",
+      "dairy products (except milk in tea/coffee)",
+      "simple carbohydrates (rice, wheat chapati, dal)",
+      "coconut water",
+      "curd/buttermilk",
       "no body-shaming",
       "no cure-all claims",
       "no anti-gym or anti-diet messaging",
       "no competitor bashing",
+      "not for users below 18 years old",
+      "Do not claim: rapid fat melting",
+      "Do not claim: unlimited junk food",
+      "Do not claim: zero-discipline outcomes",
       "Do not claim: burns fat rapidly",
       "Do not claim: boosts metabolism drastically",
       "Do not claim: melts fat without effort",
       "Do not claim: works without diet awareness",
       "Do not claim: lets you eat unlimited junk",
-      "Do not claim: overrides overeating completely"
+      "Do not claim: overrides overeating completely",
+      "Do not claim: standalone fat-burner"
     ]
   }
 }

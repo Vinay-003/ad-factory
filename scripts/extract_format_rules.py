@@ -14,7 +14,7 @@ def extract_section(content: str, header: str) -> str:
     if not match:
         raise RuntimeError(f"Section '{header}' not found")
     start = match.end()
-    next_header = re.search(r"^###\s+", content[start:], flags=re.MULTILINE)
+    next_header = re.search(r"^##+\s+", content[start:], flags=re.MULTILINE)
     end = start + next_header.start() if next_header else len(content)
     return content[start:end].strip()
 

@@ -660,7 +660,9 @@ def call_opencode_compatible(config: dict[str, Any], context: dict[str, Any], ru
     language_mode = resolve_language_mode(config)
     system = (
         "You generate ad copy JSON only. Return valid JSON with keys default_aspect_ratio and ads. "
-        "Each ads item must include format, headline_angle, persona fields and copy.EN/copy.HI fields compatible with assembler."
+        "Each ads item must include format, headline_angle, persona fields and copy.EN/copy.HI fields compatible with assembler. "
+        "Never include price in any on-image copy field (headline/support_line/trust_line/bullets/cta/attribution). "
+        "Do not use currency symbols or words like INR, price, only, discount, off, MRP in on-image copy."
     )
     user_payload = {
         "task": "Generate fresh ad copy JSON for provided context.",

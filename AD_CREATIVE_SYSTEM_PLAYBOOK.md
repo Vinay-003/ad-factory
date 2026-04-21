@@ -531,47 +531,136 @@ Same-persona multi-format diversification (mandatory):
 
 Keep format structure fixed. Swap persona-specific headline/caption blocks.
 
+Variation operating mode:
+- Default production remains 1 variation per format unless user asks for more.
+- Scale mode: prepare up to 8 variation lanes per format using the variation matrices below.
+- Across multi-variation runs, rotate headline angle, CTA wording, scene/background slot, and composition map. Do not only swap one word.
+
 ### HERO
 - Purpose: broad conversion
 - Persona use: strongest pain-led hook + fastest believable outcome
-- Copy shape: strong headline, one mechanism-to-outcome support line, CTA
-- Text budget: 18-32 words
-      - Minimum copy units: headline + 1 support line + CTA
-      - HERO support-line rule: the support line must show how the approved mechanism supports weight loss / excess-weight reduction / obesity-reduction intent; it cannot be only a generic routine or mindset line
-      - Preferred support-line pattern: mechanism -> weight-management outcome
-      - Example direction only: "Helps control cravings so weight reduction feels easier to sustain."
-      - Layout lock: headline in top text band only (top 15-32% of canvas), support directly below, CTA in lower safe band.
+- Copy shape: strong headline + support line + CTA + disclaimer
+- Text budget: 18-36 words + disclaimer
+- Minimum copy units: headline + 1 support line + CTA + disclaimer
+- Prompt-detail baseline (Hero must be highest-clarity format):
+  - Use uploaded product references as EXACT visual truth (shape, color, label, logo placement unchanged).
+  - Product cluster remains dominant focal element; background and props are secondary.
+  - Headline lives in top text band only; CTA button in lower safe zone only.
+  - Never render price text, price badges, or currency symbols on-image.
+  - Keep style clean, minimal, conversion-led, Meta-ready, and text fully legible.
+- Hero headline variation lanes (rotate for up to 8 variants):
+  - Benefit-led: "[Top benefit] in [timeframe]"
+  - Value-led: "Simple routine. Clear daily progress."
+  - Social-proof-led: "[X,000+] customers trust [brand]"
+  - Problem-solution: "Stop [pain point]. Start [benefit]."
+  - Curiosity-led: "Why [audience] are switching to [product]"
+  - Urgency-led: "[Offer] ends soon. [Benefit] starts now."
+  - Comparison-led: "[Product] vs [old way]. No contest."
+  - Direct offer: "[Product]. [One-line benefit]."
+- Hero background variation lanes:
+  - Clean studio gradient
+  - Lifestyle countertop scene
+  - Trust/clinical desk context
+  - Home practical routine context
+  - Minimal editorial dark-premium context
 
 ### BA
 - Purpose: show transition from pain to control
 - Persona use: "before" = persona struggle, "after" = first meaningful win
 - Copy shape: pain-to-progress headline + 3 outcome bullets
-- Text budget: 22-36 words
-      - Minimum copy units: headline + 2-3 short bullets + CTA
+- Text budget: 22-36 words + disclaimer
+- Minimum copy units: headline + 2-3 short bullets + CTA + disclaimer
+- Prompt-detail baseline:
+  - Split-screen structure with clear divider and explicit BEFORE/AFTER labels.
+  - BEFORE side: muted/desaturated tone, friction/pain context, lower confidence energy.
+  - AFTER side: vibrant/clean tone, confident outcome, product visibly integrated.
+  - Keep product fidelity exact on both sides; never redraw packaging.
+- BA variation lanes (do not rely only on facial mood changes):
+  - Context-shift lane: messy routine vs structured routine.
+  - Time-of-day lane: late-night struggle vs morning control.
+  - Choice-architecture lane: impulse-snack desk vs planned-kit setup.
+  - Energy-state lane: low-energy posture vs active upright posture.
+  - Environment lane: kitchen chaos vs clean meal-prep corner.
+  - Decision lane: confusion board/screens vs simple step-by-step kit use.
+  - Social lane: isolated/stressed frame vs supported/accountable frame.
+  - Progress lane: stagnation cues vs measurable-win cues (without fake body morphing).
+- BA hard constraints:
+  - No body-shaming visuals, no unrealistic body transformation edits, no fake medical visuals.
+  - Transformation must be shown via routine/behavior/outcome cues, not extreme physique manipulation.
 
 ### TEST
 - Purpose: trust
 - Persona use: testimonial language mirrors persona words (cravings, stuck, no time)
 - Copy shape: quote + attribution + trust line + CTA
-- Text budget: 24-40 words
-      - Minimum copy units: headline/quote + attribution + trust line + CTA
+- Text budget: 24-40 words + disclaimer
+- Minimum copy units: headline/quote + attribution + trust line + CTA + disclaimer
 - Testimonial integrity: never fabricate customer quotes; if real quote is unavailable, use rating + user-count + mechanism proof framing instead
+- Prompt-detail baseline:
+  - Quote card as primary visual block, product as secondary support element.
+  - Large quote marks, clear attribution area, trust strip under quote.
+  - If real testimonial exists in source: use exact quote + real attribution.
+  - If no real testimonial: switch to rating-and-benefits card (no fabricated human quote).
+- TEST variation lanes:
+  - Real-quote lane (when available)
+  - Star-rating + review-count lane
+  - Outcome-proof lane (specific measurable benefit line)
+  - Objection-resolution lane (price/safety/adherence concern)
+  - Doctor/trust-anchor lane
+  - Community/social-proof lane
+  - Simplicity/usability lane
+  - Consistency/maintenance lane
 
 ### FEAT
 - Purpose: mechanism clarity
 - Persona use: map each feature to persona friction
 - Copy shape: "what makes it work" + 3-4 benefit bullets + CTA
-- Text budget: 26-42 words
-      - Minimum copy units: headline + 3 feature-benefit bullets + CTA
+- Text budget: 26-42 words + disclaimer
+- Minimum copy units: headline + 3 feature-benefit bullets + CTA + disclaimer
+- Prompt-detail baseline:
+  - Center product remains exact reference; use callout pointers with clean labels.
+  - Each callout must connect feature/mechanism to practical benefit.
+  - Keep callout arrows clean and non-overlapping; no diagram clutter.
+- FEAT variation lanes:
+  - Component lane: Liquid / Powder / Tablet role clarity
+  - Timing lane: morning step vs night step protocol
+  - Benefit lane: appetite / digestion / adherence mapping
+  - Objection lane: no-crash-diet / practical-routine framing
+  - Trust lane: doctor-formulated + user-scale proof
+  - Safety lane: boundaries + exclusions clarity
+  - Lifestyle lane: busy-day compatibility mapping
+  - Maintenance lane: continuation + post-goal sustainability
 
 ### UGC
 - Purpose: authenticity
 - Persona use: first-person micro-story from persona POV
 - Copy shape: my routine support + 3 practical wins + CTA
-- Text budget: 16-26 words
-      - Default text policy: headline (max 8 words) + support line (max 8 words) + CTA (max 4 words)
-      - Minimum copy units: headline + 1 short support line + CTA
+- Text budget: 16-26 words + disclaimer
+- Default text policy: headline (max 8 words) + support line (max 8 words) + CTA (max 4 words) + disclaimer only
+- Minimum copy units: headline + 1 short support line + CTA + disclaimer
 - No bullets or long paragraph quote unless explicitly requested
+- Prompt-detail baseline:
+  - Casual phone-captured feel with natural framing, not polished studio symmetry.
+  - Product remains clearly visible and exactly matched to reference.
+  - Authentic setting aligned to persona (kitchen, desk, bedroom, commute, etc.).
+  - Overlay text stays punchy and legible; avoid dense copy in UGC.
+- UGC variation lanes:
+  - Morning-rush routine
+  - Office-break habit reset
+  - Night-craving interruption
+  - Parent-schedule compliance
+  - Travel-day adaptation
+  - Weekend consistency
+  - First-week progress reaction
+  - Maintenance confidence update
+
+Cross-format variation rule (mandatory for 100+ ad libraries):
+- Rotate at least 3 axes per new creative: copy angle, scene context, composition map, trust framing, CTA voice.
+- Do not repeat the same format skeleton more than 2 times consecutively for one persona.
+- Maintain product fidelity and compliance constant while varying narrative frame and visual context.
+
+Pricing visibility rule (global):
+- Do not show price anywhere on-image in any format.
+- Do not use currency symbols (`₹`, `$`) or text like INR, price, only, discount, off, MRP on-image.
 
 ---
 
