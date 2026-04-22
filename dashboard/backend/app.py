@@ -215,12 +215,36 @@ def list_models_for_provider(provider: str) -> list[str]:
     return [line for line in lines if line and line.startswith(provider + "/")]
 
 
+def choose_openai_gpt52(models: list[str]) -> str:
+    preferred = "openai/gpt-5.2"
+    if preferred in models:
+        return preferred
+    for model in models:
+        lower = model.lower()
+        if lower.startswith("openai/") and "gpt-5.2" in lower:
+            return model
+    for model in models:
+        if model.lower().startswith("openai/"):
+            return model
+    non_copilot = [m for m in models if not m.lower().startswith("github-copilot/")]
+    if non_copilot:
+        return non_copilot[0]
+    return preferred
+
+
+def sanitize_dashboard_model(selected: str, models: list[str]) -> str:
+    chosen = (selected or "").strip()
+    if chosen and not chosen.lower().startswith("github-copilot/"):
+        return chosen
+    return choose_openai_gpt52(models)
+
+
 def build_opencode_catalog() -> dict[str, Any]:
     models = list_opencode_models()
     provider_labels = list_opencode_provider_labels()
     provider_ids = {line.split("/", 1)[0] for line in models}
 
-    known_providers = ["opencode", "github-copilot"]
+    known_providers = ["opencode", "openai"]
     for provider in known_providers:
         provider_ids.add(provider)
     for label in provider_labels:
@@ -233,16 +257,18 @@ def build_opencode_catalog() -> dict[str, Any]:
             continue
         models.extend(list_models_for_provider(provider))
 
-    providers = sorted(provider_ids)
+    providers = sorted(provider for provider in provider_ids if provider.lower() != "github-copilot")
     grouped: dict[str, list[str]] = {provider: [] for provider in providers}
     for model in models:
         provider = model.split("/", 1)[0]
+        if provider.lower() == "github-copilot":
+            continue
         grouped.setdefault(provider, []).append(model)
     for provider in grouped:
         grouped[provider] = sorted(grouped[provider])
     default_model = ""
     if models:
-        default_model = "github-copilot/gpt-5.3-codex" if "github-copilot/gpt-5.3-codex" in models else models[0]
+        default_model = choose_openai_gpt52(models)
     return {
         "api_url": DEFAULT_OPENCODE_API_URL,
         "providers": providers,
@@ -253,25 +279,15 @@ def build_opencode_catalog() -> dict[str, Any]:
 
 
 def choose_extractor_model(config: dict[str, Any]) -> str:
+    models = list_opencode_models()
     explicit = (config.get("opencode_extractor_model") or "").strip()
     if explicit:
-        return explicit
-
-    models = list_opencode_models()
-    if models:
-        preferred_checks = [
-            lambda m: "bigpickle" in m,
-            lambda m: "minimax" in m and "free" in m,
-            lambda m: "minimax" in m,
-        ]
-        lowered = [m.lower() for m in models]
-        for check in preferred_checks:
-            for idx, lower in enumerate(lowered):
-                if check(lower):
-                    return models[idx]
+        return sanitize_dashboard_model(explicit, models)
 
     selected = (config.get("opencode_model") or "").strip()
-    return selected or "gpt-5.3-codex"
+    if selected:
+        return sanitize_dashboard_model(selected, models)
+    return choose_openai_gpt52(models)
 
 
 def parse_json_stdout(result: subprocess.CompletedProcess[str], context: str) -> Any:
@@ -468,7 +484,7 @@ def call_opencode_repair_copy(
     run_dir: Path,
 ) -> dict[str, Any] | None:
     api_url = (config.get("opencode_api_url") or "").strip()
-    model = (config.get("opencode_model") or "gpt-5.3-codex").strip()
+    model = sanitize_dashboard_model((config.get("opencode_model") or "").strip(), list_opencode_models())
     if not api_url:
         return None
 
@@ -534,19 +550,23 @@ def ensure_testimonial_headline(headline: str, lang: str, persona: dict[str, Any
     clean = shorten_copy_line(headline, limit=90)
     if lang == "EN":
         if re.search(r"\b(i|i'm|i’ve|i'd|my|me)\b", clean, flags=re.IGNORECASE):
-            return clean
+            if re.search(r"\b(weight|obesity|excess\s*weight|kg|kilo)\b", clean, flags=re.IGNORECASE):
+                return clean
+            return shorten_copy_line(f'{clean.rstrip(".")}. It finally fit my weight-loss routine.', limit=90)
         desire = _clean_str(persona.get("desire_en")).rstrip(".")
         if desire:
             desire_phrase = desire[:1].lower() + desire[1:] if len(desire) > 1 else desire.lower()
-            return shorten_copy_line(f'"I finally found {desire_phrase}."', limit=90)
-        return '"I finally found a routine I can follow every day."'
+            return shorten_copy_line(f'"I finally found {desire_phrase} for my weight-loss goal."', limit=90)
+        return '"I finally found a routine I can follow for weight loss every day."'
 
     if re.search(r"(मैं|मेरी|मेरा|मुझे|मैंने)", clean):
-        return clean
+        if re.search(r"(वजन|मोटापा|किलो|kg)", clean):
+            return clean
+        return shorten_copy_line(f'{clean.rstrip("।")}। यह मेरे वजन घटाने के लिए काम आया।', limit=90)
     desire_hi = _clean_str(persona.get("desire_hi")).rstrip("।")
     if desire_hi:
-        return shorten_copy_line(f'"मुझे आखिर {desire_hi} वाला रूटीन मिला।"', limit=90)
-    return '"मुझे आखिर ऐसा रूटीन मिला जिसे मैं रोज निभा सकूं।"'
+        return shorten_copy_line(f'"मुझे आखिर {desire_hi} वाला रूटीन मिला जो वजन घटाने में मदद करता है।"', limit=90)
+    return '"मुझे आखिर ऐसा रूटीन मिला जिसे मैं रोज निभा सकूं और वजन घटा सकूं।"'
 
 
 def _persona_number_from_candidate(candidate: dict[str, Any]) -> int | None:
@@ -675,45 +695,45 @@ def build_template_copy(context: dict[str, Any], run_id: str) -> dict[str, Any]:
         tone_hi = "सरल, भरोसेमंद, और व्यावहारिक"
 
         if fmt == "BA":
-            headline_en = f"From craving-led eating to steadier daily control {unique}."
-            headline_hi = f"बार-बार cravings से रोज़ाना बेहतर नियंत्रण तक {unique}।"
+            headline_en = f"From \"nothing works\" to visible 15-day weight-loss progress {unique}."
+            headline_hi = f"\"कुछ काम नहीं करता\" से 15 दिन में दिखने वाली वजन घटाने की प्रगति तक {unique}।"
         else:
-            headline_en = f"{persona_name}: build a simpler weight routine today {unique}."
-            headline_hi = f"{persona_name}: आज से सरल वजन रूटीन शुरू करें {unique}।"
+            headline_en = f"{persona_name}: start your 15-day obesity and weight-loss routine {unique}."
+            headline_hi = f"{persona_name}: आज से 15-दिन का obesity और वजन घटाने का रूटीन शुरू करें {unique}।"
         cta_en = f"Start Now {unique}"
         cta_hi = f"अभी शुरू करें {unique}"
 
         copy_en: dict[str, Any]
         copy_hi: dict[str, Any]
         if fmt in {"HERO", "UGC"}:
-            support_en = f"Ayurvedic hunger and digestion support helps weight control consistency {unique}."
-            support_hi = f"आयुर्वेदिक भूख और पाचन सपोर्ट वजन नियंत्रण की निरंतरता में सहायक है {unique}।"
+            support_en = f"Helps reduce cravings and supports digestion so excess-weight reduction feels practical {unique}."
+            support_hi = f"यह cravings कम करने और पाचन सपोर्ट से अतिरिक्त वजन घटाने को व्यावहारिक बनाता है {unique}।"
             copy_en = {"headline": headline_en, "support_line": support_en, "cta": cta_en}
             copy_hi = {"headline": headline_hi, "support_line": support_hi, "cta": cta_hi}
         elif fmt in {"BA", "FEAT"}:
             bullets_en = [
-                f"Morning step supports calmer appetite control {unique}.",
-                f"Night step supports lighter digestion consistency {unique}.",
-                f"No crash diet, no heavy workout pressure {unique}.",
+                f"Morning OK Liquid helps reduce hunger and random snacking for weight loss {unique}.",
+                f"Night Tablet + Powder support digestion and lighter mornings in obesity routine {unique}.",
+                f"Built for visible 15-day weight-loss support without crash-diet pressure {unique}.",
             ]
             bullets_hi = [
-                f"सुबह का स्टेप भूख को अधिक स्थिर रखने में सहायक है {unique}।",
-                f"रात का स्टेप पाचन की नियमितता को सपोर्ट करता है {unique}।",
-                f"न crash diet, न भारी workout दबाव {unique}।",
+                f"सुबह का OK Liquid वजन घटाने के लिए भूख और स्नैकिंग कम करने में सहायक है {unique}।",
+                f"रात का Tablet + Powder obesity रूटीन में पाचन और हल्की सुबह के लिए सपोर्ट देता है {unique}।",
+                f"crash diet दबाव के बिना 15 दिन की visible weight-loss support के लिए बनाया गया {unique}।",
             ]
             copy_en = {"headline": headline_en, "bullets": bullets_en, "cta": cta_en}
             copy_hi = {"headline": headline_hi, "bullets": bullets_hi, "cta": cta_hi}
         else:
             copy_en = {
                 "headline": headline_en,
-                "attribution": "Ayurvedic routine with structured daily protocol",
-                "trust_line": f"Trusted framework with clear morning and night usage steps {unique}.",
+                "attribution": "Doctor-formulated Ayurvedic obesity and weight-loss protocol",
+                "trust_line": f"Structured morning-night steps for visible weight-loss progress and obesity control {unique}.",
                 "cta": cta_en,
             }
             copy_hi = {
                 "headline": headline_hi,
-                "attribution": "संरचित दैनिक प्रोटोकॉल वाला आयुर्वेदिक रूटीन",
-                "trust_line": f"सुबह और रात के साफ स्टेप्स के साथ भरोसेमंद रूटीन {unique}।",
+                "attribution": "डॉक्टर-फॉर्मुलेटेड आयुर्वेदिक obesity और weight-loss प्रोटोकॉल",
+                "trust_line": f"सुबह-रात के स्पष्ट स्टेप्स से visible वजन घटाने और obesity नियंत्रण का भरोसेमंद सपोर्ट {unique}।",
                 "cta": cta_hi,
             }
 
@@ -745,7 +765,7 @@ def build_template_copy(context: dict[str, Any], run_id: str) -> dict[str, Any]:
 def call_opencode_compatible(config: dict[str, Any], context: dict[str, Any], run_dir: Path) -> dict[str, Any] | None:
     api_url = (config.get("opencode_api_url") or "").strip()
     api_key = (config.get("opencode_api_key") or "").strip()
-    model = (config.get("opencode_model") or "gpt-5.3-codex").strip()
+    model = sanitize_dashboard_model((config.get("opencode_model") or "").strip(), list_opencode_models())
     if not api_url:
         return None
 
@@ -753,13 +773,17 @@ def call_opencode_compatible(config: dict[str, Any], context: dict[str, Any], ru
     system = (
         "You generate ad copy JSON only. Return valid JSON with keys default_aspect_ratio and ads. "
         "Each ads item must include format, headline_angle, persona fields and copy.EN/copy.HI fields compatible with assembler. "
+        "Every ad unit must make the obesity and weight-loss intent obvious to a first-time viewer. "
+        "At minimum, headline or support line must explicitly mention weight loss, obesity reduction, excess-weight reduction, or a direct 15-day result framing. "
+        "Avoid abstract lines that hide the product goal. "
         "Never include price in any on-image copy field (headline/support_line/trust_line/bullets/cta/attribution). "
         "Do not use currency symbols or words like INR, price, only, discount, off, MRP in on-image copy. "
         "For BA format, never prefix bullet text with BEFORE:/AFTER: (or Hindi equivalents); bullets must be plain statements. "
         "For TEST format, headline must read like a first-person review line suitable for quote card (not generic 'highly rated' phrasing). "
         "If no real quote is provided in context, create one believable representative review line grounded in persona pain/desire and safe claims. "
         "Keep each format's core shape intact, but vary headline/support/trust framing using persona pain, desire, friction, proof needed, and tone cue. "
-        "For the same format across runs, rotate variation lane and wording rhythm while preserving format-specific structure."
+        "For the same format across runs, rotate variation lane and wording rhythm while preserving format-specific structure. "
+        "Ensure obesity and weight-loss intent is obvious to someone who has never heard of the product."
     )
     user_payload = {
         "task": "Generate fresh ad copy JSON for provided context.",

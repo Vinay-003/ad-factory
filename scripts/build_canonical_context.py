@@ -35,6 +35,7 @@ CANONICAL_BUCKETS = [
     "maintenance",
     "proof_points",
     "messaging_guardrails",
+    "on_image_copy_requirements",
 ]
 
 
@@ -140,6 +141,7 @@ def build_generation_context(canonical: dict[str, list[str]]) -> dict[str, list[
     product_info = (
         canonical["positioning"]
         + canonical["promise_claims"]
+        + canonical["on_image_copy_requirements"]
         + canonical["eligibility"]
         + canonical["exclusions"]
         + canonical["caution_conditions"]
@@ -152,6 +154,7 @@ def build_generation_context(canonical: dict[str, list[str]]) -> dict[str, list[
     )
     mechanism = (
         canonical["mechanism_allowed_claims"]
+        + canonical["on_image_copy_requirements"]
         + canonical["protocol_morning"]
         + canonical["protocol_night"]
         + canonical["fasting_rules"]
@@ -219,6 +222,7 @@ def build_prompt(product_text: str, mechanism_text: str, faq_text: str) -> str:
                 "31_unique_44_total": True,
                 "refund_7day_with_tracker": True,
                 "not_fat_burner_positioning": True,
+                "on_image_copy_explicit_weightloss": True,
             },
             "missing_required": [],
         },
@@ -232,7 +236,9 @@ def build_prompt(product_text: str, mechanism_text: str, faq_text: str) -> str:
         "1) PRODUCT_MECHANISM_V1.txt for mechanism boundaries\n"
         "2) productinfomain.txt CONTEXT SNAPSHOT and Single Source of Truth sections\n"
         "3) faq.txt for operational protocol and objection handling\n"
+        "4) If ON-IMAGE COPY MANDATE is present, extract it into on_image_copy_requirements and preserve it verbatim in practical form\n"
         "Legacy encyclopedia/training fragments must not override higher-priority claims.\n"
+        "If any source includes abstract ad-copy guidance that hides product goal, explicitly drop it or rewrite into explicit weight-loss/obesity language in canonical extraction.\n"
     )
 
     payload = {

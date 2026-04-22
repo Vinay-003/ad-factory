@@ -1,601 +1,271 @@
 CONTEXT SNAPSHOT (FOR EXTRACTION)
-- CANONICAL OVERRIDES (2026-04-21) - if any lower section conflicts, this block wins.
-- Core positioning: doctor-formulated Ayurvedic weight-loss system; structured guided protocol, not a loose supplement.
+- CANONICAL OVERRIDES (2026-04-22): if any lower section conflicts, this block wins.
+- Product: Obesity Killer Kit is a doctor-formulated Ayurvedic obesity and weight-loss system.
 - Core promise: 3 to 5 kg weight loss in 15 days when protocol is followed.
-- Target user: adults (18+) with BMI > 25; especially users with cravings, inconsistency, emotional eating, low energy, or slow progress.
-- Harder-case relevance (not cure claim): PCOD/PCOS, thyroid imbalance, high BP, fatty liver, diabetes, IBS, menopause-related weight gain.
-- Exclusions: pregnancy, within 6 months postpartum, active insulin users.
-- Caution: multi-psychiatric-medication and multiple-surgery cases require doctor review.
-- Kit structure: OK Liquid (morning), OK Powder (night), OK Tablet (night), dried amla, tracker, booklet, guided support.
-- Protocol: morning liquid on empty stomach, then 4-hour no-solid-food window; zero-calorie drinks allowed.
-- Protocol: night powder + tablet ~15 minutes before bed; digestion/gut comfort support.
-- Formulation standard (latest): 31 unique ingredients, 44 total entries (20 liquid, 12 powder, 12 tablet).
+- Core positioning: structured guided system, not a loose supplement and not a standalone fat-burner claim product.
+- Primary user: adults with BMI above 25 who want fast visible weight-loss support with natural and practical adherence.
+- Not for: pregnant women, women within 6 months postpartum, active insulin users.
+- Doctor-review required: multiple psychiatric medications, multiple surgeries.
+- Kit components: OK Liquid (morning), OK Tablet (night), OK Powder (night), dried amla, tracker, booklet, WhatsApp support.
+- Morning protocol: take OK Liquid on empty stomach, then keep 4-hour no-solid-food window; zero-calorie drinks allowed.
+- Night protocol: take OK Tablet plus 1/2 tsp OK Powder around 15 minutes before sleep with warm water.
+- Routine logic: eat only on true hunger; no fixed meal timing; many users shift to 1 to 1.5 meals/day.
+- Diet allowed: vegetables, salads, soups, fruits; if still hungry, up to 30g complex carbs (millets or oats).
+- Diet restricted: non-vegetarian food, alcohol, dairy except milk in tea/coffee, wheat chapati, rice, dal, nuts.
+- Lifestyle: around 4 liters water/day and 5000 to 7000 steps/day or pranayam.
+- Formulation standard: 31 unique ingredients and 44 total ingredient entries (20 liquid, 12 powder, 12 tablet).
 - Composition truth: no synthetic ingredients and no chemical preservatives.
-- Guarantee: if weight-loss start is not observed in first 7 days, refund applies when protocol + daily tracker conditions are met.
-- Safety framing: public line "no side effects"; internal line "first 3 days can be adjustment phase".
-- Continuation: continue until target/BMI 25; after each 30 days keep 7 to 10 day break.
-- Maintenance: BMR-based intake, daily activity, macro order (protein -> fiber -> fats -> carbs), booklet guidance.
-- Proof stack: real customer outcomes, 70,000+ users served, 200 video testimonials, founder credibility, tracker-led support.
-- Messaging guardrails: no body-shaming, no cure-all claims, no anti-gym or anti-diet messaging, no competitor bashing.
-- Product: Obesity Killer Kit (doctor-formulated Ayurvedic weight-loss system).
-- Core promise: 3 to 5 kg weight loss in 15 days when course is followed.
-- Brand truths: fast results, all-natural Ayurvedic formulation, no side effects, easy to follow, sustainable.
-- Who it is for: adults with BMI > 25; users struggling with cravings, inconsistency, emotional eating, low energy, slow progress.
-- Harder cases where it is still used: PCOD/PCOS, thyroid imbalance, high BP, fatty liver, diabetes, IBS (not a cure claim).
-- Not for: pregnancy, up to 6 months postpartum, active insulin users.
-- Doctor-review caution: multiple psychiatric meds, multiple surgeries.
-- Kit components: OK Liquid (morning), OK Powder (night), OK Tablet (night), dried amla, tracker, booklet, support.
-- OK Liquid protocol: empty stomach, warm pouch, then 4-hour no-solid-food window; zero-calorie drinks allowed.
-- OK Liquid nutrition: approximately 350 to 400 kcal support.
-- Powder + Tablet protocol: take at night, around 15 minutes before sleep (and typically after dinner gap).
-- Formulation facts: 31 unique ingredients, 44 total entries; 20 Liquid, 12 Powder, 12 Tablet.
-- Composition claim: no synthetic ingredients and no chemical preservatives.
-- Guarantee: if no weight-loss start within 7 days, full refund subject to course-following + daily tracker sharing.
-- Continuation rule: can continue till target/BMI 25; after each 30 days keep 7 to 10 day break.
-- Maintenance basics: BMR-based intake, daily activity, macro order (protein -> fiber -> fats -> carbs), booklet guidance.
-- Trust proof: founder Dr. Arun Tyagi, Arogyam backing, 70,000+ users served, 200 video testimonials.
-- Safety handling note: public line is "no side effects"; internal handling includes first 3 days as adjustment phase.
-- Messaging guardrails: no body-shaming, no cure-all claims, no anti-gym/anti-diet statements, no competitor bashing.
+- Safety framing: public claim is no side effects; internal handling says first 3 days can be an adjustment phase.
+- Guarantee: if weight-loss start is not observed in first 7 days, refund applies only when protocol is followed and daily tracker is shared.
+- Continuation: continue in cycles until target weight or BMI 25; after every 30 days take a 7 to 10 day break.
+- Maintenance: maintain caloric balance, balanced diet, daily activity; no automatic bounce back from stopping alone.
+- Trust proof: 70,000+ users served, 200 video testimonials, doctor authority, tracker-led support, 7-day refund policy.
+- Messaging guardrails: no body-shaming, no cure claims, no anti-gym framing, no competitor bashing.
+- ON-IMAGE COPY MANDATE (NON-NEGOTIABLE): every headline and subheadline must explicitly mention weight loss, obesity reduction, or clear weight outcome language. Avoid abstract copy that hides the core product goal.
+- ON-IMAGE COPY MANDATE (NON-NEGOTIABLE): approved explicit phrases include weight loss support, obesity management support, lose weight, reduce excess weight, 3 to 5 kg in 15 days, appetite control for weight loss.
+- ON-IMAGE COPY MANDATE (NON-NEGOTIABLE): do not use vague transformational lines without naming weight loss or obesity context.
 
 Single Source of Truth: Product Foundation Document
+
 1. What is Obesity Killer Kit?
-Obesity Killer Kit is a doctor-formulated Ayurvedic weight-loss system designed for
-overweight and obese adults who want to lose weight in a safe, natural, and practical way. It
-is built for people who want fast visible results without relying on injections, crash diets,
-hard-to-sustain gym routines, or extreme lifestyle changes that are difficult to maintain.
-Rather than being a standalone supplement, it is designed as a structured, guided system
-that makes weight loss easier to follow in real life.
-At its core, Obesity Killer Kit offers a simple promise: lose 3 to 5 kg in 15 days through a
-natural, easy-to-follow process that does not leave the user feeling hungry, weak, or
-overwhelmed. The product is built around five core ideas: fast results, an Ayurvedic and
-all-natural formulation, no side effects, ease of following, and long-term sustainability.
+Obesity Killer Kit is a doctor-formulated Ayurvedic weight-loss system designed for overweight and obese adults who want to lose weight in a safe, natural, and practical way.
+It is built for people who want fast visible results without relying on injections, crash diets, hard-to-sustain gym routines, or extreme lifestyle changes.
+It is not positioned as a standalone supplement. It is a structured, guided system built for real-life adherence.
+Core promise: lose 3 to 5 kg in 15 days through a natural, easy-to-follow process that does not leave the user feeling hungry, weak, or overwhelmed.
+
 2. What problem does it solve?
-The product is built for a common failure pattern in weight loss. Many people do not fail
-because they lack intent. They fail because most methods create too much friction. Strict
-diets create hunger. Meal replacements feel unnatural. Intense workout plans are hard to
-maintain. Injections are scary. Medication creates dependency. Stimulant-style products can
-feel unsustainable. The result is a cycle of effort, inconsistency, disappointment, and quitting.
-Also,
-Weight gain is also not always driven only by eating habits or lifestyle choices. For many
-people, it is influenced by factors outside their direct control, such as genetics, hormonal
-imbalance, medications, and chronic health conditions. These situations often make weight
-loss slower, more frustrating, and harder to sustain with standard advice alone.
-Obesity Killer Kit is built to solve these friction points. It is designed for people who want to
-lose weight without feeling hungry, weak, confused, or forced into an unrealistic routine. It is
-also relevant for people whose weight-loss journey is made harder by underlying biological
-or medical factors, because it aims to make the process easier to follow, more manageable,
-and more sustainable in real life.
-3. What is the customer really hiring this product to
-do?
-At a surface level, the customer is hiring Obesity Killer Kit to lose weight.
-At a deeper level, the customer is hiring it to help them lose weight in a way that feels fast,
-safe, believable, and easy enough to sustain in real life. They are not just buying a lower
-number on the weighing scale. They are buying relief from hunger, cravings, inconsistency,
-confusion, and the frustration of methods that become too hard to follow after a few days.
-The real job of the product is to reduce the day-to-day friction of weight loss. It helps the
-customer stay in a caloric deficit more consistently, feel more in control, and follow a
-structured path without relying on injections, crash diets, or high-effort routines that do not fit
-ordinary life.
-The product is also being hired to solve a practical decision problem. Many users do not just
-want a formula. They want a system that removes guesswork, gives them a clear routine,
-and supports them through the process. In that sense, Obesity Killer Kit is not just a
-weight-loss product. It is a guided system that makes the journey feel more manageable and
-more achievable.
-At the emotional level, the customer is often hiring it for something even deeper: “I want a
-weight-loss method that feels like it can work for someone like me.” That is why the product
-is not only about fat loss. It is also about restoring belief, control, and consistency
+Most users do not fail from lack of intent. They fail because methods are hard to sustain: strict diets create hunger, intense routines create drop-off, and high-friction methods create inconsistency.
+For many people, weight gain is also influenced by genetics, hormonal imbalance, medications, and chronic conditions.
+Obesity Killer Kit is designed to reduce these friction points and make adherence easier in day-to-day life.
+
+3. What is the customer hiring the product to do?
+Surface job: lose weight.
+Deeper job: lose weight in a way that feels fast, safe, believable, and practical to continue.
+Functional job: reduce hunger and cravings, support caloric-deficit consistency, remove guesswork through a guided routine.
+Emotional job: restore belief, control, and consistency after repeated failure.
+
 4. Who is it for?
-Obesity Killer Kit is meant for adults with a BMI above 25 who want weight loss support that
-feels natural, guided, and easy to follow. It is relevant for men and women dealing with
-stubborn fat, belly fat, appetite cravings, emotional eating, slow metabolism, low energy, and
-repeated failure with diets, meal replacement products, or gym-led approaches.
-It is also a fit for people who:
-● want fast visible results
-● do not want injections
-● want an Ayurvedic and all-natural option
-● want a routine that feels sustainable
-● cannot commit to hardcore workouts
-● do better with guided accountability and support
-● are looking for a doctor-backed system rather than a generic supplement
-The product is often considered by people dealing with obesity-linked concerns such as
-PCOD, PCOS, thyroid imbalance, high blood pressure, fatty liver, diabetes, and IBS.
+Adults with BMI above 25 who want natural, guided, easy-to-follow weight-loss support.
+Common fit profiles: stubborn fat, belly fat, cravings, emotional eating, low energy, slow metabolism, repeated diet failure.
+Also relevant for users dealing with obesity-linked concerns such as PCOD, PCOS, thyroid imbalance, high blood pressure, fatty liver, diabetes, and IBS (not a cure claim).
+Primary demand fit: users wanting fast visible results without injections or hardcore workout dependency.
+
 5. Who is it not for?
-The product should not be taken by:
-● pregnant women
-● women within 6 months postpartum
-● people actively taking insulin
-The user’s final internal guidance also adds caution for people on multiple psychiatric
-medications and people who have undergone multiple surgeries. Those cases should be
-treated as doctor-review situations before use. The final document should not state that the
-product is for users below 18 years of age.
+Do not use for:
+- pregnant women
+- women within 6 months postpartum
+- people actively taking insulin
+
+Doctor-review caution before use:
+- people on multiple psychiatric medications
+- people with multiple surgery history
+
+Do not position for users below 18 years of age.
+
 6. What comes in the kit?
-Obesity Killer Kit is a physical boxed course built around three main formulation components
-plus support material and tracking tools. The live product page also sells it in 15-day, 30-day,
-and 2 x 30-day partner variants, while your internal usage language refers to 15-day, 30-day,
-and 60-day buying options. The standardized pricing you confirmed is ₹5,800 for 15 days,
-₹10,000 for 30 days, and ₹17,000 for 60 days.
-OK Liquid
-OK Liquid is the core part of the system. It comes as 15 pre-measured pouches in a 15-day
-kit, one for each day. Its role is to reduce hunger, increase satiety, help the user eat less
-without feeling weak, and support the body with nutrition during the process. You confirmed
-that the OK Liquid provides 350 to 400 kcal of nutrition. It is taken every morning on an
-empty stomach after warming the pouch in hot water. No solid food should be consumed for
-the next 4 hours, though zero-calorie drinks such as tea, coffee, lemon water, lemon tea, and
-jeera water can be taken.
-OK Tablet
-OK Tablet is taken at night, 15 minutes before bed. It is positioned as digestive support that
-helps with bloating, acidity, and gas. It can also continue to be used after the main course as
-part of gut health support.
-OK Powder
-OK Powder is taken at night, 15 minutes before bed, followed by warm water. It supports
-digestion, nutrient absorption, and waste excretion. Like the tablet, it can continue to play a
-role beyond the main course.
-Dried Amla
-Dried amla is taken after the liquid. It acts as a natural mouth freshener, helps with taste
-balance, and supports digestion.
-Daily Tracker
-The tracker is a core part of the system, not just an accessory. Users record daily weight,
-meals, steps, water, and sleep, then share it with the team on WhatsApp. This improves
-accountability, helps the support team guide the user using real data, and is part of refund
-eligibility.
-Guide and support
-The kit includes an information booklet, a list of allowed and not allowed foods, and a 7-day
-suggested diet plan for users who want more step-by-step direction. Users can also
-choose from allowed foods according to convenience. Dedicated chat support is available to
-answer questions, keep users on track, and nudge tracker sharing.
+Physical boxed system with three formulation components plus support tools.
+Buying options: 15-day, 30-day, and 60-day.
+Standardized pricing:
+- 15 days: INR 5,800
+- 30 days: INR 10,000
+- 60 days: INR 17,000
+
+Components:
+- OK Liquid: morning empty-stomach step; hunger/craving reduction and satiety support; around 350 to 400 kcal nutrition support.
+- OK Tablet: night step for digestive comfort support (bloating, acidity, gas).
+- OK Powder: night step for digestion, absorption, and elimination support.
+- Dried amla: post-liquid taste balance and digestive support.
+- Daily tracker: records weight, meals, steps, water, sleep; shared on WhatsApp; part of accountability and refund eligibility.
+- Booklet and food guide: allowed/restricted foods and 7-day suggested plan.
+- Dedicated chat support: daily guidance and adherence support.
+
 7. What is in the formulation?
-The formulation has been updated. The current internal standard is:
-● 31 unique ingredients
-● 44 total ingredient entries across the kit
-● 20 in OK Liquid
-● 12 in OK Powder
-● 12 in OK Tablet
-There are no synthetic ingredients and no chemical preservatives anywhere in the kit.
-This is one of the most important truths the brand wants to own. The live site still uses an
-older public number for herbs, so the internal training version should use the updated
-formulation count above.
+Updated internal formulation standard:
+- 31 unique ingredients
+- 44 total ingredient entries across the kit
+- 20 in OK Liquid
+- 12 in OK Powder
+- 12 in OK Tablet
+
+No synthetic ingredients and no chemical preservatives anywhere in the kit.
+
 8. How does it work?
-Obesity Killer Kit is designed as a multi-action Ayurvedic weight-loss system, not a
-single-function product. Its three components work together to support weight loss through
-complementary mechanisms rather than relying on just one lever.
-The OK Liquid primarily helps on the intake side. It reduces hunger and cravings, improves
-satiety, and makes it easier for the user to maintain a caloric deficit without feeling weak or
-depleted. This is important because most weight-loss plans fail not in theory, but in
-day-to-day adherence. By making lower intake easier to sustain, the OK Liquid helps turn
-caloric deficit from a struggle into a more manageable routine.
-The OK Tablet and OK Powder work on the body’s processing side. They are designed to
-support digestion, gut comfort, and metabolic function during the course. By helping reduce
-issues such as bloating, acidity, gas, constipation, and heaviness, they improve digestive
-efficiency and support a lighter, more comfortable physiological state. This matters because
-better digestive function often improves compliance, energy, and overall ease of following
-the program.
-Taken together, the system works on both sides of the equation. The OK Liquid helps reduce
-calorie intake. The OK Tablet and OK Powder support the body’s ability to digest,
-metabolize, and eliminate more effectively. So the kit is not positioned merely as an
-appetite-control product, but as a more holistic weight-loss system that supports both lower
-intake and better internal functioning.
-From an Ayurvedic perspective, the kit is designed to support pachakagni and dhatvagni,
-reduce the accumulation of aam, and promote detoxification. In practical terms, this means
-the course is intended not only to support fat loss, but also to help the body feel lighter,
-cleaner, and more balanced over time. This is why Obesity Killer Kit is positioned as more
-than a short-term weight-loss intervention. It is designed as a structured Ayurvedic system
-that supports fast visible results while remaining natural, practical, and sustainable.
+The system works through complementary actions:
+- Intake side: OK Liquid helps reduce hunger and cravings and supports satiety, making lower intake easier.
+- Processing side: OK Tablet and OK Powder support digestion and gut comfort, helping consistency and comfort.
+
+Combined mechanism: easier adherence to lower intake plus better digestive comfort, resulting in practical and sustainable weight-loss support.
+
+Ayurvedic framing: supports pachakagni and dhatvagni, reduces aam accumulation, and supports detoxification.
+
 9. What benefits do users see?
-The main visible product outcome is 3 to 5 kg weight loss in 15 days when the system is
-followed properly. The live site also foregrounds this same result claim.
-Beyond weight loss, the main expected benefits are:
-● reduced hunger and cravings
-● feeling full for longer
-● sustained energy
-● no hunger-led weakness
-● better digestion
-● less bloating, acidity, gas, and heaviness
-● a feeling of being lighter and more active
-● an easier path to staying in caloric deficit
-● a routine that is easier to follow than most alternatives
-Your earlier product notes also mention secondary benefits such as improved lightness,
-improved sense of nimbleness, detoxification, and sometimes improvements in skin and hair
-texture. These can remain in the internal product truth document, but they should sit below
-the main weight-loss and adherence benefits in hierarchy.
+Primary visible outcome:
+- 3 to 5 kg weight loss in 15 days when followed properly.
+
+Primary practical benefits:
+- reduced hunger and cravings
+- longer fullness
+- sustained energy without hunger-led weakness
+- better digestion and reduced bloating, acidity, gas, heaviness
+- easier day-to-day caloric-deficit adherence
+- easier routine compliance versus high-friction alternatives
+
+Secondary internal benefits may include feeling lighter, improved nimbleness, detox support, and occasional skin/hair improvements.
+
 10. What makes it different?
-Obesity Killer Kit is designed to solve one of the biggest trade-offs in the weight-loss
-category. Most options force people to choose between speed and safety, naturalness and
-effectiveness, or visible results and long-term sustainability. Obesity Killer Kit is positioned to
-bring these together in one system: fast results without side effects, through an all-natural
-Ayurvedic approach that is practical enough to follow in real life.
-The brand truths this product should own are:
-● all-natural and Ayurvedic
-● no side effects
-● fast results
-● long-term sustainability
-● easy to follow
-The single most important differentiator is this: an all-natural Ayurvedic weight-loss
-system with no side effects that still delivers fast visible results.
-This differentiation is not based on one claim alone. It is earned through how the kit is
-designed. The OK Liquid helps reduce hunger and cravings, making it easier to maintain a
-caloric deficit without weakness. The OK Tablet and OK Powder support digestion, gut
-comfort, and metabolic function, so the system works not only by reducing intake but also by
-improving how the body processes food during the course. This makes the kit more holistic
-than a product that works only as an appetite suppressant or only as a fat-burner.
-The product also stands apart in how it is used. It is not positioned as a loose supplement
-that the user takes casually. It is a structured course with a defined routine, food guidance,
-progress tracking, and human support. That structure makes it easier to follow, and that
-ease of following supports better consistency over time.
-Long-term sustainability is another important point of difference, and in this product it has a
-specific meaning. First, the kit can be continued in cycles until the user reaches their target
-weight or a BMI of 25, with a 7 to 10 day break after every 30 days. This makes it
-sustainable as a practical weight-loss path, not just a one-time short course. Second, the kit
-is not designed to create dependency. Once the desired result is achieved, the user can stop
-using it and maintain their weight through a balanced diet, activity, and overall caloric
-balance. Stopping the kit does not by itself cause weight regain. In that sense, the product is
-positioned as a guided aid for weight loss, not a lifelong dependency product.
-In short, Obesity Killer Kit is different because it is designed to offer something people
-strongly want but rarely believe they can get together: a weight-loss system that is natural,
-safe, fast, sustainable, and easy to follow. That is the core strategic space the brand should
-aim to own
-11. What proof supports belief in the product?
-The strongest belief drivers, in your order, are:
-1. testimonials and before/after proof
-2. founder credibility
-3. customer volume
-4. refund guarantee
-5. support structure
-The current standardized proof set is:
-● 70,000+ satisfied users on the live site
-● 200 video testimonials as your updated internal number
-● a live claim of 3 to 5 kg in 15 days
-● a 7-day money-back guarantee with defined adherence conditions on the product
-page
-● daily tracker-led guidance and support
-The live page also shows named testimonials with specific loss figures such as 5.2 kg, 4.6
-kg, and 5.3 kg in 15 days, which strengthens the “visible result” story.
-12. What exactly is the money-back guarantee?
-The guarantee should be described precisely.
-The current offer is: if the customer does not start losing weight within 7 days, they can
-request a full refund. For the guarantee to apply, they must:
-1. follow the course as instructed in the course booklet
-2. share the daily tracker so the team can guide them
-If both conditions are met and the customer still sees no progress, the guarantee is honored.
-The live site states this same structure and also lays out a refund claim flow.
-13. What is the safety position?
-The official internal line is: no side effects. At the same time, the document should note that
-the first 3 days are an adjustment period. That preserves your chosen brand language
-while still keeping internal training grounded in actual user experience.
-For internal use, it is important to distinguish:
-● “no side effects” as the public trust claim
-● “first 3 days are an adjustment period” as internal handling guidance
-That distinction matters because it helps support teams answer early-course questions
-consistently.
-14. What is the continuation and repeat logic?
-The official line is:
-● the kit can be continued until the user reaches their target weight or reaches a BMI of
-25
-● after every 30 days, users should take a break of 7 to 10 days
-● the purpose of this break is to help them learn weight maintenance and allow the
-body to accept the reduced weight as the new normal
-● maintenance afterward depends on balanced diet and activity
-● stopping the kit does not itself cause regain
-You also clarified an important nuance:
-● technically, someone can take the course even below a BMI of 25
-● but if the goal is weight loss, the course should not be taken below a BMI of 25
-● below that point, the weight-loss effect should not be positioned like the first few
-courses
-● other benefits, such as detoxification, may still exist
-15. What is the maintenance story after the main
-course?
-The maintenance story is not “keep taking the kit forever.” The real maintenance logic is:
-● maintain caloric balance
-● follow a balanced diet
-● stay active
-● use Arogyam’s maintenance kit if needed for extra help
-That is important because it keeps the long-term brand story credible. The product is a
-structured intervention, but long-term maintenance still depends on balanced intake, routine,
-and follow-through.
-16. Who created the product?
-The live site identifies Dr. Arun Tyagi as the creator and authority behind Obesity Killer Kit.
-It describes him as having 34 years of experience, with qualifications including BAMS and
-M.D. (Kaya Chikitsa). The site also identifies him as Professor of Medicine and Ex. HOD
-Medicine Panchakarma and Hygiene, Rajasthan Ayurved University.
-He is presented as the founder of Arogyam Ayurvedic Panchakarma Hospital and
-Research Centre Pvt. Ltd., and the site states that he founded Arogyam in 2013.
-17. What is Arogyam’s role in the trust story?
-Arogyam is an important part of the product’s credibility. Your internal guidance positions the
-Obesity Killer Kit as associated with Arogyam Hospital in Jodhpur, Rajasthan, and the live
-site confirms that Dr. Tyagi founded Arogyam Ayurvedic Panchakarma Hospital and
-Research Centre in 2013 and that it has 40 beds. The site also describes it as one of the
-biggest Ayurvedic hospitals in North India.
-Your internal truth set also includes that Arogyam is NABH accredited, has RGHS license,
-and specializes in Panchakarma, obesity, piles, fistula, and joint pain. Since those details
-were provided by you but were not confirmed on the live page I reviewed, they can remain in
-the internal version, but I would treat them as “to be externally verified before broad public
-reuse.”
-18. What mission sits behind the product?
-The mission you want tied to the broader institution is:
-Empower individuals to attain optimal health and well-being through Ayurveda and
-Panchakarma.
-At the product level, the underlying worldview is that obesity is not just a cosmetic issue. It is
-a serious health condition that deserves root-cause treatment, not just temporary
-suppression. The product therefore sits at the intersection of Ayurveda, obesity care,
-practical adherence, and long-term metabolic improvement. This is also consistent with how
-the live product ecosystem presents Dr. Tyagi and Arogyam.
-19. What should the brand not say?
-These are important exclusions for consistency:
-● do not say the product is for users below 18 years of age
-● do not make “no separate meal prep” the center of brand positioning, even though it
-can still be used as an ease-of-following support point
-● do not rely on older ingredient counts such as 39 herbs in internal training material,
-because the formulation count has changed
-20. Final strategic summary
-If this document is used as the product foundation for employees, creative teams, agencies,
-and AI systems, the core truths to remember are these:
-Obesity Killer Kit is a structured Ayurvedic weight-loss system for adults with BMI
-above 25 who want fast visible results through a natural, easy-to-follow,
-doctor-backed process.
-It wins because it combines:
-● appetite control without weakness
-● digestive and metabolic support
-● easy daily structure
-● human guidance
-● credible proof
-● a clear institutional trust story through Dr. Arun Tyagi and Arogyam
-It should be remembered not as “just an Ayurvedic kit,” but as a practical obesity-support
-system designed to make weight loss easier to follow in real life.
+Strategic differentiator:
+an all-natural Ayurvedic weight-loss system with no side effects positioning that still targets fast visible results.
 
-Encyclopedia of the Dr. Arun Tyagi’s Obesity
-Killer Kit
-Parent Brand Overview: Arogyam Panchakarma
-Hospital and Research Centre
-Founded in 2013 by Dr. Arun Tyagi, Arogyam is an Ayurvedic Hospital and Research
-Centre based in Jodhpur, Rajasthan. It combines Panchakarma therapy and Ayurvedic
-medicine to treat chronic lifestyle and metabolic diseases. Dr. Tyagi holds an M.D. and
-B.A.M.S. in Kaya-Chikitsa from Madan Mohan Malviya Ayurvedic College, Udaipur and
-has over 34 years of experience in the field. (Ajit colony earlier and Bhagat ki o\Kothi now)
-Mission Statement:
-Empower individuals to attain optimal health and well-being through Ayurveda and
-Panchakarma.
-Dr. Arun Tyagi
-Dr. Arun Tyagi is the founder of Arogyam Ayurvedic Panchakarma Hospital & Research
-Center (est. 2013, Jodhpur).
-● Expertise: M.D. (Ayurveda), BAMS (Medicine/Kaya-Chikitsa).
-● Experience: Ex. HOD, Panchakarma and Hygiene, Dr. Sarvepalli Radhakrishnan
-Ayurvedic University, Jodhpur
-● Over 30 years of clinical, research and teaching experience.
-● Focus: Obesity and Panchakarma
-● Formulated the Obesity Killer Kit in 2013 with the mission of eradicating obesity from
-the world
-The Obesity Killer Kit
-The Obesity Killer Kit is a Ayurvedic weight loss course designed for individuals with a BMI
-over 25 who struggle with high weight. Formulated by Dr. Arun Tyagi after years of research,
-the kit includes a blend of 39 natural herbs that suppress hunger, improves digestion, and
-induces body to burn fat. It enables safe and visible weight loss—3 to 5 kg on average every
-15 days —without requiring crash diets or intense workouts. The course includes
-pre-portioned liquid sachets (OK Liquid), tablets (OK Tablet), and powder (OK Powder) with
-personalized support, making it an easy, fast, and effective solution for long-term
-transformation.
-Key highlights:
-● Naturally reduces appetite and improves metabolism and digestion.
-● Backed by Ayurveda and modern research.
-● Trusted by 70,000+ customers
-● No side effects, no crash diets, no heavy workouts.
-● Natural fat loss. No automatic bounce back once the course is stopped
-Product Contents:
-What’s inside the kit - WATCH HERE
-What’s inside?
-● OK Liquid: Taken in the morning on an empty stomach. Reduces hunger, activates
-fat burning. Provides nutrition and sustained energy to prevent weakness.
-● OK Powder & Tablet: Taken at night. Supports digestion, detoxifies, and helps
-overnight fat breakdown.
-● Packaging (15 day kit): 15 daily pouches + OK Powder (comes in a bottle), OK
-Tablet (15 count, comes in a bottle), Amla (comes in an bottle), Instructions Booklet,
-daily tracker (sample trackers filled by users)
-Ingredients and Composition:
-● 39 Ayurvedic herbs broken across three key components, designed to suppress
-hunger, break down fat, and provide nutrition.
-How does it work?
-Watch Dr. Arun Tyagi explain - How does The Obesity Killer Kit Work?
-The Obesity Killer Kit works in three simple, natural ways:
-Controls hunger and cravings
-The OK Liquid, taken in the morning, creates a feeling of fullness. It increases satiety. The
-liquid gets digested very slowly which makes users feel fuller for longer. The liquid also
-provides necessary nutrition (along with the advised diet plan) to ensure that no weakness or
-lethargy is experienced by the users.
-Boosts fat burning
-While you're naturally eating less, the body starts using stored fat for energy. The herbs in
-the kit activate your body's fat-burning mechanisms without affecting your strength.
-Improves digestion and detoxifies
-The OK Powder & Tablet, taken at night, helps clean the gut, improve digestion (Agni), and
-remove toxins (Ama) — all key principles in Ayurveda for sustainable fat loss.
-Who is it for?
-● Anyone with BMI > 25.
-● Age group 10-80 years
-● Those whose weight has increased due to genetics, medical conditions (PCOD,
-Thyroid, Diabetes etc.)
-● Those struggling with cravings, emotional eating, or stuck weight.
-● Suitable for busy professionals, homemakers, seniors.
-● Not for: Pregnant women or those within 6 months postpartum.
-Why is it different?
-● Ayurvedic & natural — 27 carefully chosen herbs.
-● No hunger, no weakness — people feel energetic.
-● Quick results - 3-5 kg weight loss in 15 days
-● 100% natural ingredients
-● No side effects
-● Dedicated support via WhatsApp, free on-call consultation
-● Money-back guarantee (terms apply).
-Course Brief
-“The Obesity Killer Kit has 3 components - OK Liquid, OK Tablet, and OK Powder. OK Liquid
-is the main component which needs to be taken on an empty stomach in the morning. On
-taking the OK Liquid, you will not feel hungry for a long duration. You will feel full. Because
-you are feeling full, naturally you will be taking fewer calories from an external meal. During
-this time, the body starts using stored fat to fulfill energy needs for your regular activities.
-And that is how you lose weight. With this kit, you can lose 3-5 kg in 15 days and 6-10 kg in
-a 30 day period.
-Now, because you will not be feeling hungry, the biggest instruction from our side is to eat
-ONLY when you feel true hunger. There is no fixed meal timing with the course. So a 2 PM
-lunch or 8 PM dinner does not apply. Eat only when you are hungry. Most people take 1-1.5
-meals with this course in a day.
-Now, because you will be taking fewer meals, it is important that they are nutritious.
-Whenever you eat, start with home-made vegetables, salads, fruits and soup. There is no
-limit to the amount of any of these. You can consume as much as you want. The vegetables
-can be cooked normally in ghee or oil. If you feel hungry even after eating all this, you can
-take up to 30 g of complex carbohydrates like millets or oats.
-During the course, non-vegetarian food, alcohol, dairy products and simple carbohydrates
-like wheat chapati and rice are not allowed.
-Along with this, drink 4 liters of water per day, walk
-5000-7000 steps, and right before going to sleep take ½ teaspoon of powder and 1 tablet
-that comes with the course. This will help you with any acidity, bloating or constipation issues
-you might have. Your digestion and metabolism will improve and you will feel lighter and
-more energetic by the end of the course.”
-Top Guidelines
-General Guidelines
-OK Liquid: Drink on an empty stomach in the morning. Fast for 4 hours after (tea/coffee
-allowed). Take any regular medications as usual.
-Tablet & Powder: Take 1 tablet + 1/2 teaspoon of powder 15 minutes before bedtime.
-Eat Only When Hungry: The liquid curbs cravings. Eat only when you're truly hungry—not by
-the clock.
-Diet Guidelines
-- Focus on vegetables, salads, soups, and fruits (see booklet for full list).
-- If you're very hungry, you may have millet or oats in moderation.
-- Not allowed: Non-veg, nuts, alcohol, and dairy (except milk in tea/coffee). Rice, chapati, or
-dal—these are simple carbs.
-- Drink 4 liters of water daily.
-Workout
-- Walk 45–60 minutes (5000-7000 steps) daily. If walking is not possible, do pranayam
-Customer Support
-● Consultation Calls: all consultation calls are to be booked by customers.
-● Daily Support:
-○ 10/6 WhatsApp chat support.
-○ Feedback based on daily trackers
-○ Consultation calls during the course on request
-Pricing, Value, and Competition
-● Cost: ₹5800 for a 15-day course (3-5 kg weight loss), 10,000 for a 30-day course
-(6-10 kg weight loss)
-● Comparison: Competitive against Herbalife, Amway, and gym memberships.
-● Value Proposition: Fastest weight loss for each rupee spent and each day devoted
-Understanding Weight Loss Customers
-Benefits
-Weight Loss: "lost 20 pounds", "dropped a dress size", "finally seeing results".
-Improved Health: "lowered my blood pressure", "better cholesterol levels", "more energy".
-Increased Confidence: "feel more confident", "improved self-esteem", "happier with my body".
-Sustainable Habits: "developed healthier eating habits", "consistent exercise routine", "lifestyle change".
-Prior Pain Points
-Plateaus: "hit a plateau", "stuck at the same weight", "not seeing progress".
-Cravings: "struggling with cravings", "can't resist junk food", "sugar addiction".
-Lack of Motivation: "hard to stay motivated", "lost interest", "gave up easily".
-Emotional Eating: "eat when stressed", "binge eating", "emotional eater".
-Features of Products and Solutions Used
-Calorie Counting Apps: "using MyFitnessPal", "tracking calories", "logging food intake".
-Meal Plans: "following a meal plan", "prepping meals", "structured diet".
-Exercise Programs: "joined a gym", "doing HIIT workouts", "following a fitness routine".
-Support Groups: "joined a support group", "accountability partner", "online community".
-Prior Objections or Previous Failed Solutions
-Diet Restrictions: "couldn't stick to keto", "too restrictive", "gave up on low-carb", "felt deprived, couldn't
-continue"
-Time Constraints: "no time to cook", "busy schedule", "can't find time to exercise", "felt overwhelmed by
-information"
-Cost: "too expensive", "can't afford a gym membership", "costly meal plans".
-Ineffectiveness: "didn't see results", "waste of time", "didn't work for me".
-Real Customer Language Examples
-Benefits: "I finally lost 20 pounds after struggling for years. My energy levels are through the roof, and I feel
-more confident in my own skin."
-Prior Pain Points: "I was stuck at the same weight for months and felt so discouraged. The cravings for
-sweets were unbearable, and I often found myself binge eating."
-Features of Products and Solutions Used: "Using MyFitnessPal to track my calories has been a
-game-changer. I also started prepping my meals on Sundays, which helps me stay on track during the
-week."
-Prior Objections or Previous Failed Solutions: "I tried keto, but it was too restrictive for me. I also found it
-hard to stick to a workout routine because of my busy schedule."
-These insights provide a comprehensive understanding of the language and experiences shared by users
-on r/loseit regarding their weight loss journeys.
-"I've tried so many diets, but I always end up back where I started. It's frustrating."
-"Tracking my calories with MyFitnessPal has been a game-changer for me. It keeps me accountable."
-"I hit a plateau and felt like giving up, but the support from this community kept me going."
-"Intermittent fasting works for me because it's flexible and fits into my busy schedule."
-"I used to binge eat when stressed, but therapy has helped me manage my emotions better."
-"Joining a local support group made all the difference. Having people who understand what I'm going
-through is invaluable."
-Needs
-Accountability and support: Many users express the need for a community or support system to keep them
-motivated and accountable.
-Sustainable habits: There is a strong desire for solutions that can be maintained long-term rather than
-quick fixes.
-Personalized plans: Users often seek tailored advice that fits their unique lifestyle, preferences, and
-challenges.
-Wants
-Clear and achievable goals: Setting realistic milestones and having a clear path to follow is important for
-many users.
-Flexibility: Solutions that allow for flexibility in diet and exercise are highly valued, as they accommodate
-busy schedules and personal preferences.
-Positive reinforcement: Celebrating small victories and receiving encouragement from others is crucial for
-maintaining motivation.
-Challenges
-Emotional and psychological barriers: Overcoming emotional eating, stress, and mental health issues are
-common hurdles.
-Social situations: Navigating social events, family gatherings, and peer pressure without derailing progress
-is a frequent challenge.
-Consistency: Maintaining consistency in diet and exercise routines, especially during busy or stressful
-periods, is a significant struggle for many users.
-Who are the primary customers currently?
-Male : Female - 30% : 70%
-Age group - 25-45 years (70%+)
-Location - 50% Metros, 50% rest of India
-How big is the problem of obesity?
-In India, approximately 24%, that is 35 Cr people are obese or overweight. All these people
-can be helped with weight loss.
-Globally ~250 Cr people are overweight
-Marketing Guidelines
-Brand Personality (How do we act & speak?)
-● Empathetic Coach: Friendly, understanding, but firm — like a coach who cares
-deeply but doesn’t sugarcoat.
-● Knowledgeable & Trustworthy: Speaks with authority based on research and
-clinical expertise (Dr. Tyagi’s background).
-● Positive & Uplifting: Encourages transformation and self-confidence, focuses on
-solutions rather than guilt or shame.
-Communication and creative principles:
-● Function over form
-● Simple language, no jargons
-● Correct information at all touch points - losing a customer is okay, losing trust is not
-Messaging Strategy
-Pain Points Addressed:
-● Hunger cravings and emotional eating.
-● Consistency challenges.
-● Failed past attempts with other methods.
-Benefits Highlighted:
-● Fast and sustainable weight loss.
-● Improved overall health.
-● Simple and convenient solution.
-Objections Overcome:
-● Safety Concerns: Proven, natural, and side-effect-free.
-● Cost vs. Value: Competitive pricing with high ROI.
-● Effectiveness: Backed by success stories and a money-back guarantee.
-Differentiating USPs:
-● Results in just 15 days.
-● 100% natural and Ayurvedic. No side effects.
-● No hunger, no weakness, no sacrifices.
-● Money back guarantee
+Brand truths to preserve:
+- all-natural and Ayurvedic
+- no side effects (public line)
+- fast results
+- easy to follow
+- long-term sustainability
+
+Usage differentiator:
+structured protocol with routine, food guidance, tracker, and human support instead of casual supplement usage.
+
+11. What proof supports belief?
+Current proof stack:
+- 70,000+ users served
+- 200 video testimonials
+- 3 to 5 kg in 15 days claim
+- 7-day money-back guarantee with adherence conditions
+- daily tracker-led support
+- founder and institutional credibility
+
+12. Money-back guarantee details
+If user does not start losing weight within 7 days, full refund can be requested when BOTH are true:
+1) course protocol was followed as instructed
+2) daily tracker was shared with support team
+
+13. Safety position
+Public trust line: no side effects.
+Internal handling: first 3 days can be adjustment period.
+
+14. Continuation and repeat logic
+- continue until target weight or BMI 25
+- after each 30 days, keep 7 to 10 day break
+- break helps maintenance learning and adaptation
+- stopping kit does not itself cause regain
+
+15. Maintenance after main course
+Maintenance is not lifelong dependency on the kit.
+Core maintenance logic:
+- maintain caloric balance
+- follow balanced diet
+- stay active
+- optional maintenance support products if needed
+
+16. Creator and trust institution
+Creator: Dr. Arun Tyagi.
+Positioning: 34 years of experience; BAMS and M.D. (Kaya Chikitsa); obesity and Panchakarma specialist.
+Institution: Arogyam Ayurvedic Panchakarma Hospital and Research Centre, founded in 2013 in Jodhpur.
+
+17. Parent brand context
+Arogyam mission:
+"Empower individuals to attain optimal health and well-being through Ayurveda and Panchakarma."
+
+18. Detailed execution protocol
+Daily routine:
+- take OK Liquid in morning on empty stomach
+- maintain 4-hour fasting window for solids after liquid
+- take OK Tablet + 1/2 tsp Powder before sleep
+
+Eating behavior:
+- eat only when true hunger is felt
+- no fixed meal timings
+- many users naturally move to 1 to 1.5 meals/day
+
+19. Diet system and lifestyle requirements
+Allowed foods:
+- vegetables (no practical cap)
+- salads
+- fruits
+- soups
+
+Conditional:
+- up to 30g complex carbs (millets/oats) if still hungry
+
+Restricted:
+- non-vegetarian food
+- alcohol
+- dairy except milk in tea/coffee
+- wheat chapati, rice, dal
+- nuts
+
+Lifestyle:
+- water around 4 liters/day
+- activity 5000 to 7000 steps/day or pranayam
+- consistency over intensity
+
+20. Support, psychology, and communication
+Support system:
+- WhatsApp daily support
+- tracker-based guidance
+- consultation calls on request
+
+Core customer pain points:
+- cravings and emotional eating
+- plateaus
+- inconsistency and low motivation
+- failure with restrictive diets
+
+Communication principles:
+- simple language
+- accuracy over persuasion
+- trust-first messaging
+
+Brand personality:
+- empathetic but firm coach
+- authoritative and knowledgeable
+- positive and solution-focused
+
+21. Messaging strategy and market context
+Pain points addressed:
+- hunger and cravings
+- inconsistency
+- failure of past methods
+
+Benefits highlighted:
+- fast, visible weight-loss support
+- improved energy and comfort
+- simple, structured system
+
+Objection handling:
+- safety: natural with no side effects positioning
+- cost: outcome-oriented value
+- effectiveness: proof plus guarantee
+
+Competitive framing:
+- compared against Herbalife, Amway, and gym-only routes on adherence, speed visibility, and practical ROI
+
+Target customer distribution:
+- gender: about 30% male, 70% female
+- age: primarily 25 to 45
+- geography: about 50% metro and 50% non-metro
+
+Obesity context:
+- India: around 24% population overweight (~35 crore)
+- Global: around 250 crore overweight
+
+22. Brand design system
 Typography:
-● Headline Font: Poppins Bold.
-● Body Font: Poppins Regular.
-colors:
+- Headline: Poppins Bold
+- Body: Poppins Regular
 
-F5821F
-000000
-560E06
-008C44
-8DA738
-FFCC29
-FEFAEO
+Palette:
+- #F5821F
+- #000000
+- #560E06
+- #008C44
+- #8DA738
+- #FFCC29
+- #FEFAE0
 
-Acceptable variations in color
-Flush Orange
-
-50 FFFBED
-100 FEEFD6
-200 FCDBAC
-300 FACT77
-400 F79040
-500 F5821F
-600 E66410
-700 BF4BOF
-800 973015
-900 7A3314
-950 421808
+23. Final exclusions and guardrails
+Do not claim product is for users below 18.
+Do not use old ingredient counts (for example 39 herbs) in internal truth outputs.
+Do not make abstract ad copy that hides the obesity/weight-loss objective.
+Do not use cure language for medical conditions.

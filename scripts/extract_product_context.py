@@ -82,6 +82,12 @@ def extract_product_sections(lines: list[str]) -> list[str]:
         "14. What is the continuation and repeat logic",
         "15. What is the maintenance story",
         "16. Who created the product",
+        "17. Parent brand context",
+        "18. Detailed execution protocol",
+        "19. Diet system and lifestyle requirements",
+        "20. Support, psychology, and communication",
+        "21. Messaging strategy and market context",
+        "22. Brand design system",
         "19. What should the brand not say",
     ]
 
@@ -90,7 +96,7 @@ def extract_product_sections(lines: list[str]) -> list[str]:
         match = next((section for title, section in sections if title.lower().startswith(wanted.lower())), None)
         if not match:
             continue
-        out.extend(match[:10])
+        out.extend(match[:16])
     return out
 
 
@@ -200,9 +206,9 @@ def main() -> int:
     parser.add_argument("--mechanism", default="PRODUCT_MECHANISM_V1.txt")
     parser.add_argument("--faq", default="faq.txt")
     parser.add_argument("--max-lines", type=int, default=0, help="Optional global cap for all sources")
-    parser.add_argument("--max-lines-product", type=int, default=70)
-    parser.add_argument("--max-lines-mechanism", type=int, default=45)
-    parser.add_argument("--max-lines-faq", type=int, default=55)
+    parser.add_argument("--max-lines-product", type=int, default=120)
+    parser.add_argument("--max-lines-mechanism", type=int, default=70)
+    parser.add_argument("--max-lines-faq", type=int, default=80)
     parser.add_argument("--json", action="store_true")
     args = parser.parse_args()
 
@@ -235,6 +241,9 @@ def main() -> int:
         "continuation",
         "maintenance",
         "dr. arun",
+        "on-image copy mandate",
+        "explicitly mention weight loss",
+        "obesity reduction",
     ]
     mechanism_keywords = [
         "mechanism",
