@@ -1,0 +1,281 @@
+{
+  "metadata": {
+    "extractor_model": "canonical-extraction-v1",
+    "source_files": [
+      "productinfomain.txt",
+      "PRODUCT_MECHANISM_V1.txt",
+      "faq.txt"
+    ]
+  },
+  "canonical": {
+    "positioning": [
+      "doctor-formulated Ayurvedic weight-loss system",
+      "structured guided protocol, not a loose supplement",
+      "not a standalone fat-burner"
+    ],
+    "promise_claims": [
+      "3 to 5 kg weight loss in 15 days when protocol is followed",
+      "6-10 kg weight loss in 30 days"
+    ],
+    "eligibility": [
+      "adults (18+) with BMI > 25",
+      "users with cravings, inconsistency, emotional eating, low energy, or slow progress",
+      "relevant for PCOD/PCOS, thyroid imbalance, high BP, fatty liver, diabetes, IBS, menopause-related weight gain (not a cure claim)"
+    ],
+    "exclusions": [
+      "pregnancy",
+      "within 6 months postpartum",
+      "active insulin users"
+    ],
+    "caution_conditions": [
+      "multi-psychiatric-medication cases require doctor review",
+      "multiple-surgery cases require doctor review"
+    ],
+    "protocol_morning": [
+      "OK Liquid on empty stomach in the morning",
+      "warm pouch in hot water for 3-5 minutes",
+      "then 4-hour no-solid-food window",
+      "zero-calorie drinks (tea, coffee, lemon water) allowed",
+      "take first thing upon waking, even if wake-up time is unusual"
+    ],
+    "protocol_night": [
+      "OK Powder + OK Tablet ~15 minutes before bed",
+      "maintain 2-hour gap between dinner and bedtime",
+      "follow with warm water"
+    ],
+    "fasting_rules": [
+      "4-hour no-solid-food window after morning liquid",
+      "no fixed meal timing - eat only when truly hungry"
+    ],
+    "allowed_items": [
+      "vegetables (cooked in ghee or oil)",
+      "salads",
+      "soups",
+      "fruits",
+      "millets or oats (up to 30g if still hungry)",
+      "zero-calorie drinks - tea, coffee, lemon water, jeera water",
+      "sprouts (boiled), tofu, protein powders"
+    ],
+    "restricted_items": [
+      "non-vegetarian food",
+      "alcohol",
+      "dairy products (except milk in tea/coffee)",
+      "simple carbohydrates - rice, wheat chapati, dal",
+      "nuts",
+      "curd/buttermilk/coconut water"
+    ],
+    "mechanism_allowed_claims": [
+      "helps reduce hunger",
+      "helps control cravings",
+      "supports digestion",
+      "helps reduce overall intake",
+      "helps feel full for longer",
+      "helps reduce random snacking",
+      "can support more stable daily energy",
+      "can make a simpler routine easier to follow",
+      "reduces meal frequency",
+      "reduces portion size",
+      "easier caloric deficit adherence"
+    ],
+    "mechanism_disallowed_claims": [
+      "burns fat rapidly",
+      "boosts metabolism drastically",
+      "melts fat without effort",
+      "works without diet awareness",
+      "lets you eat unlimited junk",
+      "overrides overeating completely"
+    ],
+    "safety_public_line": [
+      "no side effects"
+    ],
+    "safety_internal_handling": [
+      "first 3 days can be adjustment phase"
+    ],
+    "pricing": [
+      "15-day kit: ₹5,800",
+      "30-day kit: ₹10,000",
+      "60-day kit: ₹17,000"
+    ],
+    "guarantee": [
+      "if weight-loss start is not observed in first 7 days, refund applies",
+      "conditions: follow protocol + daily tracker sharing",
+      "refund not applicable without tracker information"
+    ],
+    "continuation": [
+      "continue until target weight or BMI 25 is reached",
+      "after each 30 days, keep 7 to 10 day break",
+      "break helps body accept reduced weight as new normal"
+    ],
+    "maintenance": [
+      "BMR-based intake (1200-1400 kcal for female, 1400-1600 kcal for male)",
+      "daily activity - 45 minutes",
+      "macro order: protein -> fiber -> fats -> carbs",
+      "replace simple carbs with complex carbs (millets)",
+      "heavy lunch, light dinner before 7 PM",
+      "3-hour gap between dinner and bedtime",
+      "limit outside food to once a week",
+      "drink 4 liters water daily"
+    ],
+    "proof_points": [
+      "70,000+ users served",
+      "200 video testimonials",
+      "founder Dr. Arun Tyagi - 34 years experience, BAMS, M.D. Kaya Chikitsa",
+      "Arogyam Ayurvedic Hospital established 2013",
+      "3-5 kg weight loss claim",
+      "daily tracker-led guidance and support",
+      "98.3% success rate (Aug 2025)"
+    ],
+    "messaging_guardrails": [
+      "no body-shaming",
+      "no cure-all claims",
+      "no anti-gym or anti-diet messaging",
+      "no competitor bashing"
+    ]
+  },
+  "conflicts": [
+    {
+      "conflict_id": "ingredient-count-legacy",
+      "bucket": "formulation",
+      "claim_a": {
+        "text": "31 unique ingredients, 44 total entries (20 liquid, 12 powder, 12 tablet)",
+        "source_file": "productinfomain.txt",
+        "line_start": 1,
+        "line_end": 1
+      },
+      "claim_b": {
+        "text": "39 Ayurvedic herbs broken across three key components",
+        "source_file": "productinfomain.txt",
+        "line_start": 1,
+        "line_end": 1
+      },
+      "resolution_status": "resolved",
+      "chosen_claim": {
+        "text": "31 unique ingredients, 44 total entries (20 liquid, 12 powder, 12 tablet)",
+        "source_file": "productinfomain.txt",
+        "line_start": 1,
+        "line_end": 1
+      },
+      "resolution_reason": "CONTEXT SNAPSHOT establishes 31/44 as CANONICAL OVERRIDE - older encyclopedia/training fragments must not override higher-priority claims. The 39-claim is legacy data from encyclopedia section.",
+      "risk_level": "medium"
+    },
+    {
+      "conflict_id": "mechanism-positioning-fat-burner",
+      "bucket": "positioning",
+      "claim_a": {
+        "text": "This is NOT a standalone fat-burner claim product",
+        "source_file": "PRODUCT_MECHANISM_V1.txt",
+        "line_start": 1,
+        "line_end": 1
+      },
+      "claim_b": {
+        "text": "induces body to burn fat",
+        "source_file": "productinfomain.txt",
+        "line_start": 1,
+        "line_end": 1
+      },
+      "resolution_status": "resolved",
+      "chosen_claim": {
+        "text": "This is NOT a standalone fat-burner claim product - protocol-based appetite regulation + eating-behavior correction + digestion/gut-comfort support",
+        "source_file": "PRODUCT_MECHANISM_V1.txt",
+        "line_start": 1,
+        "line_end": 1
+      },
+      "resolution_reason": "PRODUCT_MECHANISM_V1.txt explicitly states this is NOT a fat-burner. The encyclopedia's 'burn fat' language is removed. Mechanism is appetite control leading to caloric deficit, not direct fat-burning.",
+      "risk_level": "high"
+    },
+    {
+      "conflict_id": "target-age-range",
+      "bucket": "eligibility",
+      "claim_a": {
+        "text": "adults (18+) with BMI above 25",
+        "source_file": "productinfomain.txt",
+        "line_start": 1,
+        "line_end": 1
+      },
+      "claim_b": {
+        "text": "Age group 10-80 years",
+        "source_file": "productinfomain.txt",
+        "line_start": 1,
+        "line_end": 1
+      },
+      "resolution_status": "resolved",
+      "chosen_claim": {
+        "text": "adults (18+) with BMI above 25",
+        "source_file": "productinfomain.txt",
+        "line_start": 1,
+        "line_end": 1
+      },
+      "resolution_reason": "CONTEXT SNAPSHOT establishes adults 18+ as target. Encyclopedia's 10-80 years is legacy data and contradicts safety exclusions. Product is not for users below 18 per CANONICAL OVERRIDES.",
+      "risk_level": "high"
+    },
+    {
+      "conflict_id": "ketosis-claim",
+      "bucket": "mechanism",
+      "claim_a": {
+        "text": "The body starts using stored fat for energy through a natural process called ketosis",
+        "source_file": "faq.txt",
+        "line_start": 1,
+        "line_end": 1
+      },
+      "claim_b": {
+        "text": "This is NOT a keto diet. However, the OK Liquid promotes natural ketosis",
+        "source_file": "faq.txt",
+        "line_start": 1,
+        "line_end": 1
+      },
+      "resolution_status": "resolved",
+      "chosen_claim": {
+        "text": "The product reduces unnecessary eating leading to lower intake, body uses stored fat - NOT positioned as ketosis/ketogenic product",
+        "source_file": "PRODUCT_MECHANISM_V1.txt",
+        "line_start": 1,
+        "line_end": 1
+      },
+      "resolution_reason": "While faq.txt mentions ketosis in conversational language, mechanism file clarifies this is NOT a ketogenic product claim. The mechanism is appetite regulation, not metabolic ketosis induction.",
+      "risk_level": "medium"
+    }
+  ],
+  "dropped_claims": [
+    {
+      "text": "39 Ayurvedic herbs",
+      "reason": "legacy_override_blocked",
+      "source_file": "productinfomain.txt",
+      "line_start": 1,
+      "line_end": 1
+    },
+    {
+      "text": "Age group 10-80 years",
+      "reason": "legacy_override_blocked",
+      "source_file": "productinfomain.txt",
+      "line_start": 1,
+      "line_end": 1
+    },
+    {
+      "text": "induces body to burn fat",
+      "reason": "conflict",
+      "source_file": "productinfomain.txt",
+      "line_start": 1,
+      "line_end": 1
+    },
+    {
+      "text": "natural ketosis",
+      "reason": "ambiguity",
+      "source_file": "faq.txt",
+      "line_start": 1,
+      "line_end": 1
+    }
+  ],
+  "coverage_check": {
+    "required_present": {
+      "3_to_5kg_15days": true,
+      "adults_18plus_bmi_gt_25": true,
+      "insulin_exclusion": true,
+      "pregnancy_postpartum_exclusion": true,
+      "morning_liquid_4h_no_solids": true,
+      "night_powder_tablet": true,
+      "31_unique_44_total": true,
+      "refund_7day_with_tracker": true,
+      "not_fat_burner_positioning": true
+    },
+    "missing_required": []
+  }
+}

@@ -1,0 +1,269 @@
+{
+  "metadata": {
+    "extractor_model": "opencode/minimax-m2.5-free",
+    "source_files": [
+      "productinfomain.txt",
+      "PRODUCT_MECHANISM_V1.txt",
+      "faq.txt"
+    ]
+  },
+  "canonical": {
+    "positioning": [
+      "doctor-formulated Ayurvedic weight-loss system; structured guided protocol, not a loose supplement",
+      "protocol-based appetite regulation + eating-behavior correction + digestion/gut-comfort support",
+      "NOT a standalone fat-burner claim product"
+    ],
+    "promise_claims": [
+      "3 to 5 kg weight loss in 15 days when protocol is followed",
+      "6 to 10 kg in 30 days"
+    ],
+    "eligibility": [
+      "Adults (18+) with BMI > 25",
+      "users with cravings, inconsistency, emotional eating, low energy, or slow progress",
+      "relevant for PCOD/PCOS, thyroid imbalance, high BP, fatty liver, diabetes, IBS, menopause-related weight gain (not a cure claim)"
+    ],
+    "exclusions": [
+      "pregnancy",
+      "within 6 months postpartum",
+      "active insulin users",
+      "do not state product is for users below 18 years of age"
+    ],
+    "caution_conditions": [
+      "multi-psychiatric-medication cases require doctor review",
+      "multiple-surgery cases require doctor review",
+      "first 3 days can be adjustment phase (internal handling guidance)"
+    ],
+    "protocol_morning": [
+      "OK Liquid on empty stomach",
+      "warm pouch in hot water",
+      "then 4-hour no-solid-food window",
+      "zero-calorie drinks allowed (tea, coffee, lemon water, jeera water)",
+      "provides approximately 350 to 400 kcal nutrition"
+    ],
+    "protocol_night": [
+      "OK Powder + OK Tablet around 15 minutes before bed",
+      "typically after dinner gap (maintain 2-hour gap between dinner and bedtime)",
+      "take with warm water"
+    ],
+    "fasting_rules": [
+      "4-hour no-solid-food window after morning liquid",
+      "zero-calorie drinks may be consumed during fasting window",
+      "eat ONLY when true hunger is felt; no fixed meal timing"
+    ],
+    "allowed_items": [
+      "vegetables",
+      "salads",
+      "soups",
+      "fruits",
+      "millets (up to 30g/day)",
+      "oats",
+      "dried amla",
+      "tea/coffee (up to 3 cups, 50:50 milk:water ratio)"
+    ],
+    "restricted_items": [
+      "non-vegetarian food",
+      "alcohol",
+      "dairy products (except milk in tea/coffee)",
+      "nuts",
+      "coconut water",
+      "curd/buttermilk",
+      "rice",
+      "wheat chapati",
+      "dal",
+      "simple carbohydrates"
+    ],
+    "mechanism_allowed_claims": [
+      "helps reduce hunger",
+      "helps control cravings",
+      "supports digestion",
+      "helps reduce overall intake",
+      "helps feel full for longer",
+      "helps reduce random snacking",
+      "supports more stable daily energy",
+      "supports lower caloric deficit adherence"
+    ],
+    "mechanism_disallowed_claims": [
+      "rapid fat melting",
+      "boosts metabolism drastically",
+      "melts fat without effort",
+      "fat burner positioning",
+      "unlimited junk food",
+      "zero-discipline outcomes",
+      "works without diet awareness",
+      "overrides overeating completely"
+    ],
+    "safety_public_line": [
+      "no side effects"
+    ],
+    "safety_internal_handling": [
+      "first 3 days can be adjustment phase",
+      "distinguish public claim from internal guidance for support team consistency"
+    ],
+    "pricing": [
+      "₹5,800 for 15 days",
+      "₹10,000 for 30 days",
+      "₹17,000 for 60 days"
+    ],
+    "guarantee": [
+      "if weight-loss start is not observed in first 7 days, full refund applies",
+      "conditions: protocol adherence + daily tracker sharing",
+      "refund processed within 2 days after return parcel reaches"
+    ],
+    "continuation": [
+      "can continue until target weight or BMI 25 is reached",
+      "after every 30 days, take 7 to 10 day break",
+      "purpose of break: help body accept reduced weight as new normal and learn maintenance"
+    ],
+    "maintenance": [
+      "BMR-based intake (1200-1400 kcal for female, 1400-1600 kcal for male)",
+      "daily activity (45-60 minutes)",
+      "macro order: protein -> fiber -> fats -> carbs",
+      "drink 4 liters of water daily",
+      "heavy lunch, light dinner before 7 PM",
+      "maintain 3-hour gap between dinner and bedtime",
+      "limit outside food to once a week"
+    ],
+    "proof_points": [
+      "70,000+ users served",
+      "200 video testimonials",
+      "3 to 5 kg in 15 days result claim",
+      "founder Dr. Arun Tyagi (34 years experience, BAMS, M.D. Kaya Chikitsa)",
+      "Arogyam Ayurvedic Panchakarma Hospital founded 2013",
+      "tracker-led daily guidance and support"
+    ],
+    "messaging_guardrails": [
+      "no body-shaming",
+      "no cure-all claims",
+      "no anti-gym or anti-diet messaging",
+      "no competitor bashing"
+    ]
+  },
+  "conflicts": [
+    {
+      "conflict_id": "INGREDIENT_COUNT_001",
+      "bucket": "formulation_composition",
+      "claim_a": {
+        "text": "39 Ayurvedic herbs",
+        "source_file": "productinfomain.txt (Encyclopedia section)",
+        "line_start": 0,
+        "line_end": 0
+      },
+      "claim_b": {
+        "text": "31 unique ingredients, 44 total entries (20 liquid, 12 powder, 12 tablet)",
+        "source_file": "productinfomain.txt (CONTEXT SNAPSHOT - CANONICAL OVERRIDES 2026-04-21)",
+        "line_start": 0,
+        "line_end": 0
+      },
+      "resolution_status": "resolved",
+      "chosen_claim": {
+        "text": "31 unique ingredients, 44 total entries (20 liquid, 12 powder, 12 tablet)",
+        "source_file": "productinfomain.txt (CONTEXT SNAPSHOT - CANONICAL OVERRIDES 2026-04-21)",
+        "line_start": 0,
+        "line_end": 0
+      },
+      "resolution_reason": "CANONICAL OVERRIDES section explicitly supersedes lower sections per source file directive; 39 herb count is from legacy encyclopedia/training fragment",
+      "risk_level": "high"
+    },
+    {
+      "conflict_id": "POSITIONING_001",
+      "bucket": "product_positioning",
+      "claim_a": {
+        "text": "blend of 39 natural herbs that suppress hunger, improves digestion, and induces body to burn fat",
+        "source_file": "productinfomain.txt (Encyclopedia section)",
+        "line_start": 0,
+        "line_end": 0
+      },
+      "claim_b": {
+        "text": "NOT a fat burner; appetite regulation + eating behavior correction system",
+        "source_file": "PRODUCT_MECHANISM_V1.txt",
+        "line_start": 0,
+        "line_end": 0
+      },
+      "resolution_status": "resolved",
+      "chosen_claim": {
+        "text": "NOT a fat burner; protocol-based appetite regulation + eating behavior correction + digestion/gut-comfort support",
+        "source_file": "PRODUCT_MECHANISM_V1.txt",
+        "line_start": 0,
+        "line_end": 0
+      },
+      "resolution_reason": "PRODUCT_MECHANISM_V1.txt has explicit mechanism boundaries authority per resolution hierarchy; fat-burner claim is explicitly listed as disallowed",
+      "risk_level": "high"
+    },
+    {
+      "conflict_id": "TESTIMONIAL_COUNT_001",
+      "bucket": "proof_claims",
+      "claim_a": {
+        "text": "trusted by 70,000+ customers",
+        "source_file": "productinfomain.txt (Encyclopedia section)",
+        "line_start": 0,
+        "line_end": 0
+      },
+      "claim_b": {
+        "text": "200 video testimonials",
+        "source_file": "productinfomain.txt (CONTEXT SNAPSHOT)",
+        "line_start": 0,
+        "line_end": 0
+      },
+      "resolution_status": "resolved",
+      "chosen_claim": {
+        "text": "70,000+ users served, 200 video testimonials",
+        "source_file": "productinfomain.txt (CONTEXT SNAPSHOT)",
+        "line_start": 0,
+        "line_end": 0
+      },
+      "resolution_reason": "Both claims coexist; 70,000+ is user volume and 200 is video testimonial count; no direct conflict; merged into single proof point",
+      "risk_level": "low"
+    }
+  ],
+  "dropped_claims": [
+    {
+      "text": "Age group 10-80 years",
+      "reason": "legacy_override_blocked",
+      "source_file": "productinfomain.txt (Encyclopedia section)",
+      "line_start": 0,
+      "line_end": 0
+    },
+    {
+      "text": "39 Ayurvedic herbs broken across three key components",
+      "reason": "legacy_override_blocked",
+      "source_file": "productinfomain.txt (Encyclopedia section)",
+      "line_start": 0,
+      "line_end": 0
+    },
+    {
+      "text": "27 carefully chosen herbs",
+      "reason": "legacy_override_blocked",
+      "source_file": "productinfomain.txt (Encyclopedia section)",
+      "line_start": 0,
+      "line_end": 0
+    },
+    {
+      "text": "no separate meal prep as center of brand positioning",
+      "reason": "legacy_override_blocked",
+      "source_file": "productinfomain.txt (CONTEXT SNAPSHOT - brand exclusion)",
+      "line_start": 0,
+      "line_end": 0
+    },
+    {
+      "text": "burns fat rapidly",
+      "reason": "legacy_override_blocked",
+      "source_file": "PRODUCT_MECHANISM_V1.txt (NOT allowed claims)",
+      "line_start": 0,
+      "line_end": 0
+    }
+  ],
+  "coverage_check": {
+    "required_present": {
+      "3_to_5kg_15days": true,
+      "adults_18_plus_bmi_gt_25": true,
+      "insulin_exclusion": true,
+      "pregnancy_postpartum_exclusion": true,
+      "morning_liquid_4h_no_solids": true,
+      "night_powder_tablet": true,
+      "31_unique_44_total": true,
+      "refund_7day_with_tracker": true,
+      "not_fat_burner_positioning": true
+    },
+    "missing_required": []
+  }
+}

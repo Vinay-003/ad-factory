@@ -289,6 +289,8 @@ def main() -> int:
         raise RuntimeError(f"OpenCode canonical extraction failed: {result.stderr.strip() or result.stdout.strip()}")
 
     raw_content = parse_opencode_stream(result.stdout)
+    if not raw_content:
+        raw_content = (result.stdout or "").strip()
     parsed = parse_json_object_from_text(raw_content)
     if not parsed:
         raise RuntimeError("OpenCode canonical extraction returned no parseable JSON")

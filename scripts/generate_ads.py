@@ -270,6 +270,8 @@ def parse_copy_block(fmt: str, lang: str, raw: dict[str, Any]) -> CopyBlock:
         if not isinstance(bullets_val, list) or not all(isinstance(x, str) and x.strip() for x in bullets_val):
             raise RuntimeError(f"'bullets' must be a non-empty string list when present in {ctx}")
         bullets = [x.strip() for x in bullets_val]
+        if fmt == "BA":
+            bullets = [strip_ba_panel_label(x) for x in bullets]
     return CopyBlock(
         headline=headline,
         cta=cta,
@@ -278,6 +280,14 @@ def parse_copy_block(fmt: str, lang: str, raw: dict[str, Any]) -> CopyBlock:
         attribution=attribution,
         bullets=bullets,
     )
+
+
+def strip_ba_panel_label(text: str) -> str:
+    cleaned = (text or "").strip()
+    cleaned = re.sub(r"^\s*(?:before|after)\s*[:\-]\s*", "", cleaned, flags=re.IGNORECASE)
+    cleaned = re.sub(r"^\s*(?:पहले|बाद|पहले\s*में|बाद\s*में)\s*[:\-]\s*", "", cleaned)
+    cleaned = re.sub(r"\s{2,}", " ", cleaned).strip()
+    return cleaned
 
 
 def registry_used_text(registry: dict[str, Any]) -> dict[str, set[str]]:
@@ -341,7 +351,7 @@ def render_prompt(
     elif fmt == "BA":
         style = "BA (before/after journey without body-shaming visuals)."
     elif fmt == "TEST":
-        style = "TEST (trust-first proof framing, no fabricated quotes)."
+        style = "TEST (trust-first testimonial/review framing)."
     elif fmt == "FEAT":
         style = "FEAT (features and mechanism clarity)."
     elif fmt == "UGC":
@@ -384,12 +394,17 @@ def render_prompt(
         layout_lines = [
             "- Format: BA.",
             "- Build a strict split contrast story: left panel = BEFORE struggle, right panel = AFTER first meaningful win.",
-            "- Add explicit micro labels: BEFORE on left and AFTER on right (small but readable).",
+            "- Do NOT print literal BEFORE/AFTER words as on-image labels; show contrast through scene, behavior, and styling.",
             "- Keep a visible vertical divider between panels; contrast must be obvious even on quick scroll.",
             "- Left side expression/context should feel frustrated or stuck; right side should feel relieved/confident.",
+            "- BEFORE panel must include concrete struggle cues (for example: cluttered routine surface, impulse-snack context, rushed/late-day lighting).",
+            "- AFTER panel must include concrete control cues (for example: clean setup, simple fixed-step context, calmer morning-style lighting).",
+            "- Do not rely on text-only contrast; make panel contrast visible in scene composition, props, and lighting.",
+            "- Keep one unified base palette across both panels; create contrast using light, props, posture, and clarity (not random background color shifts).",
             "- Keep products grouped near lower center bridging both halves (inside safe field).",
             "- Place headline at top across both panels; make pain-to-progress transition unmistakable.",
             "- Place 2 to 3 short bullets favoring right panel outcomes; avoid generic motivational bullets.",
+            "- Keep headline and all bullets in upper safe region only (top half); do not place bullets near product strip or lower half.",
             "- CTA must be rendered as a filled rounded button chip centered in lower safe band, never plain text.",
             "- Camera framing: medium lifestyle-product hybrid; premium and realistic.",
             "- Lighting: left side slightly flatter/dimmer, right side cleaner/brighter (subtle, not dramatic).",
@@ -398,9 +413,10 @@ def render_prompt(
         layout_lines = [
             "- Format: TEST.",
             "- This must look evidently testimonial-first, not HERO with a person.",
-            "- Use a clear quote card or quote block as primary element with opening quote mark and first-person statement.",
+            "- Use a clear quote/review card as primary element with opening quote mark and first-person statement.",
             "- Attribution must sit directly under quote (for example: Verified user / persona-matched user type).",
             "- Trust line sits as a separate proof strip below quote card; keep hierarchy quote -> attribution -> trust proof.",
+            "- If no real testimonial text is available, generate one representative positive review line grounded in persona pain/desire (no absurd claims).",
             "- Human subject supports credibility but remains secondary to quote card; do not let product or headline dominate like HERO.",
             "- Product cluster anchored bottom-center with kit box as primary; keep all labels readable.",
             "- CTA must be rendered as a filled rounded button chip in lower safe band, never plain text.",
@@ -425,8 +441,8 @@ def render_prompt(
             "- Format: UGC.",
             "- Creator-style authenticity with premium cleanliness; avoid stock-template look.",
             "- Subject holds the kit toward camera while remaining natural and unposed; all 5 products still visible.",
-            "- Headline top, support line mid, CTA bottom; keep on-image text minimal but meaningful.",
-            "- UGC copy density: headline should feel complete (about 6-12 words), support line should carry a clear mechanism + outcome phrase (about 8-16 words).",
+            "- Headline top, support line mid, context/proof line below support, CTA bottom; keep text compact but informative.",
+            "- UGC copy density: headline should feel complete (about 6-12 words), support line should carry mechanism + outcome (about 8-16 words), and context/proof line should anchor real-life fit (about 6-12 words).",
             "- CTA must be rendered as a filled rounded button chip, never plain text.",
             "- Hands must look anatomically correct; no extra fingers or warped nails.",
             "- Camera framing: handheld close-to-medium, phone-like realism with stable focus on product labels.",
@@ -436,10 +452,17 @@ def render_prompt(
 
     # Copy block: render EXACTLY what was provided.
     copy_lines: list[str] = []
-    if fmt in {"HERO", "UGC"}:
+    if fmt == "HERO":
         copy_lines = [
             f"- Headline: {copy.headline}",
             f"- Support line: {copy.support_line}",
+            f"- CTA: {copy.cta}",
+        ]
+    elif fmt == "UGC":
+        copy_lines = [
+            f"- Headline: {copy.headline}",
+            f"- Support line: {copy.support_line}",
+            f"- Context line: {proof}",
             f"- CTA: {copy.cta}",
         ]
     elif fmt in {"BA", "FEAT"}:
@@ -459,12 +482,19 @@ def render_prompt(
     lock = visual_lock if isinstance(visual_lock, dict) else {}
     subject_line = (lock.get("subject") or "").strip() if isinstance(lock.get("subject"), str) else ""
     if not subject_line:
-        subject_line = build_ugc_subject_line(bg_seed) if fmt == "UGC" else "No human subject, products only."
+        if fmt == "UGC":
+            subject_line = build_ugc_subject_line(bg_seed)
+        elif fmt == "BA":
+            subject_line = "Same adult subject identity appears in both panels: left shows routine struggle, right shows practical control; no body-shaming or body-morph visuals."
+        else:
+            subject_line = "No human subject, products only."
     action_line = (
         "Hold the kit box toward camera with one hand; the other products arranged on a clean surface in-frame."
         if fmt == "UGC"
         else "Arrange all 5 products as a cohesive premium cluster; kit box acts as anchor."
     )
+    if fmt == "BA":
+        action_line = "Split action: BEFORE panel shows rushed/impulsive routine cue; AFTER panel shows one clear repeatable step with cleaner setup and calmer behavior."
     if isinstance(lock.get("action"), str) and lock.get("action").strip():
         action_line = lock.get("action").strip()
     camera_line = "Handheld close-to-medium framing, phone-like realism, stable focus on labels." if fmt == "UGC" else "Eye-level medium framing with clean edge discipline."
@@ -542,6 +572,8 @@ def render_prompt(
     ]
     if fmt == "UGC":
         negative.insert(8, "- Do not render unnatural or anatomically incorrect hands.")
+    if fmt == "BA":
+        negative.append("- Do not render literal BEFORE:/AFTER: words anywhere on-image.")
     lines.extend(negative)
     lines.append("")
     lines.append("QUALITY BAR - verify before accepting output")
@@ -576,6 +608,14 @@ def render_prompt(
             f"- Realism: {realism_line}",
         ]
     )
+    if fmt == "BA":
+        lines.extend(
+            [
+                "- BEFORE panel visual anchors: include at least 2 struggle cues (messy surface, unplanned snack context, low-clarity routine signals).",
+                "- AFTER panel visual anchors: include at least 2 control cues (clean setup, fixed-step context, calmer brighter environment).",
+                "- Identity continuity: if a person is shown, keep same person across both panels; change only mood/context, never fake body transformation.",
+            ]
+        )
     if lock:
         lines.append("- VISUAL MATCH LOCK (from base 4:5): keep same subject identity, camera feel, lighting direction, prop family, and product arrangement; only adjust spacing/scale for aspect-ratio fit.")
         if aspect_ratio == "9:16":

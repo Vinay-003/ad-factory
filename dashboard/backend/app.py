@@ -77,6 +77,32 @@ def parse_persona_library(playbook_path: Path) -> list[dict[str, Any]]:
     return out
 
 
+PERSONA_SEED_INPUTS: dict[int, dict[str, str]] = {
+    1: {"pain": "Daily cravings break every weight plan.", "desire": "Steady appetite control without feeling deprived.", "friction": "Willpower-only plans collapse by evening.", "proof": "Needs visible early control over snack urges.", "tone": "practical and reassuring"},
+    2: {"pain": "Work schedule leaves no room for complex routines.", "desire": "Simple weight routine that fits packed days.", "friction": "Meal prep and long workouts are not sustainable.", "proof": "Needs a low-effort protocol that still shows progress.", "tone": "efficient and confidence-building"},
+    3: {"pain": "Stress triggers emotional snacking at random times.", "desire": "Calmer eating with fewer stress-led cravings.", "friction": "Plans fail during stressful moments.", "proof": "Needs believable support during emotional triggers.", "tone": "empathetic and non-judgmental"},
+    4: {"pain": "Weight loss plateaus despite repeated effort.", "desire": "Break stagnation with a clear daily system.", "friction": "Repeated plateaus kill motivation.", "proof": "Needs a trackable, structured restart path.", "tone": "direct and motivating"},
+    5: {"pain": "PCOD-related weight gain feels harder to reverse.", "desire": "Steadier weight progress with manageable routine.", "friction": "Fear of harsh or unsafe methods.", "proof": "Needs non-cure, compliant weight-support framing.", "tone": "careful and trust-led"},
+    6: {"pain": "Thyroid-linked weight gain feels stubborn and slow.", "desire": "Consistent progress without extreme restrictions.", "friction": "Low confidence after slow previous results.", "proof": "Needs realistic, compliant support expectations.", "tone": "measured and credible"},
+    7: {"pain": "Multiple failed diets created low confidence.", "desire": "A restart that actually feels doable.", "friction": "Past strict plans felt impossible to continue.", "proof": "Needs simple steps and visible early wins.", "tone": "encouraging and reset-focused"},
+    8: {"pain": "Wants weight loss but fears weakness and fatigue.", "desire": "Lighter body with stable daily energy.", "friction": "Skeptical of plans that feel draining.", "proof": "Needs assurance of practical energy support.", "tone": "calm and evidence-led"},
+    9: {"pain": "Parent schedule causes rushed meals and random snacking.", "desire": "A routine that works even on chaotic days.", "friction": "No time for rigid diets or long workouts.", "proof": "Needs a simple protocol that fits family life.", "tone": "real-life and practical"},
+    10: {"pain": "Self-care is postponed while handling household priorities.", "desire": "A manageable routine that can be sustained at home.", "friction": "Complex plans don't fit daily responsibilities.", "proof": "Needs a low-friction system for homemaker schedules.", "tone": "supportive and respectful"},
+    11: {"pain": "Tea-time office snacking derails daily intake control.", "desire": "Fewer impulse snacks during work breaks.", "friction": "Social snack cues are hard to resist.", "proof": "Needs practical control over recurring snack windows.", "tone": "conversational and specific"},
+    12: {"pain": "Late-night hunger leads to repeated overeating.", "desire": "Calmer nights with better eating control.", "friction": "Evening cravings undo daytime discipline.", "proof": "Needs night-routine support that feels realistic.", "tone": "steady and habit-focused"},
+    13: {"pain": "Weight rebounds after festivals and travel periods.", "desire": "Quick reset back to steady routine.", "friction": "Irregular days break consistency easily.", "proof": "Needs a restart protocol that works after disruptions.", "tone": "reset-oriented and practical"},
+    14: {"pain": "Worry that metabolism has slowed permanently.", "desire": "Believable progress through structured daily consistency.", "friction": "Confusion from too many conflicting theories.", "proof": "Needs clear mechanism logic without hype claims.", "tone": "clear and science-grounded"},
+    15: {"pain": "Digestive discomfort and weight concerns occur together.", "desire": "Lighter digestion with better intake control.", "friction": "Discomfort makes routines hard to follow.", "proof": "Needs digestion-support plus weight-management framing.", "tone": "gentle and practical"},
+    16: {"pain": "Budget concerns reduce trust in expensive plans.", "desire": "Reliable progress from a practical system.", "friction": "Fear of paying without results.", "proof": "Needs strong value and risk-reduction cues.", "tone": "transparent and outcome-focused"},
+    17: {"pain": "Event deadline creates pressure and urgency.", "desire": "Visible progress in a short, realistic window.", "friction": "Panic-driven plans often backfire.", "proof": "Needs structured short-term milestone framing.", "tone": "urgent but controlled"},
+    18: {"pain": "Low confidence from body discomfort and low energy.", "desire": "Feel lighter, sharper, and more confident daily.", "friction": "Inconsistent routines reduce momentum.", "proof": "Needs confidence-building early progress signals.", "tone": "uplifting and grounded"},
+    19: {"pain": "Only trusts doctor-backed, evidence-grounded solutions.", "desire": "Safe-feeling system with clear proof signals.", "friction": "Distrust of generic internet claims.", "proof": "Needs founder credibility and structured protocol proof.", "tone": "authoritative and factual"},
+    20: {"pain": "Struggles to stay consistent without accountability.", "desire": "Daily support that keeps follow-through high.", "friction": "Drops routines when guidance is missing.", "proof": "Needs tracker-led support and coach cues.", "tone": "coach-like and motivating"},
+    21: {"pain": "Hates complicated plans and too many rules.", "desire": "Simple steps with almost no guesswork.", "friction": "Complexity causes early drop-off.", "proof": "Needs a very clear, easy-to-follow structure.", "tone": "simple and direct"},
+    22: {"pain": "Progress feels slower after 35 despite effort.", "desire": "Steady sustainable progress without extreme routines.", "friction": "Frustration from slow visible change.", "proof": "Needs realistic milestones and consistency proof.", "tone": "reassuring and practical"},
+}
+
+
 def build_persona_payload(persona_number: int, personas: list[dict[str, Any]]) -> dict[str, Any]:
     persona_name = f"Persona {persona_number}"
     for item in personas:
@@ -85,19 +111,26 @@ def build_persona_payload(persona_number: int, personas: list[dict[str, Any]]) -
             if name:
                 persona_name = name
             break
+    seed = PERSONA_SEED_INPUTS.get(persona_number, {})
+    pain = seed.get("pain", "Daily routine feels heavy and hard to sustain.")
+    desire = seed.get("desire", "A practical routine that feels easy to follow.")
+    friction = seed.get("friction", "Past plans felt too strict and difficult to maintain.")
+    proof = seed.get("proof", "Needs clear structure and believable support.")
+    tone = seed.get("tone", "practical and confidence-building")
+
     return {
         "persona_number": persona_number,
         "persona_name": persona_name,
-        "pain_points": [],
+        "pain_points": [pain],
         "trigger_scenarios": [],
-        "objections": [],
+        "objections": [friction],
         "language_bank": [],
-        "core_message": [],
+        "core_message": [desire],
         "grounded_mechanism_map": [],
         "how_kit_solves": [],
-        "trust_anchors": [],
-        "english_ready": [],
-        "hindi_ready": [],
+        "trust_anchors": [proof],
+        "english_ready": [f"Tone cue: {tone}"],
+        "hindi_ready": ["टोन संकेत: सरल, भरोसेमंद, व्यावहारिक"],
     }
 
 
@@ -292,6 +325,28 @@ def strip_internal_marker(text: str) -> str:
     return cleaned
 
 
+def strip_price_tokens(text: str) -> str:
+    if not isinstance(text, str):
+        return ""
+    cleaned = text
+    cleaned = re.sub(r"\bINR\b\s*\d+[\d,]*(?:\.\d+)?", "", cleaned, flags=re.IGNORECASE)
+    cleaned = re.sub(r"[₹$]\s*\d+[\d,]*(?:\.\d+)?", "", cleaned)
+    cleaned = re.sub(r"\b\d+[\d,]*(?:\.\d+)?\s*(?:INR|Rs\.?|rupees?)\b", "", cleaned, flags=re.IGNORECASE)
+    cleaned = re.sub(r"\b(?:price|only|discount|off|mrp)\b", "", cleaned, flags=re.IGNORECASE)
+    cleaned = re.sub(r"\s{2,}", " ", cleaned).strip(" ,;:-")
+    return cleaned
+
+
+def strip_ba_panel_label(text: str) -> str:
+    if not isinstance(text, str):
+        return ""
+    cleaned = text.strip()
+    cleaned = re.sub(r"^\s*(?:before|after)\s*[:\-]\s*", "", cleaned, flags=re.IGNORECASE)
+    cleaned = re.sub(r"^\s*(?:पहले|बाद|पहले\s*में|बाद\s*में)\s*[:\-]\s*", "", cleaned)
+    cleaned = re.sub(r"\s{2,}", " ", cleaned).strip()
+    return cleaned
+
+
 def strip_internal_markers_from_payload(payload: dict[str, Any]) -> dict[str, Any]:
     ads = payload.get("ads")
     if not isinstance(ads, list):
@@ -309,9 +364,17 @@ def strip_internal_markers_from_payload(payload: dict[str, Any]) -> dict[str, An
                 continue
             for key in ["headline", "support_line", "cta", "trust_line", "attribution"]:
                 if key in block and isinstance(block.get(key), str):
-                    block[key] = strip_internal_marker(block[key])
+                    value = strip_internal_marker(block[key])
+                    block[key] = strip_price_tokens(value)
             if isinstance(block.get("bullets"), list):
-                block["bullets"] = [strip_internal_marker(x) for x in block["bullets"] if isinstance(x, str)]
+                cleaned_bullets = []
+                for item in block["bullets"]:
+                    if not isinstance(item, str):
+                        continue
+                    value = strip_price_tokens(strip_internal_marker(item))
+                    if value:
+                        cleaned_bullets.append(value)
+                block["bullets"] = cleaned_bullets
     return payload
 
 
@@ -372,6 +435,31 @@ def parse_json_object_from_text(content: str) -> dict[str, Any] | None:
     return best
 
 
+def parse_opencode_json_output(stdout: str) -> dict[str, Any] | None:
+    text_chunks: list[str] = []
+    for raw_line in (stdout or "").splitlines():
+        line = raw_line.strip()
+        if not line:
+            continue
+        try:
+            event = json.loads(line)
+        except json.JSONDecodeError:
+            continue
+        if event.get("type") != "text":
+            continue
+        part = event.get("part") or {}
+        text = part.get("text")
+        if isinstance(text, str) and text.strip():
+            text_chunks.append(text.strip())
+
+    if text_chunks:
+        parsed = parse_json_object_from_text("\n".join(text_chunks).strip())
+        if parsed is not None:
+            return parsed
+
+    return parse_json_object_from_text((stdout or "").strip())
+
+
 def call_opencode_repair_copy(
     config: dict[str, Any],
     context: dict[str, Any],
@@ -425,27 +513,7 @@ def call_opencode_repair_copy(
         )
         return None
 
-    text_chunks: list[str] = []
-    for raw_line in result.stdout.splitlines():
-        line = raw_line.strip()
-        if not line:
-            continue
-        try:
-            event = json.loads(line)
-        except json.JSONDecodeError:
-            continue
-        if event.get("type") != "text":
-            continue
-        part = event.get("part") or {}
-        text = part.get("text")
-        if isinstance(text, str) and text.strip():
-            text_chunks.append(text.strip())
-
-    if not text_chunks:
-        return None
-
-    content = "\n".join(text_chunks)
-    return parse_json_object_from_text(content)
+    return parse_opencode_json_output(result.stdout)
 
 
 def _clean_str(value: Any) -> str:
@@ -460,6 +528,25 @@ def _clean_bullets(value: Any) -> list[str]:
         if isinstance(item, str) and item.strip():
             out.append(item.strip())
     return out
+
+
+def ensure_testimonial_headline(headline: str, lang: str, persona: dict[str, Any]) -> str:
+    clean = shorten_copy_line(headline, limit=90)
+    if lang == "EN":
+        if re.search(r"\b(i|i'm|i’ve|i'd|my|me)\b", clean, flags=re.IGNORECASE):
+            return clean
+        desire = _clean_str(persona.get("desire_en")).rstrip(".")
+        if desire:
+            desire_phrase = desire[:1].lower() + desire[1:] if len(desire) > 1 else desire.lower()
+            return shorten_copy_line(f'"I finally found {desire_phrase}."', limit=90)
+        return '"I finally found a routine I can follow every day."'
+
+    if re.search(r"(मैं|मेरी|मेरा|मुझे|मैंने)", clean):
+        return clean
+    desire_hi = _clean_str(persona.get("desire_hi")).rstrip("।")
+    if desire_hi:
+        return shorten_copy_line(f'"मुझे आखिर {desire_hi} वाला रूटीन मिला।"', limit=90)
+    return '"मुझे आखिर ऐसा रूटीन मिला जिसे मैं रोज निभा सकूं।"'
 
 
 def _persona_number_from_candidate(candidate: dict[str, Any]) -> int | None:
@@ -541,6 +628,9 @@ def normalize_generated_copy(
             if cta:
                 base_lang["cta"] = cta
 
+            if fmt == "TEST":
+                base_lang["headline"] = ensure_testimonial_headline(base_lang.get("headline", ""), lang, persona)
+
             if fmt in {"HERO", "UGC"}:
                 support = _clean_str(src_lang.get("support_line"))
                 if support:
@@ -548,6 +638,8 @@ def normalize_generated_copy(
             elif fmt in {"BA", "FEAT"}:
                 bullets = _clean_bullets(src_lang.get("bullets"))
                 if len(bullets) >= 2:
+                    if fmt == "BA":
+                        bullets = [strip_ba_panel_label(b) for b in bullets]
                     base_lang["bullets"] = [shorten_copy_line(b, limit=88) for b in bullets]
             else:
                 attribution = _clean_str(src_lang.get("attribution"))
@@ -662,7 +754,12 @@ def call_opencode_compatible(config: dict[str, Any], context: dict[str, Any], ru
         "You generate ad copy JSON only. Return valid JSON with keys default_aspect_ratio and ads. "
         "Each ads item must include format, headline_angle, persona fields and copy.EN/copy.HI fields compatible with assembler. "
         "Never include price in any on-image copy field (headline/support_line/trust_line/bullets/cta/attribution). "
-        "Do not use currency symbols or words like INR, price, only, discount, off, MRP in on-image copy."
+        "Do not use currency symbols or words like INR, price, only, discount, off, MRP in on-image copy. "
+        "For BA format, never prefix bullet text with BEFORE:/AFTER: (or Hindi equivalents); bullets must be plain statements. "
+        "For TEST format, headline must read like a first-person review line suitable for quote card (not generic 'highly rated' phrasing). "
+        "If no real quote is provided in context, create one believable representative review line grounded in persona pain/desire and safe claims. "
+        "Keep each format's core shape intact, but vary headline/support/trust framing using persona pain, desire, friction, proof needed, and tone cue. "
+        "For the same format across runs, rotate variation lane and wording rhythm while preserving format-specific structure."
     )
     user_payload = {
         "task": "Generate fresh ad copy JSON for provided context.",
@@ -708,27 +805,9 @@ def call_opencode_compatible(config: dict[str, Any], context: dict[str, Any], ru
 
     cli_result = run_cmd(cli_cmd, cwd=ROOT)
     if cli_result.returncode == 0:
-        text_chunks: list[str] = []
-        for raw_line in cli_result.stdout.splitlines():
-            line = raw_line.strip()
-            if not line:
-                continue
-            try:
-                event = json.loads(line)
-            except json.JSONDecodeError:
-                continue
-            if event.get("type") != "text":
-                continue
-            part = event.get("part") or {}
-            text = part.get("text")
-            if isinstance(text, str) and text.strip():
-                text_chunks.append(text.strip())
-
-        if text_chunks:
-            content = "\n".join(text_chunks).strip()
-            parsed = parse_json_object_from_text(content)
-            if parsed is not None:
-                return parsed
+        parsed = parse_opencode_json_output(cli_result.stdout)
+        if parsed is not None:
+            return parsed
 
         (run_dir / "logs" / "opencode_error.txt").write_text(
             "OpenCode CLI returned no parseable JSON text block.\n"
