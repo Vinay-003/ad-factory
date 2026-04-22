@@ -85,6 +85,24 @@ OBESITY KILLER KIT — COMPLETE AD GENERATION PROMPT
 
       No colors outside this palette. No neon. No harsh gradients. No random accent colors anywhere.      
 
+      A5. BRAND LOGO PLACEMENT — MANDATORY ON EVERY AD      
+
+      Use the provided standalone brand logo reference image as the logo asset.      
+
+      Place this logo in the top-right corner in every ad output.      
+
+      Logo size: approximately 10% of canvas width (keep aspect ratio intact).      
+
+      Safe margins: 4% from top edge and 4% from right edge.      
+
+      Keep the logo crisp, fully visible, and never cropped.      
+
+      Do not overlap key product labels, headline text, or CTA.      
+
+      Add only a subtle shadow if needed for contrast; no glow, no badge, no frame.      
+
+      Keep spacing around the logo clean so it reads premium and intentional.      
+
       A7. LIGHTING      
 
       Warm, soft, directional light — source from top-left      

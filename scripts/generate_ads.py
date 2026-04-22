@@ -46,10 +46,12 @@ FORMAT_VISUAL_ARCHETYPES: dict[str, list[dict[str, Any]]] = {
                 "- Archetype: centered premium packshot with headline centered above the product block.",
                 "- Keep the product cluster compact in the middle third with a balanced pedestal feel and strong whitespace around it.",
                 "- Use symmetrical spacing so the ad reads as premium and stable rather than busy or collage-like.",
+                "- Keep both text and product centered; do not introduce obvious left/right asymmetry in this variant.",
             ],
             "direction_lines": [
                 "- Archetype direction: centered composition with soft pedestal energy and minimal side distractions.",
                 "- Text placement: headline/support centered in upper safe field; CTA centered below support with generous breathing room.",
+                "- This is the only HERO variant that should read as fully centered and symmetrical.",
             ],
         },
         {
@@ -59,10 +61,12 @@ FORMAT_VISUAL_ARCHETYPES: dict[str, list[dict[str, Any]]] = {
                 "- Archetype: left-aligned copy block with product cluster weighted to the right half.",
                 "- Build a clear asymmetric composition where text owns the left safe field and product owns the right safe field.",
                 "- Preserve clean negative space between copy and product so the frame feels intentional, not cramped.",
+                "- Headline, support, and CTA must align left in a clean copy column; do not center the typography in this variant.",
             ],
             "direction_lines": [
                 "- Archetype direction: editorial left-copy/right-product split with crisp column alignment.",
                 "- Product emphasis: kit box and product stack dominate the right-center while copy stays in a protected left column.",
+                "- Force visible asymmetry: if the result reads centered at a glance, reject and regenerate.",
             ],
         },
         {
@@ -71,11 +75,13 @@ FORMAT_VISUAL_ARCHETYPES: dict[str, list[dict[str, Any]]] = {
             "layout_lines": [
                 "- Archetype: larger, tighter product crop with the pack cluster feeling closer to camera.",
                 "- Let product presence feel slightly oversized while keeping every label readable and fully inside safe field.",
-                "- Copy should sit in a compact high-contrast block above or beside the enlarged product mass.",
+                "- Copy should sit in a compact high-contrast block occupying one upper corner rather than a wide centered text stack.",
+                "- Crop the product group noticeably larger than other HERO variants so the pack mass dominates the lower half.",
             ],
             "direction_lines": [
                 "- Archetype direction: premium close crop with a luxury pedestal feel and shallow scene complexity.",
                 "- Visual balance: oversized product hero, minimal props, restrained typography footprint.",
+                "- Composition should feel tighter and more zoomed-in than the centered or split variants; reject if it reads like a standard balanced packshot.",
             ],
         },
         {
@@ -85,10 +91,12 @@ FORMAT_VISUAL_ARCHETYPES: dict[str, list[dict[str, Any]]] = {
                 "- Archetype: premium hero layout softened by subtle lifestyle context, not pure studio isolation.",
                 "- Keep product dominant while allowing background context cues to add warmth and realism.",
                 "- Headline and support should sit in a calm editorial block with more atmospheric breathing room than strict commercial grid.",
+                "- Product cluster should sit lower-left or lower-right with the opposite upper zone reserved for copy; do not center both elements together.",
             ],
             "direction_lines": [
                 "- Archetype direction: premium lifestyle frame with product dominance preserved over the environment.",
                 "- Background behavior: warm believable context adds credibility but never competes with the packshot.",
+                "- This variant must feel more environmental and editorial than the studio-centered HERO options.",
             ],
         },
     ],
@@ -506,6 +514,7 @@ def safezone_enforcement_block(aspect_ratio: str) -> str:
             "- Keep all critical content inside the 14%-65% vertical safe band.\n"
             "- Reserve the lower 35% as quiet space; no product labels or headline copy in this band.\n"
             "- Keep side margins clean; no key content touching left or right frame edges.\n"
+            "- Product cluster may be centered or left/right weighted according to the selected archetype, but must remain fully inside safe zones.\n"
             "- Reject and regenerate if any headline, CTA, or product detail crosses restricted zones."
         )
     return (
@@ -513,7 +522,7 @@ def safezone_enforcement_block(aspect_ratio: str) -> str:
         "- Frame: 1080x1350 (4:5).\n"
         "- Restricted bands: top 10% (0-135px), bottom 15% (1148-1350px), side edges outer 8% (0-86px and 994-1080px).\n"
         "- Keep all products and all on-image text fully inside the central safe field: x=86-994 and y=135-1148.\n"
-        "- Keep the entire product cluster in a centered core with mild upward bias; do not touch any restricted band.\n"
+        "- Product cluster may be centered or left/right weighted according to the selected archetype, with mild upward bias allowed, but must not touch any restricted band.\n"
         "- Reject and regenerate if any headline, CTA, or product detail crosses restricted zones."
     )
 
@@ -650,9 +659,10 @@ def base_layout_lines_for_format(fmt: str) -> list[str]:
         return [
             "- HERO format: strong headline, one support line, and one CTA.",
             "- Focal hierarchy: product dominant, text secondary, background tertiary.",
-            "- Product zone: all key pack details stay away from edge-risk zones.",
+            "- Product zone: all key pack details stay away from edge-risk zones, but left/right weighting must follow the selected archetype rather than defaulting to a centered stack.",
             "- CTA must be rendered as a filled rounded button chip (high-contrast), never as plain text.",
             "- Camera framing should feel stable, premium, and label-safe.",
+            "- Do not collapse every HERO into centered text over centered products unless the selected archetype explicitly requires a centered composition.",
         ]
     if fmt == "BA":
         return [
@@ -702,6 +712,7 @@ def pick_visual_archetype(
     copy: CopyBlock,
     seed: int,
     forced_archetype: str | None = None,
+    used_archetype_ids: set[str] | None = None,
 ) -> dict[str, Any]:
     variants = FORMAT_VISUAL_ARCHETYPES.get(fmt) or []
     if not variants:
@@ -709,6 +720,12 @@ def pick_visual_archetype(
 
     if forced_archetype and forced_archetype.strip():
         return find_visual_archetype(fmt, forced_archetype.strip())
+
+    available_variants = variants
+    if used_archetype_ids:
+        unused = [item for item in variants if str(item.get("id") or "") not in used_archetype_ids]
+        if unused:
+            available_variants = unused
 
     selector_seed = stable_signature_seed(
         fmt,
@@ -722,7 +739,7 @@ def pick_visual_archetype(
         "|".join(copy.bullets or []),
     )
     rng = random.Random(selector_seed)
-    return variants[rng.randrange(len(variants))]
+    return available_variants[rng.randrange(len(available_variants))]
 
 
 def render_prompt(
@@ -940,6 +957,8 @@ def render_prompt(
             f"- Selected visual archetype: {visual_archetype['id']} - {visual_archetype['label']}",
         ]
     )
+    if fmt == "HERO":
+        lines.append("- HERO anti-convergence rule: obey the selected archetype literally. Do not fall back to generic centered headline + centered product composition unless the chosen archetype is the centered variant.")
     lines.extend(archetype_direction_lines)
     if fmt == "BA":
         lines.extend(
@@ -1091,6 +1110,7 @@ def main() -> int:
 
     batch_dir.mkdir(parents=True, exist_ok=True)
     timestamp = now_utc_iso()
+    run_archetype_usage: dict[str, set[str]] = {}
 
     for i, ad in enumerate(ads):
         fmt = str(ad["format"]).upper()
@@ -1133,13 +1153,16 @@ def main() -> int:
             forced_archetype = ad["visual_archetype"].strip()
         elif isinstance(visual_lock.get("visual_archetype"), str) and visual_lock.get("visual_archetype", "").strip():
             forced_archetype = visual_lock["visual_archetype"].strip()
+        used_archetypes_for_format = run_archetype_usage.setdefault(fmt, set())
         visual_archetype = pick_visual_archetype(
             fmt,
             persona_number,
             selector_copy,
             bg_seed,
             forced_archetype=forced_archetype,
+            used_archetype_ids=used_archetypes_for_format,
         )
+        used_archetypes_for_format.add(visual_archetype["id"])
 
         rendered: dict[str, str] = {}
         for lang in render_langs:

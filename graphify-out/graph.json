@@ -9,7 +9,7 @@
       "source_file": "dashboard/__init__.py",
       "source_location": "L1",
       "id": "dashboard_init_py",
-      "community": 17,
+      "community": 18,
       "norm_label": "__init__.py"
     },
     {
@@ -18,7 +18,7 @@
       "source_file": "dashboard/backend/__init__.py",
       "source_location": "L1",
       "id": "dashboard_backend_init_py",
-      "community": 18,
+      "community": 19,
       "norm_label": "__init__.py"
     },
     {
@@ -27,7 +27,7 @@
       "source_file": "dashboard/backend/app.py",
       "source_location": "L1",
       "id": "dashboard_backend_app_py",
-      "community": 2,
+      "community": 3,
       "norm_label": "app.py"
     },
     {
@@ -36,7 +36,7 @@
       "source_file": "dashboard/backend/app.py",
       "source_location": "L41",
       "id": "app_resolve_language_mode",
-      "community": 6,
+      "community": 8,
       "norm_label": "resolve_language_mode()"
     },
     {
@@ -45,7 +45,7 @@
       "source_file": "dashboard/backend/app.py",
       "source_location": "L48",
       "id": "app_assembler_language_mode",
-      "community": 6,
+      "community": 8,
       "norm_label": "assembler_language_mode()"
     },
     {
@@ -54,7 +54,7 @@
       "source_file": "dashboard/backend/app.py",
       "source_location": "L57",
       "id": "app_now_iso",
-      "community": 2,
+      "community": 3,
       "norm_label": "now_iso()"
     },
     {
@@ -63,7 +63,7 @@
       "source_file": "dashboard/backend/app.py",
       "source_location": "L61",
       "id": "app_make_run_id",
-      "community": 6,
+      "community": 8,
       "norm_label": "make_run_id()"
     },
     {
@@ -72,7 +72,7 @@
       "source_file": "dashboard/backend/app.py",
       "source_location": "L65",
       "id": "app_ensure_dirs",
-      "community": 2,
+      "community": 3,
       "norm_label": "ensure_dirs()"
     },
     {
@@ -81,7 +81,7 @@
       "source_file": "dashboard/backend/app.py",
       "source_location": "L70",
       "id": "app_load_env_file",
-      "community": 2,
+      "community": 3,
       "norm_label": "load_env_file()"
     },
     {
@@ -90,7 +90,7 @@
       "source_file": "dashboard/backend/app.py",
       "source_location": "L84",
       "id": "app_parse_persona_library",
-      "community": 2,
+      "community": 16,
       "norm_label": "parse_persona_library()"
     },
     {
@@ -99,7 +99,7 @@
       "source_file": "dashboard/backend/app.py",
       "source_location": "L124",
       "id": "app_build_persona_payload",
-      "community": 6,
+      "community": 8,
       "norm_label": "build_persona_payload()"
     },
     {
@@ -108,7 +108,7 @@
       "source_file": "dashboard/backend/app.py",
       "source_location": "L155",
       "id": "app_read_active_images",
-      "community": 2,
+      "community": 16,
       "norm_label": "read_active_images()"
     },
     {
@@ -117,7 +117,7 @@
       "source_file": "dashboard/backend/app.py",
       "source_location": "L162",
       "id": "app_run_cmd",
-      "community": 4,
+      "community": 2,
       "norm_label": "run_cmd()"
     },
     {
@@ -126,7 +126,7 @@
       "source_file": "dashboard/backend/app.py",
       "source_location": "L166",
       "id": "app_build_multipart_form",
-      "community": 13,
+      "community": 3,
       "norm_label": "build_multipart_form()"
     },
     {
@@ -135,7 +135,7 @@
       "source_file": "dashboard/backend/app.py",
       "source_location": "L192",
       "id": "app_upload_image_to_cloudinary",
-      "community": 13,
+      "community": 3,
       "norm_label": "upload_image_to_cloudinary()"
     },
     {
@@ -144,7 +144,7 @@
       "source_file": "dashboard/backend/app.py",
       "source_location": "L222",
       "id": "app_load_batch_image_summary",
-      "community": 13,
+      "community": 2,
       "norm_label": "load_batch_image_summary()"
     },
     {
@@ -153,7 +153,7 @@
       "source_file": "dashboard/backend/app.py",
       "source_location": "L236",
       "id": "app_strip_ansi",
-      "community": 7,
+      "community": 11,
       "norm_label": "strip_ansi()"
     },
     {
@@ -162,7 +162,7 @@
       "source_file": "dashboard/backend/app.py",
       "source_location": "L240",
       "id": "app_opencode_discovery_env",
-      "community": 7,
+      "community": 11,
       "norm_label": "opencode_discovery_env()"
     },
     {
@@ -171,7 +171,7 @@
       "source_file": "dashboard/backend/app.py",
       "source_location": "L254",
       "id": "app_run_opencode_discovery_cmd",
-      "community": 7,
+      "community": 11,
       "norm_label": "run_opencode_discovery_cmd()"
     },
     {
@@ -180,7 +180,7 @@
       "source_file": "dashboard/backend/app.py",
       "source_location": "L258",
       "id": "app_list_opencode_models",
-      "community": 7,
+      "community": 11,
       "norm_label": "list_opencode_models()"
     },
     {
@@ -189,7 +189,7 @@
       "source_file": "dashboard/backend/app.py",
       "source_location": "L266",
       "id": "app_list_opencode_provider_labels",
-      "community": 7,
+      "community": 11,
       "norm_label": "list_opencode_provider_labels()"
     },
     {
@@ -198,7 +198,7 @@
       "source_file": "dashboard/backend/app.py",
       "source_location": "L286",
       "id": "app_provider_id_from_label",
-      "community": 7,
+      "community": 11,
       "norm_label": "provider_id_from_label()"
     },
     {
@@ -207,7 +207,7 @@
       "source_file": "dashboard/backend/app.py",
       "source_location": "L298",
       "id": "app_list_models_for_provider",
-      "community": 7,
+      "community": 11,
       "norm_label": "list_models_for_provider()"
     },
     {
@@ -216,7 +216,7 @@
       "source_file": "dashboard/backend/app.py",
       "source_location": "L306",
       "id": "app_choose_openai_gpt52",
-      "community": 7,
+      "community": 12,
       "norm_label": "choose_openai_gpt52()"
     },
     {
@@ -225,7 +225,7 @@
       "source_file": "dashboard/backend/app.py",
       "source_location": "L323",
       "id": "app_sanitize_dashboard_model",
-      "community": 7,
+      "community": 12,
       "norm_label": "sanitize_dashboard_model()"
     },
     {
@@ -234,7 +234,7 @@
       "source_file": "dashboard/backend/app.py",
       "source_location": "L330",
       "id": "app_build_opencode_catalog",
-      "community": 7,
+      "community": 11,
       "norm_label": "build_opencode_catalog()"
     },
     {
@@ -243,7 +243,7 @@
       "source_file": "dashboard/backend/app.py",
       "source_location": "L369",
       "id": "app_choose_extractor_model",
-      "community": 7,
+      "community": 12,
       "norm_label": "choose_extractor_model()"
     },
     {
@@ -252,7 +252,7 @@
       "source_file": "dashboard/backend/app.py",
       "source_location": "L381",
       "id": "app_parse_json_stdout",
-      "community": 6,
+      "community": 8,
       "norm_label": "parse_json_stdout()"
     },
     {
@@ -261,7 +261,7 @@
       "source_file": "dashboard/backend/app.py",
       "source_location": "L390",
       "id": "app_save_upload",
-      "community": 6,
+      "community": 8,
       "norm_label": "save_upload()"
     },
     {
@@ -270,7 +270,7 @@
       "source_file": "dashboard/backend/app.py",
       "source_location": "L399",
       "id": "app_coalesce_path",
-      "community": 6,
+      "community": 8,
       "norm_label": "coalesce_path()"
     },
     {
@@ -279,7 +279,7 @@
       "source_file": "dashboard/backend/app.py",
       "source_location": "L403",
       "id": "app_resolve_safe_path",
-      "community": 2,
+      "community": 3,
       "norm_label": "resolve_safe_path()"
     },
     {
@@ -288,7 +288,7 @@
       "source_file": "dashboard/backend/app.py",
       "source_location": "L410",
       "id": "app_choose_text",
-      "community": 10,
+      "community": 9,
       "norm_label": "choose_text()"
     },
     {
@@ -297,7 +297,7 @@
       "source_file": "dashboard/backend/app.py",
       "source_location": "L418",
       "id": "app_shorten_copy_line",
-      "community": 10,
+      "community": 9,
       "norm_label": "shorten_copy_line()"
     },
     {
@@ -306,7 +306,7 @@
       "source_file": "dashboard/backend/app.py",
       "source_location": "L423",
       "id": "app_strip_internal_marker",
-      "community": 2,
+      "community": 15,
       "norm_label": "strip_internal_marker()"
     },
     {
@@ -315,7 +315,7 @@
       "source_file": "dashboard/backend/app.py",
       "source_location": "L432",
       "id": "app_strip_price_tokens",
-      "community": 2,
+      "community": 15,
       "norm_label": "strip_price_tokens()"
     },
     {
@@ -324,7 +324,7 @@
       "source_file": "dashboard/backend/app.py",
       "source_location": "L444",
       "id": "app_strip_ba_panel_label",
-      "community": 10,
+      "community": 9,
       "norm_label": "strip_ba_panel_label()"
     },
     {
@@ -333,7 +333,7 @@
       "source_file": "dashboard/backend/app.py",
       "source_location": "L454",
       "id": "app_strip_internal_markers_from_payload",
-      "community": 2,
+      "community": 15,
       "norm_label": "strip_internal_markers_from_payload()"
     },
     {
@@ -342,7 +342,7 @@
       "source_file": "dashboard/backend/app.py",
       "source_location": "L485",
       "id": "app_parse_uniqueness_collisions",
-      "community": 6,
+      "community": 8,
       "norm_label": "parse_uniqueness_collisions()"
     },
     {
@@ -351,7 +351,7 @@
       "source_file": "dashboard/backend/app.py",
       "source_location": "L503",
       "id": "app_parse_json_object_from_text",
-      "community": 6,
+      "community": 12,
       "norm_label": "parse_json_object_from_text()"
     },
     {
@@ -360,7 +360,7 @@
       "source_file": "dashboard/backend/app.py",
       "source_location": "L542",
       "id": "app_parse_opencode_json_output",
-      "community": 6,
+      "community": 12,
       "norm_label": "parse_opencode_json_output()"
     },
     {
@@ -369,7 +369,7 @@
       "source_file": "dashboard/backend/app.py",
       "source_location": "L567",
       "id": "app_call_opencode_repair_copy",
-      "community": 4,
+      "community": 2,
       "norm_label": "call_opencode_repair_copy()"
     },
     {
@@ -378,7 +378,7 @@
       "source_file": "dashboard/backend/app.py",
       "source_location": "L629",
       "id": "app_clean_str",
-      "community": 10,
+      "community": 9,
       "norm_label": "_clean_str()"
     },
     {
@@ -387,7 +387,7 @@
       "source_file": "dashboard/backend/app.py",
       "source_location": "L633",
       "id": "app_clean_bullets",
-      "community": 10,
+      "community": 9,
       "norm_label": "_clean_bullets()"
     },
     {
@@ -396,7 +396,7 @@
       "source_file": "dashboard/backend/app.py",
       "source_location": "L643",
       "id": "app_ensure_testimonial_headline",
-      "community": 10,
+      "community": 9,
       "norm_label": "ensure_testimonial_headline()"
     },
     {
@@ -405,7 +405,7 @@
       "source_file": "dashboard/backend/app.py",
       "source_location": "L666",
       "id": "app_ensure_testimonial_attribution",
-      "community": 10,
+      "community": 9,
       "norm_label": "ensure_testimonial_attribution()"
     },
     {
@@ -414,7 +414,7 @@
       "source_file": "dashboard/backend/app.py",
       "source_location": "L709",
       "id": "app_persona_number_from_candidate",
-      "community": 2,
+      "community": 3,
       "norm_label": "_persona_number_from_candidate()"
     },
     {
@@ -423,7 +423,7 @@
       "source_file": "dashboard/backend/app.py",
       "source_location": "L724",
       "id": "app_persona_name_from_candidate",
-      "community": 10,
+      "community": 9,
       "norm_label": "_persona_name_from_candidate()"
     },
     {
@@ -432,7 +432,7 @@
       "source_file": "dashboard/backend/app.py",
       "source_location": "L731",
       "id": "app_normalize_generated_copy",
-      "community": 10,
+      "community": 9,
       "norm_label": "normalize_generated_copy()"
     },
     {
@@ -441,7 +441,7 @@
       "source_file": "dashboard/backend/app.py",
       "source_location": "L816",
       "id": "app_build_template_copy",
-      "community": 10,
+      "community": 9,
       "norm_label": "build_template_copy()"
     },
     {
@@ -450,7 +450,7 @@
       "source_file": "dashboard/backend/app.py",
       "source_location": "L921",
       "id": "app_call_opencode_compatible",
-      "community": 6,
+      "community": 12,
       "norm_label": "call_opencode_compatible()"
     },
     {
@@ -459,7 +459,7 @@
       "source_file": "dashboard/backend/app.py",
       "source_location": "L1037",
       "id": "app_collect_run_result",
-      "community": 4,
+      "community": 2,
       "norm_label": "collect_run_result()"
     },
     {
@@ -468,7 +468,7 @@
       "source_file": "dashboard/backend/app.py",
       "source_location": "L1064",
       "id": "app_scan_prompt_files_for_batch",
-      "community": 2,
+      "community": 3,
       "norm_label": "scan_prompt_files_for_batch()"
     },
     {
@@ -477,7 +477,7 @@
       "source_file": "dashboard/backend/app.py",
       "source_location": "L1074",
       "id": "app_scan_image_files_for_batch",
-      "community": 2,
+      "community": 3,
       "norm_label": "scan_image_files_for_batch()"
     },
     {
@@ -486,7 +486,7 @@
       "source_file": "dashboard/backend/app.py",
       "source_location": "L1085",
       "id": "app_refresh_manifest_file_state",
-      "community": 2,
+      "community": 3,
       "norm_label": "refresh_manifest_file_state()"
     },
     {
@@ -495,7 +495,7 @@
       "source_file": "dashboard/backend/app.py",
       "source_location": "L1105",
       "id": "app_force_aspect_ratio",
-      "community": 4,
+      "community": 2,
       "norm_label": "force_aspect_ratio()"
     },
     {
@@ -504,7 +504,7 @@
       "source_file": "dashboard/backend/app.py",
       "source_location": "L1116",
       "id": "app_parse_prompt_field",
-      "community": 12,
+      "community": 2,
       "norm_label": "_parse_prompt_field()"
     },
     {
@@ -513,7 +513,7 @@
       "source_file": "dashboard/backend/app.py",
       "source_location": "L1121",
       "id": "app_parse_background_lock_from_prompt",
-      "community": 12,
+      "community": 2,
       "norm_label": "parse_background_lock_from_prompt()"
     },
     {
@@ -522,7 +522,7 @@
       "source_file": "dashboard/backend/app.py",
       "source_location": "L1129",
       "id": "app_parse_prompt_filename",
-      "community": 12,
+      "community": 2,
       "norm_label": "parse_prompt_filename()"
     },
     {
@@ -531,7 +531,7 @@
       "source_file": "dashboard/backend/app.py",
       "source_location": "L1139",
       "id": "app_parse_persona_number_from_prompt",
-      "community": 12,
+      "community": 3,
       "norm_label": "parse_persona_number_from_prompt()"
     },
     {
@@ -540,7 +540,7 @@
       "source_file": "dashboard/backend/app.py",
       "source_location": "L1146",
       "id": "app_extract_on_image_copy_lines",
-      "community": 12,
+      "community": 3,
       "norm_label": "extract_on_image_copy_lines()"
     },
     {
@@ -549,7 +549,7 @@
       "source_file": "dashboard/backend/app.py",
       "source_location": "L1167",
       "id": "app_load_run_language_mode",
-      "community": 4,
+      "community": 2,
       "norm_label": "load_run_language_mode()"
     },
     {
@@ -558,7 +558,7 @@
       "source_file": "dashboard/backend/app.py",
       "source_location": "L1184",
       "id": "app_rerender_prompts_for_run",
-      "community": 4,
+      "community": 2,
       "norm_label": "rerender_prompts_for_run()"
     },
     {
@@ -567,7 +567,7 @@
       "source_file": "dashboard/backend/app.py",
       "source_location": "L1207",
       "id": "app_merge_manifest",
-      "community": 4,
+      "community": 2,
       "norm_label": "merge_manifest()"
     },
     {
@@ -576,7 +576,7 @@
       "source_file": "dashboard/backend/app.py",
       "source_location": "L1213",
       "id": "app_generate_916_for_run",
-      "community": 4,
+      "community": 2,
       "norm_label": "generate_916_for_run()"
     },
     {
@@ -585,7 +585,7 @@
       "source_file": "dashboard/backend/app.py",
       "source_location": "L1258",
       "id": "app_collect_45_visual_locks",
-      "community": 12,
+      "community": 2,
       "norm_label": "collect_45_visual_locks()"
     },
     {
@@ -594,7 +594,7 @@
       "source_file": "dashboard/backend/app.py",
       "source_location": "L1302",
       "id": "app_apply_visual_locks",
-      "community": 4,
+      "community": 2,
       "norm_label": "apply_visual_locks()"
     },
     {
@@ -603,7 +603,7 @@
       "source_file": "dashboard/backend/app.py",
       "source_location": "L1330",
       "id": "app_resolve_format_plan",
-      "community": 6,
+      "community": 8,
       "norm_label": "resolve_format_plan()"
     },
     {
@@ -612,7 +612,7 @@
       "source_file": "dashboard/backend/app.py",
       "source_location": "L1362",
       "id": "app_startup",
-      "community": 2,
+      "community": 3,
       "norm_label": "startup()"
     },
     {
@@ -621,7 +621,7 @@
       "source_file": "dashboard/backend/app.py",
       "source_location": "L1368",
       "id": "app_api_defaults",
-      "community": 2,
+      "community": 16,
       "norm_label": "api_defaults()"
     },
     {
@@ -630,7 +630,7 @@
       "source_file": "dashboard/backend/app.py",
       "source_location": "L1386",
       "id": "app_api_opencode_catalog",
-      "community": 7,
+      "community": 11,
       "norm_label": "api_opencode_catalog()"
     },
     {
@@ -639,7 +639,7 @@
       "source_file": "dashboard/backend/app.py",
       "source_location": "L1391",
       "id": "app_api_runs",
-      "community": 2,
+      "community": 3,
       "norm_label": "api_runs()"
     },
     {
@@ -648,7 +648,7 @@
       "source_file": "dashboard/backend/app.py",
       "source_location": "L1411",
       "id": "app_api_run",
-      "community": 2,
+      "community": 3,
       "norm_label": "api_run()"
     },
     {
@@ -657,7 +657,7 @@
       "source_file": "dashboard/backend/app.py",
       "source_location": "L1421",
       "id": "app_api_run_prompt_copies",
-      "community": 12,
+      "community": 3,
       "norm_label": "api_run_prompt_copies()"
     },
     {
@@ -666,7 +666,7 @@
       "source_file": "dashboard/backend/app.py",
       "source_location": "L1455",
       "id": "app_api_run_update_prompt_copies",
-      "community": 4,
+      "community": 2,
       "norm_label": "api_run_update_prompt_copies()"
     },
     {
@@ -675,7 +675,7 @@
       "source_file": "dashboard/backend/app.py",
       "source_location": "L1596",
       "id": "app_api_run_generate_916",
-      "community": 4,
+      "community": 2,
       "norm_label": "api_run_generate_916()"
     },
     {
@@ -684,7 +684,7 @@
       "source_file": "dashboard/backend/app.py",
       "source_location": "L1607",
       "id": "app_api_run_generate_916_selected",
-      "community": 4,
+      "community": 2,
       "norm_label": "api_run_generate_916_selected()"
     },
     {
@@ -693,7 +693,7 @@
       "source_file": "dashboard/backend/app.py",
       "source_location": "L1673",
       "id": "app_validate_selected_45_prompts",
-      "community": 13,
+      "community": 2,
       "norm_label": "validate_selected_45_prompts()"
     },
     {
@@ -702,7 +702,7 @@
       "source_file": "dashboard/backend/app.py",
       "source_location": "L1690",
       "id": "app_map_45_to_96_prompts",
-      "community": 13,
+      "community": 2,
       "norm_label": "map_45_to_96_prompts()"
     },
     {
@@ -711,7 +711,7 @@
       "source_file": "dashboard/backend/app.py",
       "source_location": "L1700",
       "id": "app_extract_selected_ad_keys_from_45_prompts",
-      "community": 12,
+      "community": 2,
       "norm_label": "extract_selected_ad_keys_from_45_prompts()"
     },
     {
@@ -720,7 +720,7 @@
       "source_file": "dashboard/backend/app.py",
       "source_location": "L1711",
       "id": "app_filter_copy_json_for_selected_ads",
-      "community": 4,
+      "community": 2,
       "norm_label": "filter_copy_json_for_selected_ads()"
     },
     {
@@ -729,7 +729,7 @@
       "source_file": "dashboard/backend/app.py",
       "source_location": "L1732",
       "id": "app_api_run_generate_images_45",
-      "community": 4,
+      "community": 2,
       "norm_label": "api_run_generate_images_45()"
     },
     {
@@ -738,7 +738,7 @@
       "source_file": "dashboard/backend/app.py",
       "source_location": "L1788",
       "id": "app_api_run_generate_images_916_from_45",
-      "community": 13,
+      "community": 2,
       "norm_label": "api_run_generate_images_916_from_45()"
     },
     {
@@ -747,7 +747,7 @@
       "source_file": "dashboard/backend/app.py",
       "source_location": "L1892",
       "id": "app_api_file_content",
-      "community": 2,
+      "community": 3,
       "norm_label": "api_file_content()"
     },
     {
@@ -756,7 +756,7 @@
       "source_file": "dashboard/backend/app.py",
       "source_location": "L1907",
       "id": "app_api_run_execute",
-      "community": 6,
+      "community": 8,
       "norm_label": "api_run_execute()"
     },
     {
@@ -765,7 +765,7 @@
       "source_file": "dashboard/frontend/app.js",
       "source_location": "L1",
       "id": "dashboard_frontend_app_js",
-      "community": 3,
+      "community": 4,
       "norm_label": "app.js"
     },
     {
@@ -774,7 +774,7 @@
       "source_file": "dashboard/frontend/app.js",
       "source_location": "L19",
       "id": "app_setselectoptions",
-      "community": 3,
+      "community": 4,
       "norm_label": "setselectoptions()"
     },
     {
@@ -783,7 +783,7 @@
       "source_file": "dashboard/frontend/app.js",
       "source_location": "L30",
       "id": "app_rendermodeloptions",
-      "community": 3,
+      "community": 4,
       "norm_label": "rendermodeloptions()"
     },
     {
@@ -792,7 +792,7 @@
       "source_file": "dashboard/frontend/app.js",
       "source_location": "L36",
       "id": "app_applytheme",
-      "community": 3,
+      "community": 4,
       "norm_label": "applytheme()"
     },
     {
@@ -801,7 +801,7 @@
       "source_file": "dashboard/frontend/app.js",
       "source_location": "L44",
       "id": "app_inittheme",
-      "community": 3,
+      "community": 4,
       "norm_label": "inittheme()"
     },
     {
@@ -810,7 +810,7 @@
       "source_file": "dashboard/frontend/app.js",
       "source_location": "L54",
       "id": "app_chip",
-      "community": 3,
+      "community": 4,
       "norm_label": "chip()"
     },
     {
@@ -819,7 +819,7 @@
       "source_file": "dashboard/frontend/app.js",
       "source_location": "L63",
       "id": "app_setstatus",
-      "community": 3,
+      "community": 4,
       "norm_label": "setstatus()"
     },
     {
@@ -828,7 +828,7 @@
       "source_file": "dashboard/frontend/app.js",
       "source_location": "L67",
       "id": "app_getpersonaselection",
-      "community": 3,
+      "community": 4,
       "norm_label": "getpersonaselection()"
     },
     {
@@ -837,7 +837,7 @@
       "source_file": "dashboard/frontend/app.js",
       "source_location": "L72",
       "id": "app_getformatsbypersona",
-      "community": 3,
+      "community": 4,
       "norm_label": "getformatsbypersona()"
     },
     {
@@ -846,7 +846,7 @@
       "source_file": "dashboard/frontend/app.js",
       "source_location": "L86",
       "id": "app_renderglobalformats",
-      "community": 3,
+      "community": 4,
       "norm_label": "renderglobalformats()"
     },
     {
@@ -855,7 +855,7 @@
       "source_file": "dashboard/frontend/app.js",
       "source_location": "L110",
       "id": "app_renderlanguagemodes",
-      "community": 3,
+      "community": 4,
       "norm_label": "renderlanguagemodes()"
     },
     {
@@ -864,7 +864,7 @@
       "source_file": "dashboard/frontend/app.js",
       "source_location": "L121",
       "id": "app_renderpersonas",
-      "community": 3,
+      "community": 4,
       "norm_label": "renderpersonas()"
     },
     {
@@ -873,7 +873,7 @@
       "source_file": "dashboard/frontend/app.js",
       "source_location": "L154",
       "id": "app_fetchdefaults",
-      "community": 3,
+      "community": 4,
       "norm_label": "fetchdefaults()"
     },
     {
@@ -882,7 +882,7 @@
       "source_file": "dashboard/frontend/app.js",
       "source_location": "L176",
       "id": "app_fileinput",
-      "community": 3,
+      "community": 4,
       "norm_label": "fileinput()"
     },
     {
@@ -891,7 +891,7 @@
       "source_file": "dashboard/frontend/app.js",
       "source_location": "L180",
       "id": "app_runpipeline",
-      "community": 3,
+      "community": 4,
       "norm_label": "runpipeline()"
     },
     {
@@ -900,7 +900,7 @@
       "source_file": "dashboard/frontend/app.js",
       "source_location": "L231",
       "id": "app_renderrun",
-      "community": 3,
+      "community": 4,
       "norm_label": "renderrun()"
     },
     {
@@ -909,7 +909,7 @@
       "source_file": "dashboard/frontend/app.js",
       "source_location": "L515",
       "id": "app_loadruns",
-      "community": 3,
+      "community": 4,
       "norm_label": "loadruns()"
     },
     {
@@ -918,7 +918,7 @@
       "source_file": "notusing/legacy_misc/generate_ads_wrapper.py",
       "source_location": "L1",
       "id": "notusing_legacy_misc_generate_ads_wrapper_py",
-      "community": 19,
+      "community": 20,
       "norm_label": "generate_ads_wrapper.py"
     },
     {
@@ -927,7 +927,7 @@
       "source_file": "notusing/legacy_misc/registry_banlist_wrapper.py",
       "source_location": "L1",
       "id": "notusing_legacy_misc_registry_banlist_wrapper_py",
-      "community": 20,
+      "community": 21,
       "norm_label": "registry_banlist_wrapper.py"
     },
     {
@@ -936,7 +936,7 @@
       "source_file": "notusing/legacy_persona/extract_persona.py",
       "source_location": "L1",
       "id": "notusing_legacy_persona_extract_persona_py",
-      "community": 14,
+      "community": 13,
       "norm_label": "extract_persona.py"
     },
     {
@@ -945,7 +945,7 @@
       "source_file": "notusing/legacy_persona/extract_persona.py",
       "source_location": "L11",
       "id": "extract_persona_parse_bullets",
-      "community": 14,
+      "community": 13,
       "norm_label": "parse_bullets()"
     },
     {
@@ -954,7 +954,7 @@
       "source_file": "notusing/legacy_persona/extract_persona.py",
       "source_location": "L25",
       "id": "extract_persona_get_persona_block",
-      "community": 14,
+      "community": 13,
       "norm_label": "get_persona_block()"
     },
     {
@@ -963,7 +963,7 @@
       "source_file": "notusing/legacy_persona/extract_persona.py",
       "source_location": "L38",
       "id": "extract_persona_build_payload",
-      "community": 14,
+      "community": 13,
       "norm_label": "build_payload()"
     },
     {
@@ -972,7 +972,7 @@
       "source_file": "notusing/legacy_persona/extract_persona.py",
       "source_location": "L55",
       "id": "extract_persona_parse_args",
-      "community": 14,
+      "community": 13,
       "norm_label": "parse_args()"
     },
     {
@@ -981,7 +981,7 @@
       "source_file": "notusing/legacy_persona/extract_persona.py",
       "source_location": "L63",
       "id": "extract_persona_main",
-      "community": 14,
+      "community": 13,
       "norm_label": "main()"
     },
     {
@@ -990,7 +990,7 @@
       "source_file": "notusing/legacy_persona/generate_persona_txt.py",
       "source_location": "L1",
       "id": "notusing_legacy_persona_generate_persona_txt_py",
-      "community": 8,
+      "community": 6,
       "norm_label": "generate_persona_txt.py"
     },
     {
@@ -999,7 +999,7 @@
       "source_file": "notusing/legacy_persona/generate_persona_txt.py",
       "source_location": "L52",
       "id": "generate_persona_txt_split_items",
-      "community": 8,
+      "community": 6,
       "norm_label": "split_items()"
     },
     {
@@ -1008,7 +1008,7 @@
       "source_file": "notusing/legacy_persona/generate_persona_txt.py",
       "source_location": "L58",
       "id": "generate_persona_txt_split_sources",
-      "community": 8,
+      "community": 6,
       "norm_label": "split_sources()"
     },
     {
@@ -1017,7 +1017,7 @@
       "source_file": "notusing/legacy_persona/generate_persona_txt.py",
       "source_location": "L64",
       "id": "generate_persona_txt_load_rows",
-      "community": 8,
+      "community": 6,
       "norm_label": "load_rows()"
     },
     {
@@ -1026,7 +1026,7 @@
       "source_file": "notusing/legacy_persona/generate_persona_txt.py",
       "source_location": "L96",
       "id": "generate_persona_txt_extract_existing_snapshots",
-      "community": 8,
+      "community": 6,
       "norm_label": "extract_existing_snapshots()"
     },
     {
@@ -1035,7 +1035,7 @@
       "source_file": "notusing/legacy_persona/generate_persona_txt.py",
       "source_location": "L125",
       "id": "generate_persona_txt_fallback_snapshot",
-      "community": 8,
+      "community": 6,
       "norm_label": "fallback_snapshot()"
     },
     {
@@ -1044,7 +1044,7 @@
       "source_file": "notusing/legacy_persona/generate_persona_txt.py",
       "source_location": "L132",
       "id": "generate_persona_txt_make_language_bank",
-      "community": 8,
+      "community": 6,
       "norm_label": "make_language_bank()"
     },
     {
@@ -1053,7 +1053,7 @@
       "source_file": "notusing/legacy_persona/generate_persona_txt.py",
       "source_location": "L151",
       "id": "generate_persona_txt_add_list",
-      "community": 8,
+      "community": 6,
       "norm_label": "add_list()"
     },
     {
@@ -1062,7 +1062,7 @@
       "source_file": "notusing/legacy_persona/generate_persona_txt.py",
       "source_location": "L156",
       "id": "generate_persona_txt_render",
-      "community": 8,
+      "community": 6,
       "norm_label": "render()"
     },
     {
@@ -1071,7 +1071,7 @@
       "source_file": "notusing/legacy_persona/generate_persona_txt.py",
       "source_location": "L249",
       "id": "generate_persona_txt_parse_args",
-      "community": 8,
+      "community": 6,
       "norm_label": "parse_args()"
     },
     {
@@ -1080,7 +1080,7 @@
       "source_file": "notusing/legacy_persona/generate_persona_txt.py",
       "source_location": "L269",
       "id": "generate_persona_txt_main",
-      "community": 8,
+      "community": 6,
       "norm_label": "main()"
     },
     {
@@ -1088,9 +1088,9 @@
       "file_type": "rationale",
       "source_file": "notusing/legacy_persona/generate_persona_txt.py",
       "source_location": "L97",
-      "id": "generate_persona_txt_rationale_97",
-      "community": 8,
-      "norm_label": "extract basic snapshot bullet lines from existing persona file.      keeps exist"
+      "community": 6,
+      "norm_label": "extract basic snapshot bullet lines from existing persona file.      keeps exist",
+      "id": "generate_persona_txt_rationale_97"
     },
     {
       "label": "bootstrap_stack.ps1",
@@ -1098,7 +1098,7 @@
       "source_file": "scripts/bootstrap_stack.ps1",
       "source_location": "L1",
       "id": "scripts_bootstrap_stack_ps1",
-      "community": 21,
+      "community": 22,
       "norm_label": "bootstrap_stack.ps1"
     },
     {
@@ -1305,7 +1305,7 @@
       "source_file": "scripts/kie_nano_batch.py",
       "source_location": "L403",
       "id": "kie_nano_batch_write_text",
-      "community": 4,
+      "community": 2,
       "norm_label": "write_text()"
     },
     {
@@ -1350,7 +1350,7 @@
       "source_file": "scripts/upgrade_safezone_backgrounds.py",
       "source_location": "L1",
       "id": "scripts_upgrade_safezone_backgrounds_py",
-      "community": 9,
+      "community": 7,
       "norm_label": "upgrade_safezone_backgrounds.py"
     },
     {
@@ -1359,7 +1359,7 @@
       "source_file": "scripts/upgrade_safezone_backgrounds.py",
       "source_location": "L16",
       "id": "upgrade_safezone_backgrounds_parse_args",
-      "community": 9,
+      "community": 7,
       "norm_label": "parse_args()"
     },
     {
@@ -1368,7 +1368,7 @@
       "source_file": "scripts/upgrade_safezone_backgrounds.py",
       "source_location": "L27",
       "id": "upgrade_safezone_backgrounds_detect_layout_mode",
-      "community": 9,
+      "community": 7,
       "norm_label": "detect_layout_mode()"
     },
     {
@@ -1377,7 +1377,7 @@
       "source_file": "scripts/upgrade_safezone_backgrounds.py",
       "source_location": "L39",
       "id": "upgrade_safezone_backgrounds_composition_variants",
-      "community": 9,
+      "community": 7,
       "norm_label": "composition_variants()"
     },
     {
@@ -1386,7 +1386,7 @@
       "source_file": "scripts/upgrade_safezone_backgrounds.py",
       "source_location": "L68",
       "id": "upgrade_safezone_backgrounds_layout_intent_variants",
-      "community": 9,
+      "community": 7,
       "norm_label": "layout_intent_variants()"
     },
     {
@@ -1395,7 +1395,7 @@
       "source_file": "scripts/upgrade_safezone_backgrounds.py",
       "source_location": "L89",
       "id": "upgrade_safezone_backgrounds_cta_safe_space_variants",
-      "community": 9,
+      "community": 7,
       "norm_label": "cta_safe_space_variants()"
     },
     {
@@ -1404,7 +1404,7 @@
       "source_file": "scripts/upgrade_safezone_backgrounds.py",
       "source_location": "L114",
       "id": "upgrade_safezone_backgrounds_crop_safety_variants",
-      "community": 9,
+      "community": 7,
       "norm_label": "crop_safety_variants()"
     },
     {
@@ -1413,7 +1413,7 @@
       "source_file": "scripts/upgrade_safezone_backgrounds.py",
       "source_location": "L129",
       "id": "upgrade_safezone_backgrounds_choose_seed",
-      "community": 9,
+      "community": 7,
       "norm_label": "choose_seed()"
     },
     {
@@ -1422,7 +1422,7 @@
       "source_file": "scripts/upgrade_safezone_backgrounds.py",
       "source_location": "L136",
       "id": "upgrade_safezone_backgrounds_upgraded_variant",
-      "community": 9,
+      "community": 7,
       "norm_label": "upgraded_variant()"
     },
     {
@@ -1431,7 +1431,7 @@
       "source_file": "scripts/upgrade_safezone_backgrounds.py",
       "source_location": "L146",
       "id": "upgrade_safezone_backgrounds_pick_background",
-      "community": 9,
+      "community": 7,
       "norm_label": "pick_background()"
     },
     {
@@ -1440,7 +1440,7 @@
       "source_file": "scripts/upgrade_safezone_backgrounds.py",
       "source_location": "L155",
       "id": "upgrade_safezone_backgrounds_build_final_prompt",
-      "community": 9,
+      "community": 7,
       "norm_label": "build_final_prompt()"
     },
     {
@@ -1449,7 +1449,7 @@
       "source_file": "scripts/upgrade_safezone_backgrounds.py",
       "source_location": "L196",
       "id": "upgrade_safezone_backgrounds_main",
-      "community": 9,
+      "community": 7,
       "norm_label": "main()"
     },
     {
@@ -1465,7 +1465,7 @@
       "label": "CopyBlock",
       "file_type": "code",
       "source_file": "scripts/generate_ads.py",
-      "source_location": "L41",
+      "source_location": "L315",
       "id": "generate_ads_copyblock",
       "community": 0,
       "norm_label": "copyblock"
@@ -1474,7 +1474,7 @@
       "label": "parse_args()",
       "file_type": "code",
       "source_file": "scripts/generate_ads.py",
-      "source_location": "L51",
+      "source_location": "L325",
       "id": "generate_ads_parse_args",
       "community": 0,
       "norm_label": "parse_args()"
@@ -1483,7 +1483,7 @@
       "label": "now_utc_iso()",
       "file_type": "code",
       "source_file": "scripts/generate_ads.py",
-      "source_location": "L63",
+      "source_location": "L337",
       "id": "generate_ads_now_utc_iso",
       "community": 0,
       "norm_label": "now_utc_iso()"
@@ -1492,7 +1492,7 @@
       "label": "load_json()",
       "file_type": "code",
       "source_file": "scripts/generate_ads.py",
-      "source_location": "L67",
+      "source_location": "L341",
       "id": "generate_ads_load_json",
       "community": 0,
       "norm_label": "load_json()"
@@ -1501,7 +1501,7 @@
       "label": "write_json()",
       "file_type": "code",
       "source_file": "scripts/generate_ads.py",
-      "source_location": "L71",
+      "source_location": "L345",
       "id": "generate_ads_write_json",
       "community": 0,
       "norm_label": "write_json()"
@@ -1510,7 +1510,7 @@
       "label": "list_batches()",
       "file_type": "code",
       "source_file": "scripts/generate_ads.py",
-      "source_location": "L75",
+      "source_location": "L349",
       "id": "generate_ads_list_batches",
       "community": 0,
       "norm_label": "list_batches()"
@@ -1519,7 +1519,7 @@
       "label": "next_batch_name()",
       "file_type": "code",
       "source_file": "scripts/generate_ads.py",
-      "source_location": "L87",
+      "source_location": "L361",
       "id": "generate_ads_next_batch_name",
       "community": 0,
       "norm_label": "next_batch_name()"
@@ -1528,7 +1528,7 @@
       "label": "stable_fmt_seed()",
       "file_type": "code",
       "source_file": "scripts/generate_ads.py",
-      "source_location": "L92",
+      "source_location": "L366",
       "id": "generate_ads_stable_fmt_seed",
       "community": 0,
       "norm_label": "stable_fmt_seed()"
@@ -1537,7 +1537,7 @@
       "label": "ensure_slot_tracker()",
       "file_type": "code",
       "source_file": "scripts/generate_ads.py",
-      "source_location": "L96",
+      "source_location": "L370",
       "id": "generate_ads_ensure_slot_tracker",
       "community": 0,
       "norm_label": "ensure_slot_tracker()"
@@ -1546,7 +1546,7 @@
       "label": "pick_background_slot()",
       "file_type": "code",
       "source_file": "scripts/generate_ads.py",
-      "source_location": "L122",
+      "source_location": "L396",
       "id": "generate_ads_pick_background_slot",
       "community": 0,
       "norm_label": "pick_background_slot()"
@@ -1555,7 +1555,7 @@
       "label": "get_background_by_id()",
       "file_type": "code",
       "source_file": "scripts/generate_ads.py",
-      "source_location": "L149",
+      "source_location": "L423",
       "id": "generate_ads_get_background_by_id",
       "community": 0,
       "norm_label": "get_background_by_id()"
@@ -1564,7 +1564,7 @@
       "label": "build_seeded_background_sentence()",
       "file_type": "code",
       "source_file": "scripts/generate_ads.py",
-      "source_location": "L166",
+      "source_location": "L440",
       "id": "generate_ads_build_seeded_background_sentence",
       "community": 0,
       "norm_label": "build_seeded_background_sentence()"
@@ -1573,7 +1573,7 @@
       "label": "build_ugc_subject_line()",
       "file_type": "code",
       "source_file": "scripts/generate_ads.py",
-      "source_location": "L208",
+      "source_location": "L482",
       "id": "generate_ads_build_ugc_subject_line",
       "community": 0,
       "norm_label": "build_ugc_subject_line()"
@@ -1582,7 +1582,7 @@
       "label": "safezone_enforcement_block()",
       "file_type": "code",
       "source_file": "scripts/generate_ads.py",
-      "source_location": "L227",
+      "source_location": "L501",
       "id": "generate_ads_safezone_enforcement_block",
       "community": 0,
       "norm_label": "safezone_enforcement_block()"
@@ -1591,7 +1591,7 @@
       "label": "outpaint_lock_block()",
       "file_type": "code",
       "source_file": "scripts/generate_ads.py",
-      "source_location": "L247",
+      "source_location": "L521",
       "id": "generate_ads_outpaint_lock_block",
       "community": 0,
       "norm_label": "outpaint_lock_block()"
@@ -1600,7 +1600,7 @@
       "label": "require_str()",
       "file_type": "code",
       "source_file": "scripts/generate_ads.py",
-      "source_location": "L263",
+      "source_location": "L537",
       "id": "generate_ads_require_str",
       "community": 0,
       "norm_label": "require_str()"
@@ -1609,7 +1609,7 @@
       "label": "require_int()",
       "file_type": "code",
       "source_file": "scripts/generate_ads.py",
-      "source_location": "L270",
+      "source_location": "L544",
       "id": "generate_ads_require_int",
       "community": 0,
       "norm_label": "require_int()"
@@ -1618,7 +1618,7 @@
       "label": "parse_copy_block()",
       "file_type": "code",
       "source_file": "scripts/generate_ads.py",
-      "source_location": "L277",
+      "source_location": "L551",
       "id": "generate_ads_parse_copy_block",
       "community": 0,
       "norm_label": "parse_copy_block()"
@@ -1627,7 +1627,7 @@
       "label": "strip_ba_panel_label()",
       "file_type": "code",
       "source_file": "scripts/generate_ads.py",
-      "source_location": "L304",
+      "source_location": "L578",
       "id": "generate_ads_strip_ba_panel_label",
       "community": 0,
       "norm_label": "strip_ba_panel_label()"
@@ -1636,7 +1636,7 @@
       "label": "split_ba_contrast_lines()",
       "file_type": "code",
       "source_file": "scripts/generate_ads.py",
-      "source_location": "L312",
+      "source_location": "L586",
       "id": "generate_ads_split_ba_contrast_lines",
       "community": 0,
       "norm_label": "split_ba_contrast_lines()"
@@ -1645,7 +1645,7 @@
       "label": "registry_used_text()",
       "file_type": "code",
       "source_file": "scripts/generate_ads.py",
-      "source_location": "L323",
+      "source_location": "L597",
       "id": "generate_ads_registry_used_text",
       "community": 0,
       "norm_label": "registry_used_text()"
@@ -1654,7 +1654,7 @@
       "label": "uniqueness_check()",
       "file_type": "code",
       "source_file": "scripts/generate_ads.py",
-      "source_location": "L333",
+      "source_location": "L607",
       "id": "generate_ads_uniqueness_check",
       "community": 0,
       "norm_label": "uniqueness_check()"
@@ -1663,7 +1663,7 @@
       "label": "add_used_text()",
       "file_type": "code",
       "source_file": "scripts/generate_ads.py",
-      "source_location": "L344",
+      "source_location": "L618",
       "id": "generate_ads_add_used_text",
       "community": 0,
       "norm_label": "add_used_text()"
@@ -1672,7 +1672,7 @@
       "label": "next_entry_id()",
       "file_type": "code",
       "source_file": "scripts/generate_ads.py",
-      "source_location": "L352",
+      "source_location": "L626",
       "id": "generate_ads_next_entry_id",
       "community": 0,
       "norm_label": "next_entry_id()"
@@ -1681,16 +1681,52 @@
       "label": "append_background_index()",
       "file_type": "code",
       "source_file": "scripts/generate_ads.py",
-      "source_location": "L363",
+      "source_location": "L637",
       "id": "generate_ads_append_background_index",
       "community": 0,
       "norm_label": "append_background_index()"
     },
     {
+      "label": "stable_signature_seed()",
+      "file_type": "code",
+      "source_file": "scripts/generate_ads.py",
+      "source_location": "L642",
+      "id": "generate_ads_stable_signature_seed",
+      "community": 0,
+      "norm_label": "stable_signature_seed()"
+    },
+    {
+      "label": "base_layout_lines_for_format()",
+      "file_type": "code",
+      "source_file": "scripts/generate_ads.py",
+      "source_location": "L648",
+      "id": "generate_ads_base_layout_lines_for_format",
+      "community": 0,
+      "norm_label": "base_layout_lines_for_format()"
+    },
+    {
+      "label": "find_visual_archetype()",
+      "file_type": "code",
+      "source_file": "scripts/generate_ads.py",
+      "source_location": "L692",
+      "id": "generate_ads_find_visual_archetype",
+      "community": 0,
+      "norm_label": "find_visual_archetype()"
+    },
+    {
+      "label": "pick_visual_archetype()",
+      "file_type": "code",
+      "source_file": "scripts/generate_ads.py",
+      "source_location": "L699",
+      "id": "generate_ads_pick_visual_archetype",
+      "community": 0,
+      "norm_label": "pick_visual_archetype()"
+    },
+    {
       "label": "render_prompt()",
       "file_type": "code",
       "source_file": "scripts/generate_ads.py",
-      "source_location": "L368",
+      "source_location": "L728",
       "id": "generate_ads_render_prompt",
       "community": 0,
       "norm_label": "render_prompt()"
@@ -1699,7 +1735,7 @@
       "label": "validate_prompt_text()",
       "file_type": "code",
       "source_file": "scripts/generate_ads.py",
-      "source_location": "L693",
+      "source_location": "L986",
       "id": "generate_ads_validate_prompt_text",
       "community": 0,
       "norm_label": "validate_prompt_text()"
@@ -1708,7 +1744,7 @@
       "label": "aspect_ratio_folder()",
       "file_type": "code",
       "source_file": "scripts/generate_ads.py",
-      "source_location": "L705",
+      "source_location": "L998",
       "id": "generate_ads_aspect_ratio_folder",
       "community": 0,
       "norm_label": "aspect_ratio_folder()"
@@ -1717,7 +1753,7 @@
       "label": "prompt_filename()",
       "file_type": "code",
       "source_file": "scripts/generate_ads.py",
-      "source_location": "L709",
+      "source_location": "L1002",
       "id": "generate_ads_prompt_filename",
       "community": 0,
       "norm_label": "prompt_filename()"
@@ -1726,7 +1762,7 @@
       "label": "main()",
       "file_type": "code",
       "source_file": "scripts/generate_ads.py",
-      "source_location": "L713",
+      "source_location": "L1006",
       "id": "generate_ads_main",
       "community": 0,
       "norm_label": "main()"
@@ -1737,7 +1773,7 @@
       "source_file": "scripts/extract_product_context.py",
       "source_location": "L1",
       "id": "scripts_extract_product_context_py",
-      "community": 11,
+      "community": 10,
       "norm_label": "extract_product_context.py"
     },
     {
@@ -1746,7 +1782,7 @@
       "source_file": "scripts/extract_product_context.py",
       "source_location": "L11",
       "id": "extract_product_context_clean_lines",
-      "community": 11,
+      "community": 10,
       "norm_label": "_clean_lines()"
     },
     {
@@ -1755,7 +1791,7 @@
       "source_file": "scripts/extract_product_context.py",
       "source_location": "L15",
       "id": "extract_product_context_append_unique",
-      "community": 11,
+      "community": 10,
       "norm_label": "_append_unique()"
     },
     {
@@ -1764,7 +1800,7 @@
       "source_file": "scripts/extract_product_context.py",
       "source_location": "L23",
       "id": "extract_product_context_extract_snapshot_block",
-      "community": 11,
+      "community": 10,
       "norm_label": "extract_snapshot_block()"
     },
     {
@@ -1773,7 +1809,7 @@
       "source_file": "scripts/extract_product_context.py",
       "source_location": "L43",
       "id": "extract_product_context_extract_keyword_lines",
-      "community": 11,
+      "community": 10,
       "norm_label": "extract_keyword_lines()"
     },
     {
@@ -1782,7 +1818,7 @@
       "source_file": "scripts/extract_product_context.py",
       "source_location": "L50",
       "id": "extract_product_context_extract_product_sections",
-      "community": 11,
+      "community": 10,
       "norm_label": "extract_product_sections()"
     },
     {
@@ -1791,7 +1827,7 @@
       "source_file": "scripts/extract_product_context.py",
       "source_location": "L103",
       "id": "extract_product_context_extract_mechanism_sections",
-      "community": 11,
+      "community": 10,
       "norm_label": "extract_mechanism_sections()"
     },
     {
@@ -1800,7 +1836,7 @@
       "source_file": "scripts/extract_product_context.py",
       "source_location": "L133",
       "id": "extract_product_context_extract_faq_sections",
-      "community": 11,
+      "community": 10,
       "norm_label": "extract_faq_sections()"
     },
     {
@@ -1809,7 +1845,7 @@
       "source_file": "scripts/extract_product_context.py",
       "source_location": "L176",
       "id": "extract_product_context_compact_lines",
-      "community": 11,
+      "community": 10,
       "norm_label": "compact_lines()"
     },
     {
@@ -1818,7 +1854,7 @@
       "source_file": "scripts/extract_product_context.py",
       "source_location": "L203",
       "id": "extract_product_context_main",
-      "community": 11,
+      "community": 10,
       "norm_label": "main()"
     },
     {
@@ -1827,7 +1863,7 @@
       "source_file": "scripts/registry_banlist.py",
       "source_location": "L1",
       "id": "scripts_registry_banlist_py",
-      "community": 15,
+      "community": 14,
       "norm_label": "registry_banlist.py"
     },
     {
@@ -1836,7 +1872,7 @@
       "source_file": "scripts/registry_banlist.py",
       "source_location": "L34",
       "id": "registry_banlist_parse_args",
-      "community": 15,
+      "community": 14,
       "norm_label": "parse_args()"
     },
     {
@@ -1845,7 +1881,7 @@
       "source_file": "scripts/registry_banlist.py",
       "source_location": "L42",
       "id": "registry_banlist_load_json",
-      "community": 15,
+      "community": 14,
       "norm_label": "load_json()"
     },
     {
@@ -1854,7 +1890,7 @@
       "source_file": "scripts/registry_banlist.py",
       "source_location": "L46",
       "id": "registry_banlist_main",
-      "community": 15,
+      "community": 14,
       "norm_label": "main()"
     },
     {
@@ -1863,7 +1899,7 @@
       "source_file": "scripts/stop_dashboard_stack.ps1",
       "source_location": "L1",
       "id": "scripts_stop_dashboard_stack_ps1",
-      "community": 16,
+      "community": 17,
       "norm_label": "stop_dashboard_stack.ps1"
     },
     {
@@ -1872,7 +1908,7 @@
       "source_file": "scripts/stop_dashboard_stack.ps1",
       "source_location": "L6",
       "id": "stop_dashboard_stack_stop_frompidfile",
-      "community": 16,
+      "community": 17,
       "norm_label": "stop-frompidfile()"
     },
     {
@@ -5883,8 +5919,8 @@
       "source_file": "scripts/upgrade_safezone_backgrounds.py",
       "source_location": "L209",
       "weight": 1.0,
-      "_src": "upgrade_safezone_backgrounds_main",
-      "_tgt": "kie_nano_batch_write_text",
+      "_src": "kie_nano_batch_write_text",
+      "_tgt": "upgrade_safezone_backgrounds_main",
       "source": "kie_nano_batch_write_text",
       "target": "upgrade_safezone_backgrounds_main"
     },
@@ -5895,8 +5931,8 @@
       "source_file": "scripts/generate_ads.py",
       "source_location": "L72",
       "weight": 1.0,
-      "_src": "generate_ads_write_json",
-      "_tgt": "kie_nano_batch_write_text",
+      "_src": "kie_nano_batch_write_text",
+      "_tgt": "generate_ads_write_json",
       "source": "kie_nano_batch_write_text",
       "target": "generate_ads_write_json"
     },
@@ -5907,8 +5943,8 @@
       "source_file": "scripts/generate_ads.py",
       "source_location": "L842",
       "weight": 1.0,
-      "_src": "generate_ads_main",
-      "_tgt": "kie_nano_batch_write_text",
+      "_src": "kie_nano_batch_write_text",
+      "_tgt": "generate_ads_main",
       "source": "kie_nano_batch_write_text",
       "target": "generate_ads_main"
     },
@@ -5919,8 +5955,8 @@
       "source_file": "scripts/registry_banlist.py",
       "source_location": "L64",
       "weight": 1.0,
-      "_src": "registry_banlist_main",
-      "_tgt": "kie_nano_batch_write_text",
+      "_src": "kie_nano_batch_write_text",
+      "_tgt": "registry_banlist_main",
       "source": "kie_nano_batch_write_text",
       "target": "registry_banlist_main"
     },
@@ -5931,8 +5967,8 @@
       "source_file": "scripts/build_canonical_context.py",
       "source_location": "L330",
       "weight": 1.0,
-      "_src": "build_canonical_context_main",
-      "_tgt": "kie_nano_batch_write_text",
+      "_src": "kie_nano_batch_write_text",
+      "_tgt": "build_canonical_context_main",
       "source": "kie_nano_batch_write_text",
       "target": "build_canonical_context_main"
     },
@@ -6276,7 +6312,7 @@
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "scripts/generate_ads.py",
-      "source_location": "L41",
+      "source_location": "L315",
       "weight": 1.0,
       "_src": "scripts_generate_ads_py",
       "_tgt": "generate_ads_copyblock",
@@ -6288,7 +6324,7 @@
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "scripts/generate_ads.py",
-      "source_location": "L51",
+      "source_location": "L325",
       "weight": 1.0,
       "_src": "scripts_generate_ads_py",
       "_tgt": "generate_ads_parse_args",
@@ -6300,7 +6336,7 @@
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "scripts/generate_ads.py",
-      "source_location": "L63",
+      "source_location": "L337",
       "weight": 1.0,
       "_src": "scripts_generate_ads_py",
       "_tgt": "generate_ads_now_utc_iso",
@@ -6312,7 +6348,7 @@
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "scripts/generate_ads.py",
-      "source_location": "L67",
+      "source_location": "L341",
       "weight": 1.0,
       "_src": "scripts_generate_ads_py",
       "_tgt": "generate_ads_load_json",
@@ -6324,7 +6360,7 @@
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "scripts/generate_ads.py",
-      "source_location": "L71",
+      "source_location": "L345",
       "weight": 1.0,
       "_src": "scripts_generate_ads_py",
       "_tgt": "generate_ads_write_json",
@@ -6336,7 +6372,7 @@
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "scripts/generate_ads.py",
-      "source_location": "L75",
+      "source_location": "L349",
       "weight": 1.0,
       "_src": "scripts_generate_ads_py",
       "_tgt": "generate_ads_list_batches",
@@ -6348,7 +6384,7 @@
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "scripts/generate_ads.py",
-      "source_location": "L87",
+      "source_location": "L361",
       "weight": 1.0,
       "_src": "scripts_generate_ads_py",
       "_tgt": "generate_ads_next_batch_name",
@@ -6360,7 +6396,7 @@
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "scripts/generate_ads.py",
-      "source_location": "L92",
+      "source_location": "L366",
       "weight": 1.0,
       "_src": "scripts_generate_ads_py",
       "_tgt": "generate_ads_stable_fmt_seed",
@@ -6372,7 +6408,7 @@
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "scripts/generate_ads.py",
-      "source_location": "L96",
+      "source_location": "L370",
       "weight": 1.0,
       "_src": "scripts_generate_ads_py",
       "_tgt": "generate_ads_ensure_slot_tracker",
@@ -6384,7 +6420,7 @@
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "scripts/generate_ads.py",
-      "source_location": "L122",
+      "source_location": "L396",
       "weight": 1.0,
       "_src": "scripts_generate_ads_py",
       "_tgt": "generate_ads_pick_background_slot",
@@ -6396,7 +6432,7 @@
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "scripts/generate_ads.py",
-      "source_location": "L149",
+      "source_location": "L423",
       "weight": 1.0,
       "_src": "scripts_generate_ads_py",
       "_tgt": "generate_ads_get_background_by_id",
@@ -6408,7 +6444,7 @@
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "scripts/generate_ads.py",
-      "source_location": "L166",
+      "source_location": "L440",
       "weight": 1.0,
       "_src": "scripts_generate_ads_py",
       "_tgt": "generate_ads_build_seeded_background_sentence",
@@ -6420,7 +6456,7 @@
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "scripts/generate_ads.py",
-      "source_location": "L208",
+      "source_location": "L482",
       "weight": 1.0,
       "_src": "scripts_generate_ads_py",
       "_tgt": "generate_ads_build_ugc_subject_line",
@@ -6432,7 +6468,7 @@
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "scripts/generate_ads.py",
-      "source_location": "L227",
+      "source_location": "L501",
       "weight": 1.0,
       "_src": "scripts_generate_ads_py",
       "_tgt": "generate_ads_safezone_enforcement_block",
@@ -6444,7 +6480,7 @@
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "scripts/generate_ads.py",
-      "source_location": "L247",
+      "source_location": "L521",
       "weight": 1.0,
       "_src": "scripts_generate_ads_py",
       "_tgt": "generate_ads_outpaint_lock_block",
@@ -6456,7 +6492,7 @@
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "scripts/generate_ads.py",
-      "source_location": "L263",
+      "source_location": "L537",
       "weight": 1.0,
       "_src": "scripts_generate_ads_py",
       "_tgt": "generate_ads_require_str",
@@ -6468,7 +6504,7 @@
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "scripts/generate_ads.py",
-      "source_location": "L270",
+      "source_location": "L544",
       "weight": 1.0,
       "_src": "scripts_generate_ads_py",
       "_tgt": "generate_ads_require_int",
@@ -6480,7 +6516,7 @@
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "scripts/generate_ads.py",
-      "source_location": "L277",
+      "source_location": "L551",
       "weight": 1.0,
       "_src": "scripts_generate_ads_py",
       "_tgt": "generate_ads_parse_copy_block",
@@ -6492,7 +6528,7 @@
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "scripts/generate_ads.py",
-      "source_location": "L304",
+      "source_location": "L578",
       "weight": 1.0,
       "_src": "scripts_generate_ads_py",
       "_tgt": "generate_ads_strip_ba_panel_label",
@@ -6504,7 +6540,7 @@
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "scripts/generate_ads.py",
-      "source_location": "L312",
+      "source_location": "L586",
       "weight": 1.0,
       "_src": "scripts_generate_ads_py",
       "_tgt": "generate_ads_split_ba_contrast_lines",
@@ -6516,7 +6552,7 @@
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "scripts/generate_ads.py",
-      "source_location": "L323",
+      "source_location": "L597",
       "weight": 1.0,
       "_src": "scripts_generate_ads_py",
       "_tgt": "generate_ads_registry_used_text",
@@ -6528,7 +6564,7 @@
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "scripts/generate_ads.py",
-      "source_location": "L333",
+      "source_location": "L607",
       "weight": 1.0,
       "_src": "scripts_generate_ads_py",
       "_tgt": "generate_ads_uniqueness_check",
@@ -6540,7 +6576,7 @@
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "scripts/generate_ads.py",
-      "source_location": "L344",
+      "source_location": "L618",
       "weight": 1.0,
       "_src": "scripts_generate_ads_py",
       "_tgt": "generate_ads_add_used_text",
@@ -6552,7 +6588,7 @@
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "scripts/generate_ads.py",
-      "source_location": "L352",
+      "source_location": "L626",
       "weight": 1.0,
       "_src": "scripts_generate_ads_py",
       "_tgt": "generate_ads_next_entry_id",
@@ -6564,7 +6600,7 @@
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "scripts/generate_ads.py",
-      "source_location": "L363",
+      "source_location": "L637",
       "weight": 1.0,
       "_src": "scripts_generate_ads_py",
       "_tgt": "generate_ads_append_background_index",
@@ -6576,7 +6612,55 @@
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "scripts/generate_ads.py",
-      "source_location": "L368",
+      "source_location": "L642",
+      "weight": 1.0,
+      "_src": "scripts_generate_ads_py",
+      "_tgt": "generate_ads_stable_signature_seed",
+      "source": "scripts_generate_ads_py",
+      "target": "generate_ads_stable_signature_seed",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "scripts/generate_ads.py",
+      "source_location": "L648",
+      "weight": 1.0,
+      "_src": "scripts_generate_ads_py",
+      "_tgt": "generate_ads_base_layout_lines_for_format",
+      "source": "scripts_generate_ads_py",
+      "target": "generate_ads_base_layout_lines_for_format",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "scripts/generate_ads.py",
+      "source_location": "L692",
+      "weight": 1.0,
+      "_src": "scripts_generate_ads_py",
+      "_tgt": "generate_ads_find_visual_archetype",
+      "source": "scripts_generate_ads_py",
+      "target": "generate_ads_find_visual_archetype",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "scripts/generate_ads.py",
+      "source_location": "L699",
+      "weight": 1.0,
+      "_src": "scripts_generate_ads_py",
+      "_tgt": "generate_ads_pick_visual_archetype",
+      "source": "scripts_generate_ads_py",
+      "target": "generate_ads_pick_visual_archetype",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "scripts/generate_ads.py",
+      "source_location": "L728",
       "weight": 1.0,
       "_src": "scripts_generate_ads_py",
       "_tgt": "generate_ads_render_prompt",
@@ -6588,7 +6672,7 @@
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "scripts/generate_ads.py",
-      "source_location": "L693",
+      "source_location": "L986",
       "weight": 1.0,
       "_src": "scripts_generate_ads_py",
       "_tgt": "generate_ads_validate_prompt_text",
@@ -6600,7 +6684,7 @@
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "scripts/generate_ads.py",
-      "source_location": "L705",
+      "source_location": "L998",
       "weight": 1.0,
       "_src": "scripts_generate_ads_py",
       "_tgt": "generate_ads_aspect_ratio_folder",
@@ -6612,7 +6696,7 @@
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "scripts/generate_ads.py",
-      "source_location": "L709",
+      "source_location": "L1002",
       "weight": 1.0,
       "_src": "scripts_generate_ads_py",
       "_tgt": "generate_ads_prompt_filename",
@@ -6624,7 +6708,7 @@
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "scripts/generate_ads.py",
-      "source_location": "L713",
+      "source_location": "L1006",
       "weight": 1.0,
       "_src": "scripts_generate_ads_py",
       "_tgt": "generate_ads_main",
@@ -6636,7 +6720,7 @@
       "relation": "calls",
       "confidence": "EXTRACTED",
       "source_file": "scripts/generate_ads.py",
-      "source_location": "L293",
+      "source_location": "L567",
       "weight": 1.0,
       "_src": "generate_ads_parse_copy_block",
       "_tgt": "generate_ads_copyblock",
@@ -6648,7 +6732,7 @@
       "relation": "calls",
       "confidence": "EXTRACTED",
       "source_file": "scripts/generate_ads.py",
-      "source_location": "L714",
+      "source_location": "L1007",
       "weight": 1.0,
       "_src": "generate_ads_main",
       "_tgt": "generate_ads_parse_args",
@@ -6660,7 +6744,7 @@
       "relation": "calls",
       "confidence": "EXTRACTED",
       "source_file": "scripts/generate_ads.py",
-      "source_location": "L800",
+      "source_location": "L1093",
       "weight": 1.0,
       "_src": "generate_ads_main",
       "_tgt": "generate_ads_now_utc_iso",
@@ -6672,7 +6756,7 @@
       "relation": "calls",
       "confidence": "EXTRACTED",
       "source_file": "scripts/generate_ads.py",
-      "source_location": "L716",
+      "source_location": "L1009",
       "weight": 1.0,
       "_src": "generate_ads_main",
       "_tgt": "generate_ads_load_json",
@@ -6684,7 +6768,7 @@
       "relation": "calls",
       "confidence": "EXTRACTED",
       "source_file": "scripts/generate_ads.py",
-      "source_location": "L908",
+      "source_location": "L1228",
       "weight": 1.0,
       "_src": "generate_ads_main",
       "_tgt": "generate_ads_write_json",
@@ -6696,7 +6780,7 @@
       "relation": "calls",
       "confidence": "EXTRACTED",
       "source_file": "scripts/generate_ads.py",
-      "source_location": "L88",
+      "source_location": "L362",
       "weight": 1.0,
       "_src": "generate_ads_next_batch_name",
       "_tgt": "generate_ads_list_batches",
@@ -6708,7 +6792,7 @@
       "relation": "calls",
       "confidence": "EXTRACTED",
       "source_file": "scripts/generate_ads.py",
-      "source_location": "L790",
+      "source_location": "L1083",
       "weight": 1.0,
       "_src": "generate_ads_main",
       "_tgt": "generate_ads_next_batch_name",
@@ -6720,7 +6804,7 @@
       "relation": "calls",
       "confidence": "EXTRACTED",
       "source_file": "scripts/generate_ads.py",
-      "source_location": "L113",
+      "source_location": "L387",
       "weight": 1.0,
       "_src": "generate_ads_ensure_slot_tracker",
       "_tgt": "generate_ads_stable_fmt_seed",
@@ -6732,7 +6816,7 @@
       "relation": "calls",
       "confidence": "EXTRACTED",
       "source_file": "scripts/generate_ads.py",
-      "source_location": "L133",
+      "source_location": "L407",
       "weight": 1.0,
       "_src": "generate_ads_pick_background_slot",
       "_tgt": "generate_ads_ensure_slot_tracker",
@@ -6744,7 +6828,7 @@
       "relation": "calls",
       "confidence": "EXTRACTED",
       "source_file": "scripts/generate_ads.py",
-      "source_location": "L822",
+      "source_location": "L1115",
       "weight": 1.0,
       "_src": "generate_ads_main",
       "_tgt": "generate_ads_pick_background_slot",
@@ -6756,7 +6840,7 @@
       "relation": "calls",
       "confidence": "EXTRACTED",
       "source_file": "scripts/generate_ads.py",
-      "source_location": "L820",
+      "source_location": "L1113",
       "weight": 1.0,
       "_src": "generate_ads_main",
       "_tgt": "generate_ads_get_background_by_id",
@@ -6768,7 +6852,7 @@
       "relation": "calls",
       "confidence": "EXTRACTED",
       "source_file": "scripts/generate_ads.py",
-      "source_location": "L830",
+      "source_location": "L1123",
       "weight": 1.0,
       "_src": "generate_ads_main",
       "_tgt": "generate_ads_build_seeded_background_sentence",
@@ -6780,7 +6864,7 @@
       "relation": "calls",
       "confidence": "EXTRACTED",
       "source_file": "scripts/generate_ads.py",
-      "source_location": "L526",
+      "source_location": "L816",
       "weight": 1.0,
       "_src": "generate_ads_render_prompt",
       "_tgt": "generate_ads_build_ugc_subject_line",
@@ -6792,7 +6876,7 @@
       "relation": "calls",
       "confidence": "EXTRACTED",
       "source_file": "scripts/generate_ads.py",
-      "source_location": "L684",
+      "source_location": "L977",
       "weight": 1.0,
       "_src": "generate_ads_render_prompt",
       "_tgt": "generate_ads_safezone_enforcement_block",
@@ -6804,7 +6888,7 @@
       "relation": "calls",
       "confidence": "EXTRACTED",
       "source_file": "scripts/generate_ads.py",
-      "source_location": "L685",
+      "source_location": "L978",
       "weight": 1.0,
       "_src": "generate_ads_render_prompt",
       "_tgt": "generate_ads_outpaint_lock_block",
@@ -6816,7 +6900,7 @@
       "relation": "calls",
       "confidence": "EXTRACTED",
       "source_file": "scripts/generate_ads.py",
-      "source_location": "L279",
+      "source_location": "L553",
       "weight": 1.0,
       "_src": "generate_ads_parse_copy_block",
       "_tgt": "generate_ads_require_str",
@@ -6828,7 +6912,7 @@
       "relation": "calls",
       "confidence": "EXTRACTED",
       "source_file": "scripts/generate_ads.py",
-      "source_location": "L393",
+      "source_location": "L754",
       "weight": 1.0,
       "_src": "generate_ads_render_prompt",
       "_tgt": "generate_ads_require_str",
@@ -6840,7 +6924,7 @@
       "relation": "calls",
       "confidence": "EXTRACTED",
       "source_file": "scripts/generate_ads.py",
-      "source_location": "L736",
+      "source_location": "L1029",
       "weight": 1.0,
       "_src": "generate_ads_main",
       "_tgt": "generate_ads_require_str",
@@ -6852,7 +6936,7 @@
       "relation": "calls",
       "confidence": "EXTRACTED",
       "source_file": "scripts/generate_ads.py",
-      "source_location": "L407",
+      "source_location": "L768",
       "weight": 1.0,
       "_src": "generate_ads_render_prompt",
       "_tgt": "generate_ads_require_int",
@@ -6864,7 +6948,7 @@
       "relation": "calls",
       "confidence": "EXTRACTED",
       "source_file": "scripts/generate_ads.py",
-      "source_location": "L747",
+      "source_location": "L1040",
       "weight": 1.0,
       "_src": "generate_ads_main",
       "_tgt": "generate_ads_require_int",
@@ -6876,7 +6960,7 @@
       "relation": "calls",
       "confidence": "EXTRACTED",
       "source_file": "scripts/generate_ads.py",
-      "source_location": "L292",
+      "source_location": "L566",
       "weight": 1.0,
       "_src": "generate_ads_parse_copy_block",
       "_tgt": "generate_ads_strip_ba_panel_label",
@@ -6888,7 +6972,7 @@
       "relation": "calls",
       "confidence": "EXTRACTED",
       "source_file": "scripts/generate_ads.py",
-      "source_location": "L758",
+      "source_location": "L1051",
       "weight": 1.0,
       "_src": "generate_ads_main",
       "_tgt": "generate_ads_parse_copy_block",
@@ -6900,7 +6984,7 @@
       "relation": "calls",
       "confidence": "EXTRACTED",
       "source_file": "scripts/generate_ads.py",
-      "source_location": "L313",
+      "source_location": "L587",
       "weight": 1.0,
       "_src": "generate_ads_split_ba_contrast_lines",
       "_tgt": "generate_ads_strip_ba_panel_label",
@@ -6912,7 +6996,7 @@
       "relation": "calls",
       "confidence": "EXTRACTED",
       "source_file": "scripts/generate_ads.py",
-      "source_location": "L501",
+      "source_location": "L791",
       "weight": 1.0,
       "_src": "generate_ads_render_prompt",
       "_tgt": "generate_ads_split_ba_contrast_lines",
@@ -6924,7 +7008,7 @@
       "relation": "calls",
       "confidence": "EXTRACTED",
       "source_file": "scripts/generate_ads.py",
-      "source_location": "L726",
+      "source_location": "L1019",
       "weight": 1.0,
       "_src": "generate_ads_main",
       "_tgt": "generate_ads_registry_used_text",
@@ -6936,7 +7020,7 @@
       "relation": "calls",
       "confidence": "EXTRACTED",
       "source_file": "scripts/generate_ads.py",
-      "source_location": "L773",
+      "source_location": "L1066",
       "weight": 1.0,
       "_src": "generate_ads_main",
       "_tgt": "generate_ads_uniqueness_check",
@@ -6948,7 +7032,7 @@
       "relation": "calls",
       "confidence": "EXTRACTED",
       "source_file": "scripts/generate_ads.py",
-      "source_location": "L882",
+      "source_location": "L1202",
       "weight": 1.0,
       "_src": "generate_ads_main",
       "_tgt": "generate_ads_add_used_text",
@@ -6960,7 +7044,7 @@
       "relation": "calls",
       "confidence": "EXTRACTED",
       "source_file": "scripts/generate_ads.py",
-      "source_location": "L848",
+      "source_location": "L1167",
       "weight": 1.0,
       "_src": "generate_ads_main",
       "_tgt": "generate_ads_next_entry_id",
@@ -6972,7 +7056,7 @@
       "relation": "calls",
       "confidence": "EXTRACTED",
       "source_file": "scripts/generate_ads.py",
-      "source_location": "L878",
+      "source_location": "L1198",
       "weight": 1.0,
       "_src": "generate_ads_main",
       "_tgt": "generate_ads_append_background_index",
@@ -6984,7 +7068,55 @@
       "relation": "calls",
       "confidence": "EXTRACTED",
       "source_file": "scripts/generate_ads.py",
-      "source_location": "L839",
+      "source_location": "L713",
+      "weight": 1.0,
+      "_src": "generate_ads_pick_visual_archetype",
+      "_tgt": "generate_ads_stable_signature_seed",
+      "source": "generate_ads_stable_signature_seed",
+      "target": "generate_ads_pick_visual_archetype",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "calls",
+      "confidence": "EXTRACTED",
+      "source_file": "scripts/generate_ads.py",
+      "source_location": "L770",
+      "weight": 1.0,
+      "_src": "generate_ads_render_prompt",
+      "_tgt": "generate_ads_base_layout_lines_for_format",
+      "source": "generate_ads_base_layout_lines_for_format",
+      "target": "generate_ads_render_prompt",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "calls",
+      "confidence": "EXTRACTED",
+      "source_file": "scripts/generate_ads.py",
+      "source_location": "L711",
+      "weight": 1.0,
+      "_src": "generate_ads_pick_visual_archetype",
+      "_tgt": "generate_ads_find_visual_archetype",
+      "source": "generate_ads_find_visual_archetype",
+      "target": "generate_ads_pick_visual_archetype",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "calls",
+      "confidence": "EXTRACTED",
+      "source_file": "scripts/generate_ads.py",
+      "source_location": "L1136",
+      "weight": 1.0,
+      "_src": "generate_ads_main",
+      "_tgt": "generate_ads_pick_visual_archetype",
+      "source": "generate_ads_pick_visual_archetype",
+      "target": "generate_ads_main",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "calls",
+      "confidence": "EXTRACTED",
+      "source_file": "scripts/generate_ads.py",
+      "source_location": "L1147",
       "weight": 1.0,
       "_src": "generate_ads_main",
       "_tgt": "generate_ads_render_prompt",
@@ -6996,7 +7128,7 @@
       "relation": "calls",
       "confidence": "EXTRACTED",
       "source_file": "scripts/generate_ads.py",
-      "source_location": "L841",
+      "source_location": "L1160",
       "weight": 1.0,
       "_src": "generate_ads_main",
       "_tgt": "generate_ads_validate_prompt_text",
@@ -7008,7 +7140,7 @@
       "relation": "calls",
       "confidence": "EXTRACTED",
       "source_file": "scripts/generate_ads.py",
-      "source_location": "L805",
+      "source_location": "L1098",
       "weight": 1.0,
       "_src": "generate_ads_main",
       "_tgt": "generate_ads_aspect_ratio_folder",
@@ -7020,7 +7152,7 @@
       "relation": "calls",
       "confidence": "EXTRACTED",
       "source_file": "scripts/generate_ads.py",
-      "source_location": "L814",
+      "source_location": "L1107",
       "weight": 1.0,
       "_src": "generate_ads_main",
       "_tgt": "generate_ads_prompt_filename",
@@ -7467,8 +7599,8 @@
       "source_file": "scripts/extract_format_rules.py",
       "source_location": "L36",
       "weight": 1.0,
-      "_src": "extract_format_rules_main",
-      "_tgt": "build_canonical_context_parse_args",
+      "_src": "build_canonical_context_parse_args",
+      "_tgt": "extract_format_rules_main",
       "source": "build_canonical_context_parse_args",
       "target": "extract_format_rules_main"
     },
