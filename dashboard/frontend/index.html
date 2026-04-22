@@ -57,9 +57,7 @@
       <label>Model</label>
       <select id="opencodeModel"></select>
 
-      <label><input id="generateImages" type="checkbox" /> Generate images after prompt creation</label>
-      <label>KIE API key (required only if generate images checked)</label>
-      <input id="kieApiKey" type="password" placeholder="kie-..." />
+      <p class="hint">Image and Cloudinary credentials are loaded from <code>.env.dashboard</code>.</p>
 
       <button id="runBtn">Run Pipeline</button>
       <pre id="status" class="status"></pre>

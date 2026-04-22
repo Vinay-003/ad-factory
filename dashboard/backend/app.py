@@ -9,11 +9,14 @@ import re
 import subprocess
 import time
 import urllib.request
+import hashlib
+import mimetypes
+import uuid
 from datetime import datetime, timezone
 from pathlib import Path
 from typing import Any
 
-from fastapi import FastAPI, File, Form, HTTPException, UploadFile
+from fastapi import Body, FastAPI, File, Form, HTTPException, UploadFile
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.staticfiles import StaticFiles
 
@@ -22,6 +25,7 @@ ROOT = Path(__file__).resolve().parents[2]
 STORAGE_ROOT = ROOT / "dashboard_storage"
 RUNS_ROOT = STORAGE_ROOT / "runs"
 RUNTIME_ROOT = ROOT / "runtime"
+ENV_DASHBOARD_PATH = ROOT / ".env.dashboard"
 
 DEFAULT_PRODUCT_INFO = ROOT / "productinfomain.txt"
 DEFAULT_MECHANISM = ROOT / "PRODUCT_MECHANISM_V1.txt"
@@ -61,6 +65,20 @@ def make_run_id() -> str:
 def ensure_dirs() -> None:
     RUNS_ROOT.mkdir(parents=True, exist_ok=True)
     RUNTIME_ROOT.mkdir(parents=True, exist_ok=True)
+
+
+def load_env_file(path: Path) -> None:
+    if not path.exists() or not path.is_file():
+        return
+    for raw_line in path.read_text(encoding="utf-8", errors="ignore").splitlines():
+        line = raw_line.strip()
+        if not line or line.startswith("#") or "=" not in line:
+            continue
+        key, value = line.split("=", 1)
+        key = key.strip()
+        value = value.strip().strip('"').strip("'")
+        if key and key not in os.environ:
+            os.environ[key] = value
 
 
 def parse_persona_library(playbook_path: Path) -> list[dict[str, Any]]:
@@ -143,6 +161,76 @@ def read_active_images(path: Path) -> list[str]:
 
 def run_cmd(cmd: list[str], cwd: Path) -> subprocess.CompletedProcess[str]:
     return subprocess.run(cmd, cwd=str(cwd), text=True, capture_output=True, check=False)
+
+
+def build_multipart_form(fields: dict[str, str], file_field: str, file_path: Path) -> tuple[bytes, str]:
+    boundary = f"----dashboard{uuid.uuid4().hex}"
+    lines: list[bytes] = []
+
+    for key, value in fields.items():
+        lines.append(f"--{boundary}\r\n".encode("utf-8"))
+        lines.append(f'Content-Disposition: form-data; name="{key}"\r\n\r\n'.encode("utf-8"))
+        lines.append(f"{value}\r\n".encode("utf-8"))
+
+    mime_type = mimetypes.guess_type(file_path.name)[0] or "application/octet-stream"
+    lines.append(f"--{boundary}\r\n".encode("utf-8"))
+    lines.append(
+        (
+            f'Content-Disposition: form-data; name="{file_field}"; filename="{file_path.name}"\r\n'
+            f"Content-Type: {mime_type}\r\n\r\n"
+        ).encode("utf-8")
+    )
+    lines.append(file_path.read_bytes())
+    lines.append(b"\r\n")
+    lines.append(f"--{boundary}--\r\n".encode("utf-8"))
+
+    body = b"".join(lines)
+    content_type = f"multipart/form-data; boundary={boundary}"
+    return body, content_type
+
+
+def upload_image_to_cloudinary(image_path: Path, cloud_name: str, api_key: str, api_secret: str) -> str:
+    if not image_path.exists() or not image_path.is_file():
+        raise RuntimeError(f"Image not found for upload: {image_path}")
+
+    timestamp = str(int(time.time()))
+    signature_base = f"timestamp={timestamp}{api_secret}"
+    signature = hashlib.sha1(signature_base.encode("utf-8")).hexdigest()
+
+    fields = {
+        "api_key": api_key,
+        "timestamp": timestamp,
+        "signature": signature,
+    }
+    body, content_type = build_multipart_form(fields, "file", image_path)
+    upload_url = f"https://api.cloudinary.com/v1_1/{cloud_name}/image/upload"
+    req = urllib.request.Request(
+        url=upload_url,
+        data=body,
+        method="POST",
+        headers={"Content-Type": content_type},
+    )
+    with urllib.request.urlopen(req, timeout=180) as response:
+        raw = response.read().decode("utf-8")
+    payload = json.loads(raw)
+    secure_url = str(payload.get("secure_url") or "").strip()
+    if not secure_url:
+        raise RuntimeError(f"Cloudinary upload did not return secure_url: {payload}")
+    return secure_url
+
+
+def load_batch_image_summary(batch: str) -> list[dict[str, Any]]:
+    summary_path = ROOT / "generated_image" / batch / "batch_run_summary.json"
+    if not summary_path.exists():
+        return []
+    try:
+        summary = json.loads(summary_path.read_text(encoding="utf-8"))
+    except Exception:
+        return []
+    jobs = summary.get("jobs")
+    if isinstance(jobs, list):
+        return [job for job in jobs if isinstance(job, dict)]
+    return []
 
 
 def strip_ansi(text: str) -> str:
@@ -522,7 +610,13 @@ def call_opencode_repair_copy(
     if password:
         cmd.extend(["--password", password])
 
-    result = run_cmd(cmd, cwd=ROOT)
+    try:
+        result = run_cmd(cmd, cwd=ROOT)
+    except OSError as exc:
+        (run_dir / "logs" / "opencode_repair_error.txt").write_text(
+            f"Repair command launch failed: {exc}", encoding="utf-8"
+        )
+        return None
     if result.returncode != 0:
         (run_dir / "logs" / "opencode_repair_error.txt").write_text(
             f"Repair command failed\nSTDOUT:\n{result.stdout}\n\nSTDERR:\n{result.stderr}", encoding="utf-8"
@@ -567,6 +661,49 @@ def ensure_testimonial_headline(headline: str, lang: str, persona: dict[str, Any
     if desire_hi:
         return shorten_copy_line(f'"मुझे आखिर {desire_hi} वाला रूटीन मिला जो वजन घटाने में मदद करता है।"', limit=90)
     return '"मुझे आखिर ऐसा रूटीन मिला जिसे मैं रोज निभा सकूं और वजन घटा सकूं।"'
+
+
+def ensure_testimonial_attribution(attribution: str, lang: str, persona: dict[str, Any], headline: str, trust_line: str) -> str:
+    if lang == "EN":
+        variants = [
+            "Verified routine user feedback",
+            "15-day adherence feedback snapshot",
+            "Community obesity-care review",
+            "Early weight-loss routine review",
+            "Structured-plan user feedback",
+            "Repeat-user experience note",
+        ]
+    else:
+        variants = [
+            "रूटीन-फॉलो यूजर फीडबैक",
+            "15-दिन adherence फीडबैक स्नैपशॉट",
+            "कम्युनिटी obesity-care रिव्यू",
+            "शुरुआती वजन-घटाने रूटीन रिव्यू",
+            "स्ट्रक्चर्ड-प्लान यूजर फीडबैक",
+            "रीपीट-यूजर अनुभव नोट",
+        ]
+
+    current = _clean_str(attribution)
+    seed_input = (
+        f"{persona.get('number', '')}|{persona.get('name', '')}|{headline}|{trust_line}|{persona.get('pain_en', '')}|{persona.get('pain_hi', '')}"
+    )
+    digest = hashlib.sha1(seed_input.encode("utf-8", errors="ignore")).hexdigest()
+    idx = int(digest[:8], 16) % len(variants)
+    chosen = variants[idx]
+
+    if not current:
+        return chosen
+
+    # For TEST attribution we avoid personal names and generic repeated labels.
+    if re.search(r"\brepresentative\s+user\s+review\b", current, flags=re.IGNORECASE):
+        return chosen
+    if re.search(r"\b(user|customer)\s+review\b", current, flags=re.IGNORECASE):
+        return chosen
+    if re.search(r"\b[A-Z][a-z]+\s+[A-Z][a-z]+\b", current):
+        return chosen
+    if re.search(r"[\u0900-\u097F]{2,}\s+[\u0900-\u097F]{2,}", current):
+        return chosen
+    return shorten_copy_line(current, limit=86)
 
 
 def _persona_number_from_candidate(candidate: dict[str, Any]) -> int | None:
@@ -650,6 +787,13 @@ def normalize_generated_copy(
 
             if fmt == "TEST":
                 base_lang["headline"] = ensure_testimonial_headline(base_lang.get("headline", ""), lang, persona)
+                base_lang["attribution"] = ensure_testimonial_attribution(
+                    _clean_str(src_lang.get("attribution")),
+                    lang,
+                    persona,
+                    base_lang.get("headline", ""),
+                    _clean_str(src_lang.get("trust_line")) or base_lang.get("trust_line", ""),
+                )
 
             if fmt in {"HERO", "UGC"}:
                 support = _clean_str(src_lang.get("support_line"))
@@ -662,10 +806,7 @@ def normalize_generated_copy(
                         bullets = [strip_ba_panel_label(b) for b in bullets]
                     base_lang["bullets"] = [shorten_copy_line(b, limit=88) for b in bullets]
             else:
-                attribution = _clean_str(src_lang.get("attribution"))
                 trust = _clean_str(src_lang.get("trust_line"))
-                if attribution:
-                    base_lang["attribution"] = shorten_copy_line(attribution, limit=86)
                 if trust:
                     base_lang["trust_line"] = shorten_copy_line(trust)
 
@@ -710,7 +851,22 @@ def build_template_copy(context: dict[str, Any], run_id: str) -> dict[str, Any]:
             support_hi = f"यह cravings कम करने और पाचन सपोर्ट से अतिरिक्त वजन घटाने को व्यावहारिक बनाता है {unique}।"
             copy_en = {"headline": headline_en, "support_line": support_en, "cta": cta_en}
             copy_hi = {"headline": headline_hi, "support_line": support_hi, "cta": cta_hi}
-        elif fmt in {"BA", "FEAT"}:
+        elif fmt == "BA":
+            bullets_en = [
+                f"Evening cravings and unplanned snacking keep weight-loss efforts stuck {unique}.",
+                f"Mornings start heavy, so the obesity routine feels hard to repeat {unique}.",
+                f"Morning-liquid + night-support structure gives better appetite control for weight loss {unique}.",
+                f"Day-by-day consistency builds visible 15-day obesity-management momentum {unique}.",
+            ]
+            bullets_hi = [
+                f"शाम की cravings और बिना प्लान स्नैकिंग से वजन घटाने की कोशिश अटक जाती है {unique}।",
+                f"सुबह भारी लगती है, इसलिए obesity रूटीन दोहराना मुश्किल होता है {unique}।",
+                f"सुबह-liquid और रात-support की संरचना से वजन घटाने के लिए appetite control बेहतर होता है {unique}।",
+                f"रोज की consistency से 15 दिन में obesity management की दिखने वाली momentum बनती है {unique}।",
+            ]
+            copy_en = {"headline": headline_en, "bullets": bullets_en, "cta": cta_en}
+            copy_hi = {"headline": headline_hi, "bullets": bullets_hi, "cta": cta_hi}
+        elif fmt == "FEAT":
             bullets_en = [
                 f"Morning OK Liquid helps reduce hunger and random snacking for weight loss {unique}.",
                 f"Night Tablet + Powder support digestion and lighter mornings in obesity routine {unique}.",
@@ -778,8 +934,11 @@ def call_opencode_compatible(config: dict[str, Any], context: dict[str, Any], ru
         "Avoid abstract lines that hide the product goal. "
         "Never include price in any on-image copy field (headline/support_line/trust_line/bullets/cta/attribution). "
         "Do not use currency symbols or words like INR, price, only, discount, off, MRP in on-image copy. "
-        "For BA format, never prefix bullet text with BEFORE:/AFTER: (or Hindi equivalents); bullets must be plain statements. "
+        "For BA format, never prefix copy with BEFORE:/AFTER: labels (or Hindi equivalents). "
+        "For BA format, write explicit split contrast copy: bullet 1/2 = left-side struggle state, bullet 3/4 = right-side fix/progress state. "
+        "Use 2 or 4 BA bullets total (if 2, bullet 1 = struggle and bullet 2 = fix). "
         "For TEST format, headline must read like a first-person review line suitable for quote card (not generic 'highly rated' phrasing). "
+        "For TEST format, attribution must be role/source-based without personal names; avoid repeating generic text like 'Representative user review' across ads. "
         "If no real quote is provided in context, create one believable representative review line grounded in persona pain/desire and safe claims. "
         "Keep each format's core shape intact, but vary headline/support/trust framing using persona pain, desire, friction, proof needed, and tone cue. "
         "For the same format across runs, rotate variation lane and wording rhythm while preserving format-specific structure. "
@@ -827,7 +986,10 @@ def call_opencode_compatible(config: dict[str, Any], context: dict[str, Any], ru
     if cli_password:
         cli_cmd.extend(["--password", cli_password])
 
-    cli_result = run_cmd(cli_cmd, cwd=ROOT)
+    try:
+        cli_result = run_cmd(cli_cmd, cwd=ROOT)
+    except OSError as exc:
+        cli_result = subprocess.CompletedProcess(cli_cmd, returncode=1, stdout="", stderr=str(exc))
     if cli_result.returncode == 0:
         parsed = parse_opencode_json_output(cli_result.stdout)
         if parsed is not None:
@@ -899,6 +1061,47 @@ def collect_run_result(run_dir: Path, batch_name: str, image_generated: bool) ->
     return result
 
 
+def scan_prompt_files_for_batch(batch_name: str) -> list[str]:
+    output_dir = ROOT / "output" / batch_name
+    prompt_files: list[str] = []
+    if not output_dir.exists():
+        return prompt_files
+    for file in sorted(output_dir.glob("**/OUTPUT_*.txt")):
+        prompt_files.append(str(file.relative_to(ROOT)))
+    return prompt_files
+
+
+def scan_image_files_for_batch(batch_name: str) -> list[str]:
+    image_dir = ROOT / "generated_image" / batch_name
+    image_files: list[str] = []
+    if not image_dir.exists():
+        return image_files
+    for ext in ("*.png", "*.jpg", "*.jpeg", "*.webp"):
+        for file in sorted(image_dir.glob(f"**/{ext}")):
+            image_files.append(str(file.relative_to(ROOT)))
+    return image_files
+
+
+def refresh_manifest_file_state(run_dir: Path, manifest: dict[str, Any]) -> dict[str, Any]:
+    batch_name = str(manifest.get("batch") or "").strip()
+    if not batch_name:
+        return manifest
+
+    prompt_files = scan_prompt_files_for_batch(batch_name)
+    image_files = scan_image_files_for_batch(batch_name)
+    refreshed = {
+        "run_id": run_dir.name,
+        "batch": batch_name,
+        "prompt_files": prompt_files,
+        "image_files": image_files,
+        "image_generated": bool(image_files) or bool(manifest.get("image_generated", False)),
+        "updated_at": now_iso(),
+    }
+    merged = {**manifest, **refreshed}
+    (run_dir / "manifest.json").write_text(json.dumps(merged, ensure_ascii=False, indent=2) + "\n", encoding="utf-8")
+    return merged
+
+
 def force_aspect_ratio(copy_json: dict[str, Any], aspect_ratio: str) -> dict[str, Any]:
     cloned = json.loads(json.dumps(copy_json, ensure_ascii=False))
     cloned["default_aspect_ratio"] = aspect_ratio
@@ -923,18 +1126,154 @@ def parse_background_lock_from_prompt(prompt_text: str) -> tuple[str, int] | Non
     return (slot_match.group(1).upper(), int(seed_match.group(1)))
 
 
+def parse_prompt_filename(prompt_path: str) -> tuple[str, str, int | None] | None:
+    name = Path(prompt_path).name
+    match = re.match(r"^OUTPUT_([A-Z]+)(?:_P(\d+))?_(EN|HI)(?:_V\d+)?\.txt$", name)
+    if not match:
+        return None
+    persona_raw = match.group(2)
+    persona_number = int(persona_raw) if persona_raw else None
+    return (match.group(1), match.group(3), persona_number)
+
+
+def parse_persona_number_from_prompt(prompt_text: str) -> int | None:
+    match = re.search(r"\(\s*Persona\s*(\d+)\s*\)", prompt_text, flags=re.IGNORECASE)
+    if not match:
+        return None
+    return int(match.group(1))
+
+
+def extract_on_image_copy_lines(prompt_text: str) -> list[dict[str, str]]:
+    block = re.search(
+        r"EXACT ON-IMAGE COPY - DO NOT ALTER ANYTHING\s*\n(.+?)\n\s*Render every character exactly as written",
+        prompt_text,
+        flags=re.DOTALL,
+    )
+    if not block:
+        return []
+
+    out: list[dict[str, str]] = []
+    for line in block.group(1).splitlines():
+        raw = line.strip()
+        if not raw:
+            continue
+        parsed = re.match(r"^-\s*([^:]+):\s*(.*)$", raw)
+        if not parsed:
+            continue
+        out.append({"label": parsed.group(1).strip(), "value": parsed.group(2).strip()})
+    return out
+
+
+def load_run_language_mode(run_dir: Path) -> str:
+    run_context_path = run_dir / "context" / "run_context.json"
+    assembler_mode = "BOTH"
+    if not run_context_path.exists():
+        return assembler_mode
+    try:
+        run_context = json.loads(run_context_path.read_text(encoding="utf-8"))
+        lang_mode = str(run_context.get("language_mode") or "ALL").upper()
+        if lang_mode == "EN":
+            return "EN"
+        if lang_mode == "HI":
+            return "HI"
+    except Exception:
+        return assembler_mode
+    return assembler_mode
+
+
+def rerender_prompts_for_run(run_dir: Path, batch: str, copy_file: Path, language_mode: str) -> None:
+    result = run_cmd(
+        [
+            "python3",
+            "scripts/generate_ads.py",
+            "--copy-file",
+            str(copy_file),
+            "--batch",
+            batch,
+            "--language-mode",
+            language_mode,
+            "--no-registry-write",
+            "--skip-uniqueness-check",
+        ],
+        cwd=ROOT,
+    )
+    if result.returncode != 0:
+        error_text = result.stderr or result.stdout
+        (run_dir / "logs" / "assembler_edit_error.txt").write_text(error_text, encoding="utf-8")
+        short_error = "\n".join([line for line in error_text.splitlines() if line.strip()][-12:])
+        raise HTTPException(status_code=500, detail=f"Prompt regeneration failed: {short_error}")
+
+
+def merge_manifest(run_dir: Path, previous_manifest: dict[str, Any], refreshed: dict[str, Any]) -> dict[str, Any]:
+    merged = {**previous_manifest, **refreshed}
+    (run_dir / "manifest.json").write_text(json.dumps(merged, ensure_ascii=False, indent=2) + "\n", encoding="utf-8")
+    return merged
+
+
+def generate_916_for_run(run_dir: Path, manifest: dict[str, Any]) -> dict[str, Any]:
+    copy_path = run_dir / "context" / "copy_batch.json"
+    if not copy_path.exists():
+        raise HTTPException(status_code=404, detail="copy_batch.json not found for run")
+
+    batch = (manifest.get("batch") or "").strip()
+    if not batch:
+        raise HTTPException(status_code=400, detail="Run has no batch folder")
+
+    copy_json = json.loads(copy_path.read_text(encoding="utf-8"))
+    copy_916 = force_aspect_ratio(copy_json, "9:16")
+    visual_locks = collect_45_visual_locks(batch)
+    if visual_locks:
+        copy_916 = apply_visual_locks(copy_916, visual_locks)
+    copy_916_path = run_dir / "context" / "copy_batch_916.json"
+    copy_916_path.write_text(json.dumps(copy_916, ensure_ascii=False, indent=2) + "\n", encoding="utf-8")
+
+    assembler_mode = load_run_language_mode(run_dir)
+    result = run_cmd(
+        [
+            "python3",
+            "scripts/generate_ads.py",
+            "--copy-file",
+            str(copy_916_path),
+            "--batch",
+            batch,
+            "--language-mode",
+            assembler_mode,
+            "--no-registry-write",
+            "--skip-uniqueness-check",
+        ],
+        cwd=ROOT,
+    )
+
+    if result.returncode != 0:
+        error_text = result.stderr or result.stdout
+        (run_dir / "logs" / "assembler_916_error.txt").write_text(error_text, encoding="utf-8")
+        short_error = "\n".join([line for line in error_text.splitlines() if line.strip()][-12:])
+        raise HTTPException(status_code=500, detail=f"9:16 generation failed: {short_error}")
+
+    refreshed = collect_run_result(run_dir, batch, bool(manifest.get("image_generated", False)))
+    refreshed["generated_variant"] = "9:16"
+    return merge_manifest(run_dir, manifest, refreshed)
+
+
 def collect_45_visual_locks(batch: str) -> dict[str, dict[str, Any]]:
     out: dict[str, dict[str, Any]] = {}
     ratio_dir = ROOT / "output" / batch / "45"
     if not ratio_dir.exists():
         return out
     for prompt_file in sorted(ratio_dir.glob("OUTPUT_*_EN.txt")) + sorted(ratio_dir.glob("OUTPUT_*_HI.txt")):
-        match = re.match(r"^OUTPUT_([A-Z]+)_(EN|HI)\.txt$", prompt_file.name)
-        if not match:
+        parsed = parse_prompt_filename(prompt_file.name)
+        if not parsed:
             continue
-        fmt = match.group(1)
-        current = out.get(fmt, {})
+        fmt, _lang, persona_number = parsed
+        key = f"{fmt}::P{persona_number}" if isinstance(persona_number, int) else fmt
+        current = out.get(key, {})
         text = prompt_file.read_text(encoding="utf-8", errors="ignore")
+        if persona_number is None:
+            inferred = parse_persona_number_from_prompt(text)
+            if isinstance(inferred, int):
+                persona_number = inferred
+                key = f"{fmt}::P{persona_number}"
+                current = out.get(key, current)
         lock = parse_background_lock_from_prompt(text)
         if lock:
             current["background_slot"] = lock[0]
@@ -956,7 +1295,7 @@ def collect_45_visual_locks(batch: str) -> dict[str, dict[str, Any]]:
             current["visual_lock"] = visual_lock
 
         if current:
-            out[fmt] = current
+            out[key] = current
     return out
 
 
@@ -969,7 +1308,14 @@ def apply_visual_locks(copy_json: dict[str, Any], locks: dict[str, dict[str, Any
         if not isinstance(ad, dict):
             continue
         fmt = str(ad.get("format") or "").strip().upper()
-        lock = locks.get(fmt) or {}
+        persona_no = None
+        persona = ad.get("persona")
+        if isinstance(persona, dict):
+            raw_no = persona.get("number")
+            if isinstance(raw_no, int):
+                persona_no = raw_no
+        lock_key = f"{fmt}::P{persona_no}" if isinstance(persona_no, int) else ""
+        lock = (locks.get(lock_key) if lock_key else None) or locks.get(fmt) or {}
         if not lock:
             continue
         if isinstance(lock.get("background_slot"), str):
@@ -1014,6 +1360,7 @@ app.add_middleware(
 
 @app.on_event("startup")
 def startup() -> None:
+    load_env_file(ENV_DASHBOARD_PATH)
     ensure_dirs()
 
 
@@ -1043,11 +1390,20 @@ def api_opencode_catalog() -> dict[str, Any]:
 @app.get("/api/runs")
 def api_runs() -> dict[str, Any]:
     ensure_dirs()
-    runs = []
+    runs: list[dict[str, Any]] = []
+    seen_batches: set[str] = set()
     for run_dir in sorted(RUNS_ROOT.glob("run_*"), reverse=True):
         manifest = run_dir / "manifest.json"
         if manifest.exists():
-            runs.append(json.loads(manifest.read_text(encoding="utf-8")))
+            payload = json.loads(manifest.read_text(encoding="utf-8"))
+            refreshed = refresh_manifest_file_state(run_dir, payload)
+            batch_name = str(refreshed.get("batch") or "").strip()
+            if refreshed.get("prompt_files") and (not batch_name or batch_name not in seen_batches):
+                runs.append(refreshed)
+                if batch_name:
+                    seen_batches.add(batch_name)
+            if len(runs) >= 5:
+                break
     return {"runs": runs}
 
 
@@ -1057,11 +1413,46 @@ def api_run(run_id: str) -> dict[str, Any]:
     manifest = run_dir / "manifest.json"
     if not manifest.exists():
         raise HTTPException(status_code=404, detail="Run not found")
-    return json.loads(manifest.read_text(encoding="utf-8"))
+    payload = json.loads(manifest.read_text(encoding="utf-8"))
+    return refresh_manifest_file_state(run_dir, payload)
 
 
-@app.post("/api/runs/{run_id}/generate-916")
-def api_run_generate_916(run_id: str) -> dict[str, Any]:
+@app.get("/api/runs/{run_id}/prompt-copies")
+def api_run_prompt_copies(run_id: str) -> dict[str, Any]:
+    run_dir = RUNS_ROOT / run_id
+    manifest_path = run_dir / "manifest.json"
+    if not manifest_path.exists():
+        raise HTTPException(status_code=404, detail="Run not found")
+
+    manifest = json.loads(manifest_path.read_text(encoding="utf-8"))
+    prompt_files_all = manifest.get("prompt_files") or []
+    prompt_files = [path for path in prompt_files_all if "/45/" in str(path)] or prompt_files_all
+    records: list[dict[str, Any]] = []
+    for rel_path in prompt_files:
+        prompt_path = ROOT / rel_path
+        if not prompt_path.exists() or not prompt_path.is_file():
+            continue
+        text = prompt_path.read_text(encoding="utf-8", errors="ignore")
+        parsed_name = parse_prompt_filename(rel_path)
+        persona_number = parsed_name[2] if parsed_name else None
+        if persona_number is None:
+            persona_number = parse_persona_number_from_prompt(text)
+        records.append(
+            {
+                "prompt_file": rel_path,
+                "format": parsed_name[0] if parsed_name else "",
+                "language": parsed_name[1] if parsed_name else "",
+                "persona_number": persona_number,
+                "review_url": "/output/" + rel_path.replace("output/", ""),
+                "copy_lines": extract_on_image_copy_lines(text),
+            }
+        )
+
+    return {"run_id": run_id, "batch": manifest.get("batch"), "prompts": records}
+
+
+@app.post("/api/runs/{run_id}/prompt-copies")
+def api_run_update_prompt_copies(run_id: str, payload: dict[str, Any] = Body(...)) -> dict[str, Any]:
     run_dir = RUNS_ROOT / run_id
     manifest_path = run_dir / "manifest.json"
     copy_path = run_dir / "context" / "copy_batch.json"
@@ -1076,26 +1467,181 @@ def api_run_generate_916(run_id: str) -> dict[str, Any]:
     if not batch:
         raise HTTPException(status_code=400, detail="Run has no batch folder")
 
+    edits = payload.get("edits")
+    if not isinstance(edits, list) or not edits:
+        raise HTTPException(status_code=400, detail="edits must be a non-empty array")
+
     copy_json = json.loads(copy_path.read_text(encoding="utf-8"))
-    copy_916 = force_aspect_ratio(copy_json, "9:16")
+    ads = copy_json.get("ads")
+    if not isinstance(ads, list) or not ads:
+        raise HTTPException(status_code=400, detail="Invalid copy batch payload")
+
+    updated_count = 0
+    for entry in edits:
+        if not isinstance(entry, dict):
+            continue
+        prompt_file = str(entry.get("prompt_file") or "").strip()
+        if not prompt_file:
+            continue
+        parsed_name = parse_prompt_filename(prompt_file)
+        if not parsed_name:
+            continue
+        fmt, lang, parsed_persona = parsed_name
+        persona_number = entry.get("persona_number")
+        if not isinstance(persona_number, int):
+            persona_number = parsed_persona
+        line_items = entry.get("copy_lines")
+        if not isinstance(line_items, list) or not line_items:
+            continue
+
+        target_ad = None
+        for ad in ads:
+            if not isinstance(ad, dict):
+                continue
+            if str(ad.get("format") or "").strip().upper() != fmt:
+                continue
+            if isinstance(persona_number, int):
+                persona = ad.get("persona")
+                ad_persona_no = None
+                if isinstance(persona, dict) and isinstance(persona.get("number"), int):
+                    ad_persona_no = int(persona.get("number"))
+                if ad_persona_no != persona_number:
+                    continue
+            target_ad = ad
+            break
+        if not isinstance(target_ad, dict):
+            continue
+
+        ad_copy = target_ad.setdefault("copy", {})
+        if not isinstance(ad_copy, dict):
+            continue
+        lang_copy = ad_copy.setdefault(lang, {})
+        if not isinstance(lang_copy, dict):
+            continue
+
+        for line_item in line_items:
+            if not isinstance(line_item, dict):
+                continue
+            label = str(line_item.get("label") or "").strip()
+            value = str(line_item.get("value") or "").strip()
+            if not label:
+                continue
+            key = label.lower()
+
+            if key == "headline":
+                lang_copy["headline"] = value
+            elif key == "support line":
+                lang_copy["support_line"] = value
+            elif key == "context line":
+                lang_copy["context_line"] = value
+            elif key == "cta":
+                lang_copy["cta"] = value
+            elif key == "attribution":
+                lang_copy["attribution"] = value
+            elif key == "trust line":
+                lang_copy["trust_line"] = value
+            elif key.startswith("bullet "):
+                match = re.match(r"^bullet\s+(\d+)$", key)
+                if not match:
+                    continue
+                index = int(match.group(1)) - 1
+                if index < 0:
+                    continue
+                bullets = lang_copy.get("bullets")
+                if not isinstance(bullets, list):
+                    bullets = []
+                while len(bullets) <= index:
+                    bullets.append("")
+                bullets[index] = value
+                lang_copy["bullets"] = bullets
+            elif key.startswith("left situation ") or key.startswith("right shift "):
+                match = re.match(r"^(left situation|right shift)\s+(\d+)$", key)
+                if not match:
+                    continue
+                side = match.group(1)
+                ordinal = int(match.group(2))
+                if ordinal <= 0:
+                    continue
+                if side == "left situation":
+                    index = ordinal - 1
+                else:
+                    index = ordinal + 1
+                bullets = lang_copy.get("bullets")
+                if not isinstance(bullets, list):
+                    bullets = []
+                while len(bullets) <= index:
+                    bullets.append("")
+                bullets[index] = value
+                lang_copy["bullets"] = bullets
+
+        updated_count += 1
+
+    if updated_count == 0:
+        raise HTTPException(status_code=400, detail="No valid prompt edits were provided")
+
+    copy_path.write_text(json.dumps(copy_json, ensure_ascii=False, indent=2) + "\n", encoding="utf-8")
+    rerender_prompts_for_run(run_dir, batch, copy_path, load_run_language_mode(run_dir))
+
+    has_916 = any("/96/" in str(path) for path in (manifest.get("prompt_files") or []))
+    if has_916:
+        manifest = generate_916_for_run(run_dir, manifest)
+
+    refreshed = collect_run_result(run_dir, batch, bool(manifest.get("image_generated", False)))
+    refreshed["copy_edits_applied"] = updated_count
+    merged = merge_manifest(run_dir, manifest, refreshed)
+    return merged
+
+
+@app.post("/api/runs/{run_id}/generate-916")
+def api_run_generate_916(run_id: str) -> dict[str, Any]:
+    run_dir = RUNS_ROOT / run_id
+    manifest_path = run_dir / "manifest.json"
+
+    if not manifest_path.exists():
+        raise HTTPException(status_code=404, detail="Run not found")
+    manifest = json.loads(manifest_path.read_text(encoding="utf-8"))
+    return generate_916_for_run(run_dir, manifest)
+
+
+@app.post("/api/runs/{run_id}/generate-916-selected")
+def api_run_generate_916_selected(run_id: str, payload: dict[str, Any] = Body(...)) -> dict[str, Any]:
+    run_dir = RUNS_ROOT / run_id
+    manifest_path = run_dir / "manifest.json"
+    copy_path = run_dir / "context" / "copy_batch.json"
+    if not manifest_path.exists():
+        raise HTTPException(status_code=404, detail="Run not found")
+    if not copy_path.exists():
+        raise HTTPException(status_code=404, detail="copy_batch.json not found for run")
+
+    manifest = json.loads(manifest_path.read_text(encoding="utf-8"))
+    batch = str(manifest.get("batch") or "").strip()
+    if not batch:
+        raise HTTPException(status_code=400, detail="Run has no batch folder")
+
+    prompt_files = payload.get("prompt_files")
+    if not isinstance(prompt_files, list) or not prompt_files:
+        raise HTTPException(status_code=400, detail="prompt_files must be a non-empty array")
+
+    selected_45 = validate_selected_45_prompts(batch, prompt_files)
+    if not selected_45:
+        raise HTTPException(status_code=400, detail="No valid 4:5 prompt files selected")
+
+    selected_keys = extract_selected_ad_keys_from_45_prompts(selected_45)
+    if not selected_keys:
+        raise HTTPException(status_code=400, detail="Could not resolve selected persona/format keys")
+
+    copy_json = json.loads(copy_path.read_text(encoding="utf-8"))
+    selected_copy = filter_copy_json_for_selected_ads(copy_json, selected_keys)
+    ads = selected_copy.get("ads")
+    if not isinstance(ads, list) or not ads:
+        raise HTTPException(status_code=400, detail="No ads matched selected prompts")
+
+    copy_916 = force_aspect_ratio(selected_copy, "9:16")
     visual_locks = collect_45_visual_locks(batch)
     if visual_locks:
         copy_916 = apply_visual_locks(copy_916, visual_locks)
-    copy_916_path = run_dir / "context" / "copy_batch_916.json"
+    copy_916_path = run_dir / "context" / "copy_batch_916_selected.json"
     copy_916_path.write_text(json.dumps(copy_916, ensure_ascii=False, indent=2) + "\n", encoding="utf-8")
-
-    run_context_path = run_dir / "context" / "run_context.json"
-    assembler_mode = "BOTH"
-    if run_context_path.exists():
-        try:
-            run_context = json.loads(run_context_path.read_text(encoding="utf-8"))
-            lang_mode = str(run_context.get("language_mode") or "ALL").upper()
-            if lang_mode == "EN":
-                assembler_mode = "EN"
-            elif lang_mode == "HI":
-                assembler_mode = "HI"
-        except Exception:
-            pass
 
     result = run_cmd(
         [
@@ -1106,22 +1652,240 @@ def api_run_generate_916(run_id: str) -> dict[str, Any]:
             "--batch",
             batch,
             "--language-mode",
-            assembler_mode,
+            load_run_language_mode(run_dir),
             "--no-registry-write",
             "--skip-uniqueness-check",
         ],
         cwd=ROOT,
     )
-
     if result.returncode != 0:
         error_text = result.stderr or result.stdout
-        (run_dir / "logs" / "assembler_916_error.txt").write_text(error_text, encoding="utf-8")
+        (run_dir / "logs" / "assembler_916_selected_error.txt").write_text(error_text, encoding="utf-8")
         short_error = "\n".join([line for line in error_text.splitlines() if line.strip()][-12:])
-        raise HTTPException(status_code=500, detail=f"9:16 generation failed: {short_error}")
+        raise HTTPException(status_code=500, detail=f"Selective 9:16 generation failed: {short_error}")
 
-    updated = collect_run_result(run_dir, batch, bool(manifest.get("image_generated", False)))
-    updated["generated_variant"] = "9:16"
-    return updated
+    refreshed = collect_run_result(run_dir, batch, bool(manifest.get("image_generated", False)))
+    refreshed["generated_variant"] = "9:16"
+    refreshed["generated_916_for_prompts"] = selected_45
+    return merge_manifest(run_dir, manifest, refreshed)
+
+
+def validate_selected_45_prompts(batch: str, prompt_files: list[Any]) -> list[str]:
+    valid_prompt_files: list[str] = []
+    for prompt_file in prompt_files:
+        rel = str(prompt_file or "").strip().replace("\\", "/")
+        if not rel or not rel.startswith("output/"):
+            continue
+        if "/45/" not in rel:
+            continue
+        candidate = ROOT / rel
+        if not candidate.exists() or not candidate.is_file():
+            continue
+        if f"output/{batch}/" not in rel:
+            continue
+        valid_prompt_files.append(rel)
+    return valid_prompt_files
+
+
+def map_45_to_96_prompts(selected_45: list[str]) -> list[str]:
+    out: list[str] = []
+    for rel in selected_45:
+        rel_96 = rel.replace("/45/", "/96/")
+        file_96 = ROOT / rel_96
+        if file_96.exists() and file_96.is_file():
+            out.append(rel_96)
+    return out
+
+
+def extract_selected_ad_keys_from_45_prompts(selected_45: list[str]) -> set[tuple[str, int | None]]:
+    keys: set[tuple[str, int | None]] = set()
+    for rel in selected_45:
+        parsed = parse_prompt_filename(rel)
+        if not parsed:
+            continue
+        fmt, _lang, persona_number = parsed
+        keys.add((fmt, persona_number))
+    return keys
+
+
+def filter_copy_json_for_selected_ads(copy_json: dict[str, Any], selected_keys: set[tuple[str, int | None]]) -> dict[str, Any]:
+    ads = copy_json.get("ads")
+    if not isinstance(ads, list):
+        return copy_json
+    selected_ads: list[dict[str, Any]] = []
+    for ad in ads:
+        if not isinstance(ad, dict):
+            continue
+        fmt = str(ad.get("format") or "").strip().upper()
+        persona_number = None
+        persona = ad.get("persona")
+        if isinstance(persona, dict) and isinstance(persona.get("number"), int):
+            persona_number = int(persona.get("number"))
+        if (fmt, persona_number) in selected_keys or (fmt, None) in selected_keys:
+            selected_ads.append(ad)
+    cloned = json.loads(json.dumps(copy_json, ensure_ascii=False))
+    cloned["ads"] = selected_ads
+    return cloned
+
+
+@app.post("/api/runs/{run_id}/generate-images-45")
+def api_run_generate_images_45(run_id: str, payload: dict[str, Any] = Body(...)) -> dict[str, Any]:
+    run_dir = RUNS_ROOT / run_id
+    manifest_path = run_dir / "manifest.json"
+    if not manifest_path.exists():
+        raise HTTPException(status_code=404, detail="Run not found")
+
+    manifest = json.loads(manifest_path.read_text(encoding="utf-8"))
+    batch = str(manifest.get("batch") or "").strip()
+    if not batch:
+        raise HTTPException(status_code=400, detail="Run has no batch folder")
+
+    kie_api_key = str(os.getenv("KIE_API_KEY") or "").strip()
+    if not kie_api_key:
+        raise HTTPException(status_code=400, detail="KIE_API_KEY missing. Set it in .env.dashboard")
+
+    prompt_files = payload.get("prompt_files")
+    if not isinstance(prompt_files, list) or not prompt_files:
+        raise HTTPException(status_code=400, detail="prompt_files must be a non-empty array")
+
+    selected_45 = validate_selected_45_prompts(batch, prompt_files)
+    if not selected_45:
+        raise HTTPException(status_code=400, detail="No valid 4:5 prompt files selected")
+
+    active_images_file = str(manifest.get("active_images_file") or DEFAULT_ACTIVE_IMAGES)
+    cmd = [
+        "python3",
+        "scripts/kie_nano_batch.py",
+        "--batch",
+        batch,
+        "--api-key",
+        kie_api_key,
+        "--active-images-file",
+        active_images_file,
+        "--language",
+        "BOTH",
+        "--aspect-ratio",
+        "4:5",
+        "--max-variations-per-format",
+        "999",
+        "--prompt-files",
+        *selected_45,
+    ]
+    result = run_cmd(cmd, cwd=ROOT)
+    if result.returncode != 0:
+        error_text = result.stderr or result.stdout
+        (run_dir / "logs" / "image_generation_45_error.txt").write_text(error_text, encoding="utf-8")
+        short_error = "\n".join([line for line in error_text.splitlines() if line.strip()][-12:])
+        raise HTTPException(status_code=500, detail=f"Image generation failed (4:5): {short_error}")
+
+    refreshed = collect_run_result(run_dir, batch, True)
+    refreshed["generated_images_for_prompts_45"] = selected_45
+    merged = merge_manifest(run_dir, manifest, refreshed)
+    return merged
+
+
+@app.post("/api/runs/{run_id}/generate-images-916-from-45")
+def api_run_generate_images_916_from_45(run_id: str, payload: dict[str, Any] = Body(...)) -> dict[str, Any]:
+    run_dir = RUNS_ROOT / run_id
+    manifest_path = run_dir / "manifest.json"
+    if not manifest_path.exists():
+        raise HTTPException(status_code=404, detail="Run not found")
+
+    manifest = json.loads(manifest_path.read_text(encoding="utf-8"))
+    batch = str(manifest.get("batch") or "").strip()
+    if not batch:
+        raise HTTPException(status_code=400, detail="Run has no batch folder")
+
+    kie_api_key = str(os.getenv("KIE_API_KEY") or "").strip()
+    if not kie_api_key:
+        raise HTTPException(status_code=400, detail="KIE_API_KEY missing. Set it in .env.dashboard")
+
+    cloudinary_cloud_name = str(os.getenv("CLOUDINARY_CLOUD_NAME") or "").strip()
+    cloudinary_api_key = str(os.getenv("CLOUDINARY_API_KEY") or "").strip()
+    cloudinary_api_secret = str(os.getenv("CLOUDINARY_API_SECRET") or "").strip()
+    if not cloudinary_cloud_name or not cloudinary_api_key or not cloudinary_api_secret:
+        raise HTTPException(
+            status_code=400,
+            detail="Cloudinary credentials missing. Set CLOUDINARY_CLOUD_NAME/CLOUDINARY_API_KEY/CLOUDINARY_API_SECRET in .env.dashboard",
+        )
+
+    prompt_files = payload.get("prompt_files")
+    if not isinstance(prompt_files, list) or not prompt_files:
+        raise HTTPException(status_code=400, detail="prompt_files must be a non-empty array")
+
+    selected_45 = validate_selected_45_prompts(batch, prompt_files)
+    if not selected_45:
+        raise HTTPException(status_code=400, detail="No valid 4:5 prompt files selected")
+
+    selected_96 = map_45_to_96_prompts(selected_45)
+    if not selected_96:
+        raise HTTPException(status_code=400, detail="No matching 9:16 prompt files found for selected 4:5 prompts")
+
+    jobs = load_batch_image_summary(batch)
+    job_by_prompt: dict[str, dict[str, Any]] = {}
+    for job in jobs:
+        prompt_file = str(job.get("prompt_file") or "").strip().replace("\\", "/")
+        if prompt_file:
+            job_by_prompt[prompt_file] = job
+
+    prompt_reference_map: dict[str, list[str]] = {}
+    uploaded_refs: dict[str, str] = {}
+    for prompt_45 in selected_45:
+        prompt_96 = prompt_45.replace("/45/", "/96/")
+        if prompt_96 not in selected_96:
+            continue
+        job = job_by_prompt.get(prompt_45)
+        if not job:
+            continue
+        saved_files = job.get("saved_files")
+        if not isinstance(saved_files, list) or not saved_files:
+            continue
+        image_rel = str(saved_files[0]).strip().replace("\\", "/")
+        image_path = ROOT / image_rel
+        if not image_path.exists() or not image_path.is_file():
+            continue
+        cloudinary_url = upload_image_to_cloudinary(image_path, cloudinary_cloud_name, cloudinary_api_key, cloudinary_api_secret)
+        prompt_reference_map[prompt_96] = [cloudinary_url]
+        uploaded_refs[prompt_96] = cloudinary_url
+
+    if not prompt_reference_map:
+        raise HTTPException(status_code=400, detail="Could not build 9:16 reference images from selected 4:5 outputs")
+
+    map_path = run_dir / "context" / "prompt_reference_map_916.json"
+    map_path.write_text(json.dumps(prompt_reference_map, ensure_ascii=False, indent=2) + "\n", encoding="utf-8")
+
+    cmd = [
+        "python3",
+        "scripts/kie_nano_batch.py",
+        "--batch",
+        batch,
+        "--api-key",
+        kie_api_key,
+        "--language",
+        "BOTH",
+        "--aspect-ratio",
+        "9:16",
+        "--max-variations-per-format",
+        "999",
+        "--prompt-files",
+        *sorted(prompt_reference_map.keys()),
+        "--prompt-reference-map",
+        str(map_path),
+        "--reference-conversion-mode",
+        "outpaint_45_to_96",
+    ]
+    result = run_cmd(cmd, cwd=ROOT)
+    if result.returncode != 0:
+        error_text = result.stderr or result.stdout
+        (run_dir / "logs" / "image_generation_916_from_45_error.txt").write_text(error_text, encoding="utf-8")
+        short_error = "\n".join([line for line in error_text.splitlines() if line.strip()][-12:])
+        raise HTTPException(status_code=500, detail=f"Image generation failed (9:16 from 4:5 refs): {short_error}")
+
+    refreshed = collect_run_result(run_dir, batch, True)
+    refreshed["generated_images_for_prompts_916"] = sorted(prompt_reference_map.keys())
+    refreshed["uploaded_reference_urls_916"] = uploaded_refs
+    merged = merge_manifest(run_dir, manifest, refreshed)
+    return merged
 
 
 @app.get("/api/file-content")
@@ -1347,7 +2111,7 @@ async def api_run_execute(
         raise HTTPException(status_code=500, detail="Could not parse batch from assembler output")
     batch_name = batch_match.group(1)
 
-    generate_images = bool(cfg.get("generate_images"))
+    generate_images = False
     image_generated = False
     if generate_images:
         kie_api_key = (cfg.get("kie_api_key") or "").strip()

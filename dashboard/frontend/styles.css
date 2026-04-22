@@ -254,6 +254,57 @@ button:hover {
   text-decoration: underline;
 }
 
+.prompt-actions {
+  margin-top: 10px;
+  padding: 10px;
+  border: 1px solid var(--line);
+  border-radius: 10px;
+  background: color-mix(in srgb, var(--surface) 88%, var(--surface-2));
+}
+
+.prompt-controls {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-bottom: 10px;
+}
+
+.prompt-editor-list {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 8px;
+}
+
+.prompt-editor {
+  border: 1px solid var(--line);
+  border-radius: 10px;
+  padding: 10px;
+  background: var(--surface);
+}
+
+.prompt-editor-top {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 8px;
+}
+
+.prompt-line {
+  display: grid;
+  grid-template-columns: minmax(110px, 180px) 1fr;
+  gap: 8px;
+  align-items: center;
+  margin-top: 6px;
+}
+
+.prompt-line label {
+  margin: 0;
+}
+
+.prompt-line input[type="text"] {
+  margin: 0;
+}
+
 @media (max-width: 720px) {
   .page {
     padding: 14px 12px 36px;
@@ -270,5 +321,9 @@ button:hover {
 
   .card {
     padding: 14px;
+  }
+
+  .prompt-line {
+    grid-template-columns: 1fr;
   }
 }

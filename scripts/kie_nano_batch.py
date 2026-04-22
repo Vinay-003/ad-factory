@@ -12,6 +12,7 @@ Flow:
 from __future__ import annotations
 
 import argparse
+import copy
 import base64
 import json
 import os
@@ -70,6 +71,23 @@ def parse_args() -> argparse.Namespace:
         "--active-images-base-url",
         default=os.getenv("ACTIVE_IMAGES_BASE_URL", ""),
         help="Public base URL that serves input/active_images files. Example: https://cdn.example.com/active_images",
+    )
+    parser.add_argument(
+        "--prompt-files",
+        nargs="*",
+        default=[],
+        help="Optional prompt files (workspace-relative) to submit instead of all batch prompts",
+    )
+    parser.add_argument(
+        "--prompt-reference-map",
+        default="",
+        help="Optional JSON file mapping prompt_file -> image_input URL list for per-prompt img2img refs",
+    )
+    parser.add_argument(
+        "--reference-conversion-mode",
+        default="none",
+        choices=["none", "outpaint_45_to_96"],
+        help="Optional conversion lock instructions for reference-driven generation",
     )
     return parser.parse_args()
 
@@ -173,11 +191,14 @@ def build_image_inputs_from_file(url_file: Path) -> list[str]:
     return urls
 
 
-def parse_prompt_files(batch_dir: Path, language_mode: str) -> list[PromptFile]:
-    pattern = re.compile(r"^OUTPUT_([A-Z]+)_(EN|HI)(?:_V(\d+))?\.txt$")
+def parse_prompt_files(batch_dir: Path, language_mode: str, root: Path, selected_prompt_files: set[str] | None = None) -> list[PromptFile]:
+    pattern = re.compile(r"^OUTPUT_([A-Z]+)(?:_P\d+)?_(EN|HI)(?:_V(\d+))?\.txt$")
     picked: list[PromptFile] = []
     for item in sorted(batch_dir.rglob("OUTPUT_*.txt")):
         if not item.is_file():
+            continue
+        rel_path = str(item.relative_to(root))
+        if selected_prompt_files and rel_path not in selected_prompt_files:
             continue
         match = pattern.match(item.name)
         if not match:
@@ -195,8 +216,28 @@ def parse_prompt_files(batch_dir: Path, language_mode: str) -> list[PromptFile]:
     return picked
 
 
-def compose_prompt(starting_prompt: str, prompt_file: Path) -> str:
+def conversion_lock_instruction(mode: str) -> str:
+    if mode != "outpaint_45_to_96":
+        return ""
+    return """REFERENCE-LOCKED 4:5 -> 9:16 CONVERSION (NON-NEGOTIABLE)
+- Use the provided reference image as absolute ground truth.
+- Perform vertical outpainting only to reach 9:16.
+- Keep the original 4:5 layout block intact with zero stretch, zero warp, zero recomposition.
+- Do not resize products, do not alter product spacing, do not change camera perspective.
+- Keep product cluster anchored at the same visual height as reference (~45% vertical).
+- Keep headline/support hierarchy and spacing identical to reference; no extra gaps.
+- Top extension and bottom extension zones are background only.
+- Do not move text or products into extension zones.
+- Extend existing background style only (same texture, same lighting direction, same color tone).
+- If any distortion/recomposition occurs, reject and regenerate.
+""".strip()
+
+
+def compose_prompt(starting_prompt: str, prompt_file: Path, conversion_mode: str) -> str:
     body = prompt_file.read_text(encoding="utf-8").strip()
+    lock = conversion_lock_instruction(conversion_mode)
+    if lock:
+        return f"{starting_prompt.strip()}\n\n{lock}\n\n{body}\n"
     return f"{starting_prompt.strip()}\n\n{body}\n"
 
 
@@ -382,6 +423,30 @@ def trim_variations(grouped: dict[tuple[str, str], list[PromptFile]], max_variat
     return trimmed
 
 
+def load_prompt_reference_map(path: Path) -> dict[str, list[str]]:
+    if not path.exists():
+        raise RuntimeError(f"Prompt reference map file not found: {path}")
+    payload = json.loads(path.read_text(encoding="utf-8"))
+    if not isinstance(payload, dict):
+        raise RuntimeError("Prompt reference map must be a JSON object")
+    out: dict[str, list[str]] = {}
+    for key, value in payload.items():
+        if not isinstance(key, str) or not key.strip():
+            continue
+        if isinstance(value, str):
+            urls = [value.strip()] if value.strip() else []
+        elif isinstance(value, list):
+            urls = [str(item).strip() for item in value if str(item).strip()]
+        else:
+            urls = []
+        if not urls:
+            continue
+        if len(urls) > 14:
+            raise RuntimeError(f"Prompt reference map for '{key}' has >14 image URLs")
+        out[Path(key).as_posix()] = urls
+    return out
+
+
 def main() -> int:
     args = parse_args()
 
@@ -398,6 +463,10 @@ def main() -> int:
             active_images_dir = fallback_dir
     starting_prompt_file = root / "input" / "startingprompt.txt"
     active_images_file = root / args.active_images_file
+    prompt_reference_map_path = Path(args.prompt_reference_map).resolve() if args.prompt_reference_map else None
+    prompt_reference_map: dict[str, list[str]] = {}
+    if prompt_reference_map_path is not None:
+        prompt_reference_map = load_prompt_reference_map(prompt_reference_map_path)
 
     if not args.api_key:
         print("Error: Missing KIE API key. Set KIE_API_KEY or pass --api-key", file=sys.stderr)
@@ -410,13 +479,14 @@ def main() -> int:
         print(f"Error: Missing starting prompt file: {starting_prompt_file}", file=sys.stderr)
         return 1
 
-    if args.image_input_mode == "url" and not active_images_file.exists() and not args.active_images_base_url:
+    has_per_prompt_refs = bool(prompt_reference_map)
+    if not has_per_prompt_refs and args.image_input_mode == "url" and not active_images_file.exists() and not args.active_images_base_url:
         print(
             f"Error: Missing URL input source. Provide {active_images_file} or --active-images-base-url",
             file=sys.stderr,
         )
         return 1
-    if args.image_input_mode == "data_uri" and not active_images_dir.exists():
+    if not has_per_prompt_refs and args.image_input_mode == "data_uri" and not active_images_dir.exists():
         print(f"Error: Missing active images folder: {active_images_dir}", file=sys.stderr)
         return 1
 
@@ -430,12 +500,15 @@ def main() -> int:
     batch_generated_dir = generated_root / batch_name
     ensure_dir(batch_generated_dir)
 
-    if args.image_input_mode == "url" and active_images_file.exists():
+    if has_per_prompt_refs:
+        image_input_urls = []
+    elif args.image_input_mode == "url" and active_images_file.exists():
         image_input_urls = build_image_inputs_from_file(active_images_file)
     else:
         image_input_urls = build_image_inputs(active_images_dir, args.image_input_mode, args.active_images_base_url)
 
-    prompt_files = parse_prompt_files(batch_output_dir, args.language)
+    selected_prompt_files = {Path(path).as_posix() for path in (args.prompt_files or []) if str(path).strip()}
+    prompt_files = parse_prompt_files(batch_output_dir, args.language, root, selected_prompt_files if selected_prompt_files else None)
     grouped = trim_variations(iter_grouped(prompt_files), args.max_variations_per_format)
     starting_prompt = starting_prompt_file.read_text(encoding="utf-8")
 
@@ -456,12 +529,17 @@ def main() -> int:
         for prompt_file in files:
             prompt_body = prompt_file.path.read_text(encoding="utf-8")
             prompt_metadata = extract_prompt_metadata(prompt_body)
-            complete_prompt = compose_prompt(starting_prompt, prompt_file.path)
+            complete_prompt = compose_prompt(starting_prompt, prompt_file.path, args.reference_conversion_mode)
+            prompt_rel_path = str(prompt_file.path.relative_to(root))
+            per_prompt_inputs = prompt_reference_map.get(Path(prompt_rel_path).as_posix())
+            image_input_for_prompt = per_prompt_inputs if per_prompt_inputs else image_input_urls
+            if not image_input_for_prompt:
+                raise RuntimeError(f"No image_input URLs found for prompt: {prompt_rel_path}")
             task_id = create_task(
                 api_key=args.api_key,
                 callback_url=args.callback_url,
                 prompt=complete_prompt,
-                image_input=image_input_urls,
+                image_input=image_input_for_prompt,
                 aspect_ratio=args.aspect_ratio,
                 resolution=args.resolution,
                 output_format=args.output_format,
@@ -492,9 +570,10 @@ def main() -> int:
                 "format": ad_format,
                 "language": language,
                 "variation": prompt_file.variation,
-                "prompt_file": str(prompt_file.path.relative_to(root)),
+                "prompt_file": prompt_rel_path,
                 "composed_prompt_file": str(composed_prompt_path.relative_to(root)),
                 "prompt_metadata": prompt_metadata,
+                "image_input_urls": copy.deepcopy(image_input_for_prompt),
                 "result_urls": result_urls,
                 "saved_files": saved_files,
                 "state": task_data.get("state"),

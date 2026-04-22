@@ -42,6 +42,7 @@ class CopyBlock:
     headline: str
     cta: str
     support_line: str = ""
+    context_line: str = ""
     trust_line: str = ""
     attribution: str = ""
     bullets: list[str] | None = None
@@ -243,6 +244,22 @@ def safezone_enforcement_block(aspect_ratio: str) -> str:
     )
 
 
+def outpaint_lock_block(aspect_ratio: str) -> str:
+    if aspect_ratio != "9:16":
+        return ""
+    return (
+        "9:16 CONVERSION LOCK (OUTPAINT ONLY)\n"
+        "- Treat base 4:5 composition as fixed ground truth; preserve it exactly.\n"
+        "- Extend canvas vertically only; top/bottom extension zones are background only.\n"
+        "- Do not stretch, warp, zoom, crop, or recomposite existing content.\n"
+        "- Keep product cluster size, spacing, and relative proportions identical to base 4:5.\n"
+        "- Keep product cluster anchored at roughly same visual vertical position (~45%).\n"
+        "- Keep headline/support/CTA hierarchy and spacing tight; do not add vertical gaps.\n"
+        "- Keep all critical text+product content inside the central active band; do not push into extension zones.\n"
+        "- If any distortion, spacing drift, or repositioning appears, reject and regenerate."
+    )
+
+
 def require_str(obj: dict[str, Any], key: str, ctx: str) -> str:
     val = obj.get(key)
     if not isinstance(val, str) or not val.strip():
@@ -262,6 +279,7 @@ def parse_copy_block(fmt: str, lang: str, raw: dict[str, Any]) -> CopyBlock:
     headline = require_str(raw, "headline", ctx)
     cta = require_str(raw, "cta", ctx)
     support_line = (raw.get("support_line") or "").strip() if isinstance(raw.get("support_line"), str) else ""
+    context_line = (raw.get("context_line") or "").strip() if isinstance(raw.get("context_line"), str) else ""
     trust_line = (raw.get("trust_line") or "").strip() if isinstance(raw.get("trust_line"), str) else ""
     attribution = (raw.get("attribution") or "").strip() if isinstance(raw.get("attribution"), str) else ""
     bullets_val = raw.get("bullets")
@@ -276,6 +294,7 @@ def parse_copy_block(fmt: str, lang: str, raw: dict[str, Any]) -> CopyBlock:
         headline=headline,
         cta=cta,
         support_line=support_line,
+        context_line=context_line,
         trust_line=trust_line,
         attribution=attribution,
         bullets=bullets,
@@ -288,6 +307,17 @@ def strip_ba_panel_label(text: str) -> str:
     cleaned = re.sub(r"^\s*(?:पहले|बाद|पहले\s*में|बाद\s*में)\s*[:\-]\s*", "", cleaned)
     cleaned = re.sub(r"\s{2,}", " ", cleaned).strip()
     return cleaned
+
+
+def split_ba_contrast_lines(bullets: list[str]) -> tuple[list[str], list[str]]:
+    cleaned = [strip_ba_panel_label(x) for x in bullets if isinstance(x, str) and x.strip()]
+    if len(cleaned) <= 1:
+        return (cleaned[:1], [])
+    if len(cleaned) == 2:
+        return ([cleaned[0]], [cleaned[1]])
+    if len(cleaned) == 3:
+        return (cleaned[:2], [cleaned[2]])
+    return (cleaned[:2], cleaned[2:4])
 
 
 def registry_used_text(registry: dict[str, Any]) -> dict[str, set[str]]:
@@ -403,8 +433,8 @@ def render_prompt(
             "- Keep one unified base palette across both panels; create contrast using light, props, posture, and clarity (not random background color shifts).",
             "- Keep products grouped near lower center bridging both halves (inside safe field).",
             "- Place headline at top across both panels; make pain-to-progress transition unmistakable.",
-            "- Place 2 to 3 short bullets favoring right panel outcomes; avoid generic motivational bullets.",
-            "- Keep headline and all bullets in upper safe region only (top half); do not place bullets near product strip or lower half.",
+            "- On-image text must show contrast pair copy: left side gets 1-2 short struggle lines, right side gets 1-2 short fix/progress lines.",
+            "- Keep headline and all contrast lines in upper safe region only (top half); do not place these lines near product strip or lower half.",
             "- CTA must be rendered as a filled rounded button chip centered in lower safe band, never plain text.",
             "- Camera framing: medium lifestyle-product hybrid; premium and realistic.",
             "- Lighting: left side slightly flatter/dimmer, right side cleaner/brighter (subtle, not dramatic).",
@@ -459,13 +489,23 @@ def render_prompt(
             f"- CTA: {copy.cta}",
         ]
     elif fmt == "UGC":
+        context_line = copy.context_line or proof
         copy_lines = [
             f"- Headline: {copy.headline}",
             f"- Support line: {copy.support_line}",
-            f"- Context line: {proof}",
+            f"- Context line: {context_line}",
             f"- CTA: {copy.cta}",
         ]
-    elif fmt in {"BA", "FEAT"}:
+    elif fmt == "BA":
+        bullets = copy.bullets or []
+        left_lines, right_lines = split_ba_contrast_lines(bullets)
+        copy_lines = [f"- Headline: {copy.headline}"]
+        for i, line in enumerate(left_lines, start=1):
+            copy_lines.append(f"- Left situation {i}: {line}")
+        for i, line in enumerate(right_lines, start=1):
+            copy_lines.append(f"- Right shift {i}: {line}")
+        copy_lines.append(f"- CTA: {copy.cta}")
+    elif fmt == "FEAT":
         bullets = copy.bullets or []
         copy_lines = [f"- Headline: {copy.headline}"]
         for i, b in enumerate(bullets, start=1):
@@ -642,6 +682,10 @@ def render_prompt(
     lines.append("Use Poppins only for on-image text: Headline in Poppins Bold, support/CTA in Poppins Medium or Regular.")
     lines.append("")
     lines.append(safezone_enforcement_block(aspect_ratio))
+    lock_block = outpaint_lock_block(aspect_ratio)
+    if lock_block:
+        lines.append("")
+        lines.append(lock_block)
     lines.append("")
     return "\n".join(lines).strip() + "\n"
 
@@ -660,6 +704,10 @@ def validate_prompt_text(text: str, out_path: Path) -> None:
 
 def aspect_ratio_folder(aspect_ratio: str) -> str:
     return "96" if aspect_ratio == "9:16" else "45"
+
+
+def prompt_filename(fmt: str, persona_number: int, lang: str) -> str:
+    return f"OUTPUT_{fmt}_P{persona_number:02d}_{lang}.txt"
 
 
 def main() -> int:
@@ -757,12 +805,13 @@ def main() -> int:
         ratio_dir = batch_dir / aspect_ratio_folder(aspect_ratio)
         ratio_dir.mkdir(parents=True, exist_ok=True)
         persona = ad["persona"]
+        persona_number = int(persona["number"])
         angle = (ad.get("headline_angle") or "").strip()
 
         for stale_lang in ["EN", "HI"]:
             if stale_lang in render_langs:
                 continue
-            stale_path = ratio_dir / f"OUTPUT_{fmt}_{stale_lang}.txt"
+            stale_path = ratio_dir / prompt_filename(fmt, persona_number, stale_lang)
             if stale_path.exists():
                 stale_path.unlink()
 
@@ -788,7 +837,7 @@ def main() -> int:
         for lang in render_langs:
             cb = parse_copy_block(fmt, lang, ad["copy"][lang])
             out_text = render_prompt(fmt, lang, aspect_ratio, persona, cb, bg, bg_seed, seeded_sentence, visual_lock=visual_lock)
-            out_path = ratio_dir / f"OUTPUT_{fmt}_{lang}.txt"
+            out_path = ratio_dir / prompt_filename(fmt, persona_number, lang)
             validate_prompt_text(out_text, out_path)
             out_path.write_text(out_text, encoding="utf-8")
             rendered[lang] = out_text

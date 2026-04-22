@@ -1,7 +1,7 @@
 {
   "metadata": {
-    "generated_at": "2026-04-22T16:30:49Z",
-    "extractor_model": "openai/gpt-5.3-codex",
+    "generated_at": "2026-04-22T18:13:33Z",
+    "extractor_model": "openai/gpt-5.2",
     "source_files": [
       "/home/mylappy/myspace/info/productinfomain.txt",
       "/home/mylappy/myspace/info/PRODUCT_MECHANISM_V1.txt",
@@ -15,247 +15,238 @@
   },
   "canonical": {
     "positioning": [
-      "Obesity Killer Kit is a doctor-formulated Ayurvedic obesity and weight-loss support system for overweight/obese adults, delivered as a structured protocol rather than a loose supplement.",
-      "Positioning boundary: not a standalone fat-burner claim product; it supports adherence to a practical weight-loss process."
+      "Obesity Killer Kit is a doctor-formulated Ayurvedic obesity and weight-loss system for overweight/obese adults.",
+      "Positioning boundary: a structured, guided protocol; not a loose supplement and not positioned as a standalone fat-burner product.",
+      "Core mechanism framing: appetite regulation + eating-behavior correction (true-hunger eating) + digestion support to make caloric-deficit adherence easier for weight loss/obesity reduction."
     ],
     "promise_claims": [
-      "Core promise: 3 to 5 kg weight loss in 15 days when the protocol is followed.",
-      "Primary promise framing is fast visible weight-loss support through adherence-friendly routine, not zero-effort outcomes."
+      "Core promise: lose 3 to 5 kg in 15 days when the protocol is followed.",
+      "Supports weight-loss efforts by reducing hunger/cravings, supporting satiety, and improving digestive comfort so adherence becomes easier.",
+      "Refund framing: if weight loss does not start within the first 7 days, refund can be requested when protocol adherence and daily tracker sharing conditions are met."
     ],
     "eligibility": [
-      "Adults 18+ with BMI above 25.",
-      "Primary fit: users seeking natural, guided, practical weight-loss support."
+      "Adults (18+) with BMI above 25 who want fast visible weight-loss support with a natural, practical adherence-focused routine.",
+      "Users with obesity-linked concerns (e.g., PCOD/PCOS, thyroid imbalance, BP, fatty liver, diabetes, IBS) can be relevant users, but without cure/treatment claims."
     ],
     "exclusions": [
       "Pregnant women.",
       "Women within 6 months postpartum.",
-      "People actively taking insulin.",
-      "Do not position for users below 18 years."
+      "People actively taking insulin (insulin injections).",
+      "Do not position for users below 18 years of age."
     ],
     "caution_conditions": [
-      "Doctor review required before use for people on multiple psychiatric medications.",
-      "Doctor review required before use for people with multiple surgery history."
+      "Doctor-review required before use for people on multiple psychiatric medications.",
+      "Doctor-review required before use for people with multiple surgery history."
     ],
     "protocol_morning": [
-      "Take OK Liquid in the morning on an empty stomach (first step on waking).",
-      "After OK Liquid, keep a 4-hour no-solid-food window.",
-      "Use true-hunger eating after the fasting window; no fixed meal timing."
+      "Take OK Liquid first thing on waking, on an empty stomach.",
+      "After OK Liquid, maintain a 4-hour no-solid-food window.",
+      "Zero-calorie drinks are allowed during the 4-hour no-solid window.",
+      "Routine behavior: eat only on true hunger; no fixed meal timings; many users shift to 1 to 1.5 meals/day."
     ],
     "protocol_night": [
-      "Take OK Tablet plus 1/2 teaspoon OK Powder around 15 minutes before sleep.",
-      "Take with warm water guidance."
+      "Take OK Tablet + 1/2 tsp OK Powder around 15 minutes before sleep with warm water."
     ],
     "fasting_rules": [
-      "Morning post-liquid rule: 4-hour no-solid-food window.",
-      "Zero-calorie drinks are allowed during this fasting window."
+      "After OK Liquid, keep a 4-hour no-solid-food window.",
+      "Zero-calorie drinks are allowed in the 4-hour no-solid window."
     ],
     "allowed_items": [
       "Vegetables, salads, soups, fruits.",
-      "If still hungry: up to 30 g complex carbs (millets or oats).",
-      "Milk in tea/coffee is the dairy exception."
+      "Up to 30g complex carbs (millets or oats) only if still hungry.",
+      "Milk in tea/coffee is allowed (as the exception to dairy restriction).",
+      "Water and other zero-calorie drinks (during the 4-hour no-solid window)."
     ],
     "restricted_items": [
       "Non-vegetarian food.",
       "Alcohol.",
-      "Dairy except milk in tea/coffee.",
+      "Dairy products (except milk in tea/coffee).",
       "Wheat chapati, rice, dal.",
       "Nuts."
     ],
     "mechanism_allowed_claims": [
-      "Protocol-based appetite regulation + eating-behavior correction + digestion support.",
-      "Helps reduce hunger and cravings.",
-      "Helps users stay in a caloric deficit more consistently.",
-      "Supports digestion and gut comfort (bloating/acidity/gas/heaviness support).",
-      "Supports practical obesity and weight-loss efforts by improving adherence."
+      "Protocol-based appetite regulation + eating-behavior correction + digestion support for obesity/weight-loss support.",
+      "OK Liquid supports fullness/satiety and helps reduce hunger and cravings, supporting true-hunger eating.",
+      "OK Tablet + OK Powder support digestive/gut comfort (bloating, acidity, gas, heaviness) to support daily compliance.",
+      "Helps users stay in a caloric deficit more consistently by reducing unnecessary intake, making weight-loss progress more achievable over time."
     ],
     "mechanism_disallowed_claims": [
-      "Do not claim standalone fat-burning.",
-      "Do not claim rapid fat melting by itself.",
-      "Do not claim zero-effort or no-discipline outcomes.",
-      "Do not claim it works with unlimited junk food."
+      "Standalone fat-burner positioning.",
+      "Rapid fat melting / burns fat rapidly by itself.",
+      "Zero-effort results / melts fat without effort / overrides all discipline.",
+      "Works even with unlimited junk food outcomes."
     ],
     "safety_public_line": [
       "Public trust line: no side effects.",
-      "All-natural Ayurvedic formulation with no synthetic ingredients and no chemical preservatives."
+      "No synthetic ingredients and no chemical preservatives."
     ],
     "safety_internal_handling": [
-      "Internal handling note: first 3 days can be an adjustment period.",
-      "Provide close support and tracker-led guidance during early adaptation."
+      "Internal handling: first 3 days can be an adjustment period."
     ],
     "pricing": [
-      "15 days: INR 5,800.",
-      "30 days: INR 10,000.",
-      "60 days: INR 17,000."
+      "15-day: INR 5,800.",
+      "30-day: INR 10,000.",
+      "60-day: INR 17,000."
     ],
     "guarantee": [
-      "If weight-loss start is not observed in first 7 days, refund applies only when BOTH conditions are met: protocol followed and daily tracker shared."
+      "If weight loss does not start within the first 7 days, full refund can be requested when BOTH are true: protocol was followed and daily tracker was shared."
     ],
     "continuation": [
       "Continue in cycles until target weight or BMI 25.",
-      "After every 30 days, keep a 7 to 10 day break."
+      "After each 30 days, keep a 7 to 10 day break."
     ],
     "maintenance": [
-      "No automatic bounce-back from stopping alone.",
-      "Maintenance requires caloric balance, balanced diet, and daily activity.",
-      "Optional maintenance support can be considered if needed."
+      "Maintenance is not lifelong dependency on the kit.",
+      "Maintain caloric balance, follow a balanced diet, and stay active.",
+      "Positioning: stopping the kit does not itself cause automatic weight regain; maintenance habits matter."
     ],
     "proof_points": [
       "70,000+ users served.",
       "200 video testimonials.",
-      "31 unique ingredients and 44 total ingredient entries (20 liquid, 12 powder, 12 tablet).",
-      "Doctor authority and institutional backing.",
-      "Tracker-led support and 7-day refund policy with adherence conditions."
+      "Creator: Dr. Arun Tyagi (BAMS, M.D. (Kaya Chikitsa); 34 years of experience).",
+      "Institution: Arogyam Ayurvedic Panchakarma Hospital and Research Centre (founded 2013, Jodhpur).",
+      "Tracker-led support (daily tracker shared on WhatsApp) and 7-day refund policy."
     ],
     "messaging_guardrails": [
       "No body-shaming.",
       "No cure claims for medical conditions.",
       "No anti-gym framing.",
       "No competitor bashing.",
-      "Use explicit obesity/weight-loss goal language; do not hide the product goal behind abstract copy."
+      "Do not make abstract ad copy that hides the obesity/weight-loss objective.",
+      "Do not position for users below 18.",
+      "Do not position as a standalone fat-burner."
     ],
     "on_image_copy_requirements": [
-      "Every headline and subheadline must explicitly mention weight loss, obesity reduction, or clear weight outcome language.",
-      "Approved explicit phrasing includes: weight loss support, obesity management support, lose weight, reduce excess weight, 3 to 5 kg in 15 days, appetite control for weight loss.",
-      "Mechanism language must explicitly connect to obesity/weight-loss goal; do not use abstract behavior-only lines without naming weight loss/obesity context."
+      "ON-IMAGE COPY MANDATE (NON-NEGOTIABLE): every headline and subheadline must explicitly mention weight loss, obesity reduction, or clear weight outcome language. Avoid abstract copy that hides the core product goal.",
+      "ON-IMAGE COPY MANDATE (NON-NEGOTIABLE): approved explicit phrases include weight loss support, obesity management support, lose weight, reduce excess weight, 3 to 5 kg in 15 days, appetite control for weight loss.",
+      "ON-IMAGE COPY MANDATE (NON-NEGOTIABLE): do not use vague transformational lines without naming weight loss or obesity context.",
+      "ON-IMAGE COPY MANDATE: mechanism messaging must explicitly connect to obesity/weight-loss goal, not abstract behavior language alone.",
+      "Every headline/subheadline that uses mechanism language must also name the goal directly (weight loss/obesity context); avoid abstract-only mechanism lines unless the same unit also clearly states weight loss or obesity context."
     ]
   },
   "conflicts": [
     {
-      "conflict_id": "C001",
-      "bucket": "refund_policy",
-      "claim_a": {
-        "text": "In genuine cases, we can consider exceptions to our refund policy.",
-        "source_file": "faq.txt",
-        "line_start": 286,
-        "line_end": 286
-      },
-      "claim_b": {
-        "text": "Refund applies only if no weight-loss start is observed in first 7 days AND protocol was followed AND daily tracker was shared.",
-        "source_file": "productinfomain.txt",
-        "line_start": 19,
-        "line_end": 19
-      },
-      "resolution_status": "resolved",
-      "chosen_claim": {
-        "text": "Refund applies only if no weight-loss start is observed in first 7 days AND protocol was followed AND daily tracker was shared.",
-        "source_file": "productinfomain.txt",
-        "line_start": 19,
-        "line_end": 19
-      },
-      "resolution_reason": "Higher-priority canonical override in product foundation sets strict refund conditions; exception language is lower-priority and non-canonical.",
-      "risk_level": "high"
-    },
-    {
-      "conflict_id": "C002",
+      "conflict_id": "C1",
       "bucket": "continuation",
       "claim_a": {
-        "text": "Course can be safely repeatable with no upper limit.",
-        "source_file": "faq.txt",
-        "line_start": 120,
-        "line_end": 120
-      },
-      "claim_b": {
-        "text": "After each 30 days, keep a 7 to 10 day break; continue until target weight or BMI 25.",
+        "text": "Continuation: continue in cycles until target weight or BMI 25; after every 30 days take a 7 to 10 day break.",
         "source_file": "productinfomain.txt",
         "line_start": 20,
         "line_end": 20
+      },
+      "claim_b": {
+        "text": "Based on your weight-loss goals and your results, you can safely repeat the course multiple times with no upper limit.",
+        "source_file": "faq.txt",
+        "line_start": 222,
+        "line_end": 222
       },
       "resolution_status": "resolved",
       "chosen_claim": {
-        "text": "After each 30 days, keep a 7 to 10 day break; continue until target weight or BMI 25.",
+        "text": "Continuation: continue in cycles until target weight or BMI 25; after every 30 days take a 7 to 10 day break.",
         "source_file": "productinfomain.txt",
         "line_start": 20,
         "line_end": 20
       },
-      "resolution_reason": "Higher-priority continuation protocol defines mandatory cycle break structure.",
+      "resolution_reason": "Resolved by higher-priority canonical override in productinfomain.txt CONTEXT SNAPSHOT and Single Source of Truth continuation logic.",
       "risk_level": "medium"
     },
     {
-      "conflict_id": "C003",
+      "conflict_id": "C2",
+      "bucket": "positioning",
+      "claim_a": {
+        "text": "It is not positioned as a standalone supplement. It is a structured, guided system built for real-life adherence.",
+        "source_file": "productinfomain.txt",
+        "line_start": 33,
+        "line_end": 33
+      },
+      "claim_b": {
+        "text": "The Obesity Killer Kit is a herbs based food supplement that naturally reduces hunger, creates a calorie deficit, and provides essential nutrients without adding excess calories to your diet.",
+        "source_file": "faq.txt",
+        "line_start": 220,
+        "line_end": 220
+      },
+      "resolution_status": "resolved",
+      "chosen_claim": {
+        "text": "It is not positioned as a standalone supplement. It is a structured, guided system built for real-life adherence.",
+        "source_file": "productinfomain.txt",
+        "line_start": 33,
+        "line_end": 33
+      },
+      "resolution_reason": "Resolved by productinfomain.txt Single Source of Truth positioning boundary: structured guided system; avoid standalone supplement framing.",
+      "risk_level": "medium"
+    },
+    {
+      "conflict_id": "C3",
       "bucket": "fasting_rules",
       "claim_a": {
-        "text": "During 4-hour fasting after liquid, only tea/coffee allowed.",
-        "source_file": "faq.txt",
-        "line_start": 147,
-        "line_end": 147
+        "text": "Post-liquid: 4-hour no-solid-food window (zero-calorie drinks allowed).",
+        "source_file": "PRODUCT_MECHANISM_V1.txt",
+        "line_start": 36,
+        "line_end": 36
       },
       "claim_b": {
-        "text": "After morning OK Liquid, 4-hour no-solid-food window; zero-calorie drinks allowed.",
-        "source_file": "productinfomain.txt",
-        "line_start": 10,
-        "line_end": 10
+        "text": "Maintain a 4-hour fasting period (only tea/coffee allowed) afterward.",
+        "source_file": "faq.txt",
+        "line_start": 228,
+        "line_end": 228
       },
       "resolution_status": "resolved",
       "chosen_claim": {
-        "text": "After morning OK Liquid, 4-hour no-solid-food window; zero-calorie drinks allowed.",
-        "source_file": "productinfomain.txt",
-        "line_start": 10,
-        "line_end": 10
+        "text": "Post-liquid: 4-hour no-solid-food window (zero-calorie drinks allowed).",
+        "source_file": "PRODUCT_MECHANISM_V1.txt",
+        "line_start": 36,
+        "line_end": 36
       },
-      "resolution_reason": "Canonical context snapshot is higher priority and explicitly defines allowed drink class during fasting.",
-      "risk_level": "medium"
+      "resolution_reason": "Resolved by higher-priority PRODUCT_MECHANISM_V1.txt mechanism execution protocol specifying the fasting window rule and allowed drink boundary.",
+      "risk_level": "low"
     },
     {
-      "conflict_id": "C004",
-      "bucket": "eligibility",
+      "conflict_id": "C4",
+      "bucket": "protocol_morning",
       "claim_a": {
-        "text": "If BMI is below 25, user can still lose 2-3 kg with 15-day pack framing.",
-        "source_file": "faq.txt",
-        "line_start": 389,
-        "line_end": 389
+        "text": "OK Liquid: ... around 350 to 400 kcal nutrition support.",
+        "source_file": "productinfomain.txt",
+        "line_start": 74,
+        "line_end": 74
       },
       "claim_b": {
-        "text": "Primary user is adults with BMI above 25; do not position product for users below 18; eligibility framing is BMI >25.",
-        "source_file": "productinfomain.txt",
-        "line_start": 6,
-        "line_end": 6
+        "text": "The liquid that is taken in the morning has 300-400 calories which is equivalent to 4-5 chapatis.",
+        "source_file": "faq.txt",
+        "line_start": 0,
+        "line_end": 0
       },
       "resolution_status": "resolved",
       "chosen_claim": {
-        "text": "Primary user is adults with BMI above 25; eligibility framing is BMI >25.",
+        "text": "OK Liquid: ... around 350 to 400 kcal nutrition support.",
         "source_file": "productinfomain.txt",
-        "line_start": 6,
-        "line_end": 6
+        "line_start": 74,
+        "line_end": 74
       },
-      "resolution_reason": "Higher-priority canonical targeting and extraction requirement require BMI>25 eligibility as default external claim.",
-      "risk_level": "high"
+      "resolution_reason": "Resolved by productinfomain.txt Single Source of Truth component spec; lower-priority FAQ calorie range variant not used as canonical number.",
+      "risk_level": "low"
     }
   ],
   "dropped_claims": [
     {
-      "text": "Your writing is governed by four books... (general writing doctrine block).",
-      "reason": "legacy_override_blocked",
-      "source_file": "faq.txt",
-      "line_start": 69,
-      "line_end": 112
-    },
-    {
-      "text": "Split 2 pouches of OK Liquid across 3 days if weight is not reducing.",
-      "reason": "low_confidence",
-      "source_file": "faq.txt",
-      "line_start": 284,
-      "line_end": 284
-    },
-    {
-      "text": "In genuine cases, refund exceptions may be considered.",
-      "reason": "conflict",
-      "source_file": "faq.txt",
-      "line_start": 286,
-      "line_end": 286
-    },
-    {
-      "text": "Abstract-only mechanism lines (e.g., control your routine/reset your day/transform consistency) without explicit weight-loss or obesity goal.",
-      "reason": "legacy_override_blocked",
-      "source_file": "PRODUCT_MECHANISM_V1.txt",
-      "line_start": 92,
-      "line_end": 95
-    },
-    {
-      "text": "Below-BMI-25 weight-loss promotional framing for this protocol.",
+      "text": "Your writing is governed by four books. Apply their principles in every sentence simultaneously. (Elements of Style / On Writing Well / Ogilvy / Art of Thinking Clearly guidance block).",
       "reason": "ambiguity",
       "source_file": "faq.txt",
-      "line_start": 389,
-      "line_end": 389
+      "line_start": 68,
+      "line_end": 123
+    },
+    {
+      "text": "The ingredients digest slowly (7-8 hours).",
+      "reason": "legacy_override_blocked",
+      "source_file": "faq.txt",
+      "line_start": 208,
+      "line_end": 208
+    },
+    {
+      "text": "Tactically putting \":)\" emoji goes a long way in evoking a feeling of friendliness.",
+      "reason": "ambiguity",
+      "source_file": "faq.txt",
+      "line_start": 186,
+      "line_end": 186
     }
   ],
   "coverage_check": {
@@ -275,72 +266,79 @@
   },
   "generation_context": {
     "product_info": [
-      "Obesity Killer Kit is a doctor-formulated Ayurvedic obesity and weight-loss support system for overweight/obese adults, delivered as a structured protocol rather than a loose supplement.",
-      "Positioning boundary: not a standalone fat-burner claim product; it supports adherence to a practical weight-loss process.",
-      "Core promise: 3 to 5 kg weight loss in 15 days when the protocol is followed.",
-      "Primary promise framing is fast visible weight-loss support through adherence-friendly routine, not zero-effort outcomes.",
-      "Every headline and subheadline must explicitly mention weight loss, obesity reduction, or clear weight outcome language.",
-      "Approved explicit phrasing includes: weight loss support, obesity management support, lose weight, reduce excess weight, 3 to 5 kg in 15 days, appetite control for weight loss.",
-      "Mechanism language must explicitly connect to obesity/weight-loss goal; do not use abstract behavior-only lines without naming weight loss/obesity context.",
-      "Adults 18+ with BMI above 25.",
-      "Primary fit: users seeking natural, guided, practical weight-loss support.",
+      "Obesity Killer Kit is a doctor-formulated Ayurvedic obesity and weight-loss system for overweight/obese adults.",
+      "Positioning boundary: a structured, guided protocol; not a loose supplement and not positioned as a standalone fat-burner product.",
+      "Core mechanism framing: appetite regulation + eating-behavior correction (true-hunger eating) + digestion support to make caloric-deficit adherence easier for weight loss/obesity reduction.",
+      "Core promise: lose 3 to 5 kg in 15 days when the protocol is followed.",
+      "Supports weight-loss efforts by reducing hunger/cravings, supporting satiety, and improving digestive comfort so adherence becomes easier.",
+      "Refund framing: if weight loss does not start within the first 7 days, refund can be requested when protocol adherence and daily tracker sharing conditions are met.",
+      "ON-IMAGE COPY MANDATE (NON-NEGOTIABLE): every headline and subheadline must explicitly mention weight loss, obesity reduction, or clear weight outcome language. Avoid abstract copy that hides the core product goal.",
+      "ON-IMAGE COPY MANDATE (NON-NEGOTIABLE): approved explicit phrases include weight loss support, obesity management support, lose weight, reduce excess weight, 3 to 5 kg in 15 days, appetite control for weight loss.",
+      "ON-IMAGE COPY MANDATE (NON-NEGOTIABLE): do not use vague transformational lines without naming weight loss or obesity context.",
+      "ON-IMAGE COPY MANDATE: mechanism messaging must explicitly connect to obesity/weight-loss goal, not abstract behavior language alone.",
+      "Every headline/subheadline that uses mechanism language must also name the goal directly (weight loss/obesity context); avoid abstract-only mechanism lines unless the same unit also clearly states weight loss or obesity context.",
+      "Adults (18+) with BMI above 25 who want fast visible weight-loss support with a natural, practical adherence-focused routine.",
+      "Users with obesity-linked concerns (e.g., PCOD/PCOS, thyroid imbalance, BP, fatty liver, diabetes, IBS) can be relevant users, but without cure/treatment claims.",
       "Pregnant women.",
       "Women within 6 months postpartum.",
-      "People actively taking insulin.",
-      "Do not position for users below 18 years.",
-      "Doctor review required before use for people on multiple psychiatric medications.",
-      "Doctor review required before use for people with multiple surgery history.",
+      "People actively taking insulin (insulin injections).",
+      "Do not position for users below 18 years of age.",
+      "Doctor-review required before use for people on multiple psychiatric medications.",
+      "Doctor-review required before use for people with multiple surgery history.",
       "Public trust line: no side effects.",
-      "All-natural Ayurvedic formulation with no synthetic ingredients and no chemical preservatives.",
-      "Internal handling note: first 3 days can be an adjustment period.",
-      "Provide close support and tracker-led guidance during early adaptation.",
-      "If weight-loss start is not observed in first 7 days, refund applies only when BOTH conditions are met: protocol followed and daily tracker shared.",
+      "No synthetic ingredients and no chemical preservatives.",
+      "Internal handling: first 3 days can be an adjustment period.",
+      "If weight loss does not start within the first 7 days, full refund can be requested when BOTH are true: protocol was followed and daily tracker was shared.",
       "Continue in cycles until target weight or BMI 25.",
-      "After every 30 days, keep a 7 to 10 day break.",
-      "No automatic bounce-back from stopping alone.",
-      "Maintenance requires caloric balance, balanced diet, and daily activity.",
-      "Optional maintenance support can be considered if needed.",
+      "After each 30 days, keep a 7 to 10 day break.",
+      "Maintenance is not lifelong dependency on the kit.",
+      "Maintain caloric balance, follow a balanced diet, and stay active.",
+      "Positioning: stopping the kit does not itself cause automatic weight regain; maintenance habits matter.",
       "70,000+ users served.",
       "200 video testimonials.",
-      "31 unique ingredients and 44 total ingredient entries (20 liquid, 12 powder, 12 tablet).",
-      "Doctor authority and institutional backing.",
-      "Tracker-led support and 7-day refund policy with adherence conditions."
+      "Creator: Dr. Arun Tyagi (BAMS, M.D. (Kaya Chikitsa); 34 years of experience).",
+      "Institution: Arogyam Ayurvedic Panchakarma Hospital and Research Centre (founded 2013, Jodhpur).",
+      "Tracker-led support (daily tracker shared on WhatsApp) and 7-day refund policy."
     ],
     "mechanism": [
-      "Protocol-based appetite regulation + eating-behavior correction + digestion support.",
-      "Helps reduce hunger and cravings.",
-      "Helps users stay in a caloric deficit more consistently.",
-      "Supports digestion and gut comfort (bloating/acidity/gas/heaviness support).",
-      "Supports practical obesity and weight-loss efforts by improving adherence.",
-      "Every headline and subheadline must explicitly mention weight loss, obesity reduction, or clear weight outcome language.",
-      "Approved explicit phrasing includes: weight loss support, obesity management support, lose weight, reduce excess weight, 3 to 5 kg in 15 days, appetite control for weight loss.",
-      "Mechanism language must explicitly connect to obesity/weight-loss goal; do not use abstract behavior-only lines without naming weight loss/obesity context.",
-      "Take OK Liquid in the morning on an empty stomach (first step on waking).",
+      "Protocol-based appetite regulation + eating-behavior correction + digestion support for obesity/weight-loss support.",
+      "OK Liquid supports fullness/satiety and helps reduce hunger and cravings, supporting true-hunger eating.",
+      "OK Tablet + OK Powder support digestive/gut comfort (bloating, acidity, gas, heaviness) to support daily compliance.",
+      "Helps users stay in a caloric deficit more consistently by reducing unnecessary intake, making weight-loss progress more achievable over time.",
+      "ON-IMAGE COPY MANDATE (NON-NEGOTIABLE): every headline and subheadline must explicitly mention weight loss, obesity reduction, or clear weight outcome language. Avoid abstract copy that hides the core product goal.",
+      "ON-IMAGE COPY MANDATE (NON-NEGOTIABLE): approved explicit phrases include weight loss support, obesity management support, lose weight, reduce excess weight, 3 to 5 kg in 15 days, appetite control for weight loss.",
+      "ON-IMAGE COPY MANDATE (NON-NEGOTIABLE): do not use vague transformational lines without naming weight loss or obesity context.",
+      "ON-IMAGE COPY MANDATE: mechanism messaging must explicitly connect to obesity/weight-loss goal, not abstract behavior language alone.",
+      "Every headline/subheadline that uses mechanism language must also name the goal directly (weight loss/obesity context); avoid abstract-only mechanism lines unless the same unit also clearly states weight loss or obesity context.",
+      "Take OK Liquid first thing on waking, on an empty stomach.",
+      "After OK Liquid, maintain a 4-hour no-solid-food window.",
+      "Zero-calorie drinks are allowed during the 4-hour no-solid window.",
+      "Routine behavior: eat only on true hunger; no fixed meal timings; many users shift to 1 to 1.5 meals/day.",
+      "Take OK Tablet + 1/2 tsp OK Powder around 15 minutes before sleep with warm water.",
       "After OK Liquid, keep a 4-hour no-solid-food window.",
-      "Use true-hunger eating after the fasting window; no fixed meal timing.",
-      "Take OK Tablet plus 1/2 teaspoon OK Powder around 15 minutes before sleep.",
-      "Take with warm water guidance.",
-      "Morning post-liquid rule: 4-hour no-solid-food window.",
-      "Zero-calorie drinks are allowed during this fasting window."
+      "Zero-calorie drinks are allowed in the 4-hour no-solid window."
     ],
     "faq": [
       "Vegetables, salads, soups, fruits.",
-      "If still hungry: up to 30 g complex carbs (millets or oats).",
-      "Milk in tea/coffee is the dairy exception.",
+      "Up to 30g complex carbs (millets or oats) only if still hungry.",
+      "Milk in tea/coffee is allowed (as the exception to dairy restriction).",
+      "Water and other zero-calorie drinks (during the 4-hour no-solid window).",
       "Non-vegetarian food.",
       "Alcohol.",
-      "Dairy except milk in tea/coffee.",
+      "Dairy products (except milk in tea/coffee).",
       "Wheat chapati, rice, dal.",
       "Nuts.",
       "No body-shaming.",
       "No cure claims for medical conditions.",
       "No anti-gym framing.",
       "No competitor bashing.",
-      "Use explicit obesity/weight-loss goal language; do not hide the product goal behind abstract copy.",
-      "Do not claim: Do not claim standalone fat-burning.",
-      "Do not claim: Do not claim rapid fat melting by itself.",
-      "Do not claim: Do not claim zero-effort or no-discipline outcomes.",
-      "Do not claim: Do not claim it works with unlimited junk food."
+      "Do not make abstract ad copy that hides the obesity/weight-loss objective.",
+      "Do not position for users below 18.",
+      "Do not position as a standalone fat-burner.",
+      "Do not claim: Standalone fat-burner positioning.",
+      "Do not claim: Rapid fat melting / burns fat rapidly by itself.",
+      "Do not claim: Zero-effort results / melts fat without effort / overrides all discipline.",
+      "Do not claim: Works even with unlimited junk food outcomes."
     ]
   }
 }
