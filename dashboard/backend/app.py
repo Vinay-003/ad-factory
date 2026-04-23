@@ -120,6 +120,197 @@ PERSONA_SEED_INPUTS: dict[int, dict[str, str]] = {
     22: {"pain": "Progress feels slower after 35 despite effort.", "desire": "Steady sustainable progress without extreme routines.", "friction": "Frustration from slow visible change.", "proof": "Needs realistic milestones and consistency proof.", "tone": "reassuring and practical"},
 }
 
+PERSONA_HEADLINE_ANGLE_KEYS: dict[int, str] = {
+    1: "cravings_spike",
+    2: "packed_days",
+    3: "stressful_moments",
+    4: "progress_stalls",
+    5: "steadier_trust",
+    6: "slow_results",
+    7: "diet_reset",
+    8: "no_drain",
+    9: "family_rhythm",
+    10: "home_routine",
+    11: "office_snack_window",
+    12: "late_evening",
+    13: "post_disruption",
+    14: "clarity_matters",
+    15: "digestion_support",
+    16: "value_matters",
+    17: "deadline_pressure",
+    18: "small_wins",
+    19: "proof_matters",
+    20: "accountability",
+    21: "low_guesswork",
+    22: "sustainable_after_35",
+}
+
+PERSONA_HEADLINE_HOOKS: dict[str, dict[str, str]] = {
+    "EN": {
+        "cravings_spike": "when cravings spike",
+        "packed_days": "on packed days",
+        "stressful_moments": "during stressful moments",
+        "progress_stalls": "when progress stalls",
+        "steadier_trust": "when you want steadier trust",
+        "slow_results": "when results feel slow",
+        "diet_reset": "after repeated diet resets",
+        "no_drain": "without feeling drained",
+        "family_rhythm": "inside chaotic family days",
+        "home_routine": "inside home routines",
+        "office_snack_window": "during office snack windows",
+        "late_evening": "when evenings get harder",
+        "post_disruption": "after routine disruptions",
+        "clarity_matters": "when clarity matters",
+        "digestion_support": "when digestion also needs support",
+        "value_matters": "when value matters",
+        "deadline_pressure": "before a close deadline",
+        "small_wins": "when confidence needs small wins",
+        "proof_matters": "when proof matters",
+        "accountability": "when follow-through needs a check-in",
+        "low_guesswork": "when you want almost no guesswork",
+        "sustainable_after_35": "when sustainable progress matters after 35",
+    },
+    "HI": {
+        "cravings_spike": "जब cravings अचानक बढ़ें",
+        "packed_days": "जब दिन बहुत packed हों",
+        "stressful_moments": "तनाव भरे moments में",
+        "progress_stalls": "जब progress अटक जाए",
+        "steadier_trust": "जब support ज्यादा भरोसेमंद चाहिए",
+        "slow_results": "जब results धीमे लगें",
+        "diet_reset": "बार-बार diet reset के बाद",
+        "no_drain": "बिना थकान महसूस किए",
+        "family_rhythm": "उलझे हुए family दिनों में",
+        "home_routine": "घर के रूटीन में",
+        "office_snack_window": "office snack windows में",
+        "late_evening": "शाम देर होने पर",
+        "post_disruption": "रूटीन टूटने के बाद",
+        "clarity_matters": "जब clarity चाहिए",
+        "digestion_support": "जब digestion को भी support चाहिए",
+        "value_matters": "जब value सबसे ज़रूरी हो",
+        "deadline_pressure": "जब deadline नज़दीक हो",
+        "small_wins": "जब confidence को छोटे wins चाहिए",
+        "proof_matters": "जब proof ज़रूरी हो",
+        "accountability": "जब follow-through को check-in चाहिए",
+        "low_guesswork": "जब guesswork लगभग zero चाहिए",
+        "sustainable_after_35": "35 के बाद steady progress के लिए",
+    },
+}
+
+def persona_headline_angle_key(persona_num: int) -> str:
+    return PERSONA_HEADLINE_ANGLE_KEYS.get(persona_num, f"persona_{persona_num}")
+
+def persona_headline_hook(persona_num: int, lang: str) -> str:
+    lang_key = "HI" if lang == "HI" else "EN"
+    angle_key = persona_headline_angle_key(persona_num)
+    hooks = PERSONA_HEADLINE_HOOKS.get(lang_key, PERSONA_HEADLINE_HOOKS["EN"])
+    return hooks.get(angle_key, "for steadier follow-through" if lang_key == "EN" else "steadier follow-through के लिए")
+
+
+def normalize_copy_signature(text: str) -> str:
+    cleaned = re.sub(r"[^0-9A-Za-z\u0900-\u097F]+", " ", (text or "").casefold())
+    stopwords = {
+        "a",
+        "an",
+        "and",
+        "are",
+        "as",
+        "at",
+        "be",
+        "been",
+        "but",
+        "by",
+        "can",
+        "could",
+        "did",
+        "do",
+        "does",
+        "for",
+        "from",
+        "had",
+        "has",
+        "have",
+        "how",
+        "i",
+        "if",
+        "in",
+        "into",
+        "is",
+        "it",
+        "its",
+        "just",
+        "may",
+        "me",
+        "more",
+        "my",
+        "no",
+        "not",
+        "of",
+        "on",
+        "or",
+        "our",
+        "out",
+        "so",
+        "than",
+        "that",
+        "the",
+        "their",
+        "this",
+        "to",
+        "too",
+        "up",
+        "was",
+        "we",
+        "what",
+        "when",
+        "where",
+        "which",
+        "who",
+        "why",
+        "with",
+        "would",
+        "you",
+        "your",
+    }
+    tokens = [token for token in cleaned.split() if token and token not in stopwords]
+    return " ".join(tokens[:10])
+
+
+def copy_too_similar(candidate: str, seen_signatures: set[str]) -> bool:
+    signature = normalize_copy_signature(candidate)
+    if not signature:
+        return False
+    if signature in seen_signatures:
+        return True
+    candidate_tokens = set(signature.split())
+    if not candidate_tokens:
+        return False
+    for existing in seen_signatures:
+        existing_tokens = set(existing.split())
+        if not existing_tokens:
+            continue
+        overlap = len(candidate_tokens & existing_tokens) / max(len(candidate_tokens | existing_tokens), 1)
+        if overlap >= 0.66:
+            return True
+    return False
+
+
+def pick_diverse_copy(candidates: list[str], banned: set[str], fallback: str, seen_signatures: set[str]) -> str:
+    normalized = [" ".join((candidate or "").split()).strip() for candidate in candidates]
+    for candidate in normalized:
+        if not candidate or candidate in banned:
+            continue
+        if not copy_too_similar(candidate, seen_signatures):
+            seen_signatures.add(normalize_copy_signature(candidate))
+            return candidate
+    for candidate in normalized:
+        if candidate and not copy_too_similar(candidate, seen_signatures):
+            seen_signatures.add(normalize_copy_signature(candidate))
+            return candidate
+    fallback_clean = " ".join((fallback or "").split()).strip()
+    if fallback_clean:
+        seen_signatures.add(normalize_copy_signature(fallback_clean))
+    return fallback_clean
+
 
 def build_persona_payload(persona_number: int, personas: list[dict[str, Any]]) -> dict[str, Any]:
     persona_name = f"Persona {persona_number}"
@@ -149,6 +340,9 @@ def build_persona_payload(persona_number: int, personas: list[dict[str, Any]]) -
         "trust_anchors": [proof],
         "english_ready": [f"Tone cue: {tone}"],
         "hindi_ready": ["टोन संकेत: सरल, भरोसेमंद, व्यावहारिक"],
+        "headline_angle_key": persona_headline_angle_key(persona_number),
+        "headline_hook_en": persona_headline_hook(persona_number, "EN"),
+        "headline_hook_hi": persona_headline_hook(persona_number, "HI"),
     }
 
 
@@ -415,6 +609,30 @@ def choose_text(items: list[str], fallback: str) -> str:
     return fallback
 
 
+def used_text_bucket(context: dict[str, Any], bucket: str) -> set[str]:
+    banlist = context.get("banlist") if isinstance(context, dict) else {}
+    buckets = banlist.get("buckets") if isinstance(banlist, dict) else {}
+    values = buckets.get(bucket) if isinstance(buckets, dict) else []
+    if not isinstance(values, list):
+        return set()
+    return {str(item).strip() for item in values if isinstance(item, str) and item.strip()}
+
+
+def pick_unused_copy(candidates: list[str], banned: set[str], fallback: str) -> str:
+    for candidate in candidates:
+        clean = " ".join((candidate or "").split()).strip()
+        if clean and clean not in banned:
+            return clean
+    return " ".join((fallback or "").split()).strip()
+
+
+def add_used_text_bucket(bucket: set[str], values: list[str]) -> None:
+    for value in values:
+        clean = " ".join((value or "").split()).strip()
+        if clean:
+            bucket.add(clean)
+
+
 def shorten_copy_line(text: str, limit: int = 92) -> str:
     _ = limit
     return " ".join((text or "").split()).strip()
@@ -480,6 +698,83 @@ def strip_internal_markers_from_payload(payload: dict[str, Any]) -> dict[str, An
                         cleaned_bullets.append(value)
                 block["bullets"] = cleaned_bullets
     return payload
+
+
+def coerce_generated_copy_schema(payload: dict[str, Any], context: dict[str, Any]) -> dict[str, Any]:
+    ads = payload.get("ads")
+    if not isinstance(ads, list):
+        return payload
+
+    default_ratio = str(payload.get("default_aspect_ratio") or "").strip()
+    if default_ratio not in {"4:5", "9:16"}:
+        payload["default_aspect_ratio"] = "4:5"
+    else:
+        payload["default_aspect_ratio"] = default_ratio
+
+    for ad in ads:
+        if not isinstance(ad, dict):
+            continue
+        aspect_ratio = str(ad.get("aspect_ratio") or "").strip()
+        if aspect_ratio and aspect_ratio not in {"4:5", "9:16"}:
+            ad["aspect_ratio"] = payload["default_aspect_ratio"]
+        persona = ad.get("persona")
+        if not isinstance(persona, dict):
+            continue
+        if not isinstance(persona.get("number"), int):
+            val = persona.get("persona_number")
+            if isinstance(val, int):
+                persona["number"] = val
+            elif isinstance(val, str) and val.strip().isdigit():
+                persona["number"] = int(val.strip())
+        if not isinstance(persona.get("name"), str) or not persona.get("name", "").strip():
+            name = persona.get("persona_name")
+            if isinstance(name, str) and name.strip():
+                persona["name"] = name.strip()
+
+        pain_points = persona.get("pain_points") if isinstance(persona.get("pain_points"), list) else []
+        objections = persona.get("objections") if isinstance(persona.get("objections"), list) else []
+        core_message = persona.get("core_message") if isinstance(persona.get("core_message"), list) else []
+        trust_anchors = persona.get("trust_anchors") if isinstance(persona.get("trust_anchors"), list) else []
+        hindi_ready = persona.get("hindi_ready") if isinstance(persona.get("hindi_ready"), list) else []
+        english_ready = persona.get("english_ready") if isinstance(persona.get("english_ready"), list) else []
+
+        if not _clean_str(persona.get("pain_en")):
+            persona["pain_en"] = choose_text(pain_points, "Daily routine feels heavy and hard to sustain.")
+        if not _clean_str(persona.get("desire_en")):
+            persona["desire_en"] = choose_text(core_message, "A practical routine that feels easy to follow.")
+        if not _clean_str(persona.get("friction_en")):
+            persona["friction_en"] = choose_text(objections, "Past plans felt too strict and difficult to maintain.")
+        if not _clean_str(persona.get("proof_needed_en")):
+            persona["proof_needed_en"] = choose_text(trust_anchors, "Needs clear structure and believable support.")
+        if not _clean_str(persona.get("tone_cue_en")):
+            tone_en = choose_text(english_ready, "Tone cue: practical and confidence-building")
+            persona["tone_cue_en"] = re.sub(r"^\s*Tone\s+cue\s*:\s*", "", tone_en, flags=re.IGNORECASE).strip() or "practical and confidence-building"
+
+        if not _clean_str(persona.get("pain_hi")):
+            persona["pain_hi"] = choose_text(hindi_ready, "रूटीन निभाना मुश्किल लग रहा है।")
+        if not _clean_str(persona.get("desire_hi")):
+            persona["desire_hi"] = "ऐसा आसान सिस्टम जो रोज निभ सके।"
+        if not _clean_str(persona.get("friction_hi")):
+            persona["friction_hi"] = "पहले के प्लान बहुत सख्त और मुश्किल थे।"
+        if not _clean_str(persona.get("proof_needed_hi")):
+            persona["proof_needed_hi"] = "साफ तरीका, भरोसेमंद सपोर्ट और व्यावहारिक प्रूफ चाहिए।"
+        if not _clean_str(persona.get("tone_cue_hi")):
+            persona["tone_cue_hi"] = "सरल, भरोसेमंद, और व्यावहारिक"
+
+    return payload
+
+
+def validate_llm_copy_payload(payload: dict[str, Any], context: dict[str, Any]) -> str | None:
+    ads = payload.get("ads")
+    if not isinstance(ads, list) or not ads:
+        return "LLM copy payload is missing a non-empty ads array."
+    expected_ads = context.get("ads") if isinstance(context, dict) else None
+    if isinstance(expected_ads, list) and len(expected_ads) != len(ads):
+        return f"LLM copy payload returned {len(ads)} ads; expected {len(expected_ads)}."
+    default_ratio = str(payload.get("default_aspect_ratio") or "").strip()
+    if default_ratio not in {"4:5", "9:16"}:
+        return "LLM copy payload has invalid default_aspect_ratio (must be 4:5 or 9:16)."
+    return None
 
 
 def parse_uniqueness_collisions(error_text: str) -> list[dict[str, Any]]:
@@ -584,6 +879,7 @@ def call_opencode_repair_copy(
             "Only change collided fields",
             "Do not use generic repeated support lines",
             "Do not add internal tags or IDs",
+            "Do not mention persona names or persona labels verbatim in headline, support_line, trust_line, or bullets",
         ],
         "collisions": collisions,
         "current_copy": current_copy,
@@ -594,17 +890,21 @@ def call_opencode_repair_copy(
         "Return only corrected JSON object with keys default_aspect_ratio and ads.\n\n"
         + json.dumps(payload, ensure_ascii=False)
     )
+    prompt_path = run_dir / "context" / "opencode_repair_prompt.txt"
+    prompt_path.write_text(prompt, encoding="utf-8")
 
     cmd = [
         "opencode",
         "run",
+        "Read the attached repair payload and return corrected JSON only.",
         "--attach",
         api_url,
         "--model",
         model,
         "--format",
         "json",
-        prompt,
+        "--file",
+        str(prompt_path),
     ]
     password = (config.get("opencode_api_key") or "").strip() or os.getenv("OPENCODE_SERVER_PASSWORD", "").strip()
     if password:
@@ -638,6 +938,24 @@ def _clean_bullets(value: Any) -> list[str]:
         if isinstance(item, str) and item.strip():
             out.append(item.strip())
     return out
+
+
+def persona_label(persona_name: str) -> str:
+    base = (persona_name or "").split("(", 1)[0].strip()
+    return base or "This routine"
+
+
+def mentions_persona_label(text: str, persona_name: str) -> bool:
+    clean_text = _clean_str(text)
+    clean_name = _clean_str(persona_name)
+    if not clean_text or not clean_name:
+        return False
+    candidates = {clean_name.casefold()}
+    base_name = persona_label(clean_name)
+    if base_name:
+        candidates.add(base_name.casefold())
+    text_folded = clean_text.casefold()
+    return any(candidate and candidate in text_folded for candidate in candidates)
 
 
 def ensure_testimonial_headline(headline: str, lang: str, persona: dict[str, Any]) -> str:
@@ -737,6 +1055,9 @@ def normalize_generated_copy(
     ads_generated = generated.get("ads") if isinstance(generated, dict) else None
     candidates = ads_generated if isinstance(ads_generated, list) else []
     used_indices: set[int] = set()
+    default_ratio = str(generated.get("default_aspect_ratio") or "").strip() if isinstance(generated, dict) else ""
+    if default_ratio in {"4:5", "9:16"}:
+        base["default_aspect_ratio"] = default_ratio
 
     def pick_candidate(fmt: str, persona_num: int, persona_name: str) -> dict[str, Any] | None:
         for idx, cand in enumerate(candidates):
@@ -769,7 +1090,13 @@ def normalize_generated_copy(
         if not candidate:
             continue
 
+        aspect_ratio = _clean_str(candidate.get("aspect_ratio"))
+        if aspect_ratio in {"4:5", "9:16"}:
+            ad["aspect_ratio"] = aspect_ratio
+
         angle = _clean_str(candidate.get("headline_angle"))
+        if not angle or angle.lower() == "mechanism":
+            angle = persona_headline_angle_key(persona_num)
         if angle:
             ad["headline_angle"] = angle
 
@@ -780,7 +1107,7 @@ def normalize_generated_copy(
 
             headline = _clean_str(src_lang.get("headline"))
             cta = _clean_str(src_lang.get("cta"))
-            if headline:
+            if headline and not mentions_persona_label(headline, persona_name):
                 base_lang["headline"] = shorten_copy_line(headline, limit=90)
             if cta:
                 base_lang["cta"] = cta
@@ -797,17 +1124,19 @@ def normalize_generated_copy(
 
             if fmt in {"HERO", "UGC"}:
                 support = _clean_str(src_lang.get("support_line"))
-                if support:
+                if support and not mentions_persona_label(support, persona_name):
                     base_lang["support_line"] = shorten_copy_line(support)
             elif fmt in {"BA", "FEAT"}:
                 bullets = _clean_bullets(src_lang.get("bullets"))
                 if len(bullets) >= 2:
                     if fmt == "BA":
                         bullets = [strip_ba_panel_label(b) for b in bullets]
-                    base_lang["bullets"] = [shorten_copy_line(b, limit=88) for b in bullets]
+                    filtered_bullets = [b for b in bullets if not mentions_persona_label(b, persona_name)]
+                    if len(filtered_bullets) >= 2:
+                        base_lang["bullets"] = [shorten_copy_line(b, limit=88) for b in filtered_bullets]
             else:
                 trust = _clean_str(src_lang.get("trust_line"))
-                if trust:
+                if trust and not mentions_persona_label(trust, persona_name):
                     base_lang["trust_line"] = shorten_copy_line(trust)
 
     return base
@@ -815,13 +1144,25 @@ def normalize_generated_copy(
 
 def build_template_copy(context: dict[str, Any], run_id: str) -> dict[str, Any]:
     ads: list[dict[str, Any]] = []
-    token = run_id[-4:]
+    headline_en_banned = set(used_text_bucket(context, "headline_en"))
+    headline_hi_banned = set(used_text_bucket(context, "headline_hi"))
+    support_en_banned = set(used_text_bucket(context, "support_line_en"))
+    support_hi_banned = set(used_text_bucket(context, "support_line_hi"))
+    cta_en_banned = set(used_text_bucket(context, "cta_en"))
+    cta_hi_banned = set(used_text_bucket(context, "cta_hi"))
+    bullets_en_banned = set(used_text_bucket(context, "bullets_en"))
+    bullets_hi_banned = set(used_text_bucket(context, "bullets_hi"))
+    headline_en_seen: set[str] = set()
+    headline_hi_seen: set[str] = set()
+    support_en_seen: set[str] = set()
+    support_hi_seen: set[str] = set()
+    bullets_en_seen: set[str] = set()
+    bullets_hi_seen: set[str] = set()
     for idx, item in enumerate(context["ads"], start=1):
         persona = item["persona"]
         fmt = item["format"]
         persona_num = int(persona["persona_number"])
         persona_name = persona["persona_name"]
-        unique = f"{token}-{idx:02d}-{fmt.lower()}"
 
         pain_en = choose_text(persona.get("pain_points", []), f"Daily routine feels heavy and hard to sustain for persona {persona_num}.")
         desire_en = choose_text(persona.get("core_message", []), "A practical routine that feels easy to follow.")
@@ -835,68 +1176,296 @@ def build_template_copy(context: dict[str, Any], run_id: str) -> dict[str, Any]:
         proof_hi = "साफ तरीका, भरोसेमंद सपोर्ट और व्यावहारिक प्रूफ चाहिए।"
         tone_hi = "सरल, भरोसेमंद, और व्यावहारिक"
 
-        if fmt == "BA":
-            headline_en = f"From \"nothing works\" to visible 15-day weight-loss progress {unique}."
-            headline_hi = f"\"कुछ काम नहीं करता\" से 15 दिन में दिखने वाली वजन घटाने की प्रगति तक {unique}।"
-        else:
-            headline_en = f"{persona_name}: start your 15-day obesity and weight-loss routine {unique}."
-            headline_hi = f"{persona_name}: आज से 15-दिन का obesity और वजन घटाने का रूटीन शुरू करें {unique}।"
-        cta_en = f"Start Now {unique}"
-        cta_hi = f"अभी शुरू करें {unique}"
+        hero_hook_en = persona_headline_hook(persona_num, "EN")
+        hero_hook_hi = persona_headline_hook(persona_num, "HI")
+        hero_ugc_headline_en = pick_diverse_copy(
+            [
+                f"{hero_hook_en.capitalize()}, weight-loss support feels easier.",
+                f"{hero_hook_en.capitalize()}, this 15-day routine feels more manageable.",
+                f"{hero_hook_en.capitalize()}, this plan keeps weight-loss support practical.",
+            ],
+            headline_en_banned,
+            f"{hero_hook_en.capitalize()}, weight-loss support feels easier.",
+            headline_en_seen,
+        )
+        hero_ugc_headline_hi = pick_diverse_copy(
+            [
+                f"{hero_hook_hi.capitalize()}, वजन घटाने का support आसान लगता है।",
+                f"{hero_hook_hi.capitalize()}, यह 15 दिन का routine ज्यादा manageable लगता है।",
+                f"{hero_hook_hi.capitalize()}, यह plan वजन घटाने के support को practical बनाता है।",
+            ],
+            headline_hi_banned,
+            f"{hero_hook_hi.capitalize()}, वजन घटाने का support आसान लगता है।",
+            headline_hi_seen,
+        )
+        hero_ugc_support_en = pick_diverse_copy(
+            [
+                f"Built for {hero_hook_en}; appetite control and digestion support stay easy to follow.",
+                f"A calmer way to keep weight-loss follow-through steady {hero_hook_en}.",
+                f"Practical support for daily consistency {hero_hook_en}, without harsh pressure.",
+            ],
+            support_en_banned,
+            f"Practical support for daily consistency {hero_hook_en}.",
+            support_en_seen,
+        )
+        hero_ugc_support_hi = pick_diverse_copy(
+            [
+                f"{hero_hook_hi} के लिए बनाया गया; appetite control और digestion support follow करना आसान रखते हैं।",
+                f"{hero_hook_hi} में weight-loss follow-through steady रखने का calmer तरीका।",
+                f"{hero_hook_hi} में daily consistency के लिए practical support, बिना harsh pressure के।",
+            ],
+            support_hi_banned,
+            f"{hero_hook_hi} के लिए practical support।",
+            support_hi_seen,
+        )
+
+        ba_hook_en = persona_headline_hook(persona_num, "EN")
+        ba_hook_hi = persona_headline_hook(persona_num, "HI")
+        ba_headline_en = pick_diverse_copy(
+            [
+                f"From {pain_en.rstrip('.')} to steadier weight-loss progress {ba_hook_en}.",
+                f"{ba_hook_en.capitalize()}, this routine turns friction into clearer weight-loss movement.",
+                f"Less struggle, more structure {ba_hook_en} for practical weight-loss follow-through.",
+            ],
+            headline_en_banned,
+            f"From {pain_en.rstrip('.')} to steadier weight-loss progress {ba_hook_en}.",
+            headline_en_seen,
+        )
+        ba_headline_hi = pick_diverse_copy(
+            [
+                f"{pain_hi.rstrip('।')} से {ba_hook_hi} वाली steadier weight-loss progress तक।",
+                f"{ba_hook_hi.capitalize()}, यह routine friction को साफ weight-loss movement में बदलता है।",
+                f"कम struggle, ज्यादा structure {ba_hook_hi} के साथ practical weight-loss follow-through।",
+            ],
+            headline_hi_banned,
+            f"{pain_hi.rstrip('।')} से {ba_hook_hi} वाली steadier weight-loss progress तक।",
+            headline_hi_seen,
+        )
+
+        test_hook_en = persona_headline_hook(persona_num, "EN")
+        test_hook_hi = persona_headline_hook(persona_num, "HI")
+        test_headline_en = pick_diverse_copy(
+            [
+                f'"{test_hook_en.capitalize()}, this finally felt manageable for weight loss."',
+                f'"{test_hook_en.capitalize()}, I could actually stick with this weight-loss routine."',
+                f'"{test_hook_en.capitalize()}, I finally found practical weight-loss support."',
+            ],
+            headline_en_banned,
+            f'"{test_hook_en.capitalize()}, this finally felt manageable for weight loss."',
+            headline_en_seen,
+        )
+        test_headline_hi = pick_diverse_copy(
+            [
+                f'"{test_hook_hi.capitalize()}, यह weight-loss routine आखिर manageable लगा।"',
+                f'"{test_hook_hi.capitalize()}, मैं इस weight-loss routine को जारी रख सका।"',
+                f'"{test_hook_hi.capitalize()}, मुझे practical weight-loss support आखिर मिला।"',
+            ],
+            headline_hi_banned,
+            f'"{test_hook_hi.capitalize()}, यह weight-loss routine आखिर manageable लगा।"',
+            headline_hi_seen,
+        )
+
+        feat_hook_en = persona_headline_hook(persona_num, "EN")
+        feat_hook_hi = persona_headline_hook(persona_num, "HI")
+        feat_headline_en = pick_diverse_copy(
+            [
+                f"What changes {feat_hook_en} with this 15-day weight-loss system?",
+                f"Why this weight-loss system feels easier {feat_hook_en}.",
+                f"How this 15-day system supports steadier follow-through {feat_hook_en}.",
+            ],
+            headline_en_banned,
+            f"What changes {feat_hook_en} with this 15-day weight-loss system?",
+            headline_en_seen,
+        )
+        feat_headline_hi = pick_diverse_copy(
+            [
+                f"{feat_hook_hi} में यह 15-दिन weight-loss system क्या बदलता है?",
+                f"{feat_hook_hi} में यह weight-loss system ज्यादा आसान क्यों लगता है?",
+                f"{feat_hook_hi} में यह 15-दिन system steadier follow-through कैसे support करता है?",
+            ],
+            headline_hi_banned,
+            f"{feat_hook_hi} में यह 15-दिन weight-loss system क्या बदलता है?",
+            headline_hi_seen,
+        )
+        feat_headline_en = pick_diverse_copy(
+            [
+                f"What changes {feat_hook_en} with this 15-day weight-loss system?",
+                f"Why this weight-loss system feels easier {feat_hook_en}.",
+                f"How this 15-day system supports steadier follow-through {feat_hook_en}.",
+            ],
+            headline_en_banned,
+            f"What changes {feat_hook_en} with this 15-day weight-loss system?",
+            headline_en_seen,
+        )
+        feat_headline_hi = pick_diverse_copy(
+            [
+                f"{feat_hook_hi} में यह 15-दिन weight-loss system क्या बदलता है?",
+                f"{feat_hook_hi} में यह weight-loss system ज्यादा आसान क्यों लगता है?",
+                f"{feat_hook_hi} में यह 15-दिन system steadier follow-through कैसे support करता है?",
+            ],
+            headline_hi_banned,
+            f"{feat_hook_hi} में यह 15-दिन weight-loss system क्या बदलता है?",
+            headline_hi_seen,
+        )
+
+        bullets_en = [
+            pick_diverse_copy(
+                [
+                    f"Morning OK Liquid supports appetite control {feat_hook_en}.",
+                    f"Morning OK Liquid keeps cravings easier to manage {feat_hook_en}.",
+                    f"The AM step gives the day a simpler weight-loss start {feat_hook_en}.",
+                ],
+                bullets_en_banned,
+                f"Morning OK Liquid supports appetite control {feat_hook_en}.",
+                bullets_en_seen,
+            ),
+            pick_diverse_copy(
+                [
+                    f"Night Tablet and Powder support digestion and routine follow-through {feat_hook_en}.",
+                    f"Night support helps the plan feel lighter and easier to continue {feat_hook_en}.",
+                    f"The PM step keeps digestion support and routine consistency together {feat_hook_en}.",
+                ],
+                bullets_en_banned,
+                f"Night Tablet and Powder support digestion and routine follow-through {feat_hook_en}.",
+                bullets_en_seen,
+            ),
+            pick_diverse_copy(
+                [
+                    f"The full 15-day system keeps weight-loss support practical, repeatable, and less overwhelming {feat_hook_en}.",
+                    f"This 15-day system keeps the routine simple enough to repeat {feat_hook_en}.",
+                    f"Clear structure makes steady follow-through feel more realistic {feat_hook_en}.",
+                ],
+                bullets_en_banned,
+                f"The full 15-day system keeps weight-loss support practical, repeatable, and less overwhelming {feat_hook_en}.",
+                bullets_en_seen,
+            ),
+        ]
+        bullets_hi = [
+            pick_diverse_copy(
+                [
+                    f"Morning OK Liquid appetite control को {feat_hook_hi} में support करता है।",
+                    f"Morning OK Liquid cravings को {feat_hook_hi} में manage करना आसान बनाता है।",
+                    f"AM step दिन की weight-loss शुरुआत को सरल बनाता है {feat_hook_hi} में।",
+                ],
+                bullets_hi_banned,
+                f"Morning OK Liquid appetite control को {feat_hook_hi} में support करता है।",
+                bullets_hi_seen,
+            ),
+            pick_diverse_copy(
+                [
+                    f"Night Tablet और Powder digestion और routine follow-through को {feat_hook_hi} में support करते हैं।",
+                    f"Night support plan को हल्का और जारी रखने योग्य बनाता है {feat_hook_hi} में।",
+                    f"PM step digestion support और routine consistency को साथ रखता है {feat_hook_hi} में।",
+                ],
+                bullets_hi_banned,
+                f"Night Tablet और Powder digestion और routine follow-through को {feat_hook_hi} में support करते हैं।",
+                bullets_hi_seen,
+            ),
+            pick_diverse_copy(
+                [
+                    f"पूरा 15-दिन system weight-loss support को practical, repeatable, और कम overwhelming रखता है {feat_hook_hi} में।",
+                    f"यह 15-दिन system routine को इतना simple रखता है कि उसे repeat करना आसान हो {feat_hook_hi} में।",
+                    f"Clear structure steady follow-through को ज्यादा realistic बनाता है {feat_hook_hi} में।",
+                ],
+                bullets_hi_banned,
+                f"पूरा 15-दिन system weight-loss support को practical, repeatable, और कम overwhelming रखता है {feat_hook_hi} में।",
+                bullets_hi_seen,
+            ),
+        ]
+
+        cta_en = pick_unused_copy(["See The Steps", "Know The Routine", "Understand The Plan", "Start My Plan"], cta_en_banned, "See The Plan")
+        cta_hi = pick_unused_copy(["स्टेप्स देखें", "रूटीन जानें", "प्लान समझें", "मेरा प्लान शुरू करें"], cta_hi_banned, "प्लान देखें")
+        test_trust_line_en = pick_diverse_copy(
+            [
+                f"Structured support for {test_hook_en}; clearer weight-loss follow-through without harsh pressure.",
+                f"Practical appetite and digestion support {test_hook_en} for steadier weight-loss progress.",
+                f"Built to feel safer, simpler, and easier to continue {test_hook_en}.",
+            ],
+            support_en_banned,
+            f"Structured support for visible weight-loss progress and steadier follow-through {test_hook_en}.",
+            support_en_seen,
+        )
+        test_trust_line_hi = pick_diverse_copy(
+            [
+                f"{test_hook_hi} के लिए structured support; ज़्यादा clear weight-loss follow-through, बिना harsh pressure के।",
+                f"{test_hook_hi} में practical appetite और digestion support steadier weight-loss progress के लिए।",
+                f"{test_hook_hi} में इसे safer, simpler, और easy to continue बनाने के लिए।",
+            ],
+            support_hi_banned,
+            f"{test_hook_hi} के लिए structured support; clearer weight-loss follow-through.",
+            support_hi_seen,
+        )
 
         copy_en: dict[str, Any]
         copy_hi: dict[str, Any]
         if fmt in {"HERO", "UGC"}:
-            support_en = f"Helps reduce cravings and supports digestion so excess-weight reduction feels practical {unique}."
-            support_hi = f"यह cravings कम करने और पाचन सपोर्ट से अतिरिक्त वजन घटाने को व्यावहारिक बनाता है {unique}।"
-            copy_en = {"headline": headline_en, "support_line": support_en, "cta": cta_en}
-            copy_hi = {"headline": headline_hi, "support_line": support_hi, "cta": cta_hi}
+            copy_en = {"headline": hero_ugc_headline_en, "support_line": hero_ugc_support_en, "cta": cta_en}
+            copy_hi = {"headline": hero_ugc_headline_hi, "support_line": hero_ugc_support_hi, "cta": cta_hi}
+            add_used_text_bucket(headline_en_banned, [hero_ugc_headline_en])
+            add_used_text_bucket(headline_hi_banned, [hero_ugc_headline_hi])
+            add_used_text_bucket(support_en_banned, [hero_ugc_support_en])
+            add_used_text_bucket(support_hi_banned, [hero_ugc_support_hi])
         elif fmt == "BA":
             bullets_en = [
-                f"Evening cravings and unplanned snacking keep weight-loss efforts stuck {unique}.",
-                f"Mornings start heavy, so the obesity routine feels hard to repeat {unique}.",
-                f"Morning-liquid + night-support structure gives better appetite control for weight loss {unique}.",
-                f"Day-by-day consistency builds visible 15-day obesity-management momentum {unique}.",
+                pick_unused_copy([f"{pain_en.rstrip('.')} so weight-loss efforts keep feeling stuck.", "Cravings and uneven eating keep weight-loss progress from moving."], bullets_en_banned, f"{pain_en.rstrip('.')} and progress keeps stalling."),
+                pick_unused_copy([f"{friction_en.rstrip('.')} so safer weight-loss routines feel hard to trust.", "Harsh methods make steady weight-loss follow-through harder to maintain."], bullets_en_banned, f"{friction_en.rstrip('.')} and consistency drops."),
+                pick_unused_copy(["Morning appetite support and night digestion support make weight loss easier to follow.", "The AM-PM structure supports appetite control and steadier weight-loss adherence."], bullets_en_banned, "The two-step structure supports steadier weight-loss follow-through."),
+                pick_unused_copy(["That day-by-day follow-through supports visible 15-day weight-loss progress.", "Better routine adherence makes visible 15-day weight-loss movement more believable."], bullets_en_banned, "Steadier follow-through supports visible 15-day weight-loss progress."),
             ]
             bullets_hi = [
-                f"शाम की cravings और बिना प्लान स्नैकिंग से वजन घटाने की कोशिश अटक जाती है {unique}।",
-                f"सुबह भारी लगती है, इसलिए obesity रूटीन दोहराना मुश्किल होता है {unique}।",
-                f"सुबह-liquid और रात-support की संरचना से वजन घटाने के लिए appetite control बेहतर होता है {unique}।",
-                f"रोज की consistency से 15 दिन में obesity management की दिखने वाली momentum बनती है {unique}।",
+                pick_unused_copy(["शाम की cravings और असमान eating pattern से weight-loss progress अटकती है।", "वजन घटाने की कोशिश pain point के कारण बार-बार रुकती है।"], bullets_hi_banned, "cravings और uneven eating से weight-loss progress अटकती है।"),
+                pick_unused_copy(["harsh methods का डर safer weight-loss routine पर भरोसा कम करता है।", "कठिन तरीके consistency और trust दोनों को कमजोर करते हैं।"], bullets_hi_banned, "harsh method का डर consistency घटाता है।"),
+                pick_unused_copy(["सुबह appetite support और रात digestion support से weight loss निभाना आसान होता है।", "AM-PM structure weight-loss adherence को ज्यादा steady बनाता है।"], bullets_hi_banned, "दो-स्टेप structure weight-loss follow-through को steady बनाता है।"),
+                pick_unused_copy(["यही follow-through 15 दिन की visible weight-loss progress को support करता है।", "बेहतर routine adherence से 15 दिन की weight-loss movement ज्यादा believable लगती है।"], bullets_hi_banned, "steady follow-through 15 दिन की visible weight-loss progress को support करता है।"),
             ]
-            copy_en = {"headline": headline_en, "bullets": bullets_en, "cta": cta_en}
-            copy_hi = {"headline": headline_hi, "bullets": bullets_hi, "cta": cta_hi}
+            copy_en = {"headline": ba_headline_en, "bullets": bullets_en, "cta": cta_en}
+            copy_hi = {"headline": ba_headline_hi, "bullets": bullets_hi, "cta": cta_hi}
+            add_used_text_bucket(headline_en_banned, [ba_headline_en])
+            add_used_text_bucket(headline_hi_banned, [ba_headline_hi])
+            add_used_text_bucket(bullets_en_banned, bullets_en)
+            add_used_text_bucket(bullets_hi_banned, bullets_hi)
         elif fmt == "FEAT":
             bullets_en = [
-                f"Morning OK Liquid helps reduce hunger and random snacking for weight loss {unique}.",
-                f"Night Tablet + Powder support digestion and lighter mornings in obesity routine {unique}.",
-                f"Built for visible 15-day weight-loss support without crash-diet pressure {unique}.",
+                pick_unused_copy(["Morning OK Liquid supports fullness and fewer cravings for weight loss.", "OK Liquid helps reduce random eating pressure so weight loss feels more manageable."], bullets_en_banned, "OK Liquid supports appetite control for weight loss."),
+                pick_unused_copy(["Night Tablet and Powder support digestion and gut comfort for steadier follow-through.", "Tablet plus Powder support lighter digestion so the routine feels easier to continue."], bullets_en_banned, "Night support helps digestion and routine follow-through."),
+                pick_unused_copy(["The full 15-day system is built for visible weight-loss support without harsh pressure.", "This structured plan supports visible weight-loss progress without crash-diet intensity."], bullets_en_banned, "This 15-day system supports visible weight-loss progress."),
             ]
             bullets_hi = [
-                f"सुबह का OK Liquid वजन घटाने के लिए भूख और स्नैकिंग कम करने में सहायक है {unique}।",
-                f"रात का Tablet + Powder obesity रूटीन में पाचन और हल्की सुबह के लिए सपोर्ट देता है {unique}।",
-                f"crash diet दबाव के बिना 15 दिन की visible weight-loss support के लिए बनाया गया {unique}।",
+                pick_unused_copy(["सुबह का OK Liquid fullness और कम cravings के साथ weight loss support देता है।", "OK Liquid random eating pressure घटाकर weight loss को ज्यादा manageable बनाता है।"], bullets_hi_banned, "OK Liquid weight loss के लिए appetite control support देता है।"),
+                pick_unused_copy(["रात का Tablet और Powder digestion और gut comfort के साथ better follow-through support देते हैं।", "Tablet plus Powder पाचन को हल्का रखकर routine जारी रखना आसान बनाते हैं।"], bullets_hi_banned, "रात का support digestion और routine follow-through में मदद करता है।"),
+                pick_unused_copy(["पूरा 15-दिन system harsh pressure के बिना visible weight-loss support के लिए बना है।", "यह structured plan crash-diet intensity के बिना visible weight-loss progress support करता है।"], bullets_hi_banned, "यह 15-दिन system visible weight-loss progress support करता है।"),
             ]
-            copy_en = {"headline": headline_en, "bullets": bullets_en, "cta": cta_en}
-            copy_hi = {"headline": headline_hi, "bullets": bullets_hi, "cta": cta_hi}
+            copy_en = {"headline": feat_headline_en, "bullets": bullets_en, "cta": cta_en}
+            copy_hi = {"headline": feat_headline_hi, "bullets": bullets_hi, "cta": cta_hi}
+            add_used_text_bucket(headline_en_banned, [feat_headline_en])
+            add_used_text_bucket(headline_hi_banned, [feat_headline_hi])
+            add_used_text_bucket(bullets_en_banned, bullets_en)
+            add_used_text_bucket(bullets_hi_banned, bullets_hi)
         else:
             copy_en = {
-                "headline": headline_en,
-                "attribution": "Doctor-formulated Ayurvedic obesity and weight-loss protocol",
-                "trust_line": f"Structured morning-night steps for visible weight-loss progress and obesity control {unique}.",
+                "headline": test_headline_en,
+                "attribution": "Doctor-formulated Ayurvedic weight-loss protocol",
+                "trust_line": test_trust_line_en,
                 "cta": cta_en,
             }
             copy_hi = {
-                "headline": headline_hi,
+                "headline": test_headline_hi,
                 "attribution": "डॉक्टर-फॉर्मुलेटेड आयुर्वेदिक obesity और weight-loss प्रोटोकॉल",
-                "trust_line": f"सुबह-रात के स्पष्ट स्टेप्स से visible वजन घटाने और obesity नियंत्रण का भरोसेमंद सपोर्ट {unique}।",
+                "trust_line": test_trust_line_hi,
                 "cta": cta_hi,
             }
+            add_used_text_bucket(headline_en_banned, [test_headline_en])
+            add_used_text_bucket(headline_hi_banned, [test_headline_hi])
+            add_used_text_bucket(support_en_banned, [copy_en["trust_line"]])
+            add_used_text_bucket(support_hi_banned, [copy_hi["trust_line"]])
+
+        add_used_text_bucket(cta_en_banned, [cta_en])
+        add_used_text_bucket(cta_hi_banned, [cta_hi])
 
         ads.append(
             {
                 "format": fmt,
-                "headline_angle": "mechanism",
+                "headline_angle": persona_headline_angle_key(persona_num),
                 "persona": {
                     "number": persona_num,
                     "name": persona_name,
@@ -929,9 +1498,12 @@ def call_opencode_compatible(config: dict[str, Any], context: dict[str, Any], ru
     system = (
         "You generate ad copy JSON only. Return valid JSON with keys default_aspect_ratio and ads. "
         "Each ads item must include format, headline_angle, persona fields and copy.EN/copy.HI fields compatible with assembler. "
+        "Return exactly one ads item for each context.ads item, in the same order. Do not omit, merge, or reduce items. "
+        "Each persona object must use this exact schema: number, name, pain_en, desire_en, friction_en, proof_needed_en, tone_cue_en, pain_hi, desire_hi, friction_hi, proof_needed_hi, tone_cue_hi. "
         "Every ad unit must make the obesity and weight-loss intent obvious to a first-time viewer. "
         "At minimum, headline or support line must explicitly mention weight loss, obesity reduction, excess-weight reduction, or a direct 15-day result framing. "
         "Avoid abstract lines that hide the product goal. "
+        "Use persona fields only as targeting context; never mention the persona name or label verbatim in headline, support_line, trust_line, or bullets. "
         "Never include price in any on-image copy field (headline/support_line/trust_line/bullets/cta/attribution). "
         "Do not use currency symbols or words like INR, price, only, discount, off, MRP in on-image copy. "
         "For BA format, never prefix copy with BEFORE:/AFTER: labels (or Hindi equivalents). "
@@ -942,6 +1514,7 @@ def call_opencode_compatible(config: dict[str, Any], context: dict[str, Any], ru
         "If no real quote is provided in context, create one believable representative review line grounded in persona pain/desire and safe claims. "
         "Keep each format's core shape intact, but vary headline/support/trust framing using persona pain, desire, friction, proof needed, and tone cue. "
         "For the same format across runs, rotate variation lane and wording rhythm while preserving format-specific structure. "
+        "Use each persona's headline_angle_key and headline_hook values so personas in the same format land on clearly different angles, not just lightly reworded templates. "
         "Ensure obesity and weight-loss intent is obvious to someone who has never heard of the product."
     )
     user_payload = {
@@ -951,6 +1524,20 @@ def call_opencode_compatible(config: dict[str, Any], context: dict[str, Any], ru
             "language": ["EN", "HI"],
             "language_mode": language_mode,
             "formats": FORMATS,
+            "required_persona_schema": [
+                "number",
+                "name",
+                "pain_en",
+                "desire_en",
+                "friction_en",
+                "proof_needed_en",
+                "tone_cue_en",
+                "pain_hi",
+                "desire_hi",
+                "friction_hi",
+                "proof_needed_hi",
+                "tone_cue_hi"
+            ],
             "return_json_only": True,
         },
     }
@@ -970,17 +1557,21 @@ def call_opencode_compatible(config: dict[str, Any], context: dict[str, Any], ru
         f"{json.dumps(user_payload, ensure_ascii=False)}\n\n"
         "Return only valid JSON. No markdown. No extra text."
     )
+    prompt_path = run_dir / "context" / "opencode_generate_prompt.txt"
+    prompt_path.write_text(cli_prompt, encoding="utf-8")
 
     cli_cmd = [
         "opencode",
         "run",
+        "Read the attached generation payload and return valid JSON only.",
         "--attach",
         api_url,
         "--model",
         model,
         "--format",
         "json",
-        cli_prompt,
+        "--file",
+        str(prompt_path),
     ]
     cli_password = api_key or os.getenv("OPENCODE_SERVER_PASSWORD", "").strip()
     if cli_password:
@@ -2006,8 +2597,13 @@ async def api_run_execute(
     )
 
     copy_json = call_opencode_compatible(cfg, full_context, run_dir)
-    llm_mode = "opencode" if copy_json else "template"
-    copy_json = normalize_generated_copy(copy_json, full_context, run_id)
+    if copy_json is None:
+        raise HTTPException(status_code=500, detail="LLM generation failed: no parseable copy payload returned")
+    llm_mode = "opencode"
+    copy_json = coerce_generated_copy_schema(copy_json, full_context)
+    payload_error = validate_llm_copy_payload(copy_json, full_context)
+    if payload_error:
+        raise HTTPException(status_code=500, detail=payload_error)
     copy_json = strip_internal_markers_from_payload(copy_json)
 
     copy_file = run_dir / "context" / "copy_batch.json"
@@ -2032,7 +2628,10 @@ async def api_run_execute(
         if collisions:
             repaired = call_opencode_repair_copy(cfg, full_context, copy_json, collisions, run_dir)
             if repaired:
-                copy_json = normalize_generated_copy(repaired, full_context, run_id)
+                copy_json = coerce_generated_copy_schema(repaired, full_context)
+                payload_error = validate_llm_copy_payload(copy_json, full_context)
+                if payload_error:
+                    raise HTTPException(status_code=500, detail=payload_error)
                 copy_json = strip_internal_markers_from_payload(copy_json)
                 copy_file.write_text(json.dumps(copy_json, ensure_ascii=False, indent=2) + "\n", encoding="utf-8")
 
