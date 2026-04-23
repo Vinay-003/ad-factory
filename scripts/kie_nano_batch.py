@@ -17,6 +17,7 @@ import base64
 import json
 import os
 import re
+import subprocess
 import sys
 import time
 import urllib.parse
@@ -28,6 +29,12 @@ from typing import Iterable
 
 CREATE_TASK_URL = "https://api.kie.ai/api/v1/jobs/createTask"
 TASK_INFO_URL = "https://api.kie.ai/api/v1/jobs/recordInfo"
+DEFAULT_OPENCODE_API_URL = os.getenv("OPENCODE_API_URL", "http://127.0.0.1:4090")
+
+LEGACY_LOGO_INPUT_URLS = {
+    "https://res.cloudinary.com/dzhodklsr/image/upload/q_100,f_png/v1776194114/Untitled_design_1_qrtikg.png",
+    "https://res.cloudinary.com/dzhodklsr/image/upload/v1776892977/w9p3scte8vcefh4epoe7.jpg",
+}
 
 
 @dataclass
@@ -254,51 +261,172 @@ def conversion_lock_instruction(mode: str) -> str:
 """.strip()
 
 
-def choose_logo_variant(prompt_text: str) -> str:
-    dark_keywords = (
-        "dark",
-        "night",
-        "black",
-        "navy",
-        "deep",
-        "moody",
-        "dim",
-        "shadow",
-        "low light",
-        "low-light",
-    )
+def strip_ansi(text: str) -> str:
+    return re.sub(r"\x1B\[[0-?]*[ -/]*[@-~]", "", text)
+
+
+def parse_json_object_from_text(content: str) -> dict | None:
+    text = (content or "").strip()
+    if not text:
+        return None
+    try:
+        parsed = json.loads(text)
+        if isinstance(parsed, dict):
+            return parsed
+    except json.JSONDecodeError:
+        pass
+
+    decoder = json.JSONDecoder()
+    best: dict | None = None
+    best_span = -1
+    for match in re.finditer(r"\{", text):
+        start = match.start()
+        try:
+            parsed, end = decoder.raw_decode(text[start:])
+        except json.JSONDecodeError:
+            continue
+        if not isinstance(parsed, dict):
+            continue
+        if end > best_span:
+            best = parsed
+            best_span = end
+    return best
+
+
+def parse_opencode_json_output(stdout: str) -> dict | None:
+    chunks: list[str] = []
+    for raw_line in (stdout or "").splitlines():
+        line = raw_line.strip()
+        if not line:
+            continue
+        try:
+            event = json.loads(line)
+        except json.JSONDecodeError:
+            continue
+        if event.get("type") != "text":
+            continue
+        part = event.get("part") or {}
+        text = part.get("text")
+        if isinstance(text, str) and text.strip():
+            chunks.append(text.strip())
+    if chunks:
+        parsed = parse_json_object_from_text("\n".join(chunks).strip())
+        if parsed is not None:
+            return parsed
+    return parse_json_object_from_text((stdout or "").strip())
+
+
+def opencode_env() -> dict[str, str]:
+    env = os.environ.copy()
+    default_xdg = Path.home() / ".local" / "share"
+    default_auth = default_xdg / "opencode" / "auth.json"
+
+    raw_xdg = env.get("XDG_DATA_HOME", "").strip()
+    current_xdg = Path(raw_xdg).expanduser() if raw_xdg else default_xdg
+    current_auth = current_xdg / "opencode" / "auth.json"
+    if default_auth.exists() and not current_auth.exists():
+        env["XDG_DATA_HOME"] = str(default_xdg)
+    return env
+
+
+def discover_minimax_model() -> str:
+    result = subprocess.run(["opencode", "models"], text=True, capture_output=True, check=False, env=opencode_env())
+    if result.returncode != 0:
+        return ""
+    preferred = "opencode/minimax-m2.5-free"
+    listed = [line.strip() for line in strip_ansi(result.stdout).splitlines() if line.strip()]
+    if preferred in listed:
+        return preferred
+    for model in listed:
+        lower = model.lower()
+        if "minimax" in lower and "/" in model:
+            return model
+    return ""
+
+
+def heuristic_logo_variant(prompt_text: str, prompt_metadata: dict) -> str:
+    dark_keywords = ("dark", "night", "black", "navy", "midnight", "dusk", "evening")
+    light_keywords = ("light", "bright", "daylight", "sunlight", "morning", "pastel", "cream")
+    focus_parts = [
+        str(prompt_metadata.get("background_title") or ""),
+        str(prompt_metadata.get("seeded_background_prompt") or ""),
+    ]
+    focus_text = " ".join(part for part in focus_parts if part).lower()
+    if any(keyword in focus_text for keyword in dark_keywords):
+        return "dark"
+    if any(keyword in focus_text for keyword in light_keywords):
+        return "light"
     lowered = prompt_text.lower()
     if any(keyword in lowered for keyword in dark_keywords):
         return "dark"
     return "light"
 
 
+def choose_logo_variant_with_minimax(prompt_text: str, prompt_metadata: dict, model: str, api_url: str, password: str) -> tuple[str, str]:
+    fallback = heuristic_logo_variant(prompt_text, prompt_metadata)
+    if not model:
+        return fallback, "heuristic"
+    bg_title = str(prompt_metadata.get("background_title") or "")
+    seeded_prompt = str(prompt_metadata.get("seeded_background_prompt") or "")
+    classify_prompt = (
+        "Classify the ad background brightness as exactly one label: dark or light. "
+        "Return strict JSON only with keys label and reason.\n"
+        f"background_title: {bg_title}\n"
+        f"seeded_background_prompt: {seeded_prompt}\n"
+        f"prompt_excerpt: {prompt_text[:1400]}"
+    )
+    cmd = [
+        "opencode",
+        "run",
+        "--pure",
+        "--attach",
+        api_url,
+        "--model",
+        model,
+        "--format",
+        "json",
+        classify_prompt,
+    ]
+    if password:
+        cmd.extend(["--password", password])
+    result = subprocess.run(cmd, text=True, capture_output=True, check=False, env=opencode_env())
+    if result.returncode != 0:
+        return fallback, "heuristic"
+    parsed = parse_opencode_json_output(strip_ansi(result.stdout))
+    if not isinstance(parsed, dict):
+        return fallback, "heuristic"
+    label = str(parsed.get("label") or "").strip().lower()
+    if label in {"dark", "light"}:
+        if label == "light" and fallback == "dark":
+            return "dark", "heuristic_override"
+        return label, "minimax"
+    return fallback, "heuristic"
+
+
 def compose_prompt(
     starting_prompt: str,
     prompt_file: Path,
     conversion_mode: str,
-    light_logo_url: str,
-    dark_logo_url: str,
+    logo_variant: str,
 ) -> str:
     body = prompt_file.read_text(encoding="utf-8").strip()
     lock = conversion_lock_instruction(conversion_mode)
-    logo_variant = choose_logo_variant(body)
-    selected_logo_url = dark_logo_url if logo_variant == "dark" else light_logo_url
-    logo_instruction = ""
-    if selected_logo_url:
-        logo_instruction = (
-            "LOGO ASSET RULE (MANDATORY)\n"
-            f"- Use this exact logo asset URL: {selected_logo_url}\n"
-            "- If background is light, use LIGHT_LOGO_URL; if background is dark, use DARK_LOGO_URL.\n"
-            f"- This prompt is classified as {logo_variant.upper()} background, so use the selected URL above."
-        )
+    logo_instruction = (
+        "LOGO ASSET RULE (MANDATORY)\n"
+        f"- Use the preselected {logo_variant.upper()} logo reference from image_input as the only logo asset.\n"
+        "- Never print URLs, file names, or any technical strings on the canvas.\n"
+        "- Render only the visual logo mark; no link text, no metadata text."
+    )
+    big_box_visibility_instruction = (
+        "BIG BOX LABEL VISIBILITY (NON-NEGOTIABLE)\n"
+        "- Keep the main kit box label text fully visible and readable.\n"
+        "- Specifically preserve: 'Panacea for weight loss and obesity related conditions' and 'ISO 9001:2008 Certified'.\n"
+        "- Do not let any bottle, sachet, prop, or overlay block these two text regions.\n"
+        "- Product overlap is allowed only if it does not occlude any kit-box text."
+    )
     if lock:
-        if logo_instruction:
-            return f"{starting_prompt.strip()}\n\n{logo_instruction}\n\n{lock}\n\n{body}\n"
-        return f"{starting_prompt.strip()}\n\n{lock}\n\n{body}\n"
-    if logo_instruction:
-        return f"{starting_prompt.strip()}\n\n{logo_instruction}\n\n{body}\n"
-    return f"{starting_prompt.strip()}\n\n{body}\n"
+        return f"{starting_prompt.strip()}\n\n{logo_instruction}\n\n{big_box_visibility_instruction}\n\n{lock}\n\n{body}\n"
+    return f"{starting_prompt.strip()}\n\n{logo_instruction}\n\n{big_box_visibility_instruction}\n\n{body}\n"
 
 
 def _find_line_value(pattern: str, text: str) -> str | None:
@@ -471,6 +599,21 @@ def persona_folder_name(persona_number: int | None) -> str:
     return "P00"
 
 
+def sanitize_logo_inputs(image_inputs: list[str], light_logo_url: str, dark_logo_url: str, selected_logo_url: str) -> list[str]:
+    blocked = {url for url in (light_logo_url, dark_logo_url, *LEGACY_LOGO_INPUT_URLS) if url}
+    sanitized = [url for url in image_inputs if url not in blocked]
+    if selected_logo_url:
+        sanitized = [selected_logo_url, *sanitized]
+    deduped: list[str] = []
+    seen: set[str] = set()
+    for url in sanitized:
+        if url in seen:
+            continue
+        deduped.append(url)
+        seen.add(url)
+    return deduped
+
+
 def iter_grouped(items: Iterable[PromptFile]) -> dict[tuple[str, str], list[PromptFile]]:
     grouped: dict[tuple[str, str], list[PromptFile]] = {}
     for item in items:
@@ -580,6 +723,9 @@ def main() -> int:
     prompt_files = parse_prompt_files(batch_output_dir, args.language, root, selected_prompt_files if selected_prompt_files else None)
     grouped = trim_variations(iter_grouped(prompt_files), args.max_variations_per_format)
     starting_prompt = starting_prompt_file.read_text(encoding="utf-8")
+    opencode_api_url = (os.getenv("OPENCODE_API_URL") or DEFAULT_OPENCODE_API_URL).strip()
+    opencode_password = (os.getenv("OPENCODE_SERVER_PASSWORD") or "").strip()
+    minimax_model = discover_minimax_model()
 
     generated_at = time.strftime("%Y-%m-%dT%H:%M:%SZ", time.gmtime())
 
@@ -590,12 +736,19 @@ def main() -> int:
         for prompt_file in files:
             prompt_body = prompt_file.path.read_text(encoding="utf-8")
             prompt_metadata = extract_prompt_metadata(prompt_body)
+            logo_variant, logo_variant_source = choose_logo_variant_with_minimax(
+                prompt_body,
+                prompt_metadata,
+                minimax_model,
+                opencode_api_url,
+                opencode_password,
+            )
+            selected_logo_url = dark_logo_url if logo_variant == "dark" else light_logo_url
             complete_prompt = compose_prompt(
                 starting_prompt,
                 prompt_file.path,
                 args.reference_conversion_mode,
-                light_logo_url,
-                dark_logo_url,
+                logo_variant,
             )
             prompt_rel_path = str(prompt_file.path.relative_to(root))
             persona_number = prompt_file.persona_number
@@ -607,6 +760,14 @@ def main() -> int:
             ensure_dir(persona_dir)
             per_prompt_inputs = prompt_reference_map.get(Path(prompt_rel_path).as_posix())
             image_input_for_prompt = per_prompt_inputs if per_prompt_inputs else image_input_urls
+            image_input_for_prompt = sanitize_logo_inputs(
+                image_input_for_prompt,
+                light_logo_url,
+                dark_logo_url,
+                selected_logo_url,
+            )
+            if len(image_input_for_prompt) > 14:
+                raise RuntimeError(f"Kie supports max 14 image_input URLs, found {len(image_input_for_prompt)} for prompt: {prompt_rel_path}")
             if not image_input_for_prompt:
                 raise RuntimeError(f"No image_input URLs found for prompt: {prompt_rel_path}")
             task_id = create_task(
@@ -637,7 +798,6 @@ def main() -> int:
                 download_file(url, out_file)
                 saved_files.append(str(out_file.relative_to(root)))
 
-                logo_variant = choose_logo_variant(prompt_body)
                 image_record = {
                     "record_type": "generated_image",
                     "generated_at": generated_at,
@@ -664,7 +824,8 @@ def main() -> int:
                         "prompt_variation": prompt_file.variation,
                     },
                     "logo_variant": logo_variant,
-                    "logo_asset_url": dark_logo_url if logo_variant == "dark" else light_logo_url,
+                    "logo_variant_source": logo_variant_source,
+                    "logo_asset_url": selected_logo_url,
                     "prompt_metadata": prompt_metadata,
                     "image_input_urls": copy.deepcopy(image_input_for_prompt),
                     "result_url": url,
