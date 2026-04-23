@@ -12,61 +12,74 @@
 <body>
   <div class="page">
     <header class="hero">
-      <div>
+      <div class="hero-copy">
         <p class="eyebrow">Local-first creative pipeline</p>
         <h1>Ad Generation Dashboard</h1>
-        <p>Token-optimized pipeline: scripts for retrieval, LLM for generation, local files only.</p>
+        <p>Token-optimized creative ops with sharper controls, richer visual system, and cleaner execution flow.</p>
       </div>
       <button id="themeToggle" class="theme-toggle" type="button">Dark mode</button>
     </header>
 
-    <section class="card">
-      <h2>1) Persona + Formats</h2>
-      <label>Language</label>
-      <div id="languageModes" class="chips"></div>
-      <div id="personaList" class="grid"></div>
-      <label>Apply these formats to all selected personas</label>
-      <div id="globalFormats" class="chips"></div>
-    </section>
+    <div class="layout-columns">
+      <div class="column column-left">
+        <section class="card card-personas">
+          <h2>1) Persona + Formats</h2>
+          <label>Language</label>
+          <div id="languageModes" class="chips"></div>
+          <div id="personaList" class="grid"></div>
+          <label>Apply these formats to selected personas only</label>
+          <div id="globalFormats" class="chips"></div>
+        </section>
 
-    <section class="card">
-      <h2>2) Active Images</h2>
-      <textarea id="activeImages" rows="6"></textarea>
-      <p class="hint">One URL per line. Defaults prefilled from input/activeimages.txt</p>
-    </section>
-
-    <section class="card">
-      <h2>3) Optional File Uploads</h2>
-      <div class="uploads">
-        <label>Product Info <input id="productFile" type="file" /></label>
-        <label>Mechanism <input id="mechanismFile" type="file" /></label>
-        <label>FAQ <input id="faqFile" type="file" /></label>
-        <label>Active Images TXT <input id="activeImagesFile" type="file" /></label>
+        <section class="card card-images">
+          <h2>3) Active Images</h2>
+          <textarea id="activeImages" rows="6"></textarea>
+          <p class="hint">One URL per line. Defaults prefilled from input/activeimages.txt</p>
+        </section>
       </div>
-      <div id="defaultsInfo" class="hint"></div>
-    </section>
 
-    <section class="card">
-      <h2>4) Execution</h2>
-      <label>OpenCode API URL (auto-wired by launcher; editable)</label>
-      <input id="opencodeApiUrl" type="text" placeholder="http://127.0.0.1:4090" />
-      <label>OpenCode API Key (optional)</label>
-      <input id="opencodeApiKey" type="password" placeholder="sk-..." />
-      <label>Provider</label>
-      <select id="opencodeProvider"></select>
-      <label>Model</label>
-      <select id="opencodeModel"></select>
+      <div class="column column-right">
+        <section class="card card-execution">
+          <h2>2) Execution</h2>
+          <label>OpenCode API URL (auto-wired by launcher; editable)</label>
+          <input id="opencodeApiUrl" type="text" placeholder="http://127.0.0.1:4090" />
+          <label>OpenCode API Key (optional)</label>
+          <input id="opencodeApiKey" type="password" placeholder="sk-..." />
+          <label>Provider</label>
+          <select id="opencodeProvider"></select>
+          <label>Model</label>
+          <select id="opencodeModel"></select>
 
-      <p class="hint">Image and Cloudinary credentials are loaded from <code>.env.dashboard</code>.</p>
+          <p class="hint">Image and Cloudinary credentials are loaded from root <code>.env.dashboard</code>.</p>
 
-      <button id="runBtn">Run Pipeline</button>
-      <pre id="status" class="status"></pre>
-    </section>
+          <button id="runBtn">Run Pipeline</button>
+          <pre id="status" class="status"></pre>
+        </section>
 
-    <section class="card">
+        <section class="card card-uploads">
+          <h2>4) Optional File Uploads</h2>
+          <div class="uploads">
+            <label>Product Info <input id="productFile" type="file" /></label>
+            <label>Mechanism <input id="mechanismFile" type="file" /></label>
+            <label>FAQ <input id="faqFile" type="file" /></label>
+            <label>Active Images TXT <input id="activeImagesFile" type="file" /></label>
+          </div>
+          <div id="defaultsInfo" class="hint"></div>
+        </section>
+      </div>
+    </div>
+
+    <section class="card card-runs">
       <h2>5) Latest Runs</h2>
-      <button id="refreshRuns">Refresh</button>
-      <div id="runs"></div>
+      <div class="runs-toolbar">
+        <button id="refreshRuns" class="ghost-btn" type="button">Refresh</button>
+        <div class="carousel-controls">
+          <button id="runPrev" class="carousel-btn" type="button" aria-label="Previous run">◀</button>
+          <span id="runIndex" class="run-index">0 / 0</span>
+          <button id="runNext" class="carousel-btn" type="button" aria-label="Next run">▶</button>
+        </div>
+      </div>
+      <div id="runs" class="runs-carousel"></div>
     </section>
   </div>
 

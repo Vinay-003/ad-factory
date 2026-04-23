@@ -1,10 +1,11 @@
-scripts/.env
+.env
+.env.*
+!.env.example
+
 dashboard_storage/
 __pycache__/
 *.pyc
 .venv/
 
 output/*
-trash
-.env.dashboard
-scripts/.env
+trash/

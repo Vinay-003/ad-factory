@@ -25,7 +25,7 @@ ROOT = Path(__file__).resolve().parents[2]
 STORAGE_ROOT = ROOT / "dashboard_storage"
 RUNS_ROOT = STORAGE_ROOT / "runs"
 RUNTIME_ROOT = ROOT / "runtime"
-ENV_DASHBOARD_PATH = ROOT / ".env.dashboard"
+ENV_PATH = ROOT / ".env.dashboard"
 
 DEFAULT_PRODUCT_INFO = ROOT / "productinfomain.txt"
 DEFAULT_MECHANISM = ROOT / "PRODUCT_MECHANISM_V1.txt"
@@ -1360,7 +1360,7 @@ app.add_middleware(
 
 @app.on_event("startup")
 def startup() -> None:
-    load_env_file(ENV_DASHBOARD_PATH)
+    load_env_file(ENV_PATH)
     ensure_dirs()
 
 
@@ -1742,7 +1742,7 @@ def api_run_generate_images_45(run_id: str, payload: dict[str, Any] = Body(...))
 
     kie_api_key = str(os.getenv("KIE_API_KEY") or "").strip()
     if not kie_api_key:
-        raise HTTPException(status_code=400, detail="KIE_API_KEY missing. Set it in .env.dashboard")
+        raise HTTPException(status_code=400, detail="KIE_API_KEY missing. Set it in root .env.dashboard")
 
     prompt_files = payload.get("prompt_files")
     if not isinstance(prompt_files, list) or not prompt_files:
@@ -1798,7 +1798,7 @@ def api_run_generate_images_916_from_45(run_id: str, payload: dict[str, Any] = B
 
     kie_api_key = str(os.getenv("KIE_API_KEY") or "").strip()
     if not kie_api_key:
-        raise HTTPException(status_code=400, detail="KIE_API_KEY missing. Set it in .env.dashboard")
+        raise HTTPException(status_code=400, detail="KIE_API_KEY missing. Set it in root .env.dashboard")
 
     cloudinary_cloud_name = str(os.getenv("CLOUDINARY_CLOUD_NAME") or "").strip()
     cloudinary_api_key = str(os.getenv("CLOUDINARY_API_KEY") or "").strip()
@@ -1806,7 +1806,7 @@ def api_run_generate_images_916_from_45(run_id: str, payload: dict[str, Any] = B
     if not cloudinary_cloud_name or not cloudinary_api_key or not cloudinary_api_secret:
         raise HTTPException(
             status_code=400,
-            detail="Cloudinary credentials missing. Set CLOUDINARY_CLOUD_NAME/CLOUDINARY_API_KEY/CLOUDINARY_API_SECRET in .env.dashboard",
+            detail="Cloudinary credentials missing. Set CLOUDINARY_CLOUD_NAME/CLOUDINARY_API_KEY/CLOUDINARY_API_SECRET in root .env.dashboard",
         )
 
     prompt_files = payload.get("prompt_files")

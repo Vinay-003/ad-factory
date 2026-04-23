@@ -4,6 +4,9 @@ const activeImagesEl = document.getElementById("activeImages");
 const defaultsInfoEl = document.getElementById("defaultsInfo");
 const statusEl = document.getElementById("status");
 const runsEl = document.getElementById("runs");
+const runPrevEl = document.getElementById("runPrev");
+const runNextEl = document.getElementById("runNext");
+const runIndexEl = document.getElementById("runIndex");
 const themeToggleEl = document.getElementById("themeToggle");
 const languageModesEl = document.getElementById("languageModes");
 const providerSelectEl = document.getElementById("opencodeProvider");
@@ -15,6 +18,8 @@ let defaultData = null;
 let selectedGlobalFormats = new Set(["HERO"]);
 let selectedLanguageMode = "ALL";
 let modelsByProvider = {};
+let runsData = [];
+let currentRunIndex = 0;
 
 function setSelectOptions(selectEl, values, selectedValue) {
   selectEl.innerHTML = "";
@@ -95,12 +100,22 @@ function renderGlobalFormats() {
 
   const applyBtn = document.createElement("button");
   applyBtn.type = "button";
-  applyBtn.textContent = "Apply to all personas";
+  applyBtn.className = "ghost-btn";
+  applyBtn.textContent = "Apply to selected personas";
   applyBtn.onclick = () => {
+    const selectedPersonas = new Set(getPersonaSelection());
+    if (!selectedPersonas.size) {
+      setStatus("Select at least one persona to apply global formats.");
+      return;
+    }
     for (const persona of defaultData.personas) {
+      if (!selectedPersonas.has(persona.number)) continue;
       for (const fmt of formats) {
         const el = document.getElementById(`p-${persona.number}-${fmt}`);
-        if (el) el.checked = selectedGlobalFormats.has(fmt);
+        if (el) {
+          el.checked = selectedGlobalFormats.has(fmt);
+          el.dispatchEvent(new Event("change"));
+        }
       }
     }
   };
@@ -129,11 +144,26 @@ function renderPersonas() {
     card.appendChild(main);
 
     const chips = document.createElement("div");
-    chips.className = "chips";
+    chips.className = "chips format-chip-group";
     formats.forEach((fmt) => {
       const lbl = document.createElement("label");
-      lbl.className = "chip";
-      lbl.innerHTML = `<input id="p-${p.number}-${fmt}" type="checkbox" style="margin-right:6px;"/> ${fmt}`;
+      lbl.className = `chip chip-format fmt-${fmt.toLowerCase()}`;
+
+      const input = document.createElement("input");
+      input.id = `p-${p.number}-${fmt}`;
+      input.type = "checkbox";
+      input.className = "format-check";
+
+      const text = document.createElement("span");
+      text.textContent = fmt;
+
+      const syncState = () => {
+        lbl.classList.toggle("checked", input.checked);
+      };
+      input.addEventListener("change", syncState);
+      syncState();
+
+      lbl.append(input, text);
       chips.appendChild(lbl);
     });
     card.appendChild(chips);
@@ -230,7 +260,7 @@ async function runPipeline() {
 
 function renderRun(run) {
   const div = document.createElement("div");
-  div.className = "run";
+  div.className = "run run-active";
 
   const title = document.createElement("div");
   title.innerHTML = `<strong>${run.run_id}</strong> | batch ${run.batch} | prompts ${run.prompt_files.length} | images ${run.image_files.length}`;
@@ -256,26 +286,34 @@ function renderRun(run) {
 
   const promptActions = document.createElement("div");
   promptActions.className = "prompt-actions";
-  const loading = document.createElement("div");
-  loading.className = "hint";
-  loading.textContent = "Loading editable on-image copy...";
-  promptActions.appendChild(loading);
+  const loadBtn = document.createElement("button");
+  loadBtn.type = "button";
+  loadBtn.className = "ghost-btn";
+  loadBtn.textContent = "Load editable copy";
+  const loadHint = document.createElement("div");
+  loadHint.className = "hint";
+  loadHint.textContent = "Lazy loaded to keep dashboard fast.";
+  promptActions.append(loadBtn, loadHint);
   div.appendChild(promptActions);
 
-  fetch(`/api/runs/${run.run_id}/prompt-copies`)
+  loadBtn.onclick = () => {
+    loadBtn.disabled = true;
+    loadHint.textContent = "Loading editable on-image copy...";
+    fetch(`/api/runs/${run.run_id}/prompt-copies`)
     .then((res) => res.json().then((data) => ({ ok: res.ok, data })))
     .then(({ ok, data }) => {
       if (!ok) {
-        loading.textContent = `Could not load editable copy: ${data.detail || "unknown error"}`;
+        loadHint.textContent = `Could not load editable copy: ${data.detail || "unknown error"}`;
         return;
       }
 
       const prompts = (data.prompts || []).filter((item) => (item.copy_lines || []).length > 0);
       if (!prompts.length) {
-        loading.textContent = "No editable copy block found for this run.";
+        loadHint.textContent = "No editable copy block found for this run.";
         return;
       }
-      loading.remove();
+      loadBtn.remove();
+      loadHint.remove();
 
       const controls = document.createElement("div");
       controls.className = "prompt-controls";
@@ -491,8 +529,10 @@ function renderRun(run) {
       };
     })
     .catch((err) => {
-      loading.textContent = `Could not load editable copy: ${String(err)}`;
+      loadHint.textContent = `Could not load editable copy: ${String(err)}`;
+      loadBtn.disabled = false;
     });
+  };
 
   if (run.image_files && run.image_files.length) {
     const p = document.createElement("div");
@@ -512,12 +552,39 @@ function renderRun(run) {
   return div;
 }
 
+function updateRunNav() {
+  const total = runsData.length;
+  if (runIndexEl) runIndexEl.textContent = total ? `${currentRunIndex + 1} / ${total}` : "0 / 0";
+  if (runPrevEl) runPrevEl.disabled = total <= 1;
+  if (runNextEl) runNextEl.disabled = total <= 1;
+}
+
+function renderRunCarousel() {
+  runsEl.innerHTML = "";
+  if (!runsData.length) {
+    const empty = document.createElement("div");
+    empty.className = "hint";
+    empty.textContent = "No runs yet.";
+    runsEl.appendChild(empty);
+    updateRunNav();
+    return;
+  }
+
+  if (currentRunIndex < 0) currentRunIndex = 0;
+  if (currentRunIndex >= runsData.length) currentRunIndex = runsData.length - 1;
+  runsEl.appendChild(renderRun(runsData[currentRunIndex]));
+  updateRunNav();
+}
+
 async function loadRuns() {
   const res = await fetch("/api/runs");
   if (!res.ok) return;
   const data = await res.json();
-  runsEl.innerHTML = "";
-  (data.runs || []).forEach((run) => runsEl.appendChild(renderRun(run)));
+  runsData = data.runs || [];
+  if (currentRunIndex >= runsData.length) {
+    currentRunIndex = Math.max(0, runsData.length - 1);
+  }
+  renderRunCarousel();
 }
 
 document.getElementById("runBtn").addEventListener("click", () => {
@@ -527,6 +594,22 @@ document.getElementById("runBtn").addEventListener("click", () => {
 document.getElementById("refreshRuns").addEventListener("click", () => {
   loadRuns().catch(() => {});
 });
+
+if (runPrevEl) {
+  runPrevEl.addEventListener("click", () => {
+    if (!runsData.length) return;
+    currentRunIndex = (currentRunIndex - 1 + runsData.length) % runsData.length;
+    renderRunCarousel();
+  });
+}
+
+if (runNextEl) {
+  runNextEl.addEventListener("click", () => {
+    if (!runsData.length) return;
+    currentRunIndex = (currentRunIndex + 1) % runsData.length;
+    renderRunCarousel();
+  });
+}
 
 if (providerSelectEl) {
   providerSelectEl.addEventListener("change", () => {

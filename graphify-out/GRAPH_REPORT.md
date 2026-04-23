@@ -1,11 +1,11 @@
 # Graph Report - info  (2026-04-23)
 
 ## Corpus Check
-- 17 files · ~151,498 words
+- 17 files · ~226,802 words
 - Verdict: corpus is large enough that graph structure adds value.
 
 ## Summary
-- 227 nodes · 476 edges · 17 communities detected
+- 227 nodes · 476 edges · 16 communities detected
 - Extraction: 96% EXTRACTED · 4% INFERRED · 0% AMBIGUOUS · INFERRED: 20 edges (avg confidence: 0.8)
 - Token cost: 0 input · 0 output
 
@@ -26,7 +26,6 @@
 - [[_COMMUNITY_Community 13|Community 13]]
 - [[_COMMUNITY_Community 14|Community 14]]
 - [[_COMMUNITY_Community 15|Community 15]]
-- [[_COMMUNITY_Community 16|Community 16]]
 
 ## God Nodes (most connected - your core abstractions)
 1. `main()` - 23 edges
@@ -67,8 +66,8 @@ Cohesion: 0.18
 Nodes (24): api_run_generate_916(), api_run_generate_916_selected(), api_run_generate_images_45(), api_run_generate_images_916_from_45(), api_run_update_prompt_copies(), apply_visual_locks(), call_opencode_repair_copy(), collect_45_visual_locks() (+16 more)
 
 ### Community 3 - "Community 3"
-Cohesion: 0.19
-Nodes (16): api_file_content(), api_run(), api_run_prompt_copies(), api_runs(), build_multipart_form(), ensure_dirs(), extract_on_image_copy_lines(), load_env_file() (+8 more)
+Cohesion: 0.16
+Nodes (19): api_file_content(), api_run(), api_run_prompt_copies(), api_runs(), build_multipart_form(), ensure_dirs(), extract_on_image_copy_lines(), load_env_file() (+11 more)
 
 ### Community 4 - "Community 4"
 Cohesion: 0.21
@@ -115,10 +114,6 @@ Cohesion: 0.83
 Nodes (3): load_json(), main(), parse_args()
 
 ### Community 15 - "Community 15"
-Cohesion: 0.67
-Nodes (3): strip_internal_marker(), strip_internal_markers_from_payload(), strip_price_tokens()
-
-### Community 16 - "Community 16"
 Cohesion: 0.67
 Nodes (3): api_defaults(), parse_persona_library(), read_active_images()
 

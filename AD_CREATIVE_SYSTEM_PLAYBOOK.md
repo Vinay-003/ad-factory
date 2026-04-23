@@ -1043,8 +1043,8 @@ Step 5.6 — API execution (Nano Banana 2 via Kie)
 - Auth: `Authorization: Bearer <KIE_API_KEY>`
 - API key source priority:
   - First read `KIE_API_KEY` from shell environment.
-  - If not present, load it from `scripts/.env`.
-  - Expected format in `scripts/.env`: `KIE_API_KEY=your_key_here`
+  - If not present, load it from root `.env.dashboard`.
+  - Expected format in `.env.dashboard`: `KIE_API_KEY=your_key_here`
 - Model: `nano-banana-2`
 - Images source for API: read URLs from `input/activeimages.txt` (one URL per line, max 14)
 - Keep `input/passiveimage.txt` for fallback inventory only (do not use by default)

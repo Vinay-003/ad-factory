@@ -451,7 +451,7 @@ def main() -> int:
     args = parse_args()
 
     root = Path(args.root).resolve()
-    load_env_file(root / "scripts" / ".env")
+    load_env_file(root / ".env.dashboard")
     if not args.api_key:
         args.api_key = os.getenv("KIE_API_KEY")
     output_root = root / "output"

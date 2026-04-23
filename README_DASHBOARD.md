@@ -113,6 +113,12 @@ This removes token-heavy "read whole docs" behavior and sends only relevant slic
 - OpenCode API key field is used as OpenCode server basic-auth password for attached calls.
 - If empty, backend auto-uses `OPENCODE_SERVER_PASSWORD` from launcher env.
 
+## Environment file
+
+- Use a single root env file: `.env.dashboard`
+- Dashboard backend and image batch script both load credentials from this file.
+- `scripts/.env` is no longer used.
+
 ## Notes
 
 - Persona selection now uses the persona library embedded in `AD_CREATIVE_SYSTEM_PLAYBOOK.md`.
