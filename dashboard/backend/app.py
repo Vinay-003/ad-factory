@@ -1945,76 +1945,26 @@ async def api_run_execute(
     except RuntimeError as exc:
         raise HTTPException(status_code=400, detail=str(exc)) from exc
 
-    product_ctx: dict[str, Any]
-    product_ctx_source = "extract_product_context"
-    extractor_model = choose_extractor_model(cfg)
-    canonical_path = RUNTIME_ROOT / "context_canonical.json"
-    canonical_cmd = [
-        "python3",
-        "scripts/build_canonical_context.py",
-        "--product",
-        str(product_file),
-        "--mechanism",
-        str(mechanism_file_path),
-        "--faq",
-        str(faq_file_path),
-        "--output",
-        str(canonical_path),
-        "--api-url",
-        str((cfg.get("opencode_api_url") or DEFAULT_OPENCODE_API_URL)).strip(),
-        "--model",
-        extractor_model,
-    ]
-    extractor_key = (cfg.get("opencode_api_key") or "").strip() or os.getenv("OPENCODE_SERVER_PASSWORD", "").strip()
-    if extractor_key:
-        canonical_cmd.extend(["--api-key", extractor_key])
-
-    canonical_result = run_cmd(canonical_cmd, cwd=ROOT)
-    if canonical_result.returncode == 0 and canonical_path.exists():
-        try:
-            canonical_payload = json.loads(canonical_path.read_text(encoding="utf-8"))
-            generated_ctx = canonical_payload.get("generation_context")
-            if isinstance(generated_ctx, dict):
-                product_ctx = {
-                    "product_info": generated_ctx.get("product_info") if isinstance(generated_ctx.get("product_info"), list) else [],
-                    "mechanism": generated_ctx.get("mechanism") if isinstance(generated_ctx.get("mechanism"), list) else [],
-                    "faq": generated_ctx.get("faq") if isinstance(generated_ctx.get("faq"), list) else [],
-                }
-                product_ctx_source = "canonical_llm"
-                (run_dir / "context" / "context_canonical.json").write_text(
-                    json.dumps(canonical_payload, ensure_ascii=False, indent=2) + "\n", encoding="utf-8"
-                )
-            else:
-                raise RuntimeError("Missing generation_context in canonical payload")
-        except Exception as exc:
-            (run_dir / "logs" / "canonical_context_error.txt").write_text(
-                f"Canonical context parse failed: {exc}\nSTDOUT:\n{canonical_result.stdout}\n\nSTDERR:\n{canonical_result.stderr}",
-                encoding="utf-8",
-            )
-            product_ctx = {}
-    else:
-        (run_dir / "logs" / "canonical_context_error.txt").write_text(
-            f"Canonical context generation failed\nSTDOUT:\n{canonical_result.stdout}\n\nSTDERR:\n{canonical_result.stderr}",
-            encoding="utf-8",
-        )
-        product_ctx = {}
-
-    if not product_ctx:
-        product_ctx_result = run_cmd(
-            [
-                "python3",
-                "scripts/extract_product_context.py",
-                "--product",
-                str(product_file),
-                "--mechanism",
-                str(mechanism_file_path),
-                "--faq",
-                str(faq_file_path),
-                "--json",
-            ],
-            cwd=ROOT,
-        )
-        product_ctx = parse_json_stdout(product_ctx_result, "extract_product_context")
+    product_ctx_source = "verbatim_source_chunks"
+    extractor_model = "none"
+    product_ctx_result = run_cmd(
+        [
+            "python3",
+            "scripts/extract_product_context.py",
+            "--product",
+            str(product_file),
+            "--mechanism",
+            str(mechanism_file_path),
+            "--faq",
+            str(faq_file_path),
+            "--json",
+        ],
+        cwd=ROOT,
+    )
+    product_ctx = parse_json_stdout(product_ctx_result, "extract_product_context")
+    (run_dir / "context" / "product_context_chunks.json").write_text(
+        json.dumps(product_ctx, ensure_ascii=False, indent=2) + "\n", encoding="utf-8"
+    )
 
     persona_library = parse_persona_library(DEFAULT_PLAYBOOK)
     ads_context: list[dict[str, Any]] = []

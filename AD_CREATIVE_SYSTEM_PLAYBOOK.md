@@ -58,7 +58,17 @@ Persona language source:
 - Use the persona library in this playbook as the source of persona identity and intent.
 - For each selected persona, define copy inputs using the 5-field model: pain, desire, friction, proof needed, tone cue.
 - Compose fresh copy each run from those fields and product/mechanism constraints.
-- Do not depend on external deep-dive persona files during runtime.
+- Do not depend on legacy persona artifacts outside this playbook during runtime.
+
+Foundation doc handling rules:
+- Treat `productinfomain.txt` as the Single Source of Truth product foundation document.
+- Do not summarize, reconcile, reinterpret, or re-prioritize that document at runtime.
+- Split it into meaningful verbatim section chunks and pass only the needed chunks to the model.
+- Preserve the product's own benefit hierarchy when writing copy.
+- Sections 9 (`What benefits do users see?`) and 10 (`What makes it different?`) outrank recurring ad themes seen in prior outputs, spreadsheets, or registries.
+- Do not let supporting themes like `AM/PM routine`, `cravings down`, `support`, `tracker`, or `structured system` become the lead headline/subheadline angle unless the selected persona explicitly needs that framing.
+- Default headline/subheadline priority order: fast visible weight loss first, then reduced hunger/cravings and easier adherence, then safe-feeling/no-side-effects trust, then practical ease and guided support.
+- Use routine/timing/support language as supporting explanation, not as the main promise, unless format purpose specifically requires mechanism breakdown.
 
 Mechanism grounding rules:
 - Use `productinfomain.txt`, `faq.txt`, and `PRODUCT_MECHANISM_V1.txt` together.
@@ -460,7 +470,7 @@ Batch diversity minimum:
 ### Heading uniqueness rules (mandatory)
 
 1) Fresh composition source
-- Generate all headline/support/CTA copy from Persona Layer 1 + Layer 2 only.
+- Generate all headline/support/CTA copy from the selected persona's 5-field model plus approved product/mechanism chunks only.
 - Do not reuse any prior output sentence.
 - Do not paraphrase old lines from previous batches.
 
@@ -502,13 +512,13 @@ Batch diversity minimum:
 
 Same-persona multi-format diversification (mandatory):
 - If one persona is used across multiple formats in the same batch, do not reuse the same core pain sentence across those formats.
-- Build a per-format sub-angle map from Layer 1 + Layer 2 before writing copy, and lock one unique sub-angle per format.
+- Build a per-format sub-angle map from the 5-field persona model before writing copy, and lock one unique sub-angle per format.
 - Allowed sub-angle sources:
-  - Layer 1 pain point line
-  - Layer 1 trigger scenario
-  - Layer 1 objection
-  - Layer 1 language-bank phrase
-  - Layer 2 trust-anchor angle
+  - Pain
+  - Desire
+  - Friction
+  - Proof needed
+  - Tone cue expressed through a distinct trust or framing angle
 - Sub-angle assignment rule for a 5-format batch using one persona:
   - HERO: primary pain contrast
   - BA: transition from one concrete trigger to one concrete recovery behavior
@@ -1002,7 +1012,7 @@ Validation checklist (machine-checkable):
 - `CHK-17` no_disclaimer_default: no Disclaimer line in on-image copy unless user explicitly requests disclaimer mode.
 - `CHK-18` no_forbidden_source_scan: normal create-ad run does not read old generated-image task artifacts (`generated_image/v*/prompt_task_*.txt`, `task_*.json`, `batch_run_summary.json`).
 - `CHK-19` no_progress_chatter: final response contains no internal exploration narration ("Explored", "Read", "I will now...").
-- `CHK-20` fresh_composition_only: final copy is freshly composed from persona Layer 1 + Layer 2 and passes structural uniqueness checks.
+- `CHK-20` fresh_composition_only: final copy is freshly composed from the persona 5-field model plus approved product/mechanism chunks and passes structural uniqueness checks.
 - `CHK-21` same_persona_batch_angle_separation: when one persona appears in multiple formats in a batch, each format uses a distinct sub-angle source and passes motif non-repetition checks.
 - `CHK-22` english_copy_no_hinglish: for `OUTPUT_*_EN.txt`, on-image copy fields (headline/support/quote/bullets/CTA/trust line/attribution) must not contain Hindi/romanized-Hindi phrasing.
 - `CHK-23` no_workstation_props_default: unless explicitly requested, do not include workstation-heavy props (keyboard, laptop, monitor, mouse) in visual direction blocks.

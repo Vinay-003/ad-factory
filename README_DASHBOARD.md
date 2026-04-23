@@ -68,10 +68,9 @@ Bootstrap does all of this:
    - `faq.txt`
    - `input/activeimages.txt`
 
-2. Retrieval scripts extract only required slices:
-   - `scripts/build_canonical_context.py` (LLM reconciliation, primary)
+2. Retrieval scripts prepare only required context:
    - `scripts/extract_format_rules.py`
-   - `scripts/extract_product_context.py` (fallback only if canonical build fails)
+   - `scripts/extract_product_context.py` (verbatim section chunks from product, mechanism, and FAQ docs)
 
 3. Backend builds compact context JSON and tries OpenCode-compatible chat API (optional).
 
@@ -93,19 +92,18 @@ Bootstrap does all of this:
 
 ## How parsing works (and why token use is lower)
 
-The dashboard does deterministic retrieval first, then generation.
+The dashboard does deterministic chunking first, then generation.
 
 1. User selects persona + format in UI.
 2. Backend runs context-building scripts:
-   - `scripts/build_canonical_context.py` (product + mechanism + FAQ reconciliation)
-    - `scripts/extract_format_rules.py` from `AD_CREATIVE_SYSTEM_PLAYBOOK.md`
-    - `scripts/extract_product_context.py` as fallback
+   - `scripts/extract_format_rules.py` from `AD_CREATIVE_SYSTEM_PLAYBOOK.md`
+   - `scripts/extract_product_context.py` for verbatim source chunks
 3. Backend builds compact `run_context.json` in run storage.
 4. OpenCode generates copy JSON only.
 5. Backend normalizes schema and trims long copy lines.
 6. Assembler script creates final prompt files.
 
-This removes token-heavy "read whole docs" behavior and sends only relevant slices to model.
+This avoids runtime claim extraction/reconciliation from the product foundation doc and sends verbatim source chunks instead.
 
 ## API key behavior
 

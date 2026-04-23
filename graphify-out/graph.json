@@ -9,7 +9,7 @@
       "source_file": "dashboard/__init__.py",
       "source_location": "L1",
       "id": "dashboard_init_py",
-      "community": 17,
+      "community": 18,
       "norm_label": "__init__.py"
     },
     {
@@ -18,7 +18,7 @@
       "source_file": "dashboard/backend/__init__.py",
       "source_location": "L1",
       "id": "dashboard_backend_init_py",
-      "community": 18,
+      "community": 19,
       "norm_label": "__init__.py"
     },
     {
@@ -27,7 +27,7 @@
       "source_file": "dashboard/backend/app.py",
       "source_location": "L1",
       "id": "dashboard_backend_app_py",
-      "community": 3,
+      "community": 4,
       "norm_label": "app.py"
     },
     {
@@ -54,7 +54,7 @@
       "source_file": "dashboard/backend/app.py",
       "source_location": "L57",
       "id": "app_now_iso",
-      "community": 3,
+      "community": 4,
       "norm_label": "now_iso()"
     },
     {
@@ -72,7 +72,7 @@
       "source_file": "dashboard/backend/app.py",
       "source_location": "L65",
       "id": "app_ensure_dirs",
-      "community": 3,
+      "community": 4,
       "norm_label": "ensure_dirs()"
     },
     {
@@ -81,7 +81,7 @@
       "source_file": "dashboard/backend/app.py",
       "source_location": "L70",
       "id": "app_load_env_file",
-      "community": 3,
+      "community": 4,
       "norm_label": "load_env_file()"
     },
     {
@@ -90,7 +90,7 @@
       "source_file": "dashboard/backend/app.py",
       "source_location": "L84",
       "id": "app_parse_persona_library",
-      "community": 15,
+      "community": 16,
       "norm_label": "parse_persona_library()"
     },
     {
@@ -108,7 +108,7 @@
       "source_file": "dashboard/backend/app.py",
       "source_location": "L155",
       "id": "app_read_active_images",
-      "community": 15,
+      "community": 16,
       "norm_label": "read_active_images()"
     },
     {
@@ -126,7 +126,7 @@
       "source_file": "dashboard/backend/app.py",
       "source_location": "L166",
       "id": "app_build_multipart_form",
-      "community": 3,
+      "community": 4,
       "norm_label": "build_multipart_form()"
     },
     {
@@ -135,7 +135,7 @@
       "source_file": "dashboard/backend/app.py",
       "source_location": "L192",
       "id": "app_upload_image_to_cloudinary",
-      "community": 3,
+      "community": 4,
       "norm_label": "upload_image_to_cloudinary()"
     },
     {
@@ -153,7 +153,7 @@
       "source_file": "dashboard/backend/app.py",
       "source_location": "L236",
       "id": "app_strip_ansi",
-      "community": 11,
+      "community": 10,
       "norm_label": "strip_ansi()"
     },
     {
@@ -162,7 +162,7 @@
       "source_file": "dashboard/backend/app.py",
       "source_location": "L240",
       "id": "app_opencode_discovery_env",
-      "community": 11,
+      "community": 10,
       "norm_label": "opencode_discovery_env()"
     },
     {
@@ -171,7 +171,7 @@
       "source_file": "dashboard/backend/app.py",
       "source_location": "L254",
       "id": "app_run_opencode_discovery_cmd",
-      "community": 11,
+      "community": 10,
       "norm_label": "run_opencode_discovery_cmd()"
     },
     {
@@ -180,7 +180,7 @@
       "source_file": "dashboard/backend/app.py",
       "source_location": "L258",
       "id": "app_list_opencode_models",
-      "community": 11,
+      "community": 10,
       "norm_label": "list_opencode_models()"
     },
     {
@@ -189,7 +189,7 @@
       "source_file": "dashboard/backend/app.py",
       "source_location": "L266",
       "id": "app_list_opencode_provider_labels",
-      "community": 11,
+      "community": 10,
       "norm_label": "list_opencode_provider_labels()"
     },
     {
@@ -198,7 +198,7 @@
       "source_file": "dashboard/backend/app.py",
       "source_location": "L286",
       "id": "app_provider_id_from_label",
-      "community": 11,
+      "community": 10,
       "norm_label": "provider_id_from_label()"
     },
     {
@@ -207,7 +207,7 @@
       "source_file": "dashboard/backend/app.py",
       "source_location": "L298",
       "id": "app_list_models_for_provider",
-      "community": 11,
+      "community": 10,
       "norm_label": "list_models_for_provider()"
     },
     {
@@ -216,7 +216,7 @@
       "source_file": "dashboard/backend/app.py",
       "source_location": "L306",
       "id": "app_choose_openai_gpt52",
-      "community": 12,
+      "community": 13,
       "norm_label": "choose_openai_gpt52()"
     },
     {
@@ -225,7 +225,7 @@
       "source_file": "dashboard/backend/app.py",
       "source_location": "L323",
       "id": "app_sanitize_dashboard_model",
-      "community": 12,
+      "community": 13,
       "norm_label": "sanitize_dashboard_model()"
     },
     {
@@ -234,7 +234,7 @@
       "source_file": "dashboard/backend/app.py",
       "source_location": "L330",
       "id": "app_build_opencode_catalog",
-      "community": 11,
+      "community": 10,
       "norm_label": "build_opencode_catalog()"
     },
     {
@@ -243,7 +243,7 @@
       "source_file": "dashboard/backend/app.py",
       "source_location": "L369",
       "id": "app_choose_extractor_model",
-      "community": 12,
+      "community": 13,
       "norm_label": "choose_extractor_model()"
     },
     {
@@ -279,7 +279,7 @@
       "source_file": "dashboard/backend/app.py",
       "source_location": "L403",
       "id": "app_resolve_safe_path",
-      "community": 3,
+      "community": 4,
       "norm_label": "resolve_safe_path()"
     },
     {
@@ -306,7 +306,7 @@
       "source_file": "dashboard/backend/app.py",
       "source_location": "L423",
       "id": "app_strip_internal_marker",
-      "community": 3,
+      "community": 4,
       "norm_label": "strip_internal_marker()"
     },
     {
@@ -315,7 +315,7 @@
       "source_file": "dashboard/backend/app.py",
       "source_location": "L432",
       "id": "app_strip_price_tokens",
-      "community": 3,
+      "community": 4,
       "norm_label": "strip_price_tokens()"
     },
     {
@@ -333,7 +333,7 @@
       "source_file": "dashboard/backend/app.py",
       "source_location": "L454",
       "id": "app_strip_internal_markers_from_payload",
-      "community": 3,
+      "community": 4,
       "norm_label": "strip_internal_markers_from_payload()"
     },
     {
@@ -351,7 +351,7 @@
       "source_file": "dashboard/backend/app.py",
       "source_location": "L503",
       "id": "app_parse_json_object_from_text",
-      "community": 12,
+      "community": 13,
       "norm_label": "parse_json_object_from_text()"
     },
     {
@@ -360,7 +360,7 @@
       "source_file": "dashboard/backend/app.py",
       "source_location": "L542",
       "id": "app_parse_opencode_json_output",
-      "community": 12,
+      "community": 13,
       "norm_label": "parse_opencode_json_output()"
     },
     {
@@ -414,7 +414,7 @@
       "source_file": "dashboard/backend/app.py",
       "source_location": "L709",
       "id": "app_persona_number_from_candidate",
-      "community": 3,
+      "community": 4,
       "norm_label": "_persona_number_from_candidate()"
     },
     {
@@ -450,7 +450,7 @@
       "source_file": "dashboard/backend/app.py",
       "source_location": "L921",
       "id": "app_call_opencode_compatible",
-      "community": 12,
+      "community": 13,
       "norm_label": "call_opencode_compatible()"
     },
     {
@@ -468,7 +468,7 @@
       "source_file": "dashboard/backend/app.py",
       "source_location": "L1064",
       "id": "app_scan_prompt_files_for_batch",
-      "community": 3,
+      "community": 4,
       "norm_label": "scan_prompt_files_for_batch()"
     },
     {
@@ -477,7 +477,7 @@
       "source_file": "dashboard/backend/app.py",
       "source_location": "L1074",
       "id": "app_scan_image_files_for_batch",
-      "community": 3,
+      "community": 4,
       "norm_label": "scan_image_files_for_batch()"
     },
     {
@@ -486,7 +486,7 @@
       "source_file": "dashboard/backend/app.py",
       "source_location": "L1085",
       "id": "app_refresh_manifest_file_state",
-      "community": 3,
+      "community": 4,
       "norm_label": "refresh_manifest_file_state()"
     },
     {
@@ -504,7 +504,7 @@
       "source_file": "dashboard/backend/app.py",
       "source_location": "L1116",
       "id": "app_parse_prompt_field",
-      "community": 2,
+      "community": 11,
       "norm_label": "_parse_prompt_field()"
     },
     {
@@ -513,7 +513,7 @@
       "source_file": "dashboard/backend/app.py",
       "source_location": "L1121",
       "id": "app_parse_background_lock_from_prompt",
-      "community": 2,
+      "community": 11,
       "norm_label": "parse_background_lock_from_prompt()"
     },
     {
@@ -522,7 +522,7 @@
       "source_file": "dashboard/backend/app.py",
       "source_location": "L1129",
       "id": "app_parse_prompt_filename",
-      "community": 2,
+      "community": 11,
       "norm_label": "parse_prompt_filename()"
     },
     {
@@ -531,7 +531,7 @@
       "source_file": "dashboard/backend/app.py",
       "source_location": "L1139",
       "id": "app_parse_persona_number_from_prompt",
-      "community": 3,
+      "community": 11,
       "norm_label": "parse_persona_number_from_prompt()"
     },
     {
@@ -540,7 +540,7 @@
       "source_file": "dashboard/backend/app.py",
       "source_location": "L1146",
       "id": "app_extract_on_image_copy_lines",
-      "community": 3,
+      "community": 11,
       "norm_label": "extract_on_image_copy_lines()"
     },
     {
@@ -585,7 +585,7 @@
       "source_file": "dashboard/backend/app.py",
       "source_location": "L1258",
       "id": "app_collect_45_visual_locks",
-      "community": 2,
+      "community": 11,
       "norm_label": "collect_45_visual_locks()"
     },
     {
@@ -612,7 +612,7 @@
       "source_file": "dashboard/backend/app.py",
       "source_location": "L1362",
       "id": "app_startup",
-      "community": 3,
+      "community": 4,
       "norm_label": "startup()"
     },
     {
@@ -621,7 +621,7 @@
       "source_file": "dashboard/backend/app.py",
       "source_location": "L1368",
       "id": "app_api_defaults",
-      "community": 15,
+      "community": 16,
       "norm_label": "api_defaults()"
     },
     {
@@ -630,7 +630,7 @@
       "source_file": "dashboard/backend/app.py",
       "source_location": "L1386",
       "id": "app_api_opencode_catalog",
-      "community": 11,
+      "community": 10,
       "norm_label": "api_opencode_catalog()"
     },
     {
@@ -639,7 +639,7 @@
       "source_file": "dashboard/backend/app.py",
       "source_location": "L1391",
       "id": "app_api_runs",
-      "community": 3,
+      "community": 4,
       "norm_label": "api_runs()"
     },
     {
@@ -648,7 +648,7 @@
       "source_file": "dashboard/backend/app.py",
       "source_location": "L1411",
       "id": "app_api_run",
-      "community": 3,
+      "community": 4,
       "norm_label": "api_run()"
     },
     {
@@ -657,7 +657,7 @@
       "source_file": "dashboard/backend/app.py",
       "source_location": "L1421",
       "id": "app_api_run_prompt_copies",
-      "community": 3,
+      "community": 11,
       "norm_label": "api_run_prompt_copies()"
     },
     {
@@ -711,7 +711,7 @@
       "source_file": "dashboard/backend/app.py",
       "source_location": "L1700",
       "id": "app_extract_selected_ad_keys_from_45_prompts",
-      "community": 2,
+      "community": 11,
       "norm_label": "extract_selected_ad_keys_from_45_prompts()"
     },
     {
@@ -747,7 +747,7 @@
       "source_file": "dashboard/backend/app.py",
       "source_location": "L1892",
       "id": "app_api_file_content",
-      "community": 3,
+      "community": 4,
       "norm_label": "api_file_content()"
     },
     {
@@ -765,151 +765,169 @@
       "source_file": "dashboard/frontend/app.js",
       "source_location": "L1",
       "id": "dashboard_frontend_app_js",
-      "community": 4,
+      "community": 3,
       "norm_label": "app.js"
     },
     {
       "label": "setSelectOptions()",
       "file_type": "code",
       "source_file": "dashboard/frontend/app.js",
-      "source_location": "L19",
+      "source_location": "L24",
       "id": "app_setselectoptions",
-      "community": 4,
+      "community": 3,
       "norm_label": "setselectoptions()"
     },
     {
       "label": "renderModelOptions()",
       "file_type": "code",
       "source_file": "dashboard/frontend/app.js",
-      "source_location": "L30",
+      "source_location": "L35",
       "id": "app_rendermodeloptions",
-      "community": 4,
+      "community": 3,
       "norm_label": "rendermodeloptions()"
     },
     {
       "label": "applyTheme()",
       "file_type": "code",
       "source_file": "dashboard/frontend/app.js",
-      "source_location": "L36",
+      "source_location": "L41",
       "id": "app_applytheme",
-      "community": 4,
+      "community": 3,
       "norm_label": "applytheme()"
     },
     {
       "label": "initTheme()",
       "file_type": "code",
       "source_file": "dashboard/frontend/app.js",
-      "source_location": "L44",
+      "source_location": "L49",
       "id": "app_inittheme",
-      "community": 4,
+      "community": 3,
       "norm_label": "inittheme()"
     },
     {
       "label": "chip()",
       "file_type": "code",
       "source_file": "dashboard/frontend/app.js",
-      "source_location": "L54",
+      "source_location": "L59",
       "id": "app_chip",
-      "community": 4,
+      "community": 3,
       "norm_label": "chip()"
     },
     {
       "label": "setStatus()",
       "file_type": "code",
       "source_file": "dashboard/frontend/app.js",
-      "source_location": "L63",
+      "source_location": "L68",
       "id": "app_setstatus",
-      "community": 4,
+      "community": 3,
       "norm_label": "setstatus()"
     },
     {
       "label": "getPersonaSelection()",
       "file_type": "code",
       "source_file": "dashboard/frontend/app.js",
-      "source_location": "L67",
+      "source_location": "L72",
       "id": "app_getpersonaselection",
-      "community": 4,
+      "community": 3,
       "norm_label": "getpersonaselection()"
     },
     {
       "label": "getFormatsByPersona()",
       "file_type": "code",
       "source_file": "dashboard/frontend/app.js",
-      "source_location": "L72",
+      "source_location": "L77",
       "id": "app_getformatsbypersona",
-      "community": 4,
+      "community": 3,
       "norm_label": "getformatsbypersona()"
     },
     {
       "label": "renderGlobalFormats()",
       "file_type": "code",
       "source_file": "dashboard/frontend/app.js",
-      "source_location": "L86",
+      "source_location": "L91",
       "id": "app_renderglobalformats",
-      "community": 4,
+      "community": 3,
       "norm_label": "renderglobalformats()"
     },
     {
       "label": "renderLanguageModes()",
       "file_type": "code",
       "source_file": "dashboard/frontend/app.js",
-      "source_location": "L114",
+      "source_location": "L125",
       "id": "app_renderlanguagemodes",
-      "community": 4,
+      "community": 3,
       "norm_label": "renderlanguagemodes()"
     },
     {
       "label": "renderPersonas()",
       "file_type": "code",
       "source_file": "dashboard/frontend/app.js",
-      "source_location": "L125",
+      "source_location": "L136",
       "id": "app_renderpersonas",
-      "community": 4,
+      "community": 3,
       "norm_label": "renderpersonas()"
     },
     {
       "label": "fetchDefaults()",
       "file_type": "code",
       "source_file": "dashboard/frontend/app.js",
-      "source_location": "L173",
+      "source_location": "L184",
       "id": "app_fetchdefaults",
-      "community": 4,
+      "community": 3,
       "norm_label": "fetchdefaults()"
     },
     {
       "label": "fileInput()",
       "file_type": "code",
       "source_file": "dashboard/frontend/app.js",
-      "source_location": "L195",
+      "source_location": "L206",
       "id": "app_fileinput",
-      "community": 4,
+      "community": 3,
       "norm_label": "fileinput()"
     },
     {
       "label": "runPipeline()",
       "file_type": "code",
       "source_file": "dashboard/frontend/app.js",
-      "source_location": "L199",
+      "source_location": "L210",
       "id": "app_runpipeline",
-      "community": 4,
+      "community": 3,
       "norm_label": "runpipeline()"
     },
     {
       "label": "renderRun()",
       "file_type": "code",
       "source_file": "dashboard/frontend/app.js",
-      "source_location": "L250",
+      "source_location": "L261",
       "id": "app_renderrun",
-      "community": 4,
+      "community": 3,
       "norm_label": "renderrun()"
+    },
+    {
+      "label": "updateRunNav()",
+      "file_type": "code",
+      "source_file": "dashboard/frontend/app.js",
+      "source_location": "L555",
+      "id": "app_updaterunnav",
+      "community": 3,
+      "norm_label": "updaterunnav()"
+    },
+    {
+      "label": "renderRunCarousel()",
+      "file_type": "code",
+      "source_file": "dashboard/frontend/app.js",
+      "source_location": "L562",
+      "id": "app_renderruncarousel",
+      "community": 3,
+      "norm_label": "renderruncarousel()"
     },
     {
       "label": "loadRuns()",
       "file_type": "code",
       "source_file": "dashboard/frontend/app.js",
-      "source_location": "L534",
+      "source_location": "L579",
       "id": "app_loadruns",
-      "community": 4,
+      "community": 3,
       "norm_label": "loadruns()"
     },
     {
@@ -918,7 +936,7 @@
       "source_file": "notusing/legacy_misc/generate_ads_wrapper.py",
       "source_location": "L1",
       "id": "notusing_legacy_misc_generate_ads_wrapper_py",
-      "community": 19,
+      "community": 20,
       "norm_label": "generate_ads_wrapper.py"
     },
     {
@@ -927,7 +945,7 @@
       "source_file": "notusing/legacy_misc/registry_banlist_wrapper.py",
       "source_location": "L1",
       "id": "notusing_legacy_misc_registry_banlist_wrapper_py",
-      "community": 20,
+      "community": 21,
       "norm_label": "registry_banlist_wrapper.py"
     },
     {
@@ -936,7 +954,7 @@
       "source_file": "notusing/legacy_persona/extract_persona.py",
       "source_location": "L1",
       "id": "notusing_legacy_persona_extract_persona_py",
-      "community": 13,
+      "community": 14,
       "norm_label": "extract_persona.py"
     },
     {
@@ -945,7 +963,7 @@
       "source_file": "notusing/legacy_persona/extract_persona.py",
       "source_location": "L11",
       "id": "extract_persona_parse_bullets",
-      "community": 13,
+      "community": 14,
       "norm_label": "parse_bullets()"
     },
     {
@@ -954,7 +972,7 @@
       "source_file": "notusing/legacy_persona/extract_persona.py",
       "source_location": "L25",
       "id": "extract_persona_get_persona_block",
-      "community": 13,
+      "community": 14,
       "norm_label": "get_persona_block()"
     },
     {
@@ -963,7 +981,7 @@
       "source_file": "notusing/legacy_persona/extract_persona.py",
       "source_location": "L38",
       "id": "extract_persona_build_payload",
-      "community": 13,
+      "community": 14,
       "norm_label": "build_payload()"
     },
     {
@@ -972,7 +990,7 @@
       "source_file": "notusing/legacy_persona/extract_persona.py",
       "source_location": "L55",
       "id": "extract_persona_parse_args",
-      "community": 13,
+      "community": 14,
       "norm_label": "parse_args()"
     },
     {
@@ -981,7 +999,7 @@
       "source_file": "notusing/legacy_persona/extract_persona.py",
       "source_location": "L63",
       "id": "extract_persona_main",
-      "community": 13,
+      "community": 14,
       "norm_label": "main()"
     },
     {
@@ -1098,7 +1116,7 @@
       "source_file": "scripts/bootstrap_stack.ps1",
       "source_location": "L1",
       "id": "scripts_bootstrap_stack_ps1",
-      "community": 21,
+      "community": 22,
       "norm_label": "bootstrap_stack.ps1"
     },
     {
@@ -1773,88 +1791,70 @@
       "source_file": "scripts/extract_product_context.py",
       "source_location": "L1",
       "id": "scripts_extract_product_context_py",
-      "community": 10,
+      "community": 12,
       "norm_label": "extract_product_context.py"
     },
     {
-      "label": "_clean_lines()",
+      "label": "slice_blocks()",
       "file_type": "code",
       "source_file": "scripts/extract_product_context.py",
       "source_location": "L11",
-      "id": "extract_product_context_clean_lines",
-      "community": 10,
-      "norm_label": "_clean_lines()"
+      "id": "extract_product_context_slice_blocks",
+      "community": 12,
+      "norm_label": "slice_blocks()"
     },
     {
-      "label": "_append_unique()",
+      "label": "product_sections()",
       "file_type": "code",
       "source_file": "scripts/extract_product_context.py",
-      "source_location": "L15",
-      "id": "extract_product_context_append_unique",
-      "community": 10,
-      "norm_label": "_append_unique()"
+      "source_location": "L27",
+      "id": "extract_product_context_product_sections",
+      "community": 12,
+      "norm_label": "product_sections()"
     },
     {
-      "label": "extract_snapshot_block()",
+      "label": "mechanism_sections()",
       "file_type": "code",
       "source_file": "scripts/extract_product_context.py",
-      "source_location": "L23",
-      "id": "extract_product_context_extract_snapshot_block",
-      "community": 10,
-      "norm_label": "extract_snapshot_block()"
+      "source_location": "L67",
+      "id": "extract_product_context_mechanism_sections",
+      "community": 12,
+      "norm_label": "mechanism_sections()"
     },
     {
-      "label": "extract_keyword_lines()",
+      "label": "faq_categories()",
       "file_type": "code",
       "source_file": "scripts/extract_product_context.py",
-      "source_location": "L43",
-      "id": "extract_product_context_extract_keyword_lines",
-      "community": 10,
-      "norm_label": "extract_keyword_lines()"
+      "source_location": "L77",
+      "id": "extract_product_context_faq_categories",
+      "community": 12,
+      "norm_label": "faq_categories()"
     },
     {
-      "label": "extract_product_sections()",
+      "label": "keep_sections()",
       "file_type": "code",
       "source_file": "scripts/extract_product_context.py",
-      "source_location": "L50",
-      "id": "extract_product_context_extract_product_sections",
-      "community": 10,
-      "norm_label": "extract_product_sections()"
+      "source_location": "L84",
+      "id": "extract_product_context_keep_sections",
+      "community": 12,
+      "norm_label": "keep_sections()"
     },
     {
-      "label": "extract_mechanism_sections()",
+      "label": "keep_categories()",
       "file_type": "code",
       "source_file": "scripts/extract_product_context.py",
-      "source_location": "L103",
-      "id": "extract_product_context_extract_mechanism_sections",
-      "community": 10,
-      "norm_label": "extract_mechanism_sections()"
-    },
-    {
-      "label": "extract_faq_sections()",
-      "file_type": "code",
-      "source_file": "scripts/extract_product_context.py",
-      "source_location": "L133",
-      "id": "extract_product_context_extract_faq_sections",
-      "community": 10,
-      "norm_label": "extract_faq_sections()"
-    },
-    {
-      "label": "compact_lines()",
-      "file_type": "code",
-      "source_file": "scripts/extract_product_context.py",
-      "source_location": "L176",
-      "id": "extract_product_context_compact_lines",
-      "community": 10,
-      "norm_label": "compact_lines()"
+      "source_location": "L88",
+      "id": "extract_product_context_keep_categories",
+      "community": 12,
+      "norm_label": "keep_categories()"
     },
     {
       "label": "main()",
       "file_type": "code",
       "source_file": "scripts/extract_product_context.py",
-      "source_location": "L203",
+      "source_location": "L92",
       "id": "extract_product_context_main",
-      "community": 10,
+      "community": 12,
       "norm_label": "main()"
     },
     {
@@ -1863,7 +1863,7 @@
       "source_file": "scripts/registry_banlist.py",
       "source_location": "L1",
       "id": "scripts_registry_banlist_py",
-      "community": 14,
+      "community": 15,
       "norm_label": "registry_banlist.py"
     },
     {
@@ -1872,7 +1872,7 @@
       "source_file": "scripts/registry_banlist.py",
       "source_location": "L34",
       "id": "registry_banlist_parse_args",
-      "community": 14,
+      "community": 15,
       "norm_label": "parse_args()"
     },
     {
@@ -1881,7 +1881,7 @@
       "source_file": "scripts/registry_banlist.py",
       "source_location": "L42",
       "id": "registry_banlist_load_json",
-      "community": 14,
+      "community": 15,
       "norm_label": "load_json()"
     },
     {
@@ -1890,7 +1890,7 @@
       "source_file": "scripts/registry_banlist.py",
       "source_location": "L46",
       "id": "registry_banlist_main",
-      "community": 14,
+      "community": 15,
       "norm_label": "main()"
     },
     {
@@ -1899,7 +1899,7 @@
       "source_file": "scripts/stop_dashboard_stack.ps1",
       "source_location": "L1",
       "id": "scripts_stop_dashboard_stack_ps1",
-      "community": 16,
+      "community": 17,
       "norm_label": "stop_dashboard_stack.ps1"
     },
     {
@@ -1908,7 +1908,7 @@
       "source_file": "scripts/stop_dashboard_stack.ps1",
       "source_location": "L6",
       "id": "stop_dashboard_stack_stop_frompidfile",
-      "community": 16,
+      "community": 17,
       "norm_label": "stop-frompidfile()"
     },
     {
@@ -3048,7 +3048,7 @@
       "relation": "calls",
       "confidence": "EXTRACTED",
       "source_file": "dashboard/backend/app.py",
-      "source_location": "L2047",
+      "source_location": "L1997",
       "weight": 1.0,
       "_src": "app_api_run_execute",
       "_tgt": "app_resolve_language_mode",
@@ -3060,7 +3060,7 @@
       "relation": "calls",
       "confidence": "EXTRACTED",
       "source_file": "dashboard/backend/app.py",
-      "source_location": "L2073",
+      "source_location": "L2023",
       "weight": 1.0,
       "_src": "app_api_run_execute",
       "_tgt": "app_assembler_language_mode",
@@ -3096,7 +3096,7 @@
       "relation": "calls",
       "confidence": "EXTRACTED",
       "source_file": "dashboard/backend/app.py",
-      "source_location": "L2045",
+      "source_location": "L1995",
       "weight": 1.0,
       "_src": "app_api_run_execute",
       "_tgt": "app_now_iso",
@@ -3180,7 +3180,7 @@
       "relation": "calls",
       "confidence": "EXTRACTED",
       "source_file": "dashboard/backend/app.py",
-      "source_location": "L2019",
+      "source_location": "L1969",
       "weight": 1.0,
       "_src": "app_api_run_execute",
       "_tgt": "app_parse_persona_library",
@@ -3192,7 +3192,7 @@
       "relation": "calls",
       "confidence": "EXTRACTED",
       "source_file": "dashboard/backend/app.py",
-      "source_location": "L2024",
+      "source_location": "L1974",
       "weight": 1.0,
       "_src": "app_api_run_execute",
       "_tgt": "app_build_persona_payload",
@@ -3300,7 +3300,7 @@
       "relation": "calls",
       "confidence": "EXTRACTED",
       "source_file": "dashboard/backend/app.py",
-      "source_location": "L1972",
+      "source_location": "L1950",
       "weight": 1.0,
       "_src": "app_api_run_execute",
       "_tgt": "app_run_cmd",
@@ -3612,19 +3612,7 @@
       "relation": "calls",
       "confidence": "EXTRACTED",
       "source_file": "dashboard/backend/app.py",
-      "source_location": "L1950",
-      "weight": 1.0,
-      "_src": "app_api_run_execute",
-      "_tgt": "app_choose_extractor_model",
-      "source": "app_choose_extractor_model",
-      "target": "app_api_run_execute",
-      "confidence_score": 1.0
-    },
-    {
-      "relation": "calls",
-      "confidence": "EXTRACTED",
-      "source_file": "dashboard/backend/app.py",
-      "source_location": "L2017",
+      "source_location": "L1964",
       "weight": 1.0,
       "_src": "app_api_run_execute",
       "_tgt": "app_parse_json_stdout",
@@ -3756,7 +3744,7 @@
       "relation": "calls",
       "confidence": "EXTRACTED",
       "source_file": "dashboard/backend/app.py",
-      "source_location": "L2061",
+      "source_location": "L2011",
       "weight": 1.0,
       "_src": "app_api_run_execute",
       "_tgt": "app_strip_internal_markers_from_payload",
@@ -3768,7 +3756,7 @@
       "relation": "calls",
       "confidence": "EXTRACTED",
       "source_file": "dashboard/backend/app.py",
-      "source_location": "L2081",
+      "source_location": "L2031",
       "weight": 1.0,
       "_src": "app_api_run_execute",
       "_tgt": "app_parse_uniqueness_collisions",
@@ -3828,7 +3816,7 @@
       "relation": "calls",
       "confidence": "EXTRACTED",
       "source_file": "dashboard/backend/app.py",
-      "source_location": "L2083",
+      "source_location": "L2033",
       "weight": 1.0,
       "_src": "app_api_run_execute",
       "_tgt": "app_call_opencode_repair_copy",
@@ -3948,7 +3936,7 @@
       "relation": "calls",
       "confidence": "EXTRACTED",
       "source_file": "dashboard/backend/app.py",
-      "source_location": "L2060",
+      "source_location": "L2010",
       "weight": 1.0,
       "_src": "app_api_run_execute",
       "_tgt": "app_normalize_generated_copy",
@@ -3960,7 +3948,7 @@
       "relation": "calls",
       "confidence": "EXTRACTED",
       "source_file": "dashboard/backend/app.py",
-      "source_location": "L2058",
+      "source_location": "L2008",
       "weight": 1.0,
       "_src": "app_api_run_execute",
       "_tgt": "app_call_opencode_compatible",
@@ -4044,7 +4032,7 @@
       "relation": "calls",
       "confidence": "EXTRACTED",
       "source_file": "dashboard/backend/app.py",
-      "source_location": "L2145",
+      "source_location": "L2095",
       "weight": 1.0,
       "_src": "app_api_run_execute",
       "_tgt": "app_collect_run_result",
@@ -4620,7 +4608,7 @@
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "dashboard/frontend/app.js",
-      "source_location": "L19",
+      "source_location": "L24",
       "weight": 1.0,
       "_src": "dashboard_frontend_app_js",
       "_tgt": "app_setselectoptions",
@@ -4632,7 +4620,7 @@
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "dashboard/frontend/app.js",
-      "source_location": "L30",
+      "source_location": "L35",
       "weight": 1.0,
       "_src": "dashboard_frontend_app_js",
       "_tgt": "app_rendermodeloptions",
@@ -4644,7 +4632,7 @@
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "dashboard/frontend/app.js",
-      "source_location": "L36",
+      "source_location": "L41",
       "weight": 1.0,
       "_src": "dashboard_frontend_app_js",
       "_tgt": "app_applytheme",
@@ -4656,7 +4644,7 @@
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "dashboard/frontend/app.js",
-      "source_location": "L44",
+      "source_location": "L49",
       "weight": 1.0,
       "_src": "dashboard_frontend_app_js",
       "_tgt": "app_inittheme",
@@ -4668,7 +4656,7 @@
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "dashboard/frontend/app.js",
-      "source_location": "L54",
+      "source_location": "L59",
       "weight": 1.0,
       "_src": "dashboard_frontend_app_js",
       "_tgt": "app_chip",
@@ -4680,7 +4668,7 @@
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "dashboard/frontend/app.js",
-      "source_location": "L63",
+      "source_location": "L68",
       "weight": 1.0,
       "_src": "dashboard_frontend_app_js",
       "_tgt": "app_setstatus",
@@ -4692,7 +4680,7 @@
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "dashboard/frontend/app.js",
-      "source_location": "L67",
+      "source_location": "L72",
       "weight": 1.0,
       "_src": "dashboard_frontend_app_js",
       "_tgt": "app_getpersonaselection",
@@ -4704,7 +4692,7 @@
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "dashboard/frontend/app.js",
-      "source_location": "L72",
+      "source_location": "L77",
       "weight": 1.0,
       "_src": "dashboard_frontend_app_js",
       "_tgt": "app_getformatsbypersona",
@@ -4716,7 +4704,7 @@
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "dashboard/frontend/app.js",
-      "source_location": "L86",
+      "source_location": "L91",
       "weight": 1.0,
       "_src": "dashboard_frontend_app_js",
       "_tgt": "app_renderglobalformats",
@@ -4728,7 +4716,7 @@
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "dashboard/frontend/app.js",
-      "source_location": "L114",
+      "source_location": "L125",
       "weight": 1.0,
       "_src": "dashboard_frontend_app_js",
       "_tgt": "app_renderlanguagemodes",
@@ -4740,7 +4728,7 @@
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "dashboard/frontend/app.js",
-      "source_location": "L125",
+      "source_location": "L136",
       "weight": 1.0,
       "_src": "dashboard_frontend_app_js",
       "_tgt": "app_renderpersonas",
@@ -4752,7 +4740,7 @@
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "dashboard/frontend/app.js",
-      "source_location": "L173",
+      "source_location": "L184",
       "weight": 1.0,
       "_src": "dashboard_frontend_app_js",
       "_tgt": "app_fetchdefaults",
@@ -4764,7 +4752,7 @@
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "dashboard/frontend/app.js",
-      "source_location": "L195",
+      "source_location": "L206",
       "weight": 1.0,
       "_src": "dashboard_frontend_app_js",
       "_tgt": "app_fileinput",
@@ -4776,7 +4764,7 @@
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "dashboard/frontend/app.js",
-      "source_location": "L199",
+      "source_location": "L210",
       "weight": 1.0,
       "_src": "dashboard_frontend_app_js",
       "_tgt": "app_runpipeline",
@@ -4788,7 +4776,7 @@
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "dashboard/frontend/app.js",
-      "source_location": "L250",
+      "source_location": "L261",
       "weight": 1.0,
       "_src": "dashboard_frontend_app_js",
       "_tgt": "app_renderrun",
@@ -4800,7 +4788,31 @@
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "dashboard/frontend/app.js",
-      "source_location": "L534",
+      "source_location": "L555",
+      "weight": 1.0,
+      "_src": "dashboard_frontend_app_js",
+      "_tgt": "app_updaterunnav",
+      "source": "dashboard_frontend_app_js",
+      "target": "app_updaterunnav",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "dashboard/frontend/app.js",
+      "source_location": "L562",
+      "weight": 1.0,
+      "_src": "dashboard_frontend_app_js",
+      "_tgt": "app_renderruncarousel",
+      "source": "dashboard_frontend_app_js",
+      "target": "app_renderruncarousel",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "dashboard/frontend/app.js",
+      "source_location": "L579",
       "weight": 1.0,
       "_src": "dashboard_frontend_app_js",
       "_tgt": "app_loadruns",
@@ -4812,7 +4824,7 @@
       "relation": "calls",
       "confidence": "EXTRACTED",
       "source_file": "dashboard/frontend/app.js",
-      "source_location": "L33",
+      "source_location": "L38",
       "weight": 1.0,
       "_src": "app_rendermodeloptions",
       "_tgt": "app_setselectoptions",
@@ -4824,7 +4836,7 @@
       "relation": "calls",
       "confidence": "EXTRACTED",
       "source_file": "dashboard/frontend/app.js",
-      "source_location": "L191",
+      "source_location": "L202",
       "weight": 1.0,
       "_src": "app_fetchdefaults",
       "_tgt": "app_setselectoptions",
@@ -4836,7 +4848,7 @@
       "relation": "calls",
       "confidence": "EXTRACTED",
       "source_file": "dashboard/frontend/app.js",
-      "source_location": "L192",
+      "source_location": "L203",
       "weight": 1.0,
       "_src": "app_fetchdefaults",
       "_tgt": "app_rendermodeloptions",
@@ -4848,7 +4860,7 @@
       "relation": "calls",
       "confidence": "EXTRACTED",
       "source_file": "dashboard/frontend/app.js",
-      "source_location": "L47",
+      "source_location": "L52",
       "weight": 1.0,
       "_src": "app_inittheme",
       "_tgt": "app_applytheme",
@@ -4860,7 +4872,7 @@
       "relation": "calls",
       "confidence": "EXTRACTED",
       "source_file": "dashboard/frontend/app.js",
-      "source_location": "L202",
+      "source_location": "L213",
       "weight": 1.0,
       "_src": "app_runpipeline",
       "_tgt": "app_setstatus",
@@ -4872,7 +4884,7 @@
       "relation": "calls",
       "confidence": "EXTRACTED",
       "source_file": "dashboard/frontend/app.js",
-      "source_location": "L200",
+      "source_location": "L211",
       "weight": 1.0,
       "_src": "app_runpipeline",
       "_tgt": "app_getpersonaselection",
@@ -4884,7 +4896,7 @@
       "relation": "calls",
       "confidence": "EXTRACTED",
       "source_file": "dashboard/frontend/app.js",
-      "source_location": "L210",
+      "source_location": "L221",
       "weight": 1.0,
       "_src": "app_runpipeline",
       "_tgt": "app_getformatsbypersona",
@@ -4896,7 +4908,7 @@
       "relation": "calls",
       "confidence": "EXTRACTED",
       "source_file": "dashboard/frontend/app.js",
-      "source_location": "L178",
+      "source_location": "L189",
       "weight": 1.0,
       "_src": "app_fetchdefaults",
       "_tgt": "app_renderglobalformats",
@@ -4908,7 +4920,7 @@
       "relation": "calls",
       "confidence": "EXTRACTED",
       "source_file": "dashboard/frontend/app.js",
-      "source_location": "L179",
+      "source_location": "L190",
       "weight": 1.0,
       "_src": "app_fetchdefaults",
       "_tgt": "app_renderlanguagemodes",
@@ -4920,7 +4932,7 @@
       "relation": "calls",
       "confidence": "EXTRACTED",
       "source_file": "dashboard/frontend/app.js",
-      "source_location": "L177",
+      "source_location": "L188",
       "weight": 1.0,
       "_src": "app_fetchdefaults",
       "_tgt": "app_renderpersonas",
@@ -4932,7 +4944,7 @@
       "relation": "calls",
       "confidence": "EXTRACTED",
       "source_file": "dashboard/frontend/app.js",
-      "source_location": "L222",
+      "source_location": "L233",
       "weight": 1.0,
       "_src": "app_runpipeline",
       "_tgt": "app_fileinput",
@@ -4944,11 +4956,47 @@
       "relation": "calls",
       "confidence": "EXTRACTED",
       "source_file": "dashboard/frontend/app.js",
-      "source_location": "L247",
+      "source_location": "L258",
       "weight": 1.0,
       "_src": "app_runpipeline",
       "_tgt": "app_loadruns",
       "source": "app_runpipeline",
+      "target": "app_loadruns",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "calls",
+      "confidence": "EXTRACTED",
+      "source_file": "dashboard/frontend/app.js",
+      "source_location": "L575",
+      "weight": 1.0,
+      "_src": "app_renderruncarousel",
+      "_tgt": "app_renderrun",
+      "source": "app_renderrun",
+      "target": "app_renderruncarousel",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "calls",
+      "confidence": "EXTRACTED",
+      "source_file": "dashboard/frontend/app.js",
+      "source_location": "L569",
+      "weight": 1.0,
+      "_src": "app_renderruncarousel",
+      "_tgt": "app_updaterunnav",
+      "source": "app_updaterunnav",
+      "target": "app_renderruncarousel",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "calls",
+      "confidence": "EXTRACTED",
+      "source_file": "dashboard/frontend/app.js",
+      "source_location": "L587",
+      "weight": 1.0,
+      "_src": "app_loadruns",
+      "_tgt": "app_renderruncarousel",
+      "source": "app_renderruncarousel",
       "target": "app_loadruns",
       "confidence_score": 1.0
     },
@@ -7167,100 +7215,76 @@
       "source_location": "L11",
       "weight": 1.0,
       "_src": "scripts_extract_product_context_py",
-      "_tgt": "extract_product_context_clean_lines",
+      "_tgt": "extract_product_context_slice_blocks",
       "source": "scripts_extract_product_context_py",
-      "target": "extract_product_context_clean_lines",
+      "target": "extract_product_context_slice_blocks",
       "confidence_score": 1.0
     },
     {
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "scripts/extract_product_context.py",
-      "source_location": "L15",
+      "source_location": "L27",
       "weight": 1.0,
       "_src": "scripts_extract_product_context_py",
-      "_tgt": "extract_product_context_append_unique",
+      "_tgt": "extract_product_context_product_sections",
       "source": "scripts_extract_product_context_py",
-      "target": "extract_product_context_append_unique",
+      "target": "extract_product_context_product_sections",
       "confidence_score": 1.0
     },
     {
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "scripts/extract_product_context.py",
-      "source_location": "L23",
+      "source_location": "L67",
       "weight": 1.0,
       "_src": "scripts_extract_product_context_py",
-      "_tgt": "extract_product_context_extract_snapshot_block",
+      "_tgt": "extract_product_context_mechanism_sections",
       "source": "scripts_extract_product_context_py",
-      "target": "extract_product_context_extract_snapshot_block",
+      "target": "extract_product_context_mechanism_sections",
       "confidence_score": 1.0
     },
     {
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "scripts/extract_product_context.py",
-      "source_location": "L43",
+      "source_location": "L77",
       "weight": 1.0,
       "_src": "scripts_extract_product_context_py",
-      "_tgt": "extract_product_context_extract_keyword_lines",
+      "_tgt": "extract_product_context_faq_categories",
       "source": "scripts_extract_product_context_py",
-      "target": "extract_product_context_extract_keyword_lines",
+      "target": "extract_product_context_faq_categories",
       "confidence_score": 1.0
     },
     {
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "scripts/extract_product_context.py",
-      "source_location": "L50",
+      "source_location": "L84",
       "weight": 1.0,
       "_src": "scripts_extract_product_context_py",
-      "_tgt": "extract_product_context_extract_product_sections",
+      "_tgt": "extract_product_context_keep_sections",
       "source": "scripts_extract_product_context_py",
-      "target": "extract_product_context_extract_product_sections",
+      "target": "extract_product_context_keep_sections",
       "confidence_score": 1.0
     },
     {
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "scripts/extract_product_context.py",
-      "source_location": "L103",
+      "source_location": "L88",
       "weight": 1.0,
       "_src": "scripts_extract_product_context_py",
-      "_tgt": "extract_product_context_extract_mechanism_sections",
+      "_tgt": "extract_product_context_keep_categories",
       "source": "scripts_extract_product_context_py",
-      "target": "extract_product_context_extract_mechanism_sections",
+      "target": "extract_product_context_keep_categories",
       "confidence_score": 1.0
     },
     {
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "scripts/extract_product_context.py",
-      "source_location": "L133",
-      "weight": 1.0,
-      "_src": "scripts_extract_product_context_py",
-      "_tgt": "extract_product_context_extract_faq_sections",
-      "source": "scripts_extract_product_context_py",
-      "target": "extract_product_context_extract_faq_sections",
-      "confidence_score": 1.0
-    },
-    {
-      "relation": "contains",
-      "confidence": "EXTRACTED",
-      "source_file": "scripts/extract_product_context.py",
-      "source_location": "L176",
-      "weight": 1.0,
-      "_src": "scripts_extract_product_context_py",
-      "_tgt": "extract_product_context_compact_lines",
-      "source": "scripts_extract_product_context_py",
-      "target": "extract_product_context_compact_lines",
-      "confidence_score": 1.0
-    },
-    {
-      "relation": "contains",
-      "confidence": "EXTRACTED",
-      "source_file": "scripts/extract_product_context.py",
-      "source_location": "L203",
+      "source_location": "L92",
       "weight": 1.0,
       "_src": "scripts_extract_product_context_py",
       "_tgt": "extract_product_context_main",
@@ -7272,23 +7296,35 @@
       "relation": "calls",
       "confidence": "EXTRACTED",
       "source_file": "scripts/extract_product_context.py",
-      "source_location": "L177",
+      "source_location": "L69",
       "weight": 1.0,
-      "_src": "extract_product_context_compact_lines",
-      "_tgt": "extract_product_context_clean_lines",
-      "source": "extract_product_context_clean_lines",
-      "target": "extract_product_context_compact_lines",
+      "_src": "extract_product_context_mechanism_sections",
+      "_tgt": "extract_product_context_slice_blocks",
+      "source": "extract_product_context_slice_blocks",
+      "target": "extract_product_context_mechanism_sections",
       "confidence_score": 1.0
     },
     {
       "relation": "calls",
       "confidence": "EXTRACTED",
       "source_file": "scripts/extract_product_context.py",
-      "source_location": "L223",
+      "source_location": "L79",
+      "weight": 1.0,
+      "_src": "extract_product_context_faq_categories",
+      "_tgt": "extract_product_context_slice_blocks",
+      "source": "extract_product_context_slice_blocks",
+      "target": "extract_product_context_faq_categories",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "calls",
+      "confidence": "EXTRACTED",
+      "source_file": "scripts/extract_product_context.py",
+      "source_location": "L104",
       "weight": 1.0,
       "_src": "extract_product_context_main",
-      "_tgt": "extract_product_context_clean_lines",
-      "source": "extract_product_context_clean_lines",
+      "_tgt": "extract_product_context_product_sections",
+      "source": "extract_product_context_product_sections",
       "target": "extract_product_context_main",
       "confidence_score": 1.0
     },
@@ -7296,47 +7332,11 @@
       "relation": "calls",
       "confidence": "EXTRACTED",
       "source_file": "scripts/extract_product_context.py",
-      "source_location": "L182",
-      "weight": 1.0,
-      "_src": "extract_product_context_compact_lines",
-      "_tgt": "extract_product_context_append_unique",
-      "source": "extract_product_context_append_unique",
-      "target": "extract_product_context_compact_lines",
-      "confidence_score": 1.0
-    },
-    {
-      "relation": "calls",
-      "confidence": "EXTRACTED",
-      "source_file": "scripts/extract_product_context.py",
-      "source_location": "L181",
-      "weight": 1.0,
-      "_src": "extract_product_context_compact_lines",
-      "_tgt": "extract_product_context_extract_snapshot_block",
-      "source": "extract_product_context_extract_snapshot_block",
-      "target": "extract_product_context_compact_lines",
-      "confidence_score": 1.0
-    },
-    {
-      "relation": "calls",
-      "confidence": "EXTRACTED",
-      "source_file": "scripts/extract_product_context.py",
-      "source_location": "L191",
-      "weight": 1.0,
-      "_src": "extract_product_context_compact_lines",
-      "_tgt": "extract_product_context_extract_keyword_lines",
-      "source": "extract_product_context_extract_keyword_lines",
-      "target": "extract_product_context_compact_lines",
-      "confidence_score": 1.0
-    },
-    {
-      "relation": "calls",
-      "confidence": "EXTRACTED",
-      "source_file": "scripts/extract_product_context.py",
-      "source_location": "L280",
+      "source_location": "L105",
       "weight": 1.0,
       "_src": "extract_product_context_main",
-      "_tgt": "extract_product_context_extract_product_sections",
-      "source": "extract_product_context_extract_product_sections",
+      "_tgt": "extract_product_context_mechanism_sections",
+      "source": "extract_product_context_mechanism_sections",
       "target": "extract_product_context_main",
       "confidence_score": 1.0
     },
@@ -7344,11 +7344,11 @@
       "relation": "calls",
       "confidence": "EXTRACTED",
       "source_file": "scripts/extract_product_context.py",
-      "source_location": "L286",
+      "source_location": "L106",
       "weight": 1.0,
       "_src": "extract_product_context_main",
-      "_tgt": "extract_product_context_extract_mechanism_sections",
-      "source": "extract_product_context_extract_mechanism_sections",
+      "_tgt": "extract_product_context_faq_categories",
+      "source": "extract_product_context_faq_categories",
       "target": "extract_product_context_main",
       "confidence_score": 1.0
     },
@@ -7356,11 +7356,11 @@
       "relation": "calls",
       "confidence": "EXTRACTED",
       "source_file": "scripts/extract_product_context.py",
-      "source_location": "L292",
+      "source_location": "L109",
       "weight": 1.0,
       "_src": "extract_product_context_main",
-      "_tgt": "extract_product_context_extract_faq_sections",
-      "source": "extract_product_context_extract_faq_sections",
+      "_tgt": "extract_product_context_keep_sections",
+      "source": "extract_product_context_keep_sections",
       "target": "extract_product_context_main",
       "confidence_score": 1.0
     },
@@ -7368,11 +7368,11 @@
       "relation": "calls",
       "confidence": "EXTRACTED",
       "source_file": "scripts/extract_product_context.py",
-      "source_location": "L276",
+      "source_location": "L111",
       "weight": 1.0,
       "_src": "extract_product_context_main",
-      "_tgt": "extract_product_context_compact_lines",
-      "source": "extract_product_context_compact_lines",
+      "_tgt": "extract_product_context_keep_categories",
+      "source": "extract_product_context_keep_categories",
       "target": "extract_product_context_main",
       "confidence_score": 1.0
     },
