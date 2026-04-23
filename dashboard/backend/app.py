@@ -7,6 +7,7 @@ import os
 import random
 import re
 import subprocess
+import tempfile
 import time
 import urllib.request
 import hashlib
@@ -27,7 +28,9 @@ RUNS_ROOT = STORAGE_ROOT / "runs"
 RUNTIME_ROOT = ROOT / "runtime"
 ENV_PATH = ROOT / ".env.dashboard"
 
-DEFAULT_PRODUCT_INFO = ROOT / "productinfomain.txt"
+LEGACY_PRODUCT_INFO = ROOT / "productinfomain.txt"
+MASTER_PRODUCT_INFO = ROOT / "productmaster.txt"
+DEFAULT_PRODUCT_INFO = MASTER_PRODUCT_INFO if MASTER_PRODUCT_INFO.exists() else LEGACY_PRODUCT_INFO
 DEFAULT_MECHANISM = ROOT / "PRODUCT_MECHANISM_V1.txt"
 DEFAULT_FAQ = ROOT / "faq.txt"
 DEFAULT_PLAYBOOK = ROOT / "AD_CREATIVE_SYSTEM_PLAYBOOK.md"
@@ -119,6 +122,220 @@ PERSONA_SEED_INPUTS: dict[int, dict[str, str]] = {
     21: {"pain": "Hates complicated plans and too many rules.", "desire": "Simple steps with almost no guesswork.", "friction": "Complexity causes early drop-off.", "proof": "Needs a very clear, easy-to-follow structure.", "tone": "simple and direct"},
     22: {"pain": "Progress feels slower after 35 despite effort.", "desire": "Steady sustainable progress without extreme routines.", "friction": "Frustration from slow visible change.", "proof": "Needs realistic milestones and consistency proof.", "tone": "reassuring and practical"},
 }
+
+
+FEATURE_LANES: dict[str, dict[str, str]] = {
+    "am_routine": {
+        "label": "AM routine",
+        "headline_driver": "morning OK Liquid, empty stomach start, 4-hour no-solid-food window",
+        "support_driver": "weight-loss routine gets easier when mornings are structured",
+    },
+    "pm_routine": {
+        "label": "PM routine",
+        "headline_driver": "night OK Tablet + OK Powder before sleep for digestion-support-led weight-loss routine",
+        "support_driver": "lighter nights and better next-day adherence",
+    },
+    "cravings_down": {
+        "label": "Cravings down",
+        "headline_driver": "reduced hunger, fewer cravings, easier appetite control for weight loss",
+        "support_driver": "lower snacking friction and steadier calorie-deficit follow-through",
+    },
+    "guided_support": {
+        "label": "Guided support",
+        "headline_driver": "daily tracker, WhatsApp guidance, and coach-led follow-through for weight loss",
+        "support_driver": "support system helps users stay consistent instead of guessing",
+    },
+    "structured_system": {
+        "label": "Structured system",
+        "headline_driver": "day-wise protocol, low guesswork, and practical obesity-management structure",
+        "support_driver": "clear routine replaces random trial-and-error",
+    },
+    "homemade_food": {
+        "label": "Homemade-food fit",
+        "headline_driver": "weight-loss support that works with regular homemade food",
+        "support_driver": "less meal-prep burden makes daily adherence more realistic",
+    },
+    "natural_safe": {
+        "label": "Natural safe-feeling",
+        "headline_driver": "all-natural Ayurvedic weight-loss support with no-side-effects positioning",
+        "support_driver": "trust-led framing for users avoiding harsh methods",
+    },
+    "proof_guarantee": {
+        "label": "Proof and guarantee",
+        "headline_driver": "3 to 5 kg in 15 days, tracker-backed support, and 7-day refund conditions",
+        "support_driver": "result proof and risk-reversal make the routine more believable",
+    },
+}
+
+
+FORMAT_FEATURE_ROTATION: dict[str, list[str]] = {
+    "HERO": ["am_routine", "cravings_down", "guided_support", "structured_system", "natural_safe", "proof_guarantee", "homemade_food"],
+    "BA": ["cravings_down", "am_routine", "structured_system", "guided_support", "pm_routine", "proof_guarantee"],
+    "TEST": ["guided_support", "cravings_down", "structured_system", "natural_safe", "proof_guarantee", "am_routine"],
+    "FEAT": ["am_routine", "pm_routine", "cravings_down", "guided_support", "structured_system", "homemade_food", "natural_safe"],
+    "UGC": ["cravings_down", "am_routine", "guided_support", "homemade_food", "structured_system", "proof_guarantee"],
+}
+
+
+def build_copy_requirements(persona_number: int, fmt: str, format_sequence_index: int) -> dict[str, Any]:
+    order = FORMAT_FEATURE_ROTATION.get(fmt, ["am_routine", "cravings_down", "guided_support"])
+    primary_idx = (persona_number + format_sequence_index - 1) % len(order)
+    secondary_idx = (primary_idx + 1) % len(order)
+    primary_key = order[primary_idx]
+    secondary_key = order[secondary_idx]
+    primary = FEATURE_LANES[primary_key]
+    secondary = FEATURE_LANES[secondary_key]
+    return {
+        "primary_feature": primary["label"],
+        "primary_feature_key": primary_key,
+        "headline_driver": primary["headline_driver"],
+        "secondary_feature": secondary["label"],
+        "secondary_feature_key": secondary_key,
+        "support_driver": secondary["support_driver"],
+        "must_mention": "Headline or paired support copy must explicitly mention weight loss, obesity reduction, excess-weight reduction, or a 15-day weight outcome.",
+        "variation_rule": "Do not reuse the same headline skeleton or subheadline skeleton as other ads in the same format for this batch.",
+        "format_specific_rule": {
+            "HERO": "Lead headline with one concrete product feature lane. Support line must add a second feature, not paraphrase the headline.",
+            "UGC": "Make it sound like a creator-style practical observation, but still tie the copy to a concrete product feature lane.",
+            "BA": "Left-side bullets must show the struggle state. Right-side bullets must show a specific product-feature-led shift in the weight-loss routine.",
+            "TEST": "Quote/review line should mention a specific feature or result driver, not a vague generic compliment.",
+            "FEAT": "Each bullet must cover a different feature. Do not repeat the same feature idea across all bullets.",
+        }.get(fmt, "Use feature-led copy instead of generic transformation language."),
+    }
+
+
+def build_generation_payload_for_llm(context: dict[str, Any]) -> dict[str, Any]:
+    product_context = context.get("product_context") if isinstance(context.get("product_context"), dict) else {}
+    compact_product_context: dict[str, list[str]] = {}
+    for key, value in product_context.items():
+        if isinstance(value, list):
+            compact_product_context[key] = [str(item).strip() for item in value[:40] if str(item).strip()]
+
+    compact_ads: list[dict[str, Any]] = []
+    for item in context.get("ads") or []:
+        if not isinstance(item, dict):
+            continue
+        persona = item.get("persona") if isinstance(item.get("persona"), dict) else {}
+        format_rules = item.get("format_rules") if isinstance(item.get("format_rules"), dict) else {}
+        compact_ads.append(
+            {
+                "format": item.get("format"),
+                "persona": {
+                    "persona_number": persona.get("persona_number"),
+                    "persona_name": persona.get("persona_name"),
+                    "pain_points": persona.get("pain_points") or [],
+                    "objections": persona.get("objections") or [],
+                    "core_message": persona.get("core_message") or [],
+                    "trust_anchors": persona.get("trust_anchors") or [],
+                    "english_ready": persona.get("english_ready") or [],
+                    "hindi_ready": persona.get("hindi_ready") or [],
+                },
+                "format_rules": {
+                    "format": format_rules.get("format"),
+                    "rules": [str(rule).strip() for rule in (format_rules.get("rules") or [])[:18] if str(rule).strip()],
+                },
+                "copy_requirements": item.get("copy_requirements") or {},
+            }
+        )
+
+    requested_plan = []
+    for item in compact_ads:
+        persona = item.get("persona") if isinstance(item.get("persona"), dict) else {}
+        requested_plan.append(
+            {
+                "format": item.get("format"),
+                "persona_number": persona.get("persona_number"),
+                "persona_name": persona.get("persona_name"),
+                "primary_feature": (item.get("copy_requirements") or {}).get("primary_feature"),
+            }
+        )
+
+    return {
+        "generated_at": context.get("generated_at"),
+        "run_id": context.get("run_id"),
+        "language_mode": context.get("language_mode"),
+        "context_source": context.get("context_source"),
+        "context_extractor_model": context.get("context_extractor_model"),
+        "requested_ad_count": len(compact_ads),
+        "requested_plan": requested_plan,
+        "product_context": compact_product_context,
+        "ads": compact_ads,
+    }
+
+
+def validate_generated_copy_payload(copy_json: dict[str, Any], planned_ads: list[dict[str, Any]]) -> str | None:
+    ads = copy_json.get("ads") if isinstance(copy_json, dict) else None
+    if not isinstance(ads, list):
+        return "Generated payload did not include an ads array"
+    if len(ads) < len(planned_ads):
+        return f"Generated ads count {len(ads)} is lower than planned count {len(planned_ads)}"
+
+    planned_keys = {
+        (str(item.get("format") or "").strip().upper(), int((item.get("persona") or {}).get("persona_number") or 0))
+        for item in planned_ads
+        if isinstance(item, dict) and isinstance(item.get("persona"), dict)
+    }
+    seen_keys: set[tuple[str, int]] = set()
+    for ad in ads:
+        if not isinstance(ad, dict):
+            return "Generated ads payload contains a non-object item"
+        fmt = str(ad.get("format") or "").strip().upper()
+        persona = ad.get("persona") if isinstance(ad.get("persona"), dict) else {}
+        persona_number = persona.get("number")
+        if not isinstance(persona_number, int):
+            persona_number = persona.get("persona_number")
+        if not isinstance(persona_number, int):
+            return f"Generated ad for format {fmt or '?'} is missing persona number"
+        seen_keys.add((fmt, persona_number))
+        copy = ad.get("copy") if isinstance(ad.get("copy"), dict) else {}
+        for lang in ["EN", "HI"]:
+            block = copy.get(lang) if isinstance(copy.get(lang), dict) else {}
+            if not str(block.get("headline") or "").strip():
+                return f"Generated ad {fmt}/P{persona_number} is missing {lang} headline"
+            if fmt in {"HERO", "UGC"} and not str(block.get("support_line") or "").strip():
+                return f"Generated ad {fmt}/P{persona_number} is missing {lang} support line"
+            if fmt in {"BA", "FEAT"}:
+                bullets = block.get("bullets") if isinstance(block.get("bullets"), list) else []
+                if len([item for item in bullets if isinstance(item, str) and item.strip()]) < 2:
+                    return f"Generated ad {fmt}/P{persona_number} has insufficient {lang} bullets"
+            if fmt == "TEST" and not str(block.get("attribution") or "").strip():
+                return f"Generated ad {fmt}/P{persona_number} is missing {lang} attribution"
+
+    missing = sorted(planned_keys - seen_keys)
+    if missing:
+        return "Generated payload is missing planned ads: " + ", ".join(f"{fmt}/P{persona}" for fmt, persona in missing)
+    return None
+
+
+def extract_generated_ad_candidate(payload: dict[str, Any]) -> dict[str, Any] | None:
+    if not isinstance(payload, dict):
+        return None
+
+    def normalize_candidate(candidate: dict[str, Any]) -> dict[str, Any]:
+        cloned = json.loads(json.dumps(candidate, ensure_ascii=False))
+        persona = cloned.get("persona") if isinstance(cloned.get("persona"), dict) else {}
+        if not isinstance(persona, dict):
+            persona = {}
+        if not isinstance(persona.get("persona_number"), int) and isinstance(cloned.get("persona_number"), int):
+            persona["persona_number"] = cloned.get("persona_number")
+        if not isinstance(persona.get("number"), int) and isinstance(cloned.get("persona_number"), int):
+            persona["number"] = cloned.get("persona_number")
+        if not isinstance(persona.get("persona_name"), str) and isinstance(cloned.get("persona_name"), str):
+            persona["persona_name"] = cloned.get("persona_name")
+        if not isinstance(persona.get("name"), str) and isinstance(cloned.get("persona_name"), str):
+            persona["name"] = cloned.get("persona_name")
+        if persona:
+            cloned["persona"] = persona
+        return cloned
+
+    ads = payload.get("ads")
+    if isinstance(ads, list):
+        for item in ads:
+            if isinstance(item, dict) and item.get("copy"):
+                return normalize_candidate(item)
+    if payload.get("format") and payload.get("copy"):
+        return normalize_candidate(payload)
+    return None
 
 
 def build_persona_payload(persona_number: int, personas: list[dict[str, Any]]) -> dict[str, Any]:
@@ -587,7 +804,7 @@ def call_opencode_repair_copy(
         ],
         "collisions": collisions,
         "current_copy": current_copy,
-        "context": context,
+        "context": build_generation_payload_for_llm(context),
     }
     prompt = (
         "You are fixing ad copy JSON after uniqueness collisions. "
@@ -595,9 +812,11 @@ def call_opencode_repair_copy(
         + json.dumps(payload, ensure_ascii=False)
     )
 
+    password = (config.get("opencode_api_key") or "").strip() or os.getenv("OPENCODE_SERVER_PASSWORD", "").strip()
     cmd = [
         "opencode",
         "run",
+        "--pure",
         "--attach",
         api_url,
         "--model",
@@ -606,10 +825,8 @@ def call_opencode_repair_copy(
         "json",
         prompt,
     ]
-    password = (config.get("opencode_api_key") or "").strip() or os.getenv("OPENCODE_SERVER_PASSWORD", "").strip()
     if password:
         cmd.extend(["--password", password])
-
     try:
         result = run_cmd(cmd, cwd=ROOT)
     except OSError as exc:
@@ -920,7 +1137,7 @@ def build_template_copy(context: dict[str, Any], run_id: str) -> dict[str, Any]:
 
 def call_opencode_compatible(config: dict[str, Any], context: dict[str, Any], run_dir: Path) -> dict[str, Any] | None:
     api_url = (config.get("opencode_api_url") or "").strip()
-    api_key = (config.get("opencode_api_key") or "").strip()
+    api_key = (config.get("opencode_api_key") or "").strip() or os.getenv("OPENCODE_SERVER_PASSWORD", "").strip()
     model = sanitize_dashboard_model((config.get("opencode_model") or "").strip(), list_opencode_models())
     if not api_url:
         return None
@@ -942,96 +1159,82 @@ def call_opencode_compatible(config: dict[str, Any], context: dict[str, Any], ru
         "If no real quote is provided in context, create one believable representative review line grounded in persona pain/desire and safe claims. "
         "Keep each format's core shape intact, but vary headline/support/trust framing using persona pain, desire, friction, proof needed, and tone cue. "
         "For the same format across runs, rotate variation lane and wording rhythm while preserving format-specific structure. "
+        "Each ad item includes copy_requirements; treat primary_feature/headline_driver as the headline lane and secondary_feature/support_driver as the supporting lane. "
+        "Within the same format in a single batch, do not reuse the same headline skeleton or subheadline skeleton across personas. "
+        "Follow the master-doc benefit hierarchy first: fast visible results, cravings down, natural safe-feeling, homemade-food fit, structured low-guesswork system, guided support, emotional control, then secondary digestive benefits. "
+        "Use AM routine or PM routine only when the chosen feature lane genuinely needs mechanism detail. Do not default to AM/PM wording in every ad. "
+        "Do not flatten multiple ads under a format into near-duplicate headlines with only minor wording swaps. "
+        "For FEAT, make each bullet a different product feature. For HERO and UGC, support line must add a second feature instead of restating the headline. "
+        "Do not make homemade-food compatibility the center of brand positioning even when you use it as a benefit lane. "
+        "Do not let secondary digestive or emotional benefits overshadow the main promise of fast visible weight loss with a safer, easier, more guided experience. "
         "Ensure obesity and weight-loss intent is obvious to someone who has never heard of the product."
     )
-    user_payload = {
-        "task": "Generate fresh ad copy JSON for provided context.",
-        "context": context,
-        "constraints": {
-            "language": ["EN", "HI"],
-            "language_mode": language_mode,
-            "formats": FORMATS,
-            "return_json_only": True,
-        },
-    }
-    body = {
-        "model": model,
-        "messages": [
-            {"role": "system", "content": system},
-            {"role": "user", "content": json.dumps(user_payload, ensure_ascii=False)},
-        ],
-        "temperature": 0.7,
-    }
-
-    cli_prompt = (
-        "SYSTEM:\n"
-        f"{system}\n\n"
-        "USER_PAYLOAD_JSON:\n"
-        f"{json.dumps(user_payload, ensure_ascii=False)}\n\n"
-        "Return only valid JSON. No markdown. No extra text."
-    )
-
-    cli_cmd = [
-        "opencode",
-        "run",
-        "--attach",
-        api_url,
-        "--model",
-        model,
-        "--format",
-        "json",
-        cli_prompt,
-    ]
     cli_password = api_key or os.getenv("OPENCODE_SERVER_PASSWORD", "").strip()
-    if cli_password:
-        cli_cmd.extend(["--password", cli_password])
+    generated_ads: list[dict[str, Any]] = []
+    errors: list[str] = []
 
-    try:
-        cli_result = run_cmd(cli_cmd, cwd=ROOT)
-    except OSError as exc:
-        cli_result = subprocess.CompletedProcess(cli_cmd, returncode=1, stdout="", stderr=str(exc))
-    if cli_result.returncode == 0:
+    for index, ad_item in enumerate(context.get("ads") or [], start=1):
+        single_context = {
+            **context,
+            "ads": [ad_item],
+        }
+        user_payload = {
+            "task": "Generate fresh ad copy JSON for provided context.",
+            "context": build_generation_payload_for_llm(single_context),
+            "constraints": {
+                "language": ["EN", "HI"],
+                "language_mode": language_mode,
+                "formats": FORMATS,
+                "return_json_only": True,
+            },
+        }
+        cli_prompt = (
+            "SYSTEM:\n"
+            f"{system}\n\n"
+            "USER_PAYLOAD_JSON:\n"
+            f"{json.dumps(user_payload, ensure_ascii=False)}\n\n"
+            "Return only valid JSON. No markdown. No extra text.\n"
+            "Return one ad only. You may return either a single ad object or an object with default_aspect_ratio and a one-item ads array.\n"
+            "Do not return example text. Do not return explanations."
+        )
+        cli_cmd = [
+            "opencode",
+            "run",
+            "--pure",
+            "--attach",
+            api_url,
+            "--model",
+            model,
+            "--format",
+            "json",
+            cli_prompt,
+        ]
+        if cli_password:
+            cli_cmd.extend(["--password", cli_password])
+        try:
+            cli_result = run_cmd(cli_cmd, cwd=ROOT)
+        except OSError as exc:
+            errors.append(f"Ad {index}: launch failed: {exc}")
+            continue
+
+        if cli_result.returncode != 0:
+            errors.append(
+                f"Ad {index}: return code {cli_result.returncode}\nSTDOUT:\n{cli_result.stdout}\nSTDERR:\n{cli_result.stderr}"
+            )
+            continue
+
         parsed = parse_opencode_json_output(cli_result.stdout)
-        if parsed is not None:
-            return parsed
+        candidate = extract_generated_ad_candidate(parsed) if parsed else None
+        if not candidate:
+            errors.append(f"Ad {index}: returned no usable ad JSON\nSTDOUT:\n{cli_result.stdout}\nSTDERR:\n{cli_result.stderr}")
+            continue
+        generated_ads.append(candidate)
 
-        (run_dir / "logs" / "opencode_error.txt").write_text(
-            "OpenCode CLI returned no parseable JSON text block.\n"
-            f"STDOUT:\n{cli_result.stdout}\n\nSTDERR:\n{cli_result.stderr}",
-            encoding="utf-8",
-        )
+    if errors:
+        (run_dir / "logs" / "opencode_error.txt").write_text("\n\n---\n\n".join(errors), encoding="utf-8")
         return None
 
-    cli_error = (
-        "OpenCode CLI attach call failed.\n"
-        f"Command: {' '.join(cli_cmd[:-1])} <prompt>\n"
-        f"Return code: {cli_result.returncode}\n"
-        f"STDOUT:\n{cli_result.stdout}\n\nSTDERR:\n{cli_result.stderr}"
-    )
-
-    req = urllib.request.Request(
-        url=api_url.rstrip("/") + "/v1/chat/completions",
-        data=json.dumps(body).encode("utf-8"),
-        method="POST",
-        headers={
-            "Content-Type": "application/json",
-            "Authorization": f"Bearer {api_key}",
-        },
-    )
-    try:
-        with urllib.request.urlopen(req, timeout=180) as response:
-            raw = response.read().decode("utf-8")
-        parsed = json.loads(raw)
-        content = parsed.get("choices", [{}])[0].get("message", {}).get("content", "")
-        if not content:
-            return None
-        return parse_json_object_from_text(content)
-    except Exception as exc:
-        (run_dir / "logs" / "opencode_error.txt").write_text(
-            cli_error + "\n\nOpenAI-style HTTP fallback failed:\n" + str(exc),
-            encoding="utf-8",
-        )
-        return None
+    return {"default_aspect_ratio": "4:5", "ads": generated_ads}
 
 
 def collect_run_result(run_dir: Path, batch_name: str, image_generated: bool) -> dict[str, Any]:
@@ -1975,11 +2178,7 @@ async def api_run_execute(
             canonical_payload = json.loads(canonical_path.read_text(encoding="utf-8"))
             generated_ctx = canonical_payload.get("generation_context")
             if isinstance(generated_ctx, dict):
-                product_ctx = {
-                    "product_info": generated_ctx.get("product_info") if isinstance(generated_ctx.get("product_info"), list) else [],
-                    "mechanism": generated_ctx.get("mechanism") if isinstance(generated_ctx.get("mechanism"), list) else [],
-                    "faq": generated_ctx.get("faq") if isinstance(generated_ctx.get("faq"), list) else [],
-                }
+                product_ctx = generated_ctx
                 product_ctx_source = "canonical_llm"
                 (run_dir / "context" / "context_canonical.json").write_text(
                     json.dumps(canonical_payload, ensure_ascii=False, indent=2) + "\n", encoding="utf-8"
@@ -2018,9 +2217,11 @@ async def api_run_execute(
 
     persona_library = parse_persona_library(DEFAULT_PLAYBOOK)
     ads_context: list[dict[str, Any]] = []
+    format_seen_counts: dict[str, int] = {}
     for item in plan:
         persona_no = item["persona"]
         fmt = item["format"]
+        format_seen_counts[fmt] = format_seen_counts.get(fmt, 0) + 1
         persona_payload = build_persona_payload(persona_no, persona_library)
 
         format_result = run_cmd(
@@ -2036,7 +2237,14 @@ async def api_run_execute(
             cwd=ROOT,
         )
         format_payload = parse_json_stdout(format_result, f"extract_format_rules({fmt})")
-        ads_context.append({"persona": persona_payload, "format_rules": format_payload, "format": fmt})
+        ads_context.append(
+            {
+                "persona": persona_payload,
+                "format_rules": format_payload,
+                "format": fmt,
+                "copy_requirements": build_copy_requirements(persona_no, fmt, format_seen_counts[fmt]),
+            }
+        )
 
     banlist_result = run_cmd(["python3", "scripts/registry_banlist.py", "--last", "150"], cwd=ROOT)
     banlist_payload = parse_json_stdout(banlist_result, "registry_banlist")
@@ -2056,7 +2264,16 @@ async def api_run_execute(
     )
 
     copy_json = call_opencode_compatible(cfg, full_context, run_dir)
-    llm_mode = "opencode" if copy_json else "template"
+    if not copy_json:
+        raise HTTPException(status_code=502, detail="OpenCode copy generation failed. Prompt production stopped; check run logs.")
+    generated_copy_error = validate_generated_copy_payload(copy_json, ads_context)
+    if generated_copy_error:
+        (run_dir / "logs" / "opencode_error.txt").write_text(
+            generated_copy_error + "\n\nGenerated payload:\n" + json.dumps(copy_json, ensure_ascii=False, indent=2),
+            encoding="utf-8",
+        )
+        raise HTTPException(status_code=502, detail="OpenCode copy generation returned incomplete copy. Prompt production stopped; check run logs.")
+    llm_mode = "opencode"
     copy_json = normalize_generated_copy(copy_json, full_context, run_id)
     copy_json = strip_internal_markers_from_payload(copy_json)
 

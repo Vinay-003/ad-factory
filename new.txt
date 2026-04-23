@@ -27,20 +27,6 @@ CONTEXT SNAPSHOT (FOR EXTRACTION)
 
 Single Source of Truth: Product Foundation Document
 
-0. EXTRACTOR PRIORITY BLOCK
-Keep the following extraction priorities locked in this exact order when building prompt context or ad-copy guidance:
-- Priority 1: lead with the main promise of fast visible weight loss and 3 to 5 kg in 15 days when the context allows it.
-- Priority 2: cravings down, hunger reduction, and easier caloric-deficit adherence are the main physical support benefits and should appear before routine mechanics.
-- Priority 3: natural safe-feeling, no-side-effects positioning, and all-natural Ayurvedic trust should be used when safety or harsh-method fear is relevant.
-- Priority 4: homemade-food compatibility and no-separate-meal-prep benefits should be used for time burden and family-food friction, but should not become the whole brand center.
-- Priority 5: structured system, low guesswork, and clear routine should be used when the pain is confusion, overwhelm, or repeated inconsistency.
-- Priority 6: guided support means tracker-led guidance, WhatsApp follow-up, and coach support, not vague emotional support copy.
-- Priority 7: experiential or digestive benefits can support the message, but should not overshadow the main promise.
-- Priority 8: AM routine and PM routine are mechanism lanes that should be used when the chosen angle genuinely needs morning or night protocol detail, not as the default lead every time.
-- Priority 9: headlines and subheadlines must stay feature-based and outcome-linked; do not convert them into generic transformation slogans.
-- Priority 10: if the detailed product doc defines a stronger feature hierarchy or interpretation rule, preserve that detail instead of compressing it.
-- Priority 11: headline style must not be forced into old extracted-xlsx patterns; the lane must come from product features first.
-
 1. What is Obesity Killer Kit?
 Obesity Killer Kit is a doctor-formulated Ayurvedic weight-loss system designed for overweight and obese adults who want to lose weight in a safe, natural, and practical way.
 It is built for people who want fast visible results without relying on injections, crash diets, hard-to-sustain gym routines, or extreme lifestyle changes.
@@ -283,33 +269,3 @@ Do not claim product is for users below 18.
 Do not use old ingredient counts (for example 39 herbs) in internal truth outputs.
 Do not make abstract ad copy that hides the obesity/weight-loss objective.
 Do not use cure language for medical conditions.
-
-24. HEADLINE STRATEGY AND PROTECTED THEMES
-This section is non-negotiable for copy extraction and generation.
-Protected priority order for feature-led copy:
-- Fast visible results first in most product explanations and performance-led ads.
-- Cravings down and appetite control for weight loss second when the pain is hunger, snacking, emotional eating, or adherence drop-off.
-- Natural safe-feeling and no-side-effects positioning third when safety, harsh methods, or dependency fear is relevant.
-- Homemade-food compatibility and no separate meal prep fourth when the pain is time burden, family-food friction, or daily disruption.
-- Structured system and low guesswork fifth when the pain is confusion, inconsistency, or repeated failure from high-friction plans.
-- Guided support sixth when the user needs reassurance that support, accountability, and follow-through exist.
-- Emotional-control and confidence-restoring benefits can support the headline, but should not replace the main weight-loss promise.
-- Digestive comfort and secondary internal benefits can support the journey, but should not lead by default.
-- AM routine and PM routine should be used as mechanism lanes only when the chosen feature angle genuinely needs morning or night protocol detail.
-- Proof/guarantee framing can support the headline, but should not flatten stronger benefit lanes above.
-
-Headline and subheadline rules:
-- Headlines must be oriented around concrete product features or product-mechanic outcomes, not spreadsheet-style placeholder patterns.
-- Headlines must explicitly name weight loss, obesity reduction, excess-weight reduction, appetite control for weight loss, or a 15-day weight outcome.
-- Subheadlines must complement the headline with a second feature lane; they must not restate the same line with tiny wording changes.
-- Do not let all ads under the same format repeat the same headline skeleton or the same subheadline skeleton.
-- Rotate feature lanes across ads in the same format so the set does not collapse into one repetitive routine theme.
-- Do not let secondary benefits overshadow the main promise of fast visible weight loss with a safer, easier, more guided experience.
-- Do not make homemade-food compatibility the center of brand positioning even when it is used as a benefit lane.
-
-Format-level execution:
-- HERO: one primary feature in the headline, one secondary feature in the support line.
-- UGC: creator-style practicality is allowed, but the copy still needs a concrete feature lane.
-- FEAT: each bullet should represent a different product feature, not three versions of the same support line.
-- BA: left side should show struggle or friction; right side should show a feature-led shift or progress state.
-- TEST: the review line should reference a specific feature, routine benefit, or outcome driver instead of vague praise.

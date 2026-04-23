@@ -6,6 +6,47 @@ import argparse
 import json
 import re
 from pathlib import Path
+from typing import Any
+
+
+ROOT = Path(__file__).resolve().parents[1]
+
+
+def default_product_path() -> str:
+    master = ROOT / "productmaster.txt"
+    if master.exists():
+        return str(master)
+    return "productinfomain.txt"
+
+
+def merge_product_directives(product_path: Path, product_text: str) -> str:
+    legacy = ROOT / "productinfomain.txt"
+    if not legacy.exists():
+        return product_text
+    if product_path.resolve() == legacy.resolve():
+        return product_text
+
+    legacy_text = legacy.read_text(encoding="utf-8")
+
+    def extract_block(start_marker: str) -> str:
+        pattern = re.compile(rf"(^|\n)({re.escape(start_marker)}.*?)(?=\n\d+\.\s+|\Z)", re.DOTALL)
+        match = pattern.search(legacy_text)
+        if not match:
+            return ""
+        return match.group(2).strip()
+
+    snapshot_match = re.search(r"^CONTEXT SNAPSHOT \(FOR EXTRACTION\).*?(?=\nSingle Source of Truth: Product Foundation Document|\Z)", legacy_text, re.DOTALL | re.MULTILINE)
+    supplements = []
+    if snapshot_match and "CONTEXT SNAPSHOT (FOR EXTRACTION)" not in product_text:
+        supplements.append(snapshot_match.group(0).strip())
+    for marker in ["0. EXTRACTOR PRIORITY BLOCK", "24. HEADLINE STRATEGY AND PROTECTED THEMES"]:
+        if marker not in product_text:
+            block = extract_block(marker)
+            if block:
+                supplements.append(block)
+    if not supplements:
+        return product_text
+    return "\n\n".join(supplements + [product_text])
 
 
 def _clean_lines(text: str) -> list[str]:
@@ -18,6 +59,14 @@ def _append_unique(target: list[str], seen: set[str], item: str) -> None:
         return
     target.append(value)
     seen.add(value)
+
+
+def _unique_lines(lines: list[str]) -> list[str]:
+    out: list[str] = []
+    seen: set[str] = set()
+    for line in lines:
+        _append_unique(out, seen, line)
+    return out
 
 
 def extract_snapshot_block(lines: list[str]) -> list[str]:
@@ -47,7 +96,7 @@ def extract_keyword_lines(lines: list[str], keywords: list[str]) -> list[str]:
     return [line for line in lines if pattern.search(line)]
 
 
-def extract_product_sections(lines: list[str]) -> list[str]:
+def extract_section_by_title(lines: list[str], title_prefixes: list[str], max_lines: int | None = None) -> list[str]:
     heading_re = re.compile(r"^(\d+)\.\s+(.+)$")
     sections: list[tuple[str, list[str]]] = []
     current_title = ""
@@ -65,39 +114,159 @@ def extract_product_sections(lines: list[str]) -> list[str]:
     if current_title:
         sections.append((current_title, current_lines))
 
-    preferred = [
-        "1. What is Obesity Killer Kit",
-        "2. What problem does it solve",
-        "3. What is the customer really hiring",
-        "4. Who is it for",
-        "5. Who is it not for",
-        "6. What comes in the kit",
-        "7. What is in the formulation",
-        "8. How does it work",
-        "9. What benefits do users see",
-        "10. What makes it different",
-        "11. What proof supports belief",
-        "12. What exactly is the money-back guarantee",
-        "13. What is the safety position",
-        "14. What is the continuation and repeat logic",
-        "15. What is the maintenance story",
-        "16. Who created the product",
-        "17. Parent brand context",
-        "18. Detailed execution protocol",
-        "19. Diet system and lifestyle requirements",
-        "20. Support, psychology, and communication",
-        "21. Messaging strategy and market context",
-        "22. Brand design system",
-        "19. What should the brand not say",
-    ]
-
     out: list[str] = []
-    for wanted in preferred:
-        match = next((section for title, section in sections if title.lower().startswith(wanted.lower())), None)
+    for prefix in title_prefixes:
+        match = next((section for title, section in sections if title.lower().startswith(prefix.lower())), None)
         if not match:
             continue
-        out.extend(match[:16])
+        if max_lines is None:
+            out.extend(match)
+        else:
+            out.extend(match[:max_lines])
     return out
+
+
+def extract_priority_block(lines: list[str]) -> list[str]:
+    out: list[str] = []
+    start = -1
+    for i, line in enumerate(lines):
+        if line.strip().upper().startswith("0. EXTRACTOR PRIORITY BLOCK"):
+            start = i
+            break
+    if start < 0:
+        return out
+
+    out.append(lines[start])
+    for line in lines[start + 1 :]:
+        if re.match(r"^\d+\.\s+", line):
+            break
+        out.append(line)
+    return out
+
+
+def extract_headline_strategy(lines: list[str]) -> list[str]:
+    out: list[str] = []
+    start = -1
+    for i, line in enumerate(lines):
+        if line.strip().upper().startswith("24. HEADLINE STRATEGY AND PROTECTED THEMES"):
+            start = i
+            break
+    if start < 0:
+        return out
+
+    out.append(lines[start])
+    for line in lines[start + 1 :]:
+        if re.match(r"^\d+\.\s+", line):
+            break
+        out.append(line)
+    return out
+
+
+def extract_theme_lines(lines: list[str]) -> list[str]:
+    keywords = [
+        "AM/PM routine",
+        "cravings down",
+        "support",
+        "weight loss support",
+        "obesity management support",
+        "lose weight",
+        "reduce excess weight",
+        "3 to 5 kg in 15 days",
+        "appetite control for weight loss",
+        "morning OK Liquid",
+        "night OK Tablet",
+        "night OK Powder",
+        "tracker",
+        "WhatsApp",
+        "4-hour fasting window",
+        "empty stomach",
+        "bedtime routine",
+    ]
+    return extract_keyword_lines(lines, keywords)
+
+
+def extract_trigger_rules(lines: list[str]) -> list[str]:
+    keywords = [
+        "lead with",
+        "do not transform",
+        "do not replace",
+        "feature-based",
+        "weight loss",
+        "obesity reduction",
+        "subheadlines",
+        "headline",
+        "priority order",
+        "protected order",
+        "AM/PM routine",
+        "cravings down",
+        "support",
+        "morning",
+        "night",
+    ]
+    return extract_keyword_lines(lines, keywords)
+
+
+def extract_product_sections(lines: list[str]) -> list[str]:
+    preferred = [
+        "0. EXTRACTOR PRIORITY BLOCK",
+        "1. WHAT IS OBESITY KILLER KIT?",
+        "2. WHAT PROBLEM DOES IT SOLVE?",
+        "3. WHAT IS THE CUSTOMER HIRING THE PRODUCT TO DO?",
+        "4. WHO IS IT FOR?",
+        "5. WHO IS IT NOT FOR?",
+        "6. WHAT COMES IN THE KIT?",
+        "7. WHAT IS IN THE FORMULATION?",
+        "8. HOW DOES IT WORK?",
+        "9. WHAT BENEFITS DO USERS SEE?",
+        "10. WHAT MAKES IT DIFFERENT?",
+        "11. WHAT PROOF SUPPORTS BELIEF?",
+        "12. MONEY-BACK GUARANTEE DETAILS",
+        "13. SAFETY POSITION",
+        "14. CONTINUATION AND REPEAT LOGIC",
+        "15. MAINTENANCE AFTER MAIN COURSE",
+        "16. WHO CREATED THE PRODUCT?",
+        "17. PARENT BRAND CONTEXT",
+        "18. DETAILED EXECUTION PROTOCOL",
+        "19. DIET SYSTEM AND LIFESTYLE REQUIREMENTS",
+        "20. SUPPORT, PSYCHOLOGY, AND COMMUNICATION",
+        "21. MESSAGING STRATEGY AND MARKET CONTEXT",
+        "22. BRAND DESIGN SYSTEM",
+        "23. FINAL EXCLUSIONS AND GUARDRAILS",
+        "24. HEADLINE STRATEGY AND PROTECTED THEMES",
+    ]
+    out: list[str] = []
+    for wanted in preferred:
+        if wanted.startswith("0."):
+            out.extend(extract_priority_block(lines))
+            continue
+        if wanted.startswith("24."):
+            out.extend(extract_headline_strategy(lines))
+            continue
+        match = next((section for section in split_numbered_sections(lines) if section[0].lower().startswith(wanted.lower())), None)
+        if not match:
+            continue
+        out.extend(match[1])
+    return _unique_lines(out)
+
+
+def split_numbered_sections(lines: list[str]) -> list[tuple[str, list[str]]]:
+    heading_re = re.compile(r"^(\d+)\.\s+(.+)$")
+    sections: list[tuple[str, list[str]]] = []
+    current_title = ""
+    current_lines: list[str] = []
+
+    for line in lines:
+        if heading_re.match(line):
+            if current_title:
+                sections.append((current_title, current_lines))
+            current_title = line
+            current_lines = [line]
+            continue
+        if current_title:
+            current_lines.append(line)
+    if current_title:
+        sections.append((current_title, current_lines))
+    return sections
 
 
 def extract_mechanism_sections(lines: list[str]) -> list[str]:
@@ -126,8 +295,8 @@ def extract_mechanism_sections(lines: list[str]) -> list[str]:
         match = next((section for section_id, section in sections if section_id == wanted_id), None)
         if not match:
             continue
-        out.extend(match[:8])
-    return out
+        out.extend(match[:30])
+    return _unique_lines(out)
 
 
 def extract_faq_sections(lines: list[str]) -> list[str]:
@@ -169,8 +338,8 @@ def extract_faq_sections(lines: list[str]) -> list[str]:
         match = next((section for title, section in categories if title.lower() == wanted.lower()), None)
         if not match:
             continue
-        out.extend(match[:16])
-    return out
+        out.extend(match[:40])
+    return _unique_lines(out)
 
 
 def compact_lines(text: str, max_lines: int, keywords: list[str], section_lines: list[str]) -> list[str]:
@@ -200,15 +369,24 @@ def compact_lines(text: str, max_lines: int, keywords: list[str], section_lines:
     return out[:max_lines]
 
 
+def extract_line_groups(lines: list[str]) -> dict[str, list[str]]:
+    return {
+        "headline_strategy": extract_headline_strategy(lines),
+        "protected_themes": extract_theme_lines(lines),
+        "trigger_rules": extract_trigger_rules(lines),
+        "priority_block": extract_priority_block(lines),
+    }
+
+
 def main() -> int:
     parser = argparse.ArgumentParser(description="Extract compact product context for generation")
-    parser.add_argument("--product", default="productinfomain.txt")
+    parser.add_argument("--product", default=default_product_path())
     parser.add_argument("--mechanism", default="PRODUCT_MECHANISM_V1.txt")
     parser.add_argument("--faq", default="faq.txt")
     parser.add_argument("--max-lines", type=int, default=0, help="Optional global cap for all sources")
-    parser.add_argument("--max-lines-product", type=int, default=120)
-    parser.add_argument("--max-lines-mechanism", type=int, default=70)
-    parser.add_argument("--max-lines-faq", type=int, default=80)
+    parser.add_argument("--max-lines-product", type=int, default=1200)
+    parser.add_argument("--max-lines-mechanism", type=int, default=320)
+    parser.add_argument("--max-lines-faq", type=int, default=420)
     parser.add_argument("--json", action="store_true")
     args = parser.parse_args()
 
@@ -216,7 +394,8 @@ def main() -> int:
     mechanism_limit = args.max_lines if args.max_lines > 0 else args.max_lines_mechanism
     faq_limit = args.max_lines if args.max_lines > 0 else args.max_lines_faq
 
-    product_text = Path(args.product).read_text(encoding="utf-8")
+    product_path = Path(args.product)
+    product_text = merge_product_directives(product_path, product_path.read_text(encoding="utf-8"))
     mechanism_text = Path(args.mechanism).read_text(encoding="utf-8")
     faq_text = Path(args.faq).read_text(encoding="utf-8")
 
@@ -227,8 +406,8 @@ def main() -> int:
     product_keywords = [
         "core promise",
         "3 to 5 kg",
-        "who it is for",
-        "not for",
+        "who is it for",
+        "who is it not for",
         "insulin",
         "pregnan",
         "postpartum",
@@ -241,9 +420,24 @@ def main() -> int:
         "continuation",
         "maintenance",
         "dr. arun",
-        "on-image copy mandate",
-        "explicitly mention weight loss",
-        "obesity reduction",
+        "arogyam",
+        "on-image copy",
+        "weight loss support",
+        "obesity management support",
+        "appetite control for weight loss",
+        "AM/PM routine",
+        "cravings down",
+        "support",
+        "tracker",
+        "WhatsApp",
+        "morning OK Liquid",
+        "night OK Tablet",
+        "night OK Powder",
+        "4-hour fasting window",
+        "empty stomach",
+        "bedtime routine",
+        "feature-based",
+        "headline",
     ]
     mechanism_keywords = [
         "mechanism",
@@ -292,6 +486,7 @@ def main() -> int:
             extract_faq_sections(faq_lines),
         ),
     }
+    payload.update(extract_line_groups(product_lines))
     if args.json:
         print(json.dumps(payload, ensure_ascii=False, indent=2))
     else:

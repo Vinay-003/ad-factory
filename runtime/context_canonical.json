@@ -1,123 +1,332 @@
 {
   "metadata": {
-    "generated_at": "2026-04-22T21:03:35Z",
-    "extractor_model": "openai/gpt-5.2",
+    "generated_at": "2026-04-23T15:00:26Z",
+    "extractor_model": "openai/gpt-5.4",
     "source_files": [
-      "/home/mylappy/myspace/info/productinfomain.txt",
+      "/home/mylappy/myspace/info/productmaster.txt",
       "/home/mylappy/myspace/info/PRODUCT_MECHANISM_V1.txt",
       "/home/mylappy/myspace/info/faq.txt"
     ],
     "source_sizes": {
-      "product_chars": 11801,
+      "product_chars": 50218,
       "mechanism_chars": 4083,
       "faq_chars": 61751
     }
   },
   "canonical": {
     "positioning": [
-      "Doctor-formulated Ayurvedic obesity and weight-loss system (structured guided system; not a loose supplement).",
-      "Not positioned as a standalone fat-burner claim product."
+      "Obesity Killer Kit is a doctor-formulated Ayurvedic obesity and weight-loss system for overweight and obese adults who want fast visible weight-loss support in a natural, practical, structured way.",
+      "It is a structured, guided system with routine, food guidance, tracker, booklet, and WhatsApp support; it is not positioned as a loose supplement or a standalone fat-burner claim product.",
+      "Mechanism boundary: protocol-based appetite regulation + eating-behavior correction + digestion support.",
+      "Core flow: lower unnecessary intake -> improved caloric-deficit adherence -> body uses stored fat over time.",
+      "Public-facing mechanism positioning must stay tied to weight loss or obesity reduction, not abstract routine language alone."
     ],
     "promise_claims": [
-      "3 to 5 kg weight loss in 15 days when protocol is followed."
+      "Core promise: 3 to 5 kg weight loss in 15 days when the protocol is followed properly.",
+      "Supports fast visible weight-loss progress through a natural, easy-to-follow process that does not leave the user feeling hungry, weak, or overwhelmed.",
+      "Supports weight-loss efforts by reducing hunger and cravings, improving satiety, supporting digestive comfort, and making caloric-deficit adherence easier in real life.",
+      "Expected outcome language should stay conditional on adherence and eligibility."
     ],
     "eligibility": [
-      "Adults with BMI above 25 who want fast visible weight-loss support with natural and practical adherence."
+      "Adults 18+ with BMI above 25.",
+      "Primary fit: overweight or obese adults wanting natural, guided, easy-to-follow weight-loss support with fast visible results.",
+      "Common fit profiles include users struggling with stubborn fat, belly fat, cravings, emotional eating, low energy, slow metabolism, and repeated diet failure.",
+      "Relevant obesity-linked context may include PCOD, PCOS, thyroid imbalance, high blood pressure, fatty liver, diabetes, and IBS, but this must not become a cure claim."
     ],
     "exclusions": [
-      "Pregnant women.",
-      "Women within 6 months postpartum.",
-      "People actively taking insulin."
+      "Do not use for pregnant women.",
+      "Do not use for women within 6 months postpartum.",
+      "Do not use for people actively taking insulin.",
+      "Do not position for users below 18 years of age."
     ],
     "caution_conditions": [
-      "Doctor-review required before use for people on multiple psychiatric medications.",
-      "Doctor-review required before use for people with multiple surgeries."
+      "Doctor review required before use for people on multiple psychiatric medications.",
+      "Doctor review required before use for people with multiple surgery history.",
+      "Internal operational handling from FAQ should not override the above eligibility boundaries."
     ],
     "protocol_morning": [
-      "Take OK Liquid in the morning on an empty stomach."
+      "Take OK Liquid first thing on waking on an empty stomach.",
+      "Morning step is the main appetite-support component.",
+      "Dried amla is included for post-liquid taste balance and digestive support."
     ],
     "protocol_night": [
-      "Take OK Tablet plus 1/2 tsp OK Powder around 15 minutes before sleep with warm water."
+      "Take OK Tablet plus 1/2 tsp OK Powder around 15 minutes before sleep.",
+      "Take the night components with warm water.",
+      "Night components are the digestion-support lane, not the main appetite lane."
     ],
     "fasting_rules": [
-      "After OK Liquid, keep a 4-hour no-solid-food window.",
-      "Zero-calorie drinks are allowed during the no-solids window."
+      "After OK Liquid, maintain a 4-hour no-solid-food window.",
+      "Zero-calorie drinks are allowed in the fasting window.",
+      "Eat only on true hunger; there is no fixed meal timing.",
+      "Many users naturally move to 1 to 1.5 meals per day."
     ],
     "allowed_items": [
       "Vegetables.",
       "Salads.",
       "Soups.",
       "Fruits.",
-      "Up to 30g complex carbs (millets or oats) if still hungry.",
-      "Water (around 4 liters/day).",
-      "Milk in tea/coffee (as the only dairy exception stated)."
+      "If still hungry, up to 30g complex carbs such as millets or oats.",
+      "Around 4 liters of water per day.",
+      "5000 to 7000 steps per day or pranayam.",
+      "Homemade-food compatibility can be used as a benefit lane, but it must not become the whole brand center."
     ],
     "restricted_items": [
       "Non-vegetarian food.",
       "Alcohol.",
-      "Dairy (except milk in tea/coffee).",
+      "Dairy except milk in tea or coffee.",
       "Wheat chapati.",
       "Rice.",
       "Dal.",
       "Nuts."
     ],
     "mechanism_allowed_claims": [
-      "Protocol-based appetite regulation + eating-behavior correction + digestion support for obesity/weight-loss support.",
-      "Supports fullness/satiety and reduces cravings to make true-hunger eating easier.",
-      "Supports digestive comfort (bloating, acidity, gas, heaviness) to help routine consistency.",
-      "Supports weight-loss efforts by making caloric-deficit adherence easier in real life."
+      "OK Liquid supports fullness and reduces cravings.",
+      "OK Liquid helps shift users from clock-based eating to true-hunger eating.",
+      "OK Liquid supports lower unnecessary intake without hunger-led weakness.",
+      "OK Tablet and OK Powder support digestive comfort, including bloating, acidity, gas, heaviness, digestion, absorption, and elimination comfort.",
+      "System effect: reduced meal frequency, reduced portion size, easier routine consistency.",
+      "Supports reduced hunger and cravings.",
+      "Supports easier caloric-deficit adherence.",
+      "Supports digestion and gut comfort.",
+      "Supports practical obesity and weight-loss efforts.",
+      "Approved mechanism framing must explicitly tie to goal language such as appetite control for weight loss, digestion support for easier weight-loss adherence, or obesity-support routine for fast visible weight-loss progress."
     ],
     "mechanism_disallowed_claims": [
-      "Standalone fat-burner positioning/claims.",
-      "Rapid fat melting claims.",
-      "Zero-effort results claims.",
-      "Unlimited junk-food outcomes claims."
+      "Do not position the product as a standalone fat-burner.",
+      "Do not claim it burns fat rapidly by itself.",
+      "Do not claim it melts fat without effort.",
+      "Do not claim zero-effort results.",
+      "Do not claim it works with unlimited junk food.",
+      "Do not claim it overrides all discipline.",
+      "Do not use abstract-only mechanism lines such as control your routine, reset your day, or transform consistency unless the same unit clearly states weight loss or obesity context."
     ],
     "safety_public_line": [
-      "Public claim/positioning: no side effects."
+      "Public trust line: no side effects.",
+      "All-natural Ayurvedic formulation.",
+      "No synthetic ingredients.",
+      "No chemical preservatives."
     ],
     "safety_internal_handling": [
-      "Internal handling: first 3 days can be an adjustment phase."
+      "Internal handling: first 3 days can be an adjustment phase.",
+      "Use public-facing safety language carefully without inventing additional medical safety claims.",
+      "Safety reassurance is a protected lane when harsh-method fear is relevant, but it must not replace the weight-loss outcome or mechanism."
     ],
     "pricing": [
-      "15-day: INR 5,800.",
-      "30-day: INR 10,000.",
-      "60-day: INR 17,000."
+      "15-day kit: INR 5,800.",
+      "30-day kit: INR 10,000.",
+      "60-day kit: INR 17,000."
     ],
     "guarantee": [
-      "If weight-loss start is not observed in the first 7 days, refund applies only when protocol is followed and daily tracker is shared."
+      "If weight-loss start is not observed within the first 7 days, full refund can be requested when the protocol was followed as instructed and the daily tracker was shared.",
+      "Daily tracker sharing is part of refund eligibility.",
+      "Guarantee language should stay tied to conditions and not become an unconditional promise."
     ],
     "continuation": [
       "Continue in cycles until target weight or BMI 25.",
-      "After every 30 days take a 7 to 10 day break."
+      "After every 30 days, take a 7 to 10 day break.",
+      "The kit can be repeated, but repeat logic must preserve the 30-day break rule."
     ],
     "maintenance": [
-      "Maintain caloric balance, balanced diet, and daily activity.",
-      "No automatic bounce back from stopping alone."
+      "Maintenance is not lifelong dependency on the kit.",
+      "Stopping the kit does not itself cause automatic regain.",
+      "Core maintenance logic: maintain caloric balance, follow a balanced diet, stay active, and use optional maintenance support products only if needed."
     ],
     "proof_points": [
       "70,000+ users served.",
       "200 video testimonials.",
-      "Doctor authority.",
-      "Tracker-led support.",
-      "7-day refund policy (conditioned on protocol + daily tracker sharing)."
+      "3 to 5 kg in 15 days claim.",
+      "7-day money-back guarantee with adherence conditions.",
+      "Daily tracker-led support.",
+      "Doctor authority: Dr. Arun Tyagi with 34 years of experience.",
+      "31 unique ingredients and 44 total ingredient entries across the kit.",
+      "No synthetic ingredients and no chemical preservatives."
     ],
     "messaging_guardrails": [
       "No body-shaming.",
       "No cure claims.",
       "No anti-gym framing.",
-      "No competitor bashing/insults.",
-      "Do not use abstract copy that hides the obesity/weight-loss objective."
+      "No competitor bashing.",
+      "Do not use old ingredient counts such as 39 herbs.",
+      "Do not make abstract ad copy that hides the obesity or weight-loss objective.",
+      "Do not force headline style into old extracted-xlsx patterns; the lane must come from product features first.",
+      "Headlines and subheadlines must stay feature-based and outcome-linked, not generic transformation slogans.",
+      "Secondary benefits must not overshadow the main promise of fast visible weight loss with a safer, easier, more guided experience."
     ],
     "on_image_copy_requirements": [
-      "Every headline and subheadline must explicitly mention weight loss, obesity reduction, or clear weight outcome language. Avoid abstract copy that hides the core product goal.",
-      "Approved explicit phrases include: weight loss support; obesity management support; lose weight; reduce excess weight; 3 to 5 kg in 15 days; appetite control for weight loss.",
+      "Every headline and subheadline must explicitly mention weight loss, obesity reduction, excess-weight reduction, or clear weight outcome language.",
+      "Approved explicit phrases include weight loss support, obesity management support, lose weight, reduce excess weight, 3 to 5 kg in 15 days, and appetite control for weight loss.",
+      "Mechanism messaging on-image must explicitly connect to obesity or weight-loss goal, not abstract behavior language alone.",
       "Do not use vague transformational lines without naming weight loss or obesity context.",
-      "Mechanism messaging must explicitly connect to obesity/weight-loss goal, not abstract behavior language alone."
+      "Every mechanism-led headline/subheadline unit must keep the goal visible in the same unit."
+    ],
+    "priority_block": [
+      "Priority 1: lead with the main promise of fast visible weight loss and 3 to 5 kg in 15 days when context allows it.",
+      "Priority 2: cravings down, hunger reduction, and easier caloric-deficit adherence are the main physical support benefits and should appear before routine mechanics.",
+      "Priority 3: natural safe-feeling, no-side-effects positioning, and all-natural Ayurvedic trust should be used when safety or harsh-method fear is relevant.",
+      "Priority 4: homemade-food compatibility and no-separate-meal-prep benefits should be used for time burden and family-food friction, but should not become the whole brand center.",
+      "Priority 5: structured system, low guesswork, and clear routine should be used when the pain is confusion, overwhelm, or repeated inconsistency.",
+      "Priority 6: guided support means tracker-led guidance, WhatsApp follow-up, and coach support, not vague emotional support copy.",
+      "Priority 7: experiential or digestive benefits can support the message, but should not overshadow the main promise.",
+      "Priority 8: AM routine and PM routine are mechanism lanes that should be used when the chosen angle genuinely needs morning or night protocol detail, not as the default lead every time.",
+      "Priority 9: headlines and subheadlines must stay feature-based and outcome-linked; do not convert them into generic transformation slogans.",
+      "Priority 10: if the detailed product doc defines a stronger feature hierarchy or interpretation rule, preserve that detail instead of compressing it.",
+      "Priority 11: headline style must not be forced into old extracted-xlsx patterns; the lane must come from product features first."
+    ],
+    "headline_strategy": [
+      "Protected priority order for feature-led copy: fast visible results first; cravings down and appetite control for weight loss second; natural safe-feeling and no-side-effects positioning third; homemade-food compatibility and no separate meal prep fourth; structured system and low guesswork fifth; guided support sixth; emotional-control and confidence-restoring support only as support; digestive comfort and secondary internal benefits only as support; AM routine and PM routine only as mechanism lanes when genuinely needed; proof/guarantee only as support.",
+      "Headlines must be oriented around concrete product features or product-mechanic outcomes.",
+      "Headlines must explicitly name weight loss, obesity reduction, excess-weight reduction, appetite control for weight loss, or a 15-day weight outcome.",
+      "Subheadlines must complement the headline with a second feature lane and must not merely restate the headline.",
+      "Do not let all ads under the same format repeat the same headline skeleton or the same subheadline skeleton.",
+      "Rotate feature lanes across ads in the same format so the set does not collapse into one repetitive routine theme.",
+      "Format-level execution: HERO uses one primary feature in the headline and one secondary feature in the support line; UGC allows creator-style practicality but still needs a concrete feature lane; FEAT bullets must each represent different product features; BA shows struggle on left and feature-led shift or progress state on right; TEST review line should reference a specific feature, routine benefit, or outcome driver instead of vague praise."
+    ],
+    "protected_themes": [
+      "Fast visible results first.",
+      "Cravings down and appetite control for weight loss second.",
+      "Natural safe-feeling and no-side-effects positioning third.",
+      "Homemade-food compatibility and no separate meal prep fourth.",
+      "Structured system and low guesswork fifth.",
+      "Guided support sixth.",
+      "Emotional-control and confidence-restoring benefits only as support.",
+      "Digestive comfort and secondary internal benefits only as support.",
+      "AM routine and PM routine only as mechanism lanes when genuinely needed.",
+      "Proof and guarantee framing only as support."
+    ],
+    "trigger_rules": [
+      "Trigger fast visible results and 3 to 5 kg in 15 days when context allows a performance-led claim.",
+      "Trigger cravings down and appetite control for weight loss before routine mechanics when the pain is hunger, snacking, emotional eating, or adherence drop-off.",
+      "Trigger natural safe-feeling and no-side-effects positioning when safety concerns, fear of harsh methods, or dependency fear is relevant.",
+      "Trigger homemade-food compatibility and no separate meal prep when the pain is time burden, family-food friction, or daily disruption, but do not let it become the brand center.",
+      "Trigger structured system and low guesswork when the pain is confusion, inconsistency, or repeated failure from high-friction plans.",
+      "Trigger guided support only as tracker-led guidance, WhatsApp follow-up, and coach support; do not turn support into vague emotional reassurance copy.",
+      "Trigger AM routine and PM routine only when the chosen angle genuinely needs protocol detail; do not make routine the default lead.",
+      "Use proof and guarantee as reinforcement, not as a substitute for stronger feature lanes above.",
+      "Use one primary feature lane and one secondary feature lane; do not flatten everything into a single routine theme.",
+      "Do not use what-not-to-say violations: body-shaming, cure language, anti-gym framing, competitor insults, abstract transformation lines without explicit weight-loss context, old ingredient counts, or zero-effort/fat-melting claims."
     ]
   },
-  "conflicts": [],
-  "dropped_claims": [],
+  "conflicts": [
+    {
+      "conflict_id": "C1",
+      "bucket": "positioning",
+      "claim_a": {
+        "text": "It is not positioned as a standalone supplement. It is a structured, guided system built for real-life adherence.",
+        "source_file": "productinfomain.txt",
+        "line_start": 47,
+        "line_end": 47
+      },
+      "claim_b": {
+        "text": "The Obesity Killer Kit is a herbs based food supplement that naturally reduces hunger, creates a calorie deficit, and provides essential nutrients without adding excess calories to your diet.",
+        "source_file": "faq.txt",
+        "line_start": 219,
+        "line_end": 220
+      },
+      "resolution_status": "resolved",
+      "chosen_claim": {
+        "text": "It is a structured, guided system with routine, food guidance, tracker, booklet, and support; do not position it as a loose supplement or standalone fat-burner claim product.",
+        "source_file": "productinfomain.txt",
+        "line_start": 45,
+        "line_end": 48
+      },
+      "resolution_reason": "Single Source of Truth positioning overrides lower-priority FAQ product-classification wording. The FAQ line can be treated as a loose category description, not the approved positioning.",
+      "risk_level": "medium"
+    },
+    {
+      "conflict_id": "C2",
+      "bucket": "eligibility",
+      "claim_a": {
+        "text": "Adults with BMI above 25 who want natural, guided, easy-to-follow weight-loss support.",
+        "source_file": "productinfomain.txt",
+        "line_start": 61,
+        "line_end": 65
+      },
+      "claim_b": {
+        "text": "If BMI is below 25, ask them why do they need this course and make them aware that they can lose 2-3kg with the course in the 15 days pack.",
+        "source_file": "faq.txt",
+        "line_start": 181,
+        "line_end": 182
+      },
+      "resolution_status": "resolved",
+      "chosen_claim": {
+        "text": "Adults 18+ with BMI above 25 are the canonical eligible audience.",
+        "source_file": "productinfomain.txt",
+        "line_start": 61,
+        "line_end": 65
+      },
+      "resolution_reason": "The higher-priority product source defines the primary user and eligibility boundary. The FAQ guidance is an operational exception-handling fragment and must not override canonical targeting.",
+      "risk_level": "high"
+    },
+    {
+      "conflict_id": "C3",
+      "bucket": "safety_and_medication_caution",
+      "claim_a": {
+        "text": "Doctor-review required: multiple psychiatric medications.",
+        "source_file": "productinfomain.txt",
+        "line_start": 8,
+        "line_end": 8
+      },
+      "claim_b": {
+        "text": "Yes, our customers on anxiety medications still achieve good results, typically losing 4-5 kg in 30 days.",
+        "source_file": "faq.txt",
+        "line_start": 402,
+        "line_end": 403
+      },
+      "resolution_status": "resolved",
+      "chosen_claim": {
+        "text": "Doctor review is required before use for people on multiple psychiatric medications.",
+        "source_file": "productinfomain.txt",
+        "line_start": 8,
+        "line_end": 8
+      },
+      "resolution_reason": "Higher-priority product caution rules override lower-priority FAQ reassurance. FAQ medication-response language may be used only after the doctor-review boundary is respected.",
+      "risk_level": "high"
+    }
+  ],
+  "dropped_claims": [
+    {
+      "text": "Do not use old ingredient counts (for example 39 herbs) in internal truth outputs.",
+      "reason": "legacy_override_blocked",
+      "source_file": "productinfomain.txt",
+      "line_start": 283,
+      "line_end": 283
+    },
+    {
+      "text": "Ayurvedic framing: supports pachakagni and dhatvagni, reduces aam accumulation, and supports detoxification.",
+      "reason": "ambiguity",
+      "source_file": "productinfomain.txt",
+      "line_start": 113,
+      "line_end": 113
+    },
+    {
+      "text": "The course helps you do that in a way that you neither feel hungry nor weak.",
+      "reason": "low_confidence",
+      "source_file": "faq.txt",
+      "line_start": 192,
+      "line_end": 192
+    },
+    {
+      "text": "We calculate success rate of our customers monthly and last month's (Aug 2025) success rate was 98.3%.",
+      "reason": "low_confidence",
+      "source_file": "faq.txt",
+      "line_start": 341,
+      "line_end": 342
+    },
+    {
+      "text": "Split 2 pouches of OK Liquid across 3 days. Keep leftover liquid in a glass jar at room temperature.",
+      "reason": "ambiguity",
+      "source_file": "faq.txt",
+      "line_start": 357,
+      "line_end": 358
+    },
+    {
+      "text": "We guarantee 3-5 kgs in 15 days.",
+      "reason": "conflict",
+      "source_file": "faq.txt",
+      "line_start": 337,
+      "line_end": 338
+    }
+  ],
   "coverage_check": {
     "required_present": {
       "3_to_5kg_15days": true,
@@ -129,63 +338,134 @@
       "31_unique_44_total": true,
       "refund_7day_with_tracker": true,
       "not_fat_burner_positioning": true,
-      "on_image_copy_explicit_weightloss": true
-    },
-    "missing_required": []
+      "on_image_copy_explicit_weightloss": true,
+      "headline_strategy_preserved": true,
+      "am_pm_routine_priority": true,
+      "cravings_down_priority": true,
+      "support_priority": true,
+      "feature_based_headlines": true
+    }
   },
   "generation_context": {
     "product_info": [
-      "Doctor-formulated Ayurvedic obesity and weight-loss system (structured guided system; not a loose supplement).",
-      "Not positioned as a standalone fat-burner claim product.",
-      "3 to 5 kg weight loss in 15 days when protocol is followed.",
-      "Every headline and subheadline must explicitly mention weight loss, obesity reduction, or clear weight outcome language. Avoid abstract copy that hides the core product goal.",
-      "Approved explicit phrases include: weight loss support; obesity management support; lose weight; reduce excess weight; 3 to 5 kg in 15 days; appetite control for weight loss.",
+      "Priority 1: lead with the main promise of fast visible weight loss and 3 to 5 kg in 15 days when context allows it.",
+      "Priority 2: cravings down, hunger reduction, and easier caloric-deficit adherence are the main physical support benefits and should appear before routine mechanics.",
+      "Priority 3: natural safe-feeling, no-side-effects positioning, and all-natural Ayurvedic trust should be used when safety or harsh-method fear is relevant.",
+      "Priority 4: homemade-food compatibility and no-separate-meal-prep benefits should be used for time burden and family-food friction, but should not become the whole brand center.",
+      "Priority 5: structured system, low guesswork, and clear routine should be used when the pain is confusion, overwhelm, or repeated inconsistency.",
+      "Priority 6: guided support means tracker-led guidance, WhatsApp follow-up, and coach support, not vague emotional support copy.",
+      "Priority 7: experiential or digestive benefits can support the message, but should not overshadow the main promise.",
+      "Priority 8: AM routine and PM routine are mechanism lanes that should be used when the chosen angle genuinely needs morning or night protocol detail, not as the default lead every time.",
+      "Priority 9: headlines and subheadlines must stay feature-based and outcome-linked; do not convert them into generic transformation slogans.",
+      "Priority 10: if the detailed product doc defines a stronger feature hierarchy or interpretation rule, preserve that detail instead of compressing it.",
+      "Priority 11: headline style must not be forced into old extracted-xlsx patterns; the lane must come from product features first.",
+      "Trigger fast visible results and 3 to 5 kg in 15 days when context allows a performance-led claim.",
+      "Trigger cravings down and appetite control for weight loss before routine mechanics when the pain is hunger, snacking, emotional eating, or adherence drop-off.",
+      "Trigger natural safe-feeling and no-side-effects positioning when safety concerns, fear of harsh methods, or dependency fear is relevant.",
+      "Trigger homemade-food compatibility and no separate meal prep when the pain is time burden, family-food friction, or daily disruption, but do not let it become the brand center.",
+      "Trigger structured system and low guesswork when the pain is confusion, inconsistency, or repeated failure from high-friction plans.",
+      "Trigger guided support only as tracker-led guidance, WhatsApp follow-up, and coach support; do not turn support into vague emotional reassurance copy.",
+      "Trigger AM routine and PM routine only when the chosen angle genuinely needs protocol detail; do not make routine the default lead.",
+      "Use proof and guarantee as reinforcement, not as a substitute for stronger feature lanes above.",
+      "Use one primary feature lane and one secondary feature lane; do not flatten everything into a single routine theme.",
+      "Do not use what-not-to-say violations: body-shaming, cure language, anti-gym framing, competitor insults, abstract transformation lines without explicit weight-loss context, old ingredient counts, or zero-effort/fat-melting claims.",
+      "Obesity Killer Kit is a doctor-formulated Ayurvedic obesity and weight-loss system for overweight and obese adults who want fast visible weight-loss support in a natural, practical, structured way.",
+      "It is a structured, guided system with routine, food guidance, tracker, booklet, and WhatsApp support; it is not positioned as a loose supplement or a standalone fat-burner claim product.",
+      "Mechanism boundary: protocol-based appetite regulation + eating-behavior correction + digestion support.",
+      "Core flow: lower unnecessary intake -> improved caloric-deficit adherence -> body uses stored fat over time.",
+      "Public-facing mechanism positioning must stay tied to weight loss or obesity reduction, not abstract routine language alone.",
+      "Core promise: 3 to 5 kg weight loss in 15 days when the protocol is followed properly.",
+      "Supports fast visible weight-loss progress through a natural, easy-to-follow process that does not leave the user feeling hungry, weak, or overwhelmed.",
+      "Supports weight-loss efforts by reducing hunger and cravings, improving satiety, supporting digestive comfort, and making caloric-deficit adherence easier in real life.",
+      "Expected outcome language should stay conditional on adherence and eligibility.",
+      "Protected priority order for feature-led copy: fast visible results first; cravings down and appetite control for weight loss second; natural safe-feeling and no-side-effects positioning third; homemade-food compatibility and no separate meal prep fourth; structured system and low guesswork fifth; guided support sixth; emotional-control and confidence-restoring support only as support; digestive comfort and secondary internal benefits only as support; AM routine and PM routine only as mechanism lanes when genuinely needed; proof/guarantee only as support.",
+      "Headlines must be oriented around concrete product features or product-mechanic outcomes.",
+      "Headlines must explicitly name weight loss, obesity reduction, excess-weight reduction, appetite control for weight loss, or a 15-day weight outcome.",
+      "Subheadlines must complement the headline with a second feature lane and must not merely restate the headline.",
+      "Do not let all ads under the same format repeat the same headline skeleton or the same subheadline skeleton.",
+      "Rotate feature lanes across ads in the same format so the set does not collapse into one repetitive routine theme.",
+      "Format-level execution: HERO uses one primary feature in the headline and one secondary feature in the support line; UGC allows creator-style practicality but still needs a concrete feature lane; FEAT bullets must each represent different product features; BA shows struggle on left and feature-led shift or progress state on right; TEST review line should reference a specific feature, routine benefit, or outcome driver instead of vague praise.",
+      "Fast visible results first.",
+      "Cravings down and appetite control for weight loss second.",
+      "Natural safe-feeling and no-side-effects positioning third.",
+      "Homemade-food compatibility and no separate meal prep fourth.",
+      "Structured system and low guesswork fifth.",
+      "Guided support sixth.",
+      "Emotional-control and confidence-restoring benefits only as support.",
+      "Digestive comfort and secondary internal benefits only as support.",
+      "AM routine and PM routine only as mechanism lanes when genuinely needed.",
+      "Proof and guarantee framing only as support.",
+      "Every headline and subheadline must explicitly mention weight loss, obesity reduction, excess-weight reduction, or clear weight outcome language.",
+      "Approved explicit phrases include weight loss support, obesity management support, lose weight, reduce excess weight, 3 to 5 kg in 15 days, and appetite control for weight loss.",
+      "Mechanism messaging on-image must explicitly connect to obesity or weight-loss goal, not abstract behavior language alone.",
       "Do not use vague transformational lines without naming weight loss or obesity context.",
-      "Mechanism messaging must explicitly connect to obesity/weight-loss goal, not abstract behavior language alone.",
-      "Adults with BMI above 25 who want fast visible weight-loss support with natural and practical adherence.",
-      "Pregnant women.",
-      "Women within 6 months postpartum.",
-      "People actively taking insulin.",
-      "Doctor-review required before use for people on multiple psychiatric medications.",
-      "Doctor-review required before use for people with multiple surgeries.",
-      "Public claim/positioning: no side effects.",
+      "Every mechanism-led headline/subheadline unit must keep the goal visible in the same unit.",
+      "Take OK Liquid first thing on waking on an empty stomach.",
+      "Morning step is the main appetite-support component.",
+      "Dried amla is included for post-liquid taste balance and digestive support.",
+      "Take OK Tablet plus 1/2 tsp OK Powder around 15 minutes before sleep.",
+      "Take the night components with warm water.",
+      "Night components are the digestion-support lane, not the main appetite lane.",
+      "After OK Liquid, maintain a 4-hour no-solid-food window.",
+      "Zero-calorie drinks are allowed in the fasting window.",
+      "Eat only on true hunger; there is no fixed meal timing.",
+      "Many users naturally move to 1 to 1.5 meals per day.",
+      "OK Liquid supports fullness and reduces cravings.",
+      "OK Liquid helps shift users from clock-based eating to true-hunger eating.",
+      "OK Liquid supports lower unnecessary intake without hunger-led weakness.",
+      "OK Tablet and OK Powder support digestive comfort, including bloating, acidity, gas, heaviness, digestion, absorption, and elimination comfort.",
+      "System effect: reduced meal frequency, reduced portion size, easier routine consistency.",
+      "Supports reduced hunger and cravings.",
+      "Supports easier caloric-deficit adherence.",
+      "Supports digestion and gut comfort.",
+      "Supports practical obesity and weight-loss efforts.",
+      "Approved mechanism framing must explicitly tie to goal language such as appetite control for weight loss, digestion support for easier weight-loss adherence, or obesity-support routine for fast visible weight-loss progress.",
+      "Adults 18+ with BMI above 25.",
+      "Primary fit: overweight or obese adults wanting natural, guided, easy-to-follow weight-loss support with fast visible results.",
+      "Common fit profiles include users struggling with stubborn fat, belly fat, cravings, emotional eating, low energy, slow metabolism, and repeated diet failure.",
+      "Relevant obesity-linked context may include PCOD, PCOS, thyroid imbalance, high blood pressure, fatty liver, diabetes, and IBS, but this must not become a cure claim.",
+      "Do not use for pregnant women.",
+      "Do not use for women within 6 months postpartum.",
+      "Do not use for people actively taking insulin.",
+      "Do not position for users below 18 years of age.",
+      "Doctor review required before use for people on multiple psychiatric medications.",
+      "Doctor review required before use for people with multiple surgery history.",
+      "Internal operational handling from FAQ should not override the above eligibility boundaries.",
+      "Public trust line: no side effects.",
+      "All-natural Ayurvedic formulation.",
+      "No synthetic ingredients.",
+      "No chemical preservatives.",
       "Internal handling: first 3 days can be an adjustment phase.",
-      "If weight-loss start is not observed in the first 7 days, refund applies only when protocol is followed and daily tracker is shared.",
+      "Use public-facing safety language carefully without inventing additional medical safety claims.",
+      "Safety reassurance is a protected lane when harsh-method fear is relevant, but it must not replace the weight-loss outcome or mechanism.",
+      "If weight-loss start is not observed within the first 7 days, full refund can be requested when the protocol was followed as instructed and the daily tracker was shared.",
+      "Daily tracker sharing is part of refund eligibility.",
+      "Guarantee language should stay tied to conditions and not become an unconditional promise.",
       "Continue in cycles until target weight or BMI 25.",
-      "After every 30 days take a 7 to 10 day break.",
-      "Maintain caloric balance, balanced diet, and daily activity.",
-      "No automatic bounce back from stopping alone.",
+      "After every 30 days, take a 7 to 10 day break.",
+      "The kit can be repeated, but repeat logic must preserve the 30-day break rule.",
+      "Maintenance is not lifelong dependency on the kit.",
+      "Stopping the kit does not itself cause automatic regain.",
+      "Core maintenance logic: maintain caloric balance, follow a balanced diet, stay active, and use optional maintenance support products only if needed.",
       "70,000+ users served.",
       "200 video testimonials.",
-      "Doctor authority.",
-      "Tracker-led support.",
-      "7-day refund policy (conditioned on protocol + daily tracker sharing)."
-    ],
-    "mechanism": [
-      "Protocol-based appetite regulation + eating-behavior correction + digestion support for obesity/weight-loss support.",
-      "Supports fullness/satiety and reduces cravings to make true-hunger eating easier.",
-      "Supports digestive comfort (bloating, acidity, gas, heaviness) to help routine consistency.",
-      "Supports weight-loss efforts by making caloric-deficit adherence easier in real life.",
-      "Every headline and subheadline must explicitly mention weight loss, obesity reduction, or clear weight outcome language. Avoid abstract copy that hides the core product goal.",
-      "Approved explicit phrases include: weight loss support; obesity management support; lose weight; reduce excess weight; 3 to 5 kg in 15 days; appetite control for weight loss.",
-      "Do not use vague transformational lines without naming weight loss or obesity context.",
-      "Mechanism messaging must explicitly connect to obesity/weight-loss goal, not abstract behavior language alone.",
-      "Take OK Liquid in the morning on an empty stomach.",
-      "Take OK Tablet plus 1/2 tsp OK Powder around 15 minutes before sleep with warm water.",
-      "After OK Liquid, keep a 4-hour no-solid-food window.",
-      "Zero-calorie drinks are allowed during the no-solids window."
-    ],
-    "faq": [
+      "3 to 5 kg in 15 days claim.",
+      "7-day money-back guarantee with adherence conditions.",
+      "Daily tracker-led support.",
+      "Doctor authority: Dr. Arun Tyagi with 34 years of experience.",
+      "31 unique ingredients and 44 total ingredient entries across the kit.",
+      "No synthetic ingredients and no chemical preservatives.",
       "Vegetables.",
       "Salads.",
       "Soups.",
       "Fruits.",
-      "Up to 30g complex carbs (millets or oats) if still hungry.",
-      "Water (around 4 liters/day).",
-      "Milk in tea/coffee (as the only dairy exception stated).",
+      "If still hungry, up to 30g complex carbs such as millets or oats.",
+      "Around 4 liters of water per day.",
+      "5000 to 7000 steps per day or pranayam.",
+      "Homemade-food compatibility can be used as a benefit lane, but it must not become the whole brand center.",
       "Non-vegetarian food.",
       "Alcohol.",
-      "Dairy (except milk in tea/coffee).",
+      "Dairy except milk in tea or coffee.",
       "Wheat chapati.",
       "Rice.",
       "Dal.",
@@ -193,12 +473,128 @@
       "No body-shaming.",
       "No cure claims.",
       "No anti-gym framing.",
-      "No competitor bashing/insults.",
-      "Do not use abstract copy that hides the obesity/weight-loss objective.",
-      "Do not claim: Standalone fat-burner positioning/claims.",
-      "Do not claim: Rapid fat melting claims.",
-      "Do not claim: Zero-effort results claims.",
-      "Do not claim: Unlimited junk-food outcomes claims."
+      "No competitor bashing.",
+      "Do not use old ingredient counts such as 39 herbs.",
+      "Do not make abstract ad copy that hides the obesity or weight-loss objective.",
+      "Do not force headline style into old extracted-xlsx patterns; the lane must come from product features first.",
+      "Headlines and subheadlines must stay feature-based and outcome-linked, not generic transformation slogans.",
+      "Secondary benefits must not overshadow the main promise of fast visible weight loss with a safer, easier, more guided experience."
+    ],
+    "mechanism": [
+      "OK Liquid supports fullness and reduces cravings.",
+      "OK Liquid helps shift users from clock-based eating to true-hunger eating.",
+      "OK Liquid supports lower unnecessary intake without hunger-led weakness.",
+      "OK Tablet and OK Powder support digestive comfort, including bloating, acidity, gas, heaviness, digestion, absorption, and elimination comfort.",
+      "System effect: reduced meal frequency, reduced portion size, easier routine consistency.",
+      "Supports reduced hunger and cravings.",
+      "Supports easier caloric-deficit adherence.",
+      "Supports digestion and gut comfort.",
+      "Supports practical obesity and weight-loss efforts.",
+      "Approved mechanism framing must explicitly tie to goal language such as appetite control for weight loss, digestion support for easier weight-loss adherence, or obesity-support routine for fast visible weight-loss progress.",
+      "Trigger fast visible results and 3 to 5 kg in 15 days when context allows a performance-led claim.",
+      "Trigger cravings down and appetite control for weight loss before routine mechanics when the pain is hunger, snacking, emotional eating, or adherence drop-off.",
+      "Trigger natural safe-feeling and no-side-effects positioning when safety concerns, fear of harsh methods, or dependency fear is relevant.",
+      "Trigger homemade-food compatibility and no separate meal prep when the pain is time burden, family-food friction, or daily disruption, but do not let it become the brand center.",
+      "Trigger structured system and low guesswork when the pain is confusion, inconsistency, or repeated failure from high-friction plans.",
+      "Trigger guided support only as tracker-led guidance, WhatsApp follow-up, and coach support; do not turn support into vague emotional reassurance copy.",
+      "Trigger AM routine and PM routine only when the chosen angle genuinely needs protocol detail; do not make routine the default lead.",
+      "Use proof and guarantee as reinforcement, not as a substitute for stronger feature lanes above.",
+      "Use one primary feature lane and one secondary feature lane; do not flatten everything into a single routine theme.",
+      "Do not use what-not-to-say violations: body-shaming, cure language, anti-gym framing, competitor insults, abstract transformation lines without explicit weight-loss context, old ingredient counts, or zero-effort/fat-melting claims.",
+      "Every headline and subheadline must explicitly mention weight loss, obesity reduction, excess-weight reduction, or clear weight outcome language.",
+      "Approved explicit phrases include weight loss support, obesity management support, lose weight, reduce excess weight, 3 to 5 kg in 15 days, and appetite control for weight loss.",
+      "Mechanism messaging on-image must explicitly connect to obesity or weight-loss goal, not abstract behavior language alone.",
+      "Do not use vague transformational lines without naming weight loss or obesity context.",
+      "Every mechanism-led headline/subheadline unit must keep the goal visible in the same unit.",
+      "Take OK Liquid first thing on waking on an empty stomach.",
+      "Morning step is the main appetite-support component.",
+      "Dried amla is included for post-liquid taste balance and digestive support.",
+      "Take OK Tablet plus 1/2 tsp OK Powder around 15 minutes before sleep.",
+      "Take the night components with warm water.",
+      "Night components are the digestion-support lane, not the main appetite lane.",
+      "After OK Liquid, maintain a 4-hour no-solid-food window.",
+      "Zero-calorie drinks are allowed in the fasting window.",
+      "Eat only on true hunger; there is no fixed meal timing.",
+      "Many users naturally move to 1 to 1.5 meals per day."
+    ],
+    "faq": [
+      "Vegetables.",
+      "Salads.",
+      "Soups.",
+      "Fruits.",
+      "If still hungry, up to 30g complex carbs such as millets or oats.",
+      "Around 4 liters of water per day.",
+      "5000 to 7000 steps per day or pranayam.",
+      "Homemade-food compatibility can be used as a benefit lane, but it must not become the whole brand center.",
+      "Non-vegetarian food.",
+      "Alcohol.",
+      "Dairy except milk in tea or coffee.",
+      "Wheat chapati.",
+      "Rice.",
+      "Dal.",
+      "Nuts.",
+      "No body-shaming.",
+      "No cure claims.",
+      "No anti-gym framing.",
+      "No competitor bashing.",
+      "Do not use old ingredient counts such as 39 herbs.",
+      "Do not make abstract ad copy that hides the obesity or weight-loss objective.",
+      "Do not force headline style into old extracted-xlsx patterns; the lane must come from product features first.",
+      "Headlines and subheadlines must stay feature-based and outcome-linked, not generic transformation slogans.",
+      "Secondary benefits must not overshadow the main promise of fast visible weight loss with a safer, easier, more guided experience.",
+      "Do not claim: Do not position the product as a standalone fat-burner.",
+      "Do not claim: Do not claim it burns fat rapidly by itself.",
+      "Do not claim: Do not claim it melts fat without effort.",
+      "Do not claim: Do not claim zero-effort results.",
+      "Do not claim: Do not claim it works with unlimited junk food.",
+      "Do not claim: Do not claim it overrides all discipline.",
+      "Do not claim: Do not use abstract-only mechanism lines such as control your routine, reset your day, or transform consistency unless the same unit clearly states weight loss or obesity context."
+    ],
+    "priority_block": [
+      "Priority 1: lead with the main promise of fast visible weight loss and 3 to 5 kg in 15 days when context allows it.",
+      "Priority 2: cravings down, hunger reduction, and easier caloric-deficit adherence are the main physical support benefits and should appear before routine mechanics.",
+      "Priority 3: natural safe-feeling, no-side-effects positioning, and all-natural Ayurvedic trust should be used when safety or harsh-method fear is relevant.",
+      "Priority 4: homemade-food compatibility and no-separate-meal-prep benefits should be used for time burden and family-food friction, but should not become the whole brand center.",
+      "Priority 5: structured system, low guesswork, and clear routine should be used when the pain is confusion, overwhelm, or repeated inconsistency.",
+      "Priority 6: guided support means tracker-led guidance, WhatsApp follow-up, and coach support, not vague emotional support copy.",
+      "Priority 7: experiential or digestive benefits can support the message, but should not overshadow the main promise.",
+      "Priority 8: AM routine and PM routine are mechanism lanes that should be used when the chosen angle genuinely needs morning or night protocol detail, not as the default lead every time.",
+      "Priority 9: headlines and subheadlines must stay feature-based and outcome-linked; do not convert them into generic transformation slogans.",
+      "Priority 10: if the detailed product doc defines a stronger feature hierarchy or interpretation rule, preserve that detail instead of compressing it.",
+      "Priority 11: headline style must not be forced into old extracted-xlsx patterns; the lane must come from product features first."
+    ],
+    "headline_strategy": [
+      "Protected priority order for feature-led copy: fast visible results first; cravings down and appetite control for weight loss second; natural safe-feeling and no-side-effects positioning third; homemade-food compatibility and no separate meal prep fourth; structured system and low guesswork fifth; guided support sixth; emotional-control and confidence-restoring support only as support; digestive comfort and secondary internal benefits only as support; AM routine and PM routine only as mechanism lanes when genuinely needed; proof/guarantee only as support.",
+      "Headlines must be oriented around concrete product features or product-mechanic outcomes.",
+      "Headlines must explicitly name weight loss, obesity reduction, excess-weight reduction, appetite control for weight loss, or a 15-day weight outcome.",
+      "Subheadlines must complement the headline with a second feature lane and must not merely restate the headline.",
+      "Do not let all ads under the same format repeat the same headline skeleton or the same subheadline skeleton.",
+      "Rotate feature lanes across ads in the same format so the set does not collapse into one repetitive routine theme.",
+      "Format-level execution: HERO uses one primary feature in the headline and one secondary feature in the support line; UGC allows creator-style practicality but still needs a concrete feature lane; FEAT bullets must each represent different product features; BA shows struggle on left and feature-led shift or progress state on right; TEST review line should reference a specific feature, routine benefit, or outcome driver instead of vague praise."
+    ],
+    "protected_themes": [
+      "Fast visible results first.",
+      "Cravings down and appetite control for weight loss second.",
+      "Natural safe-feeling and no-side-effects positioning third.",
+      "Homemade-food compatibility and no separate meal prep fourth.",
+      "Structured system and low guesswork fifth.",
+      "Guided support sixth.",
+      "Emotional-control and confidence-restoring benefits only as support.",
+      "Digestive comfort and secondary internal benefits only as support.",
+      "AM routine and PM routine only as mechanism lanes when genuinely needed.",
+      "Proof and guarantee framing only as support."
+    ],
+    "trigger_rules": [
+      "Trigger fast visible results and 3 to 5 kg in 15 days when context allows a performance-led claim.",
+      "Trigger cravings down and appetite control for weight loss before routine mechanics when the pain is hunger, snacking, emotional eating, or adherence drop-off.",
+      "Trigger natural safe-feeling and no-side-effects positioning when safety concerns, fear of harsh methods, or dependency fear is relevant.",
+      "Trigger homemade-food compatibility and no separate meal prep when the pain is time burden, family-food friction, or daily disruption, but do not let it become the brand center.",
+      "Trigger structured system and low guesswork when the pain is confusion, inconsistency, or repeated failure from high-friction plans.",
+      "Trigger guided support only as tracker-led guidance, WhatsApp follow-up, and coach support; do not turn support into vague emotional reassurance copy.",
+      "Trigger AM routine and PM routine only when the chosen angle genuinely needs protocol detail; do not make routine the default lead.",
+      "Use proof and guarantee as reinforcement, not as a substitute for stronger feature lanes above.",
+      "Use one primary feature lane and one secondary feature lane; do not flatten everything into a single routine theme.",
+      "Do not use what-not-to-say violations: body-shaming, cure language, anti-gym framing, competitor insults, abstract transformation lines without explicit weight-loss context, old ingredient counts, or zero-effort/fat-melting claims."
     ]
   }
 }
