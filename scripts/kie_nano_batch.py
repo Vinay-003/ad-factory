@@ -1,12 +1,12 @@
 #!/usr/bin/env python3
-"""Submit EN ad prompt batches to Kie Nano Banana 2 and save generated images.
+"""Submit ad prompt batches to Kie Nano Banana Pro and save generated images.
 
 Flow:
 1) Read prompt files from output/vN (EN only by default)
 2) Prepend input/startingprompt.txt to each prompt
 3) Submit one task per prompt to Kie createTask
 4) Poll task status via recordInfo
-5) Download generated images to generated_image/vN/<format>-en/
+5) Download generated images to generated_image/vN/<format>/<persona>/
 """
 
 from __future__ import annotations
@@ -35,6 +35,7 @@ class PromptFile:
     path: Path
     ad_format: str
     language: str
+    persona_number: int | None
     variation: int
 
 
@@ -45,7 +46,7 @@ def parse_args() -> argparse.Namespace:
     parser.add_argument("--api-key", default=os.getenv("KIE_API_KEY"), help="Kie API key (or set KIE_API_KEY)")
     parser.add_argument("--callback-url", default=os.getenv("KIE_CALLBACK_URL", ""), help="Optional callback URL")
     parser.add_argument("--aspect-ratio", default="4:5", choices=["1:1", "1:4", "1:8", "2:3", "3:2", "3:4", "4:1", "4:3", "4:5", "5:4", "8:1", "9:16", "16:9", "21:9", "auto"], help="Output aspect ratio")
-    parser.add_argument("--resolution", default="2K", choices=["1K", "2K", "4K"], help="Output resolution")
+    parser.add_argument("--resolution", default="4K", choices=["1K", "2K", "4K"], help="Output resolution (forced to 4K)")
     parser.add_argument("--output-format", default="png", choices=["png", "jpg"], help="Generated image format")
     parser.add_argument("--poll-interval", type=float, default=3.0, help="Status polling interval (seconds)")
     parser.add_argument("--timeout-seconds", type=int, default=900, help="Task timeout (seconds)")
@@ -179,20 +180,36 @@ def build_image_inputs(active_images_dir: Path, mode: str, base_url: str) -> lis
     return result
 
 
-def build_image_inputs_from_file(url_file: Path) -> list[str]:
+def load_active_images_config(url_file: Path) -> tuple[list[str], str, str]:
     if not url_file.exists():
         raise RuntimeError(f"Image URL file not found: {url_file}")
     lines = [line.strip() for line in url_file.read_text(encoding="utf-8").splitlines()]
-    urls = [line for line in lines if line and not line.startswith("#")]
+    urls: list[str] = []
+    light_logo_url = ""
+    dark_logo_url = ""
+    for line in lines:
+        if not line or line.startswith("#"):
+            continue
+        if "=" in line:
+            key, value = line.split("=", 1)
+            normalized_key = key.strip().upper()
+            normalized_value = value.strip()
+            if normalized_key == "LIGHT_LOGO_URL":
+                light_logo_url = normalized_value
+                continue
+            if normalized_key == "DARK_LOGO_URL":
+                dark_logo_url = normalized_value
+                continue
+        urls.append(line)
     if not urls:
         raise RuntimeError(f"No URLs found in {url_file}")
     if len(urls) > 14:
         raise RuntimeError(f"Kie supports max 14 image_input URLs, found {len(urls)} in {url_file}")
-    return urls
+    return urls, light_logo_url, dark_logo_url
 
 
 def parse_prompt_files(batch_dir: Path, language_mode: str, root: Path, selected_prompt_files: set[str] | None = None) -> list[PromptFile]:
-    pattern = re.compile(r"^OUTPUT_([A-Z]+)(?:_P\d+)?_(EN|HI)(?:_V(\d+))?\.txt$")
+    pattern = re.compile(r"^OUTPUT_([A-Z]+)(?:_P(\d+))?_(EN|HI)(?:_V(\d+))?\.txt$")
     picked: list[PromptFile] = []
     for item in sorted(batch_dir.rglob("OUTPUT_*.txt")):
         if not item.is_file():
@@ -203,13 +220,17 @@ def parse_prompt_files(batch_dir: Path, language_mode: str, root: Path, selected
         match = pattern.match(item.name)
         if not match:
             continue
-        ad_format, language, variation_raw = match.group(1), match.group(2), match.group(3)
+        ad_format = match.group(1)
+        persona_raw = match.group(2)
+        language = match.group(3)
+        variation_raw = match.group(4)
         if language_mode == "EN" and language != "EN":
             continue
         if language_mode == "HI" and language != "HI":
             continue
         variation = int(variation_raw) if variation_raw else 1
-        picked.append(PromptFile(path=item, ad_format=ad_format, language=language, variation=variation))
+        persona_number = int(persona_raw) if persona_raw else None
+        picked.append(PromptFile(path=item, ad_format=ad_format, language=language, persona_number=persona_number, variation=variation))
 
     if not picked:
         raise RuntimeError(f"No prompt files found in {batch_dir} for language mode={language_mode}")
@@ -233,11 +254,50 @@ def conversion_lock_instruction(mode: str) -> str:
 """.strip()
 
 
-def compose_prompt(starting_prompt: str, prompt_file: Path, conversion_mode: str) -> str:
+def choose_logo_variant(prompt_text: str) -> str:
+    dark_keywords = (
+        "dark",
+        "night",
+        "black",
+        "navy",
+        "deep",
+        "moody",
+        "dim",
+        "shadow",
+        "low light",
+        "low-light",
+    )
+    lowered = prompt_text.lower()
+    if any(keyword in lowered for keyword in dark_keywords):
+        return "dark"
+    return "light"
+
+
+def compose_prompt(
+    starting_prompt: str,
+    prompt_file: Path,
+    conversion_mode: str,
+    light_logo_url: str,
+    dark_logo_url: str,
+) -> str:
     body = prompt_file.read_text(encoding="utf-8").strip()
     lock = conversion_lock_instruction(conversion_mode)
+    logo_variant = choose_logo_variant(body)
+    selected_logo_url = dark_logo_url if logo_variant == "dark" else light_logo_url
+    logo_instruction = ""
+    if selected_logo_url:
+        logo_instruction = (
+            "LOGO ASSET RULE (MANDATORY)\n"
+            f"- Use this exact logo asset URL: {selected_logo_url}\n"
+            "- If background is light, use LIGHT_LOGO_URL; if background is dark, use DARK_LOGO_URL.\n"
+            f"- This prompt is classified as {logo_variant.upper()} background, so use the selected URL above."
+        )
     if lock:
+        if logo_instruction:
+            return f"{starting_prompt.strip()}\n\n{logo_instruction}\n\n{lock}\n\n{body}\n"
         return f"{starting_prompt.strip()}\n\n{lock}\n\n{body}\n"
+    if logo_instruction:
+        return f"{starting_prompt.strip()}\n\n{logo_instruction}\n\n{body}\n"
     return f"{starting_prompt.strip()}\n\n{body}\n"
 
 
@@ -310,8 +370,9 @@ def create_task(
     resolution: str,
     output_format: str,
 ) -> str:
+    resolution = "4K"
     payload = {
-        "model": "nano-banana-2",
+        "model": "nano-banana-pro",
         "input": {
             "prompt": prompt,
             "image_input": image_input,
@@ -402,6 +463,12 @@ def write_json(path: Path, payload: dict) -> None:
 
 def write_text(path: Path, text: str) -> None:
     path.write_text(text, encoding="utf-8")
+
+
+def persona_folder_name(persona_number: int | None) -> str:
+    if isinstance(persona_number, int) and persona_number > 0:
+        return f"P{persona_number:02d}"
+    return "P00"
 
 
 def iter_grouped(items: Iterable[PromptFile]) -> dict[tuple[str, str], list[PromptFile]]:
@@ -500,10 +567,12 @@ def main() -> int:
     batch_generated_dir = generated_root / batch_name
     ensure_dir(batch_generated_dir)
 
+    light_logo_url = ""
+    dark_logo_url = ""
     if has_per_prompt_refs:
         image_input_urls = []
     elif args.image_input_mode == "url" and active_images_file.exists():
-        image_input_urls = build_image_inputs_from_file(active_images_file)
+        image_input_urls, light_logo_url, dark_logo_url = load_active_images_config(active_images_file)
     else:
         image_input_urls = build_image_inputs(active_images_dir, args.image_input_mode, args.active_images_base_url)
 
@@ -512,25 +581,30 @@ def main() -> int:
     grouped = trim_variations(iter_grouped(prompt_files), args.max_variations_per_format)
     starting_prompt = starting_prompt_file.read_text(encoding="utf-8")
 
-    run_summary = {
-        "batch": batch_name,
-        "language_mode": args.language,
-        "max_variations_per_format": args.max_variations_per_format,
-        "submitted_at": time.strftime("%Y-%m-%dT%H:%M:%SZ", time.gmtime()),
-        "image_input_count": len(image_input_urls),
-        "jobs": [],
-    }
+    generated_at = time.strftime("%Y-%m-%dT%H:%M:%SZ", time.gmtime())
 
     for (ad_format, language), files in grouped.items():
-        folder_name = f"{ad_format.lower()}-{language.lower()}"
-        format_dir = batch_generated_dir / folder_name
+        format_dir = batch_generated_dir / ad_format.upper()
         ensure_dir(format_dir)
 
         for prompt_file in files:
             prompt_body = prompt_file.path.read_text(encoding="utf-8")
             prompt_metadata = extract_prompt_metadata(prompt_body)
-            complete_prompt = compose_prompt(starting_prompt, prompt_file.path, args.reference_conversion_mode)
+            complete_prompt = compose_prompt(
+                starting_prompt,
+                prompt_file.path,
+                args.reference_conversion_mode,
+                light_logo_url,
+                dark_logo_url,
+            )
             prompt_rel_path = str(prompt_file.path.relative_to(root))
+            persona_number = prompt_file.persona_number
+            if not isinstance(persona_number, int):
+                raw_persona_meta = prompt_metadata.get("persona_number")
+                if isinstance(raw_persona_meta, int):
+                    persona_number = raw_persona_meta
+            persona_dir = format_dir / persona_folder_name(persona_number)
+            ensure_dir(persona_dir)
             per_prompt_inputs = prompt_reference_map.get(Path(prompt_rel_path).as_posix())
             image_input_for_prompt = per_prompt_inputs if per_prompt_inputs else image_input_urls
             if not image_input_for_prompt:
@@ -546,9 +620,6 @@ def main() -> int:
             )
             print(f"[{ad_format}-{language}] variation {prompt_file.variation}: submitted task {task_id}")
 
-            composed_prompt_path = format_dir / f"prompt_task_{task_id}.txt"
-            write_text(composed_prompt_path, complete_prompt)
-
             task_data = wait_for_task(
                 api_key=args.api_key,
                 task_id=task_id,
@@ -560,36 +631,55 @@ def main() -> int:
             saved_files = []
             for idx, url in enumerate(result_urls, start=1):
                 ext = extension_from_url(url, args.output_format)
-                filename = f"{ad_format.lower()}-{language.lower()}-v{prompt_file.variation:02d}-{idx:02d}.{ext}"
-                out_file = format_dir / filename
+                persona_label = persona_folder_name(persona_number).lower()
+                filename = f"{ad_format.lower()}-{language.lower()}-{persona_label}-v{prompt_file.variation:02d}-{idx:02d}.{ext}"
+                out_file = persona_dir / filename
                 download_file(url, out_file)
                 saved_files.append(str(out_file.relative_to(root)))
 
-            task_record = {
-                "task_id": task_id,
-                "format": ad_format,
-                "language": language,
-                "variation": prompt_file.variation,
-                "prompt_file": prompt_rel_path,
-                "composed_prompt_file": str(composed_prompt_path.relative_to(root)),
-                "prompt_metadata": prompt_metadata,
-                "image_input_urls": copy.deepcopy(image_input_for_prompt),
-                "result_urls": result_urls,
-                "saved_files": saved_files,
-                "state": task_data.get("state"),
-                "create_time": task_data.get("createTime"),
-                "complete_time": task_data.get("completeTime"),
-                "cost_time": task_data.get("costTime"),
-            }
-            run_summary["jobs"].append(task_record)
+                logo_variant = choose_logo_variant(prompt_body)
+                image_record = {
+                    "record_type": "generated_image",
+                    "generated_at": generated_at,
+                    "model": "nano-banana-pro",
+                    "task_id": task_id,
+                    "batch": batch_name,
+                    "format": ad_format,
+                    "language": language,
+                    "persona_number": persona_number,
+                    "persona_folder": persona_folder_name(persona_number),
+                    "variation": prompt_file.variation,
+                    "image_index": idx,
+                    "prompt_file": prompt_rel_path,
+                    "output_prompt": prompt_body,
+                    "starting_prompt": starting_prompt.strip(),
+                    "complete_prompt": complete_prompt,
+                    "bg_used": {
+                        "slot": prompt_metadata.get("background_slot"),
+                        "title": prompt_metadata.get("background_title"),
+                        "seeded_background_prompt": prompt_metadata.get("seeded_background_prompt"),
+                    },
+                    "bg_variation_used": {
+                        "seed": prompt_metadata.get("seed"),
+                        "prompt_variation": prompt_file.variation,
+                    },
+                    "logo_variant": logo_variant,
+                    "logo_asset_url": dark_logo_url if logo_variant == "dark" else light_logo_url,
+                    "prompt_metadata": prompt_metadata,
+                    "image_input_urls": copy.deepcopy(image_input_for_prompt),
+                    "result_url": url,
+                    "saved_file": str(out_file.relative_to(root)),
+                    "state": task_data.get("state"),
+                    "create_time": task_data.get("createTime"),
+                    "complete_time": task_data.get("completeTime"),
+                    "cost_time": task_data.get("costTime"),
+                }
+                image_meta_path = out_file.with_suffix(".json")
+                write_json(image_meta_path, image_record)
 
-            task_meta_path = format_dir / f"task_{task_id}.json"
-            write_json(task_meta_path, task_record)
             print(f"[{ad_format}-{language}] variation {prompt_file.variation}: saved {len(saved_files)} image(s)")
 
-    summary_path = batch_generated_dir / "batch_run_summary.json"
-    write_json(summary_path, run_summary)
-    print(f"Done. Batch summary saved at {summary_path.relative_to(root)}")
+    print(f"Done. Image files and per-image metadata saved under {batch_generated_dir.relative_to(root)}")
     return 0
 
 

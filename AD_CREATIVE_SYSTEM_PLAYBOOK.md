@@ -25,7 +25,7 @@ Accepted user input styles (examples):
 - "Create 9:16 ads" / "Stories ads" / "Reels ads" -> switch output sizing and text placement to 9:16 safe-zone rules before prompt finalization
 
 Default starter batch profile (use when no specific input is given):
-- Persona selection: random from 1-22 per format (do not use a fixed mapping)
+- Persona selection: random from 1-26 per format (do not use a fixed mapping)
 - Prefer unique personas across selected formats in the same batch when possible
 - If user provides persona for only some formats, keep those fixed and randomize remaining formats
 - Headline mode: AI-generated fresh headlines
@@ -182,6 +182,10 @@ Persona library (select by number):
 20. Support-Dependent Persona (needs accountability)
 21. Beginner Who Hates Complex Plans
 22. 35+ Slow-Progress Persona
+23. New Mother (6+ months postpartum)
+24. Menopause
+25. Natural Solution Seeker
+26. Sustainable Weight Loss Seeker
 
 For each persona, define these 5 fields before writing copy:
 - Pain: what hurts now
@@ -389,7 +393,7 @@ In production mode:
 - id: sequential entry ID (entry_001, entry_002, etc.)
 - timestamp: ISO 8601 format
 - format: HERO / BA / TEST / FEAT / UGC
-- persona_number: 1-22
+- persona_number: 1-26
 - persona_name: readable name
 - headline_angle: pain / objection / mechanism / time / proof / sacrifice_reduction
 - headline_en: exact English headline used
@@ -922,7 +926,7 @@ Input parsing rules:
 
 Defaults when missing:
 - Headline mode default: AI-generated fresh headlines.
-- Persona default: random selection from persona library (1-22), format-wise.
+- Persona default: random selection from persona library (1-26), format-wise.
 - Randomization rule: avoid repeating the same persona across formats in the same batch when possible.
 - If registry history exists, avoid persona+format combinations that appear in the recent dedupe window.
 

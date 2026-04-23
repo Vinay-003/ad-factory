@@ -1,0 +1,445 @@
+{
+  "default_aspect_ratio": "4:5",
+  "ads": [
+    {
+      "format": "FEAT",
+      "headline_angle": "mechanism",
+      "persona": {
+        "number": 16,
+        "name": "Budget-Conscious Result Seeker",
+        "pain_en": "Budget concerns reduce trust in expensive plans.",
+        "desire_en": "Reliable progress from a practical system.",
+        "friction_en": "Fear of paying without results.",
+        "proof_needed_en": "Needs strong value and risk-reduction cues.",
+        "tone_cue_en": "transparent and outcome-focused",
+        "pain_hi": "Budget concerns reduce trust in expensive plans.",
+        "desire_hi": "Reliable progress from a practical system.",
+        "friction_hi": "Fear of paying without results.",
+        "proof_needed_hi": "Needs strong value and risk-reduction cues.",
+        "tone_cue_hi": "transparent and outcome-focused"
+      },
+      "copy": {
+        "EN": {
+          "headline": "More than a product. A full weight-loss system.",
+          "bullets": [
+            "OK Kit combines hunger control, clear routine, and trained coach guidance.",
+            "The tracker helps you record and see progress.",
+            "That makes weight loss feel less like a gamble.",
+            "A 7-day money-back guarantee lowers risk."
+          ],
+          "cta": "See How It Works"
+        },
+        "HI": {
+          "headline": "More than a product. A full weight-loss system.",
+          "bullets": [
+            "OK Kit combines hunger control, clear routine, and trained coach guidance.",
+            "The tracker helps you record and see progress.",
+            "That makes weight loss feel less like a gamble.",
+            "A 7-day money-back guarantee lowers risk."
+          ],
+          "cta": "See How It Works"
+        }
+      }
+    },
+    {
+      "format": "FEAT",
+      "headline_angle": "mechanism",
+      "persona": {
+        "number": 17,
+        "name": "Wedding / Event Deadline Persona",
+        "pain_en": "Event deadline creates pressure and urgency.",
+        "desire_en": "Visible progress in a short, realistic window.",
+        "friction_en": "Panic-driven plans often backfire.",
+        "proof_needed_en": "Needs structured short-term milestone framing.",
+        "tone_cue_en": "urgent but controlled",
+        "pain_hi": "Event deadline creates pressure and urgency.",
+        "desire_hi": "Visible progress in a short, realistic window.",
+        "friction_hi": "Panic-driven plans often backfire.",
+        "proof_needed_hi": "Needs structured short-term milestone framing.",
+        "tone_cue_hi": "urgent but controlled"
+      },
+      "copy": {
+        "EN": {
+          "headline": "A clear 15-day plan for weight loss.",
+          "bullets": [
+            "OK Kit is built around a day-wise course with visible progress in mind.",
+            "Hunger support and simple steps make the short window easier to follow.",
+            "That helps when you want weight loss before a wedding, trip, or event.",
+            "Clear structure keeps daily action focused."
+          ],
+          "cta": "See How It Works"
+        },
+        "HI": {
+          "headline": "A clear 15-day plan for weight loss.",
+          "bullets": [
+            "OK Kit is built around a day-wise course with visible progress in mind.",
+            "Hunger support and simple steps make the short window easier to follow.",
+            "That helps when you want weight loss before a wedding, trip, or event.",
+            "Clear structure keeps daily action focused."
+          ],
+          "cta": "See How It Works"
+        }
+      }
+    },
+    {
+      "format": "FEAT",
+      "headline_angle": "mechanism",
+      "persona": {
+        "number": 18,
+        "name": "Confidence-First Persona (Appearance + Energy)",
+        "pain_en": "Low confidence from body discomfort and low energy.",
+        "desire_en": "Feel lighter, sharper, and more confident daily.",
+        "friction_en": "Inconsistent routines reduce momentum.",
+        "proof_needed_en": "Needs confidence-building early progress signals.",
+        "tone_cue_en": "uplifting and grounded",
+        "pain_hi": "Low confidence from body discomfort and low energy.",
+        "desire_hi": "Feel lighter, sharper, and more confident daily.",
+        "friction_hi": "Inconsistent routines reduce momentum.",
+        "proof_needed_hi": "Needs confidence-building early progress signals.",
+        "tone_cue_hi": "uplifting and grounded"
+      },
+      "copy": {
+        "EN": {
+          "headline": "Lose weight without feeling drained.",
+          "bullets": [
+            "OK Liquid helps you eat less without feeling weak.",
+            "The routine is easier to follow, so progress is easier to continue.",
+            "That can show up in clothes, movement, and daily confidence.",
+            "The all-natural Ayurvedic formula is positioned with no side effects."
+          ],
+          "cta": "See How It Works"
+        },
+        "HI": {
+          "headline": "Lose weight without feeling drained.",
+          "bullets": [
+            "OK Liquid helps you eat less without feeling weak.",
+            "The routine is easier to follow, so progress is easier to continue.",
+            "That can show up in clothes, movement, and daily confidence.",
+            "The all-natural Ayurvedic formula is positioned with no side effects."
+          ],
+          "cta": "See How It Works"
+        }
+      }
+    },
+    {
+      "format": "FEAT",
+      "headline_angle": "mechanism",
+      "persona": {
+        "number": 19,
+        "name": "Trust-First Buyer (Doctor-Backed Only)",
+        "pain_en": "Only trusts doctor-backed, evidence-grounded solutions.",
+        "desire_en": "Safe-feeling system with clear proof signals.",
+        "friction_en": "Distrust of generic internet claims.",
+        "proof_needed_en": "Needs founder credibility and structured protocol proof.",
+        "tone_cue_en": "authoritative and factual",
+        "pain_hi": "Only trusts doctor-backed, evidence-grounded solutions.",
+        "desire_hi": "Safe-feeling system with clear proof signals.",
+        "friction_hi": "Distrust of generic internet claims.",
+        "proof_needed_hi": "Needs founder credibility and structured protocol proof.",
+        "tone_cue_hi": "authoritative and factual"
+      },
+      "copy": {
+        "EN": {
+          "headline": "Doctor-made weight loss, not generic weight loss.",
+          "bullets": [
+            "Obesity Killer Kit was made by Dr. Arun Tyagi.",
+            "It comes from 34 years of Ayurvedic experience.",
+            "That makes the weight-loss promise feel more credible.",
+            "Trusted by 70,000+ customers."
+          ],
+          "cta": "See How It Works"
+        },
+        "HI": {
+          "headline": "Doctor-made weight loss, not generic weight loss.",
+          "bullets": [
+            "Obesity Killer Kit was made by Dr. Arun Tyagi.",
+            "It comes from 34 years of Ayurvedic experience.",
+            "That makes the weight-loss promise feel more credible.",
+            "Trusted by 70,000+ customers."
+          ],
+          "cta": "See How It Works"
+        }
+      }
+    },
+    {
+      "format": "FEAT",
+      "headline_angle": "mechanism",
+      "persona": {
+        "number": 20,
+        "name": "Support-Dependent Persona (Needs Accountability)",
+        "pain_en": "Struggles to stay consistent without accountability.",
+        "desire_en": "Daily support that keeps follow-through high.",
+        "friction_en": "Drops routines when guidance is missing.",
+        "proof_needed_en": "Needs tracker-led support and coach cues.",
+        "tone_cue_en": "coach-like and motivating",
+        "pain_hi": "Struggles to stay consistent without accountability.",
+        "desire_hi": "Daily support that keeps follow-through high.",
+        "friction_hi": "Drops routines when guidance is missing.",
+        "proof_needed_hi": "Needs tracker-led support and coach cues.",
+        "tone_cue_hi": "coach-like and motivating"
+      },
+      "copy": {
+        "EN": {
+          "headline": "Weight loss gets easier with guidance.",
+          "bullets": [
+            "The tracker helps you record weight, food, and routine daily.",
+            "Trained coaches guide you when progress slows or confusion starts.",
+            "That makes weight loss easier to continue, not just start.",
+            "You are following a guided plan, not doing it alone."
+          ],
+          "cta": "See How It Works"
+        },
+        "HI": {
+          "headline": "Weight loss gets easier with guidance.",
+          "bullets": [
+            "The tracker helps you record weight, food, and routine daily.",
+            "Trained coaches guide you when progress slows or confusion starts.",
+            "That makes weight loss easier to continue, not just start.",
+            "You are following a guided plan, not doing it alone."
+          ],
+          "cta": "See How It Works"
+        }
+      }
+    },
+    {
+      "format": "FEAT",
+      "headline_angle": "mechanism",
+      "persona": {
+        "number": 21,
+        "name": "Beginner Who Hates Complex Plans",
+        "pain_en": "Hates complicated plans and too many rules.",
+        "desire_en": "Simple steps with almost no guesswork.",
+        "friction_en": "Complexity causes early drop-off.",
+        "proof_needed_en": "Needs a very clear, easy-to-follow structure.",
+        "tone_cue_en": "simple and direct",
+        "pain_hi": "Hates complicated plans and too many rules.",
+        "desire_hi": "Simple steps with almost no guesswork.",
+        "friction_hi": "Complexity causes early drop-off.",
+        "proof_needed_hi": "Needs a very clear, easy-to-follow structure.",
+        "tone_cue_hi": "simple and direct"
+      },
+      "copy": {
+        "EN": {
+          "headline": "Simple weight loss from day one.",
+          "bullets": [
+            "Day-wise pouches tell you what to do each day.",
+            "Food guidance keeps the routine easy to understand.",
+            "That makes weight loss easier to start without overthinking.",
+            "Clear steps are easier to follow than loose advice."
+          ],
+          "cta": "See How It Works"
+        },
+        "HI": {
+          "headline": "Simple weight loss from day one.",
+          "bullets": [
+            "Day-wise pouches tell you what to do each day.",
+            "Food guidance keeps the routine easy to understand.",
+            "That makes weight loss easier to start without overthinking.",
+            "Clear steps are easier to follow than loose advice."
+          ],
+          "cta": "See How It Works"
+        }
+      }
+    },
+    {
+      "format": "FEAT",
+      "headline_angle": "mechanism",
+      "persona": {
+        "number": 22,
+        "name": "35+ Slow-Progress Persona",
+        "pain_en": "Progress feels slower after 35 despite effort.",
+        "desire_en": "Steady sustainable progress without extreme routines.",
+        "friction_en": "Frustration from slow visible change.",
+        "proof_needed_en": "Needs realistic milestones and consistency proof.",
+        "tone_cue_en": "reassuring and practical",
+        "pain_hi": "Progress feels slower after 35 despite effort.",
+        "desire_hi": "Steady sustainable progress without extreme routines.",
+        "friction_hi": "Frustration from slow visible change.",
+        "proof_needed_hi": "Needs realistic milestones and consistency proof.",
+        "tone_cue_hi": "reassuring and practical"
+      },
+      "copy": {
+        "EN": {
+          "headline": "A practical system for slower weight loss.",
+          "bullets": [
+            "OK Kit helps reduce hunger without a harsh routine.",
+            "It works with regular food and clear daily steps.",
+            "That makes weight loss easier to keep working on when progress feels slower.",
+            "The guided plan supports a steadier path."
+          ],
+          "cta": "See How It Works"
+        },
+        "HI": {
+          "headline": "A practical system for slower weight loss.",
+          "bullets": [
+            "OK Kit helps reduce hunger without a harsh routine.",
+            "It works with regular food and clear daily steps.",
+            "That makes weight loss easier to keep working on when progress feels slower.",
+            "The guided plan supports a steadier path."
+          ],
+          "cta": "See How It Works"
+        }
+      }
+    },
+    {
+      "format": "FEAT",
+      "headline_angle": "mechanism",
+      "persona": {
+        "number": 23,
+        "name": "New Mother (6+ months postpartum)",
+        "pain_en": "Routine changed after childbirth and time is limited.",
+        "desire_en": "A gentle return to steady progress that fits daily life.",
+        "friction_en": "Harsh or complex plans feel unrealistic right now.",
+        "proof_needed_en": "Needs practical, supportive steps for a changed routine.",
+        "tone_cue_en": "gentle and encouraging",
+        "pain_hi": "Routine changed after childbirth and time is limited.",
+        "desire_hi": "A gentle return to steady progress that fits daily life.",
+        "friction_hi": "Harsh or complex plans feel unrealistic right now.",
+        "proof_needed_hi": "Needs practical, supportive steps for a changed routine.",
+        "tone_cue_hi": "gentle and encouraging"
+      },
+      "copy": {
+        "EN": {
+          "headline": "A gentler way to restart weight loss.",
+          "bullets": [
+            "OK Kit keeps the routine simple and structured.",
+            "It works with regular homemade food, so there is less extra effort.",
+            "That makes weight loss easier to return to in a changed routine.",
+            "Less guesswork lowers the pressure."
+          ],
+          "cta": "See How It Works"
+        },
+        "HI": {
+          "headline": "A gentler way to restart weight loss.",
+          "bullets": [
+            "OK Kit keeps the routine simple and structured.",
+            "It works with regular homemade food, so there is less extra effort.",
+            "That makes weight loss easier to return to in a changed routine.",
+            "Less guesswork lowers the pressure."
+          ],
+          "cta": "See How It Works"
+        }
+      }
+    },
+    {
+      "format": "FEAT",
+      "headline_angle": "mechanism",
+      "persona": {
+        "number": 24,
+        "name": "Menopause",
+        "pain_en": "Weight feels harder to manage during menopause.",
+        "desire_en": "Visible progress with a manageable, sustainable routine.",
+        "friction_en": "Usual methods feel harsher and harder to continue.",
+        "proof_needed_en": "Needs doctor-led credibility and real-life usability.",
+        "tone_cue_en": "respectful and practical",
+        "pain_hi": "Weight feels harder to manage during menopause.",
+        "desire_hi": "Visible progress with a manageable, sustainable routine.",
+        "friction_hi": "Usual methods feel harsher and harder to continue.",
+        "proof_needed_hi": "Needs doctor-led credibility and real-life usability.",
+        "tone_cue_hi": "respectful and practical"
+      },
+      "copy": {
+        "EN": {
+          "headline": "Weight loss that feels more workable now.",
+          "bullets": [
+            "OK Kit helps reduce hunger without demanding extremes.",
+            "Its clear routine makes day-to-day follow-through easier.",
+            "That can make weight loss feel more manageable during menopause.",
+            "Trained coaches help you stay on track."
+          ],
+          "cta": "See How It Works"
+        },
+        "HI": {
+          "headline": "Weight loss that feels more workable now.",
+          "bullets": [
+            "OK Kit helps reduce hunger without demanding extremes.",
+            "Its clear routine makes day-to-day follow-through easier.",
+            "That can make weight loss feel more manageable during menopause.",
+            "Trained coaches help you stay on track."
+          ],
+          "cta": "See How It Works"
+        }
+      }
+    },
+    {
+      "format": "FEAT",
+      "headline_angle": "mechanism",
+      "persona": {
+        "number": 25,
+        "name": "Natural Solution Seeker",
+        "pain_en": "Wants a natural path and avoids harsh methods.",
+        "desire_en": "Natural weight-loss support that still feels effective.",
+        "friction_en": "Worries natural options may be vague or weak.",
+        "proof_needed_en": "Needs clear Ayurvedic, no-synthetic trust cues.",
+        "tone_cue_en": "clear and trust-led",
+        "pain_hi": "Wants a natural path and avoids harsh methods.",
+        "desire_hi": "Natural weight-loss support that still feels effective.",
+        "friction_hi": "Worries natural options may be vague or weak.",
+        "proof_needed_hi": "Needs clear Ayurvedic, no-synthetic trust cues.",
+        "tone_cue_hi": "clear and trust-led"
+      },
+      "copy": {
+        "EN": {
+          "headline": "Natural Ayurvedic weight loss, made to work.",
+          "bullets": [
+            "OK Kit is all-natural and Ayurvedic.",
+            "It has no synthetic ingredients or chemical preservatives.",
+            "That makes weight loss feel cleaner without feeling vague.",
+            "It is positioned with no side effects."
+          ],
+          "cta": "See How It Works"
+        },
+        "HI": {
+          "headline": "Natural Ayurvedic weight loss, made to work.",
+          "bullets": [
+            "OK Kit is all-natural and Ayurvedic.",
+            "It has no synthetic ingredients or chemical preservatives.",
+            "That makes weight loss feel cleaner without feeling vague.",
+            "It is positioned with no side effects."
+          ],
+          "cta": "See How It Works"
+        }
+      }
+    },
+    {
+      "format": "FEAT",
+      "headline_angle": "mechanism",
+      "persona": {
+        "number": 26,
+        "name": "Sustainable Weight Loss Seeker",
+        "pain_en": "Past quick losses came back too fast.",
+        "desire_en": "A more sustainable path without bounce-back anxiety.",
+        "friction_en": "Short-term fixes feel temporary and hard to maintain.",
+        "proof_needed_en": "Needs non-dependency and maintainability framing.",
+        "tone_cue_en": "steady and realistic",
+        "pain_hi": "Past quick losses came back too fast.",
+        "desire_hi": "A more sustainable path without bounce-back anxiety.",
+        "friction_hi": "Short-term fixes feel temporary and hard to maintain.",
+        "proof_needed_hi": "Needs non-dependency and maintainability framing.",
+        "tone_cue_hi": "steady and realistic"
+      },
+      "copy": {
+        "EN": {
+          "headline": "Weight loss that is easier to maintain.",
+          "bullets": [
+            "OK Kit is not based on dehydration or temporary water loss.",
+            "It is built as a non-dependent path, not a lifelong crutch.",
+            "That supports weight loss that does not bounce back on its own.",
+            "The plan can be repeated until target weight is reached."
+          ],
+          "cta": "See How It Works"
+        },
+        "HI": {
+          "headline": "Weight loss that is easier to maintain.",
+          "bullets": [
+            "OK Kit is not based on dehydration or temporary water loss.",
+            "It is built as a non-dependent path, not a lifelong crutch.",
+            "That supports weight loss that does not bounce back on its own.",
+            "The plan can be repeated until target weight is reached."
+          ],
+          "cta": "See How It Works"
+        }
+      }
+    }
+  ]
+}

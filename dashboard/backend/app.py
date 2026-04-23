@@ -121,6 +121,10 @@ PERSONA_SEED_INPUTS: dict[int, dict[str, str]] = {
     20: {"pain": "Struggles to stay consistent without accountability.", "desire": "Daily support that keeps follow-through high.", "friction": "Drops routines when guidance is missing.", "proof": "Needs tracker-led support and coach cues.", "tone": "coach-like and motivating"},
     21: {"pain": "Hates complicated plans and too many rules.", "desire": "Simple steps with almost no guesswork.", "friction": "Complexity causes early drop-off.", "proof": "Needs a very clear, easy-to-follow structure.", "tone": "simple and direct"},
     22: {"pain": "Progress feels slower after 35 despite effort.", "desire": "Steady sustainable progress without extreme routines.", "friction": "Frustration from slow visible change.", "proof": "Needs realistic milestones and consistency proof.", "tone": "reassuring and practical"},
+    23: {"pain": "Routine changed after childbirth and time is limited.", "desire": "A gentle return to steady progress that fits daily life.", "friction": "Harsh or complex plans feel unrealistic right now.", "proof": "Needs practical, supportive steps for a changed routine.", "tone": "gentle and encouraging"},
+    24: {"pain": "Weight feels harder to manage during menopause.", "desire": "Visible progress with a manageable, sustainable routine.", "friction": "Usual methods feel harsher and harder to continue.", "proof": "Needs doctor-led credibility and real-life usability.", "tone": "respectful and practical"},
+    25: {"pain": "Wants a natural path and avoids harsh methods.", "desire": "Natural weight-loss support that still feels effective.", "friction": "Worries natural options may be vague or weak.", "proof": "Needs clear Ayurvedic, no-synthetic trust cues.", "tone": "clear and trust-led"},
+    26: {"pain": "Past quick losses came back too fast.", "desire": "A more sustainable path without bounce-back anxiety.", "friction": "Short-term fixes feel temporary and hard to maintain.", "proof": "Needs non-dependency and maintainability framing.", "tone": "steady and realistic"},
 }
 
 
@@ -179,7 +183,7 @@ FORMAT_FEATURE_ROTATION: dict[str, list[str]] = {
 
 def build_copy_requirements(persona_number: int, fmt: str, format_sequence_index: int) -> dict[str, Any]:
     order = FORMAT_FEATURE_ROTATION.get(fmt, ["am_routine", "cravings_down", "guided_support"])
-    primary_idx = (persona_number + format_sequence_index - 1) % len(order)
+    primary_idx = (format_sequence_index - 1) % len(order)
     secondary_idx = (primary_idx + 1) % len(order)
     primary_key = order[primary_idx]
     secondary_key = order[secondary_idx]
@@ -193,7 +197,7 @@ def build_copy_requirements(persona_number: int, fmt: str, format_sequence_index
         "secondary_feature_key": secondary_key,
         "support_driver": secondary["support_driver"],
         "must_mention": "Headline or paired support copy must explicitly mention weight loss, obesity reduction, excess-weight reduction, or a 15-day weight outcome.",
-        "variation_rule": "Do not reuse the same headline skeleton or subheadline skeleton as other ads in the same format for this batch.",
+        "variation_rule": "Do not reuse the same headline skeleton, support-line skeleton, or persuasion angle as other ads in the same format for this batch.",
         "format_specific_rule": {
             "HERO": "Lead headline with one concrete product feature lane. Support line must add a second feature, not paraphrase the headline.",
             "UGC": "Make it sound like a creator-style practical observation, but still tie the copy to a concrete product feature lane.",
@@ -338,6 +342,53 @@ def extract_generated_ad_candidate(payload: dict[str, Any]) -> dict[str, Any] | 
     return None
 
 
+def hydrate_generated_ad_candidate(candidate: dict[str, Any], planned_ad: dict[str, Any]) -> dict[str, Any]:
+    hydrated = json.loads(json.dumps(candidate, ensure_ascii=False))
+
+    planned_format = str(planned_ad.get("format") or "").strip().upper()
+    candidate_format = str(hydrated.get("format") or "").strip().upper()
+    hydrated["format"] = candidate_format or planned_format
+
+    planned_persona = planned_ad.get("persona") if isinstance(planned_ad.get("persona"), dict) else {}
+    candidate_persona = hydrated.get("persona") if isinstance(hydrated.get("persona"), dict) else {}
+
+    persona_number = candidate_persona.get("number")
+    if not isinstance(persona_number, int):
+        persona_number = candidate_persona.get("persona_number")
+    if not isinstance(persona_number, int):
+        planned_number = planned_persona.get("persona_number")
+        if isinstance(planned_number, int):
+            persona_number = planned_number
+
+    persona_name = candidate_persona.get("name")
+    if not isinstance(persona_name, str) or not persona_name.strip():
+        persona_name = candidate_persona.get("persona_name")
+    if not isinstance(persona_name, str) or not persona_name.strip():
+        planned_name = planned_persona.get("persona_name")
+        if isinstance(planned_name, str):
+            persona_name = planned_name
+
+    merged_persona = dict(candidate_persona)
+    if isinstance(persona_number, int):
+        merged_persona["number"] = persona_number
+        merged_persona["persona_number"] = persona_number
+    if isinstance(persona_name, str) and persona_name.strip():
+        clean_name = persona_name.strip()
+        merged_persona["name"] = clean_name
+        merged_persona["persona_name"] = clean_name
+    if merged_persona:
+        hydrated["persona"] = merged_persona
+
+    copy_payload = hydrated.get("copy") if isinstance(hydrated.get("copy"), dict) else {}
+    normalized_copy: dict[str, Any] = {}
+    for lang in ["EN", "HI"]:
+        lang_block = copy_payload.get(lang)
+        normalized_copy[lang] = lang_block if isinstance(lang_block, dict) else {}
+    hydrated["copy"] = normalized_copy
+
+    return hydrated
+
+
 def build_persona_payload(persona_number: int, personas: list[dict[str, Any]]) -> dict[str, Any]:
     persona_name = f"Persona {persona_number}"
     for item in personas:
@@ -439,7 +490,45 @@ def upload_image_to_cloudinary(image_path: Path, cloud_name: str, api_key: str, 
 def load_batch_image_summary(batch: str) -> list[dict[str, Any]]:
     summary_path = ROOT / "generated_image" / batch / "batch_run_summary.json"
     if not summary_path.exists():
-        return []
+        jobs_by_prompt: dict[str, dict[str, Any]] = {}
+        generated_batch_dir = ROOT / "generated_image" / batch
+        if not generated_batch_dir.exists():
+            return []
+        for meta_file in sorted(generated_batch_dir.glob("**/*.json")):
+            try:
+                payload = json.loads(meta_file.read_text(encoding="utf-8"))
+            except Exception:
+                continue
+            if not isinstance(payload, dict):
+                continue
+            if str(payload.get("record_type") or "").strip() != "generated_image":
+                continue
+
+            prompt_file = str(payload.get("prompt_file") or "").strip().replace("\\", "/")
+            saved_file = str(payload.get("saved_file") or "").strip().replace("\\", "/")
+            if not prompt_file or not saved_file:
+                continue
+
+            existing = jobs_by_prompt.get(prompt_file)
+            if not existing:
+                existing = {
+                    "prompt_file": prompt_file,
+                    "saved_files": [],
+                    "format": payload.get("format"),
+                    "language": payload.get("language"),
+                    "variation": payload.get("variation"),
+                    "task_id": payload.get("task_id"),
+                    "prompt_metadata": payload.get("prompt_metadata") or {},
+                }
+                jobs_by_prompt[prompt_file] = existing
+            saved_files = existing.get("saved_files")
+            if not isinstance(saved_files, list):
+                saved_files = []
+                existing["saved_files"] = saved_files
+            if saved_file not in saved_files:
+                saved_files.append(saved_file)
+
+        return list(jobs_by_prompt.values())
     try:
         summary = json.loads(summary_path.read_text(encoding="utf-8"))
     except Exception:
@@ -1174,6 +1263,24 @@ def call_opencode_compatible(config: dict[str, Any], context: dict[str, Any], ru
     errors: list[str] = []
 
     for index, ad_item in enumerate(context.get("ads") or [], start=1):
+        previous_same_format: list[dict[str, Any]] = []
+        target_format = str(ad_item.get("format") or "").strip().upper()
+        for prev in generated_ads:
+            if not isinstance(prev, dict):
+                continue
+            if str(prev.get("format") or "").strip().upper() != target_format:
+                continue
+            prev_copy = prev.get("copy") if isinstance(prev.get("copy"), dict) else {}
+            prev_en = prev_copy.get("EN") if isinstance(prev_copy.get("EN"), dict) else {}
+            previous_same_format.append(
+                {
+                    "persona": (prev.get("persona") or {}).get("name") if isinstance(prev.get("persona"), dict) else "",
+                    "headline_angle": prev.get("headline_angle"),
+                    "headline": prev_en.get("headline"),
+                    "support_line": prev_en.get("support_line"),
+                    "bullets": prev_en.get("bullets") if isinstance(prev_en.get("bullets"), list) else [],
+                }
+            )
         single_context = {
             **context,
             "ads": [ad_item],
@@ -1181,6 +1288,7 @@ def call_opencode_compatible(config: dict[str, Any], context: dict[str, Any], ru
         user_payload = {
             "task": "Generate fresh ad copy JSON for provided context.",
             "context": build_generation_payload_for_llm(single_context),
+            "generated_same_format_so_far": previous_same_format,
             "constraints": {
                 "language": ["EN", "HI"],
                 "language_mode": language_mode,
@@ -1195,6 +1303,9 @@ def call_opencode_compatible(config: dict[str, Any], context: dict[str, Any], ru
             f"{json.dumps(user_payload, ensure_ascii=False)}\n\n"
             "Return only valid JSON. No markdown. No extra text.\n"
             "Return one ad only. You may return either a single ad object or an object with default_aspect_ratio and a one-item ads array.\n"
+            "The current ad must use a new persuasion angle in both the headline and the support line / right-side shift / feature stack compared with generated_same_format_so_far.\n"
+            "Do not reuse the same angle family such as guided support, structured system, cravings control, proof, natural-safe, homemade-food fit, or AM/PM mechanism as the lead angle if it already appeared in generated_same_format_so_far for this format.\n"
+            "Do not reuse the same sentence pattern or opening structure from generated_same_format_so_far.\n"
             "Do not return example text. Do not return explanations."
         )
         cli_cmd = [
@@ -1228,7 +1339,7 @@ def call_opencode_compatible(config: dict[str, Any], context: dict[str, Any], ru
         if not candidate:
             errors.append(f"Ad {index}: returned no usable ad JSON\nSTDOUT:\n{cli_result.stdout}\nSTDERR:\n{cli_result.stderr}")
             continue
-        generated_ads.append(candidate)
+        generated_ads.append(hydrate_generated_ad_candidate(candidate, ad_item))
 
     if errors:
         (run_dir / "logs" / "opencode_error.txt").write_text("\n\n---\n\n".join(errors), encoding="utf-8")
@@ -1605,8 +1716,6 @@ def api_runs() -> dict[str, Any]:
                 runs.append(refreshed)
                 if batch_name:
                     seen_batches.add(batch_name)
-            if len(runs) >= 5:
-                break
     return {"runs": runs}
 
 
@@ -1969,6 +2078,8 @@ def api_run_generate_images_45(run_id: str, payload: dict[str, Any] = Body(...))
         "BOTH",
         "--aspect-ratio",
         "4:5",
+        "--resolution",
+        "4K",
         "--max-variations-per-format",
         "999",
         "--prompt-files",
@@ -2068,6 +2179,8 @@ def api_run_generate_images_916_from_45(run_id: str, payload: dict[str, Any] = B
         "BOTH",
         "--aspect-ratio",
         "9:16",
+        "--resolution",
+        "4K",
         "--max-variations-per-format",
         "999",
         "--prompt-files",

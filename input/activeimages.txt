@@ -1,3 +1,9 @@
+# Logo mapping for ad generation
+# Use LIGHT_LOGO_URL when the prompt background is light
+# Use DARK_LOGO_URL when the prompt background is dark
+LIGHT_LOGO_URL=https://res.cloudinary.com/dzhodklsr/image/upload/v1776977730/k730bwcmctbheh1nbcto.png
+DARK_LOGO_URL=https://res.cloudinary.com/dzhodklsr/image/upload/v1776977740/frkdnpatagoregpwfimg.png
+
 https://res.cloudinary.com/dzhodklsr/image/upload/q_100,f_png/v1776194127/2_khq3s2.png
 https://res.cloudinary.com/dzhodklsr/image/upload/q_100,f_png/v1776194118/5_yqd39b.png
 https://res.cloudinary.com/dzhodklsr/image/upload/q_100,f_png/v1776194115/3_gg3vch.png

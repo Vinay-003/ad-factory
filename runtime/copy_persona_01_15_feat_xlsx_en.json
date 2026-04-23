@@ -1,0 +1,605 @@
+{
+  "default_aspect_ratio": "4:5",
+  "ads": [
+    {
+      "format": "FEAT",
+      "headline_angle": "mechanism",
+      "persona": {
+        "number": 1,
+        "name": "Craving-Control Struggler",
+        "pain_en": "Daily cravings break every weight plan.",
+        "desire_en": "Steady appetite control without feeling deprived.",
+        "friction_en": "Willpower-only plans collapse by evening.",
+        "proof_needed_en": "Needs visible early control over snack urges.",
+        "tone_cue_en": "practical and reassuring",
+        "pain_hi": "Daily cravings break every weight plan.",
+        "desire_hi": "Steady appetite control without feeling deprived.",
+        "friction_hi": "Willpower-only plans collapse by evening.",
+        "proof_needed_hi": "Needs visible early control over snack urges.",
+        "tone_cue_hi": "practical and reassuring"
+      },
+      "copy": {
+        "EN": {
+          "headline": "Lose weight more easily when cravings stay lower.",
+          "bullets": [
+            "OK Liquid helps you feel full, so random eating comes down.",
+            "Clear day-wise steps make the plan easier to follow.",
+            "That helps one craving stop ruining the whole day.",
+            "Trained coaches guide you when you start slipping."
+          ],
+          "cta": "See How It Works"
+        },
+        "HI": {
+          "headline": "Lose weight more easily when cravings stay lower.",
+          "bullets": [
+            "OK Liquid helps you feel full, so random eating comes down.",
+            "Clear day-wise steps make the plan easier to follow.",
+            "That helps one craving stop ruining the whole day.",
+            "Trained coaches guide you when you start slipping."
+          ],
+          "cta": "See How It Works"
+        }
+      }
+    },
+    {
+      "format": "FEAT",
+      "headline_angle": "mechanism",
+      "persona": {
+        "number": 2,
+        "name": "Busy Professional",
+        "pain_en": "Work schedule leaves no room for complex routines.",
+        "desire_en": "Simple weight routine that fits packed days.",
+        "friction_en": "Meal prep and long workouts are not sustainable.",
+        "proof_needed_en": "Needs a low-effort protocol that still shows progress.",
+        "tone_cue_en": "efficient and confidence-building",
+        "pain_hi": "Work schedule leaves no room for complex routines.",
+        "desire_hi": "Simple weight routine that fits packed days.",
+        "friction_hi": "Meal prep and long workouts are not sustainable.",
+        "proof_needed_hi": "Needs a low-effort protocol that still shows progress.",
+        "tone_cue_hi": "efficient and confidence-building"
+      },
+      "copy": {
+        "EN": {
+          "headline": "Weight loss that fits workdays.",
+          "bullets": [
+            "One morning step and one night step keep the routine light.",
+            "It works with regular homemade food, so there is no separate plan.",
+            "That makes weight loss easier to follow on busy days.",
+            "Less guesswork means less mental load."
+          ],
+          "cta": "See How It Works"
+        },
+        "HI": {
+          "headline": "Weight loss that fits workdays.",
+          "bullets": [
+            "One morning step and one night step keep the routine light.",
+            "It works with regular homemade food, so there is no separate plan.",
+            "That makes weight loss easier to follow on busy days.",
+            "Less guesswork means less mental load."
+          ],
+          "cta": "See How It Works"
+        }
+      }
+    },
+    {
+      "format": "FEAT",
+      "headline_angle": "mechanism",
+      "persona": {
+        "number": 3,
+        "name": "Emotional Eater / Stress Snacker",
+        "pain_en": "Stress triggers emotional snacking at random times.",
+        "desire_en": "Calmer eating with fewer stress-led cravings.",
+        "friction_en": "Plans fail during stressful moments.",
+        "proof_needed_en": "Needs believable support during emotional triggers.",
+        "tone_cue_en": "empathetic and non-judgmental",
+        "pain_hi": "Stress triggers emotional snacking at random times.",
+        "desire_hi": "Calmer eating with fewer stress-led cravings.",
+        "friction_hi": "Plans fail during stressful moments.",
+        "proof_needed_hi": "Needs believable support during emotional triggers.",
+        "tone_cue_hi": "empathetic and non-judgmental"
+      },
+      "copy": {
+        "EN": {
+          "headline": "Lose weight without letting stress decide your eating.",
+          "bullets": [
+            "OK Liquid helps reduce hunger, so stress-snacking gets easier to control.",
+            "A clear routine gives you something steady to follow on hard days.",
+            "That makes it easier to stay on track with weight loss.",
+            "Trained coaches help you keep going when the day gets messy."
+          ],
+          "cta": "See How It Works"
+        },
+        "HI": {
+          "headline": "Lose weight without letting stress decide your eating.",
+          "bullets": [
+            "OK Liquid helps reduce hunger, so stress-snacking gets easier to control.",
+            "A clear routine gives you something steady to follow on hard days.",
+            "That makes it easier to stay on track with weight loss.",
+            "Trained coaches help you keep going when the day gets messy."
+          ],
+          "cta": "See How It Works"
+        }
+      }
+    },
+    {
+      "format": "FEAT",
+      "headline_angle": "mechanism",
+      "persona": {
+        "number": 4,
+        "name": "Plateau Victim",
+        "pain_en": "Weight loss plateaus despite repeated effort.",
+        "desire_en": "Break stagnation with a clear daily system.",
+        "friction_en": "Repeated plateaus kill motivation.",
+        "proof_needed_en": "Needs a trackable, structured restart path.",
+        "tone_cue_en": "direct and motivating",
+        "pain_hi": "Weight loss plateaus despite repeated effort.",
+        "desire_hi": "Break stagnation with a clear daily system.",
+        "friction_hi": "Repeated plateaus kill motivation.",
+        "proof_needed_hi": "Needs a trackable, structured restart path.",
+        "tone_cue_hi": "direct and motivating"
+      },
+      "copy": {
+        "EN": {
+          "headline": "A proven Ayurvedic routine to break weight loss plateaus.",
+          "bullets": [
+            "OK Liquid helps you eat less without feeling weak.",
+            "Day-wise pouches cut random effort and daily confusion.",
+            "That makes weight loss easier to follow when the scale is stuck.",
+            "Trusted by 70,000+ Indian"
+          ],
+          "cta": "See How It Works"
+        },
+        "HI": {
+          "headline": "A proven Ayurvedic routine to break weight loss plateaus.",
+          "bullets": [
+            "OK Liquid helps you eat less without feeling weak.",
+            "Day-wise pouches cut random effort and daily confusion.",
+            "That makes weight loss easier to follow when the scale is stuck.",
+            "Trusted by 70,000+ Indian"
+          ],
+          "cta": "See How It Works"
+        }
+      }
+    },
+    {
+      "format": "FEAT",
+      "headline_angle": "mechanism",
+      "persona": {
+        "number": 5,
+        "name": "PCOD Support Seeker",
+        "pain_en": "PCOD-related weight gain feels harder to reverse.",
+        "desire_en": "Steadier weight progress with manageable routine.",
+        "friction_en": "Fear of harsh or unsafe methods.",
+        "proof_needed_en": "Needs non-cure, compliant weight-support framing.",
+        "tone_cue_en": "careful and trust-led",
+        "pain_hi": "PCOD-related weight gain feels harder to reverse.",
+        "desire_hi": "Steadier weight progress with manageable routine.",
+        "friction_hi": "Fear of harsh or unsafe methods.",
+        "proof_needed_hi": "Needs non-cure, compliant weight-support framing.",
+        "tone_cue_hi": "careful and trust-led"
+      },
+      "copy": {
+        "EN": {
+          "headline": "Don't let your hormones guide your weight",
+          "bullets": [
+            "OK Kit helps reduce hunger and works even with PCOD or Thyroid",
+            "Its Ayurvedic formula is built for a more natural weight-loss path.",
+            "That makes weight loss easier to continue when your body feels harder to manage.",
+            "Trained coaches help you stay on track."
+          ],
+          "cta": "See How It Works"
+        },
+        "HI": {
+          "headline": "Don't let your hormones guide your weight",
+          "bullets": [
+            "OK Kit helps reduce hunger and works even with PCOD or Thyroid",
+            "Its Ayurvedic formula is built for a more natural weight-loss path.",
+            "That makes weight loss easier to continue when your body feels harder to manage.",
+            "Trained coaches help you stay on track."
+          ],
+          "cta": "See How It Works"
+        }
+      }
+    },
+    {
+      "format": "FEAT",
+      "headline_angle": "mechanism",
+      "persona": {
+        "number": 6,
+        "name": "Thyroid Weight-Gain Struggler",
+        "pain_en": "Thyroid-linked weight gain feels stubborn and slow.",
+        "desire_en": "Consistent progress without extreme restrictions.",
+        "friction_en": "Low confidence after slow previous results.",
+        "proof_needed_en": "Needs realistic, compliant support expectations.",
+        "tone_cue_en": "measured and credible",
+        "pain_hi": "Thyroid-linked weight gain feels stubborn and slow.",
+        "desire_hi": "Consistent progress without extreme restrictions.",
+        "friction_hi": "Low confidence after slow previous results.",
+        "proof_needed_hi": "Needs realistic, compliant support expectations.",
+        "tone_cue_hi": "measured and credible"
+      },
+      "copy": {
+        "EN": {
+          "headline": "Weight loss feels easier when the plan is simpler.",
+          "bullets": [
+            "OK Liquid helps keep hunger lower through the day.",
+            "It works with regular food instead of an extreme routine.",
+            "That makes slow, stubborn weight easier to keep working on.",
+            "The clear structure is easier to stay with than harsh plans."
+          ],
+          "cta": "See How It Works"
+        },
+        "HI": {
+          "headline": "Weight loss feels easier when the plan is simpler.",
+          "bullets": [
+            "OK Liquid helps keep hunger lower through the day.",
+            "It works with regular food instead of an extreme routine.",
+            "That makes slow, stubborn weight easier to keep working on.",
+            "The clear structure is easier to stay with than harsh plans."
+          ],
+          "cta": "See How It Works"
+        }
+      }
+    },
+    {
+      "format": "FEAT",
+      "headline_angle": "mechanism",
+      "persona": {
+        "number": 7,
+        "name": "Post-Failure Re-starter",
+        "pain_en": "Multiple failed diets created low confidence.",
+        "desire_en": "A restart that actually feels doable.",
+        "friction_en": "Past strict plans felt impossible to continue.",
+        "proof_needed_en": "Needs simple steps and visible early wins.",
+        "tone_cue_en": "encouraging and reset-focused",
+        "pain_hi": "Multiple failed diets created low confidence.",
+        "desire_hi": "A restart that actually feels doable.",
+        "friction_hi": "Past strict plans felt impossible to continue.",
+        "proof_needed_hi": "Needs simple steps and visible early wins.",
+        "tone_cue_hi": "encouraging and reset-focused"
+      },
+      "copy": {
+        "EN": {
+          "headline": "Easier to follow. Harder to quit.",
+          "bullets": [
+            "Day-wise pouches tell you exactly what to do each day.",
+            "OK Liquid helps eating less feel easier from the start.",
+            "That makes weight loss easier to stick with after repeated restarts.",
+            "Trained coaches help you keep momentum."
+          ],
+          "cta": "See How It Works"
+        },
+        "HI": {
+          "headline": "Easier to follow. Harder to quit.",
+          "bullets": [
+            "Day-wise pouches tell you exactly what to do each day.",
+            "OK Liquid helps eating less feel easier from the start.",
+            "That makes weight loss easier to stick with after repeated restarts.",
+            "Trained coaches help you keep momentum."
+          ],
+          "cta": "See How It Works"
+        }
+      }
+    },
+    {
+      "format": "FEAT",
+      "headline_angle": "mechanism",
+      "persona": {
+        "number": 8,
+        "name": "No-Weakness Skeptic",
+        "pain_en": "Wants weight loss but fears weakness and fatigue.",
+        "desire_en": "Lighter body with stable daily energy.",
+        "friction_en": "Skeptical of plans that feel draining.",
+        "proof_needed_en": "Needs assurance of practical energy support.",
+        "tone_cue_en": "calm and evidence-led",
+        "pain_hi": "Wants weight loss but fears weakness and fatigue.",
+        "desire_hi": "Lighter body with stable daily energy.",
+        "friction_hi": "Skeptical of plans that feel draining.",
+        "proof_needed_hi": "Needs assurance of practical energy support.",
+        "tone_cue_hi": "calm and evidence-led"
+      },
+      "copy": {
+        "EN": {
+          "headline": "Lose weight without feeling weak.",
+          "bullets": [
+            "OK Liquid helps you feel full while supporting the body.",
+            "The kit is Ayurvedic, all-natural, and positioned with no side effects.",
+            "That makes weight loss feel lighter, not harsher.",
+            "It was created by Dr. Arun Tyagi."
+          ],
+          "cta": "See How It Works"
+        },
+        "HI": {
+          "headline": "Lose weight without feeling weak.",
+          "bullets": [
+            "OK Liquid helps you feel full while supporting the body.",
+            "The kit is Ayurvedic, all-natural, and positioned with no side effects.",
+            "That makes weight loss feel lighter, not harsher.",
+            "It was created by Dr. Arun Tyagi."
+          ],
+          "cta": "See How It Works"
+        }
+      }
+    },
+    {
+      "format": "FEAT",
+      "headline_angle": "mechanism",
+      "persona": {
+        "number": 9,
+        "name": "Time-Starved Parent",
+        "pain_en": "Parent schedule causes rushed meals and random snacking.",
+        "desire_en": "A routine that works even on chaotic days.",
+        "friction_en": "No time for rigid diets or long workouts.",
+        "proof_needed_en": "Needs a simple protocol that fits family life.",
+        "tone_cue_en": "real-life and practical",
+        "pain_hi": "Parent schedule causes rushed meals and random snacking.",
+        "desire_hi": "A routine that works even on chaotic days.",
+        "friction_hi": "No time for rigid diets or long workouts.",
+        "proof_needed_hi": "Needs a simple protocol that fits family life.",
+        "tone_cue_hi": "real-life and practical"
+      },
+      "copy": {
+        "EN": {
+          "headline": "Lose weight without cooking separately.",
+          "bullets": [
+            "OK Kit works with regular homemade food.",
+            "No separate meal prep means less daily friction.",
+            "That makes weight loss easier to follow in family life.",
+            "Clear steps help you stay consistent on busy days."
+          ],
+          "cta": "See How It Works"
+        },
+        "HI": {
+          "headline": "Lose weight without cooking separately.",
+          "bullets": [
+            "OK Kit works with regular homemade food.",
+            "No separate meal prep means less daily friction.",
+            "That makes weight loss easier to follow in family life.",
+            "Clear steps help you stay consistent on busy days."
+          ],
+          "cta": "See How It Works"
+        }
+      }
+    },
+    {
+      "format": "FEAT",
+      "headline_angle": "mechanism",
+      "persona": {
+        "number": 10,
+        "name": "Homemaker, self-care deprioritized",
+        "pain_en": "Self-care is postponed while handling household priorities.",
+        "desire_en": "A manageable routine that can be sustained at home.",
+        "friction_en": "Complex plans don't fit daily responsibilities.",
+        "proof_needed_en": "Needs a low-friction system for homemaker schedules.",
+        "tone_cue_en": "supportive and respectful",
+        "pain_hi": "Self-care is postponed while handling household priorities.",
+        "desire_hi": "A manageable routine that can be sustained at home.",
+        "friction_hi": "Complex plans don't fit daily responsibilities.",
+        "proof_needed_hi": "Needs a low-friction system for homemaker schedules.",
+        "tone_cue_hi": "supportive and respectful"
+      },
+      "copy": {
+        "EN": {
+          "headline": "Weight loss that fits home life.",
+          "bullets": [
+            "OK Kit works with the food already made at home.",
+            "No separate cooking keeps your own routine lighter.",
+            "That makes weight loss easier to protect in a busy house.",
+            "Day-wise steps cut planning and confusion."
+          ],
+          "cta": "See How It Works"
+        },
+        "HI": {
+          "headline": "Weight loss that fits home life.",
+          "bullets": [
+            "OK Kit works with the food already made at home.",
+            "No separate cooking keeps your own routine lighter.",
+            "That makes weight loss easier to protect in a busy house.",
+            "Day-wise steps cut planning and confusion."
+          ],
+          "cta": "See How It Works"
+        }
+      }
+    },
+    {
+      "format": "FEAT",
+      "headline_angle": "mechanism",
+      "persona": {
+        "number": 11,
+        "name": "Office Snacker (Tea-Time / Junk Cycle)",
+        "pain_en": "Tea-time office snacking derails daily intake control.",
+        "desire_en": "Fewer impulse snacks during work breaks.",
+        "friction_en": "Social snack cues are hard to resist.",
+        "proof_needed_en": "Needs practical control over recurring snack windows.",
+        "tone_cue_en": "conversational and specific",
+        "pain_hi": "Tea-time office snacking derails daily intake control.",
+        "desire_hi": "Fewer impulse snacks during work breaks.",
+        "friction_hi": "Social snack cues are hard to resist.",
+        "proof_needed_hi": "Needs practical control over recurring snack windows.",
+        "tone_cue_hi": "conversational and specific"
+      },
+      "copy": {
+        "EN": {
+          "headline": "Better tea-time control can support weight loss.",
+          "bullets": [
+            "OK Liquid helps reduce hunger before snack hours hit.",
+            "A simple routine keeps eating more structured through work hours.",
+            "That makes office chai and junk less likely to derail weight loss.",
+            "Trained coaches help you stay on track."
+          ],
+          "cta": "See How It Works"
+        },
+        "HI": {
+          "headline": "Better tea-time control can support weight loss.",
+          "bullets": [
+            "OK Liquid helps reduce hunger before snack hours hit.",
+            "A simple routine keeps eating more structured through work hours.",
+            "That makes office chai and junk less likely to derail weight loss.",
+            "Trained coaches help you stay on track."
+          ],
+          "cta": "See How It Works"
+        }
+      }
+    },
+    {
+      "format": "FEAT",
+      "headline_angle": "mechanism",
+      "persona": {
+        "number": 12,
+        "name": "Late-Night Eater",
+        "pain_en": "Late-night hunger leads to repeated overeating.",
+        "desire_en": "Calmer nights with better eating control.",
+        "friction_en": "Evening cravings undo daytime discipline.",
+        "proof_needed_en": "Needs night-routine support that feels realistic.",
+        "tone_cue_en": "steady and habit-focused",
+        "pain_hi": "Late-night hunger leads to repeated overeating.",
+        "desire_hi": "Calmer nights with better eating control.",
+        "friction_hi": "Evening cravings undo daytime discipline.",
+        "proof_needed_hi": "Needs night-routine support that feels realistic.",
+        "tone_cue_hi": "steady and habit-focused"
+      },
+      "copy": {
+        "EN": {
+          "headline": "Weight loss gets easier when nights stop going off track.",
+          "bullets": [
+            "OK Liquid helps keep you fuller through the day.",
+            "The routine reduces random eating windows.",
+            "That can make late-night overeating easier to control.",
+            "Clear daily structure helps the whole day feel steadier."
+          ],
+          "cta": "See How It Works"
+        },
+        "HI": {
+          "headline": "Weight loss gets easier when nights stop going off track.",
+          "bullets": [
+            "OK Liquid helps keep you fuller through the day.",
+            "The routine reduces random eating windows.",
+            "That can make late-night overeating easier to control.",
+            "Clear daily structure helps the whole day feel steadier."
+          ],
+          "cta": "See How It Works"
+        }
+      }
+    },
+    {
+      "format": "FEAT",
+      "headline_angle": "mechanism",
+      "persona": {
+        "number": 13,
+        "name": "Festive / Travel Weight Regainer",
+        "pain_en": "Weight rebounds after festivals and travel periods.",
+        "desire_en": "Quick reset back to steady routine.",
+        "friction_en": "Irregular days break consistency easily.",
+        "proof_needed_en": "Needs a restart protocol that works after disruptions.",
+        "tone_cue_en": "reset-oriented and practical",
+        "pain_hi": "Weight rebounds after festivals and travel periods.",
+        "desire_hi": "Quick reset back to steady routine.",
+        "friction_hi": "Irregular days break consistency easily.",
+        "proof_needed_hi": "Needs a restart protocol that works after disruptions.",
+        "tone_cue_hi": "reset-oriented and practical"
+      },
+      "copy": {
+        "EN": {
+          "headline": "Restart weight loss without going extreme.",
+          "bullets": [
+            "OK Kit gives you a clear day-wise reset routine.",
+            "Hunger support makes controlled eating easier again.",
+            "That helps post-trip or festive weight feel easier to correct.",
+            "The simple plan is easier to restart than a crash approach."
+          ],
+          "cta": "See How It Works"
+        },
+        "HI": {
+          "headline": "Restart weight loss without going extreme.",
+          "bullets": [
+            "OK Kit gives you a clear day-wise reset routine.",
+            "Hunger support makes controlled eating easier again.",
+            "That helps post-trip or festive weight feel easier to correct.",
+            "The simple plan is easier to restart than a crash approach."
+          ],
+          "cta": "See How It Works"
+        }
+      }
+    },
+    {
+      "format": "FEAT",
+      "headline_angle": "mechanism",
+      "persona": {
+        "number": 14,
+        "name": "Metabolism-Worry Buyer",
+        "pain_en": "Worry that metabolism has slowed permanently.",
+        "desire_en": "Believable progress through structured daily consistency.",
+        "friction_en": "Confusion from too many conflicting theories.",
+        "proof_needed_en": "Needs clear mechanism logic without hype claims.",
+        "tone_cue_en": "clear and science-grounded",
+        "pain_hi": "Worry that metabolism has slowed permanently.",
+        "desire_hi": "Believable progress through structured daily consistency.",
+        "friction_hi": "Confusion from too many conflicting theories.",
+        "proof_needed_hi": "Needs clear mechanism logic without hype claims.",
+        "tone_cue_hi": "clear and science-grounded"
+      },
+      "copy": {
+        "EN": {
+          "headline": "More than a one-part weight-loss product.",
+          "bullets": [
+            "OK Liquid helps lower hunger, so eating less feels easier.",
+            "OK Tablet + Powder support digestion and gut comfort.",
+            "That makes weight loss easier when one lever alone does not feel enough.",
+            "The Ayurvedic formula works as a multi-part system."
+          ],
+          "cta": "See How It Works"
+        },
+        "HI": {
+          "headline": "More than a one-part weight-loss product.",
+          "bullets": [
+            "OK Liquid helps lower hunger, so eating less feels easier.",
+            "OK Tablet + Powder support digestion and gut comfort.",
+            "That makes weight loss easier when one lever alone does not feel enough.",
+            "The Ayurvedic formula works as a multi-part system."
+          ],
+          "cta": "See How It Works"
+        }
+      }
+    },
+    {
+      "format": "FEAT",
+      "headline_angle": "mechanism",
+      "persona": {
+        "number": 15,
+        "name": "Digestion-Issue + Weight Combo Seeker",
+        "pain_en": "Digestive discomfort and weight concerns occur together.",
+        "desire_en": "Lighter digestion with better intake control.",
+        "friction_en": "Discomfort makes routines hard to follow.",
+        "proof_needed_en": "Needs digestion-support plus weight-management framing.",
+        "tone_cue_en": "gentle and practical",
+        "pain_hi": "Digestive discomfort and weight concerns occur together.",
+        "desire_hi": "Lighter digestion with better intake control.",
+        "friction_hi": "Discomfort makes routines hard to follow.",
+        "proof_needed_hi": "Needs digestion-support plus weight-management framing.",
+        "tone_cue_hi": "gentle and practical"
+      },
+      "copy": {
+        "EN": {
+          "headline": "Work on weight loss without upsetting your stomach.",
+          "bullets": [
+            "OK Tablet + Powder help with heaviness, gas, and digestion.",
+            "OK Liquid helps you feel full, so eating less feels easier too.",
+            "That makes weight loss easier to continue without extra discomfort.",
+            "The kit works on appetite and digestion together."
+          ],
+          "cta": "See How It Works"
+        },
+        "HI": {
+          "headline": "Work on weight loss without upsetting your stomach.",
+          "bullets": [
+            "OK Tablet + Powder help with heaviness, gas, and digestion.",
+            "OK Liquid helps you feel full, so eating less feels easier too.",
+            "That makes weight loss easier to continue without extra discomfort.",
+            "The kit works on appetite and digestion together."
+          ],
+          "cta": "See How It Works"
+        }
+      }
+    }
+  ]
+}

@@ -1,0 +1,485 @@
+{
+  "default_aspect_ratio": "4:5",
+  "ads": [
+    {
+      "format": "HERO",
+      "headline_angle": "mechanism",
+      "persona": {
+        "number": 11,
+        "name": "Office Snacker (tea-time/junk cycle)",
+        "pain_en": "Tea-time office snacking derails daily intake control.",
+        "desire_en": "Fewer impulse snacks during work breaks.",
+        "friction_en": "Social snack cues are hard to resist.",
+        "proof_needed_en": "Needs practical control over recurring snack windows.",
+        "tone_cue_en": "conversational and specific",
+        "pain_hi": "ऑफिस tea-time snacking से routine बिगड़ता है।",
+        "desire_hi": "work breaks में impulsive snacks कम करने हैं।",
+        "friction_hi": "social snack cues resist करना मुश्किल है।",
+        "proof_needed_hi": "repeat होने वाले snack windows पर practical control चाहिए।",
+        "tone_cue_hi": "बातचीत जैसा और स्पष्ट"
+      },
+      "copy": {
+        "EN": {
+          "headline": "Cravings down. Weight loss feels easier.",
+          "support_line": "Doctor-formulated Ayurvedic weight-loss system designed to help you lose 3 to 5 kg with 1 Kit without feeling hungry, weak, or out of control.",
+          "cta": "See The Steps"
+        },
+        "HI": {
+          "headline": "Cravings down. Weight loss feels easier.",
+          "support_line": "Doctor-formulated Ayurvedic weight-loss system designed to help you lose 3 to 5 kg with 1 Kit without feeling hungry, weak, or out of control.",
+          "cta": "See The Steps"
+        }
+      }
+    },
+    {
+      "format": "HERO",
+      "headline_angle": "mechanism",
+      "persona": {
+        "number": 12,
+        "name": "Late-Night Eater",
+        "pain_en": "Late-night hunger leads to repeated overeating.",
+        "desire_en": "Calmer nights with better eating control.",
+        "friction_en": "Evening cravings undo daytime discipline.",
+        "proof_needed_en": "Needs night-routine support that feels realistic.",
+        "tone_cue_en": "steady and habit-focused",
+        "pain_hi": "late-night hunger से overeating हो जाती है।",
+        "desire_hi": "रात में बेहतर eating control चाहिए।",
+        "friction_hi": "evening cravings दिनभर की discipline बिगाड़ देती हैं।",
+        "proof_needed_hi": "रात के लिए realistic routine support चाहिए।",
+        "tone_cue_hi": "स्थिर और habit-focused"
+      },
+      "copy": {
+        "EN": {
+          "headline": "Cravings down. Weight loss feels easier.",
+          "support_line": "Doctor-formulated Ayurvedic weight-loss system designed to help you lose 3 to 5 kg with 1 Kit without feeling hungry, weak, or out of control.",
+          "cta": "See The Steps"
+        },
+        "HI": {
+          "headline": "Cravings down. Weight loss feels easier.",
+          "support_line": "Doctor-formulated Ayurvedic weight-loss system designed to help you lose 3 to 5 kg with 1 Kit without feeling hungry, weak, or out of control.",
+          "cta": "See The Steps"
+        }
+      }
+    },
+    {
+      "format": "HERO",
+      "headline_angle": "mechanism",
+      "persona": {
+        "number": 13,
+        "name": "Festive/Travel Weight Regainer",
+        "pain_en": "Weight rebounds after festivals and travel periods.",
+        "desire_en": "Quick reset back to steady routine.",
+        "friction_en": "Irregular days break consistency easily.",
+        "proof_needed_en": "Needs a restart protocol that works after disruptions.",
+        "tone_cue_en": "reset-oriented and practical",
+        "pain_hi": "festival/travel के बाद weight वापस बढ़ता है।",
+        "desire_hi": "steady routine में जल्दी reset चाहिए।",
+        "friction_hi": "irregular days से consistency टूट जाती है।",
+        "proof_needed_hi": "disruption के बाद काम करने वाला restart protocol चाहिए।",
+        "tone_cue_hi": "reset-oriented और practical"
+      },
+      "copy": {
+        "EN": {
+          "headline": "Cravings down. Weight loss feels easier.",
+          "support_line": "Doctor-formulated Ayurvedic weight-loss system designed to help you lose 3 to 5 kg with 1 Kit without feeling hungry, weak, or out of control.",
+          "cta": "See The Steps"
+        },
+        "HI": {
+          "headline": "Cravings down. Weight loss feels easier.",
+          "support_line": "Doctor-formulated Ayurvedic weight-loss system designed to help you lose 3 to 5 kg with 1 Kit without feeling hungry, weak, or out of control.",
+          "cta": "See The Steps"
+        }
+      }
+    },
+    {
+      "format": "HERO",
+      "headline_angle": "mechanism",
+      "persona": {
+        "number": 14,
+        "name": "Metabolism-Worry Buyer",
+        "pain_en": "Worry that metabolism has slowed permanently.",
+        "desire_en": "Believable progress through structured daily consistency.",
+        "friction_en": "Confusion from too many conflicting theories.",
+        "proof_needed_en": "Needs clear mechanism logic without hype claims.",
+        "tone_cue_en": "clear and science-grounded",
+        "pain_hi": "metabolism slow होने की चिंता रहती है।",
+        "desire_hi": "structured consistency के साथ believable progress चाहिए।",
+        "friction_hi": "conflicting advice से confusion बढ़ती है।",
+        "proof_needed_hi": "hype के बिना clear mechanism explanation चाहिए।",
+        "tone_cue_hi": "स्पष्ट और science-grounded"
+      },
+      "copy": {
+        "EN": {
+          "headline": "Cravings down. Weight loss feels easier.",
+          "support_line": "Doctor-formulated Ayurvedic weight-loss system designed to help you lose 3 to 5 kg with 1 Kit without feeling hungry, weak, or out of control.",
+          "cta": "See The Steps"
+        },
+        "HI": {
+          "headline": "Cravings down. Weight loss feels easier.",
+          "support_line": "Doctor-formulated Ayurvedic weight-loss system designed to help you lose 3 to 5 kg with 1 Kit without feeling hungry, weak, or out of control.",
+          "cta": "See The Steps"
+        }
+      }
+    },
+    {
+      "format": "HERO",
+      "headline_angle": "mechanism",
+      "persona": {
+        "number": 15,
+        "name": "Digestion-Issue + Weight Combo Seeker",
+        "pain_en": "Digestive discomfort and weight concerns occur together.",
+        "desire_en": "Lighter digestion with better intake control.",
+        "friction_en": "Discomfort makes routines hard to follow.",
+        "proof_needed_en": "Needs digestion-support plus weight-management framing.",
+        "tone_cue_en": "gentle and practical",
+        "pain_hi": "digestion discomfort और weight issues साथ आते हैं।",
+        "desire_hi": "lighter digestion और better intake control चाहिए।",
+        "friction_hi": "discomfort से routine follow करना मुश्किल होता है।",
+        "proof_needed_hi": "digestion support + weight management की framing चाहिए।",
+        "tone_cue_hi": "gentle और practical"
+      },
+      "copy": {
+        "EN": {
+          "headline": "Cravings down. Weight loss feels easier.",
+          "support_line": "Doctor-formulated Ayurvedic weight-loss system designed to help you lose 3 to 5 kg with 1 Kit without feeling hungry, weak, or out of control.",
+          "cta": "See The Steps"
+        },
+        "HI": {
+          "headline": "Cravings down. Weight loss feels easier.",
+          "support_line": "Doctor-formulated Ayurvedic weight-loss system designed to help you lose 3 to 5 kg with 1 Kit without feeling hungry, weak, or out of control.",
+          "cta": "See The Steps"
+        }
+      }
+    },
+    {
+      "format": "HERO",
+      "headline_angle": "mechanism",
+      "persona": {
+        "number": 16,
+        "name": "Budget-Conscious Result Seeker",
+        "pain_en": "Budget concerns reduce trust in expensive plans.",
+        "desire_en": "Reliable progress from a practical system.",
+        "friction_en": "Fear of paying without results.",
+        "proof_needed_en": "Needs strong value and risk-reduction cues.",
+        "tone_cue_en": "transparent and outcome-focused",
+        "pain_hi": "budget concern की वजह से expensive plans पर trust कम है।",
+        "desire_hi": "practical system से reliable progress चाहिए।",
+        "friction_hi": "पैसा खर्च करके result न मिलने का डर है।",
+        "proof_needed_hi": "strong value और risk-reduction cues चाहिए।",
+        "tone_cue_hi": "transparent और outcome-focused"
+      },
+      "copy": {
+        "EN": {
+          "headline": "Cravings down. Weight loss feels easier.",
+          "support_line": "Doctor-formulated Ayurvedic weight-loss system designed to help you lose 3 to 5 kg with 1 Kit without feeling hungry, weak, or out of control.",
+          "cta": "See The Steps"
+        },
+        "HI": {
+          "headline": "Cravings down. Weight loss feels easier.",
+          "support_line": "Doctor-formulated Ayurvedic weight-loss system designed to help you lose 3 to 5 kg with 1 Kit without feeling hungry, weak, or out of control.",
+          "cta": "See The Steps"
+        }
+      }
+    },
+    {
+      "format": "HERO",
+      "headline_angle": "mechanism",
+      "persona": {
+        "number": 17,
+        "name": "Wedding/Event Deadline Persona",
+        "pain_en": "Event deadline creates pressure and urgency.",
+        "desire_en": "Visible progress in a short, realistic window.",
+        "friction_en": "Panic-driven plans often backfire.",
+        "proof_needed_en": "Needs structured short-term milestone framing.",
+        "tone_cue_en": "urgent but controlled",
+        "pain_hi": "event deadline की वजह से urgency और pressure है।",
+        "desire_hi": "short realistic window में visible progress चाहिए।",
+        "friction_hi": "panic-driven plans अक्सर backfire करते हैं।",
+        "proof_needed_hi": "structured short-term milestone framing चाहिए।",
+        "tone_cue_hi": "urgent but controlled"
+      },
+      "copy": {
+        "EN": {
+          "headline": "Cravings down. Weight loss feels easier.",
+          "support_line": "Doctor-formulated Ayurvedic weight-loss system designed to help you lose 3 to 5 kg with 1 Kit without feeling hungry, weak, or out of control.",
+          "cta": "See The Steps"
+        },
+        "HI": {
+          "headline": "Cravings down. Weight loss feels easier.",
+          "support_line": "Doctor-formulated Ayurvedic weight-loss system designed to help you lose 3 to 5 kg with 1 Kit without feeling hungry, weak, or out of control.",
+          "cta": "See The Steps"
+        }
+      }
+    },
+    {
+      "format": "HERO",
+      "headline_angle": "mechanism",
+      "persona": {
+        "number": 18,
+        "name": "Confidence-First Persona (appearance + energy)",
+        "pain_en": "Low confidence from body discomfort and low energy.",
+        "desire_en": "Feel lighter, sharper, and more confident daily.",
+        "friction_en": "Inconsistent routines reduce momentum.",
+        "proof_needed_en": "Needs confidence-building early progress signals.",
+        "tone_cue_en": "uplifting and grounded",
+        "pain_hi": "body discomfort और low energy से confidence कम है।",
+        "desire_hi": "हर दिन lighter और confident feel करना है।",
+        "friction_hi": "inconsistent routines से momentum टूटती है।",
+        "proof_needed_hi": "early confidence-building progress signals चाहिए।",
+        "tone_cue_hi": "uplifting और grounded"
+      },
+      "copy": {
+        "EN": {
+          "headline": "Cravings down. Weight loss feels easier.",
+          "support_line": "Doctor-formulated Ayurvedic weight-loss system designed to help you lose 3 to 5 kg with 1 Kit without feeling hungry, weak, or out of control.",
+          "cta": "See The Steps"
+        },
+        "HI": {
+          "headline": "Cravings down. Weight loss feels easier.",
+          "support_line": "Doctor-formulated Ayurvedic weight-loss system designed to help you lose 3 to 5 kg with 1 Kit without feeling hungry, weak, or out of control.",
+          "cta": "See The Steps"
+        }
+      }
+    },
+    {
+      "format": "HERO",
+      "headline_angle": "mechanism",
+      "persona": {
+        "number": 19,
+        "name": "Trust-First Buyer (doctor-backed only)",
+        "pain_en": "Only trusts doctor-backed, evidence-grounded solutions.",
+        "desire_en": "Safe-feeling system with clear proof signals.",
+        "friction_en": "Distrust of generic internet claims.",
+        "proof_needed_en": "Needs founder credibility and structured protocol proof.",
+        "tone_cue_en": "authoritative and factual",
+        "pain_hi": "doctor-backed और evidence-grounded solution पर ही भरोसा है।",
+        "desire_hi": "clear proof signals वाला safe-feeling system चाहिए।",
+        "friction_hi": "generic internet claims पर trust नहीं है।",
+        "proof_needed_hi": "founder credibility और structured protocol proof चाहिए।",
+        "tone_cue_hi": "authoritative और factual"
+      },
+      "copy": {
+        "EN": {
+          "headline": "Cravings down. Weight loss feels easier.",
+          "support_line": "Doctor-formulated Ayurvedic weight-loss system designed to help you lose 3 to 5 kg with 1 Kit without feeling hungry, weak, or out of control.",
+          "cta": "See The Steps"
+        },
+        "HI": {
+          "headline": "Cravings down. Weight loss feels easier.",
+          "support_line": "Doctor-formulated Ayurvedic weight-loss system designed to help you lose 3 to 5 kg with 1 Kit without feeling hungry, weak, or out of control.",
+          "cta": "See The Steps"
+        }
+      }
+    },
+    {
+      "format": "HERO",
+      "headline_angle": "mechanism",
+      "persona": {
+        "number": 20,
+        "name": "Support-Dependent Persona (needs accountability)",
+        "pain_en": "Struggles to stay consistent without accountability.",
+        "desire_en": "Daily support that keeps follow-through high.",
+        "friction_en": "Drops routines when guidance is missing.",
+        "proof_needed_en": "Needs tracker-led support and coach cues.",
+        "tone_cue_en": "coach-like and motivating",
+        "pain_hi": "accountability के बिना consistency टूट जाती है।",
+        "desire_hi": "daily support से high follow-through चाहिए।",
+        "friction_hi": "guidance न हो तो routine छूट जाती है।",
+        "proof_needed_hi": "tracker-led support और coach cues चाहिए।",
+        "tone_cue_hi": "coach-like और motivating"
+      },
+      "copy": {
+        "EN": {
+          "headline": "Cravings down. Weight loss feels easier.",
+          "support_line": "Doctor-formulated Ayurvedic weight-loss system designed to help you lose 3 to 5 kg with 1 Kit without feeling hungry, weak, or out of control.",
+          "cta": "See The Steps"
+        },
+        "HI": {
+          "headline": "Cravings down. Weight loss feels easier.",
+          "support_line": "Doctor-formulated Ayurvedic weight-loss system designed to help you lose 3 to 5 kg with 1 Kit without feeling hungry, weak, or out of control.",
+          "cta": "See The Steps"
+        }
+      }
+    },
+    {
+      "format": "HERO",
+      "headline_angle": "mechanism",
+      "persona": {
+        "number": 21,
+        "name": "Beginner Who Hates Complex Plans",
+        "pain_en": "Hates complicated plans and too many rules.",
+        "desire_en": "Simple steps with almost no guesswork.",
+        "friction_en": "Complexity causes early drop-off.",
+        "proof_needed_en": "Needs a very clear, easy-to-follow structure.",
+        "tone_cue_en": "simple and direct",
+        "pain_hi": "complex plans और ज्यादा rules से frustration होती है।",
+        "desire_hi": "simple, low-guesswork steps चाहिए।",
+        "friction_hi": "complexity से जल्दी drop-off हो जाता है।",
+        "proof_needed_hi": "बहुत clear और easy-to-follow structure चाहिए।",
+        "tone_cue_hi": "simple और direct"
+      },
+      "copy": {
+        "EN": {
+          "headline": "Cravings down. Weight loss feels easier.",
+          "support_line": "Doctor-formulated Ayurvedic weight-loss system designed to help you lose 3 to 5 kg with 1 Kit without feeling hungry, weak, or out of control.",
+          "cta": "See The Steps"
+        },
+        "HI": {
+          "headline": "Cravings down. Weight loss feels easier.",
+          "support_line": "Doctor-formulated Ayurvedic weight-loss system designed to help you lose 3 to 5 kg with 1 Kit without feeling hungry, weak, or out of control.",
+          "cta": "See The Steps"
+        }
+      }
+    },
+    {
+      "format": "HERO",
+      "headline_angle": "mechanism",
+      "persona": {
+        "number": 22,
+        "name": "35+ Slow-Progress Persona",
+        "pain_en": "Progress feels slower after 35 despite effort.",
+        "desire_en": "Steady sustainable progress without extreme routines.",
+        "friction_en": "Frustration from slow visible change.",
+        "proof_needed_en": "Needs realistic milestones and consistency proof.",
+        "tone_cue_en": "reassuring and practical",
+        "pain_hi": "35 के बाद progress धीमी लगती है।",
+        "desire_hi": "extreme routine के बिना steady sustainable progress चाहिए।",
+        "friction_hi": "slow visible change से frustration होती है।",
+        "proof_needed_hi": "realistic milestones और consistency proof चाहिए।",
+        "tone_cue_hi": "reassuring और practical"
+      },
+      "copy": {
+        "EN": {
+          "headline": "Cravings down. Weight loss feels easier.",
+          "support_line": "Doctor-formulated Ayurvedic weight-loss system designed to help you lose 3 to 5 kg with 1 Kit without feeling hungry, weak, or out of control.",
+          "cta": "See The Steps"
+        },
+        "HI": {
+          "headline": "Cravings down. Weight loss feels easier.",
+          "support_line": "Doctor-formulated Ayurvedic weight-loss system designed to help you lose 3 to 5 kg with 1 Kit without feeling hungry, weak, or out of control.",
+          "cta": "See The Steps"
+        }
+      }
+    },
+    {
+      "format": "HERO",
+      "headline_angle": "mechanism",
+      "persona": {
+        "number": 23,
+        "name": "New Mother (6+ months postpartum)",
+        "pain_en": "Routine changed after childbirth and time is limited.",
+        "desire_en": "A gentle return to steady progress that fits daily life.",
+        "friction_en": "Harsh or complex plans feel unrealistic right now.",
+        "proof_needed_en": "Needs practical, supportive steps for a changed routine.",
+        "tone_cue_en": "gentle and encouraging",
+        "pain_hi": "delivery के बाद routine बदल गई है और समय कम है।",
+        "desire_hi": "daily life में fit होने वाली gentle progress चाहिए।",
+        "friction_hi": "harsh या complex plans अभी unrealistic लगती हैं।",
+        "proof_needed_hi": "changed routine के लिए supportive practical steps चाहिए।",
+        "tone_cue_hi": "gentle और encouraging"
+      },
+      "copy": {
+        "EN": {
+          "headline": "Cravings down. Weight loss feels easier.",
+          "support_line": "Doctor-formulated Ayurvedic weight-loss system designed to help you lose 3 to 5 kg with 1 Kit without feeling hungry, weak, or out of control.",
+          "cta": "See The Steps"
+        },
+        "HI": {
+          "headline": "Cravings down. Weight loss feels easier.",
+          "support_line": "Doctor-formulated Ayurvedic weight-loss system designed to help you lose 3 to 5 kg with 1 Kit without feeling hungry, weak, or out of control.",
+          "cta": "See The Steps"
+        }
+      }
+    },
+    {
+      "format": "HERO",
+      "headline_angle": "mechanism",
+      "persona": {
+        "number": 24,
+        "name": "Menopause",
+        "pain_en": "Weight feels harder to manage during menopause.",
+        "desire_en": "Visible progress with a manageable, sustainable routine.",
+        "friction_en": "Usual methods feel harsher and harder to continue.",
+        "proof_needed_en": "Needs doctor-led credibility and real-life usability.",
+        "tone_cue_en": "respectful and practical",
+        "pain_hi": "menopause में weight manage करना मुश्किल लग रहा है।",
+        "desire_hi": "manageable routine के साथ visible progress चाहिए।",
+        "friction_hi": "usual methods harsher लगती हैं और टिकती नहीं।",
+        "proof_needed_hi": "doctor-led credibility और real-life usability चाहिए।",
+        "tone_cue_hi": "respectful और practical"
+      },
+      "copy": {
+        "EN": {
+          "headline": "Cravings down. Weight loss feels easier.",
+          "support_line": "Doctor-formulated Ayurvedic weight-loss system designed to help you lose 3 to 5 kg with 1 Kit without feeling hungry, weak, or out of control.",
+          "cta": "See The Steps"
+        },
+        "HI": {
+          "headline": "Cravings down. Weight loss feels easier.",
+          "support_line": "Doctor-formulated Ayurvedic weight-loss system designed to help you lose 3 to 5 kg with 1 Kit without feeling hungry, weak, or out of control.",
+          "cta": "See The Steps"
+        }
+      }
+    },
+    {
+      "format": "HERO",
+      "headline_angle": "mechanism",
+      "persona": {
+        "number": 25,
+        "name": "Natural Solution Seeker",
+        "pain_en": "Wants a natural path and avoids harsh methods.",
+        "desire_en": "Natural weight-loss support that still feels effective.",
+        "friction_en": "Worries natural options may be vague or weak.",
+        "proof_needed_en": "Needs clear Ayurvedic, no-synthetic trust cues.",
+        "tone_cue_en": "clear and trust-led",
+        "pain_hi": "natural solution चाहिए, harsh methods नहीं।",
+        "desire_hi": "effective और natural weight-loss support चाहिए।",
+        "friction_hi": "natural options vague या weak लगती हैं।",
+        "proof_needed_hi": "clear Ayurvedic और no-synthetic trust cues चाहिए।",
+        "tone_cue_hi": "clear और trust-led"
+      },
+      "copy": {
+        "EN": {
+          "headline": "Cravings down. Weight loss feels easier.",
+          "support_line": "Doctor-formulated Ayurvedic weight-loss system designed to help you lose 3 to 5 kg with 1 Kit without feeling hungry, weak, or out of control.",
+          "cta": "See The Steps"
+        },
+        "HI": {
+          "headline": "Cravings down. Weight loss feels easier.",
+          "support_line": "Doctor-formulated Ayurvedic weight-loss system designed to help you lose 3 to 5 kg with 1 Kit without feeling hungry, weak, or out of control.",
+          "cta": "See The Steps"
+        }
+      }
+    },
+    {
+      "format": "HERO",
+      "headline_angle": "mechanism",
+      "persona": {
+        "number": 26,
+        "name": "Sustainable Weight Loss Seeker",
+        "pain_en": "Past quick losses came back too fast.",
+        "desire_en": "A more sustainable path without bounce-back anxiety.",
+        "friction_en": "Short-term fixes feel temporary and hard to maintain.",
+        "proof_needed_en": "Needs non-dependency and maintainability framing.",
+        "tone_cue_en": "steady and realistic",
+        "pain_hi": "पहले quick loss वापस आ गया था।",
+        "desire_hi": "bounce-back anxiety के बिना sustainable path चाहिए।",
+        "friction_hi": "short-term fixes temporary लगती हैं।",
+        "proof_needed_hi": "non-dependency और maintainability framing चाहिए।",
+        "tone_cue_hi": "steady और realistic"
+      },
+      "copy": {
+        "EN": {
+          "headline": "Cravings down. Weight loss feels easier.",
+          "support_line": "Doctor-formulated Ayurvedic weight-loss system designed to help you lose 3 to 5 kg with 1 Kit without feeling hungry, weak, or out of control.",
+          "cta": "See The Steps"
+        },
+        "HI": {
+          "headline": "Cravings down. Weight loss feels easier.",
+          "support_line": "Doctor-formulated Ayurvedic weight-loss system designed to help you lose 3 to 5 kg with 1 Kit without feeling hungry, weak, or out of control.",
+          "cta": "See The Steps"
+        }
+      }
+    }
+  ]
+}

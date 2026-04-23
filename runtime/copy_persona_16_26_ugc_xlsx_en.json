@@ -1,0 +1,357 @@
+{
+  "default_aspect_ratio": "4:5",
+  "ads": [
+    {
+      "format": "UGC",
+      "headline_angle": "mechanism",
+      "persona": {
+        "number": 16,
+        "name": "Budget-Conscious Result Seeker",
+        "pain_en": "Budget concerns reduce trust in expensive plans.",
+        "desire_en": "Reliable progress from a practical system.",
+        "friction_en": "Fear of paying without results.",
+        "proof_needed_en": "Needs strong value and risk-reduction cues.",
+        "tone_cue_en": "transparent and outcome-focused",
+        "pain_hi": "Budget concerns reduce trust in expensive plans.",
+        "desire_hi": "Reliable progress from a practical system.",
+        "friction_hi": "Fear of paying without results.",
+        "proof_needed_hi": "Needs strong value and risk-reduction cues.",
+        "tone_cue_hi": "transparent and outcome-focused"
+      },
+      "copy": {
+        "EN": {
+          "headline": "This did not feel like another gamble.",
+          "support_line": "The support and progress made it feel worth trying.",
+          "context_line": "If you are careful with money because too many things overpromise, this feels like a smarter step.",
+          "cta": "See How It Works"
+        },
+        "HI": {
+          "headline": "This did not feel like another gamble.",
+          "support_line": "The support and progress made it feel worth trying.",
+          "context_line": "If you are careful with money because too many things overpromise, this feels like a smarter step.",
+          "cta": "See How It Works"
+        }
+      }
+    },
+    {
+      "format": "UGC",
+      "headline_angle": "mechanism",
+      "persona": {
+        "number": 17,
+        "name": "Wedding / Event Deadline Persona",
+        "pain_en": "Event deadline creates pressure and urgency.",
+        "desire_en": "Visible progress in a short, realistic window.",
+        "friction_en": "Panic-driven plans often backfire.",
+        "proof_needed_en": "Needs structured short-term milestone framing.",
+        "tone_cue_en": "urgent but controlled",
+        "pain_hi": "Event deadline creates pressure and urgency.",
+        "desire_hi": "Visible progress in a short, realistic window.",
+        "friction_hi": "Panic-driven plans often backfire.",
+        "proof_needed_hi": "Needs structured short-term milestone framing.",
+        "tone_cue_hi": "urgent but controlled"
+      },
+      "copy": {
+        "EN": {
+          "headline": "I needed something that could show in time.",
+          "support_line": "The 15-day structure made it feel clear and focused.",
+          "context_line": "For people working toward a wedding, trip, or event, this gives a realistic short path.",
+          "cta": "See How It Works"
+        },
+        "HI": {
+          "headline": "I needed something that could show in time.",
+          "support_line": "The 15-day structure made it feel clear and focused.",
+          "context_line": "For people working toward a wedding, trip, or event, this gives a realistic short path.",
+          "cta": "See How It Works"
+        }
+      }
+    },
+    {
+      "format": "UGC",
+      "headline_angle": "mechanism",
+      "persona": {
+        "number": 18,
+        "name": "Confidence-First Persona (Appearance + Energy)",
+        "pain_en": "Low confidence from body discomfort and low energy.",
+        "desire_en": "Feel lighter, sharper, and more confident daily.",
+        "friction_en": "Inconsistent routines reduce momentum.",
+        "proof_needed_en": "Needs confidence-building early progress signals.",
+        "tone_cue_en": "uplifting and grounded",
+        "pain_hi": "Low confidence from body discomfort and low energy.",
+        "desire_hi": "Feel lighter, sharper, and more confident daily.",
+        "friction_hi": "Inconsistent routines reduce momentum.",
+        "proof_needed_hi": "Needs confidence-building early progress signals.",
+        "tone_cue_hi": "uplifting and grounded"
+      },
+      "copy": {
+        "EN": {
+          "headline": "I started feeling lighter again.",
+          "support_line": "My clothes, energy, and confidence all started feeling better.",
+          "context_line": "For people who want to look better and feel better, this is the kind of change that matters.",
+          "cta": "See How It Works"
+        },
+        "HI": {
+          "headline": "I started feeling lighter again.",
+          "support_line": "My clothes, energy, and confidence all started feeling better.",
+          "context_line": "For people who want to look better and feel better, this is the kind of change that matters.",
+          "cta": "See How It Works"
+        }
+      }
+    },
+    {
+      "format": "UGC",
+      "headline_angle": "mechanism",
+      "persona": {
+        "number": 19,
+        "name": "Trust-First Buyer (Doctor-Backed Only)",
+        "pain_en": "Only trusts doctor-backed, evidence-grounded solutions.",
+        "desire_en": "Safe-feeling system with clear proof signals.",
+        "friction_en": "Distrust of generic internet claims.",
+        "proof_needed_en": "Needs founder credibility and structured protocol proof.",
+        "tone_cue_en": "authoritative and factual",
+        "pain_hi": "Only trusts doctor-backed, evidence-grounded solutions.",
+        "desire_hi": "Safe-feeling system with clear proof signals.",
+        "friction_hi": "Distrust of generic internet claims.",
+        "proof_needed_hi": "Needs founder credibility and structured protocol proof.",
+        "tone_cue_hi": "authoritative and factual"
+      },
+      "copy": {
+        "EN": {
+          "headline": "I only wanted something I could trust.",
+          "support_line": "Knowing it was doctor-formulated made a big difference for me.",
+          "context_line": "If trust is the first thing you look for, this shows why this felt more credible.",
+          "cta": "See How It Works"
+        },
+        "HI": {
+          "headline": "I only wanted something I could trust.",
+          "support_line": "Knowing it was doctor-formulated made a big difference for me.",
+          "context_line": "If trust is the first thing you look for, this shows why this felt more credible.",
+          "cta": "See How It Works"
+        }
+      }
+    },
+    {
+      "format": "UGC",
+      "headline_angle": "mechanism",
+      "persona": {
+        "number": 20,
+        "name": "Support-Dependent Persona (Needs Accountability)",
+        "pain_en": "Struggles to stay consistent without accountability.",
+        "desire_en": "Daily support that keeps follow-through high.",
+        "friction_en": "Drops routines when guidance is missing.",
+        "proof_needed_en": "Needs tracker-led support and coach cues.",
+        "tone_cue_en": "coach-like and motivating",
+        "pain_hi": "Struggles to stay consistent without accountability.",
+        "desire_hi": "Daily support that keeps follow-through high.",
+        "friction_hi": "Drops routines when guidance is missing.",
+        "proof_needed_hi": "Needs tracker-led support and coach cues.",
+        "tone_cue_hi": "coach-like and motivating"
+      },
+      "copy": {
+        "EN": {
+          "headline": "I did better because I was not alone.",
+          "support_line": "The guidance helped me stay on track.",
+          "context_line": "For people who know accountability improves results, this shows why support matters.",
+          "cta": "See How It Works"
+        },
+        "HI": {
+          "headline": "I did better because I was not alone.",
+          "support_line": "The guidance helped me stay on track.",
+          "context_line": "For people who know accountability improves results, this shows why support matters.",
+          "cta": "See How It Works"
+        }
+      }
+    },
+    {
+      "format": "UGC",
+      "headline_angle": "mechanism",
+      "persona": {
+        "number": 21,
+        "name": "Beginner Who Hates Complex Plans",
+        "pain_en": "Hates complicated plans and too many rules.",
+        "desire_en": "Simple steps with almost no guesswork.",
+        "friction_en": "Complexity causes early drop-off.",
+        "proof_needed_en": "Needs a very clear, easy-to-follow structure.",
+        "tone_cue_en": "simple and direct",
+        "pain_hi": "Hates complicated plans and too many rules.",
+        "desire_hi": "Simple steps with almost no guesswork.",
+        "friction_hi": "Complexity causes early drop-off.",
+        "proof_needed_hi": "Needs a very clear, easy-to-follow structure.",
+        "tone_cue_hi": "simple and direct"
+      },
+      "copy": {
+        "EN": {
+          "headline": "I knew what to do from day one.",
+          "support_line": "I did not have to overthink every step.",
+          "context_line": "For people who get overwhelmed by complex plans, this makes the start much simpler.",
+          "cta": "See How It Works"
+        },
+        "HI": {
+          "headline": "I knew what to do from day one.",
+          "support_line": "I did not have to overthink every step.",
+          "context_line": "For people who get overwhelmed by complex plans, this makes the start much simpler.",
+          "cta": "See How It Works"
+        }
+      }
+    },
+    {
+      "format": "UGC",
+      "headline_angle": "mechanism",
+      "persona": {
+        "number": 22,
+        "name": "35+ Slow-Progress Persona",
+        "pain_en": "Progress feels slower after 35 despite effort.",
+        "desire_en": "Steady sustainable progress without extreme routines.",
+        "friction_en": "Frustration from slow visible change.",
+        "proof_needed_en": "Needs realistic milestones and consistency proof.",
+        "tone_cue_en": "reassuring and practical",
+        "pain_hi": "Progress feels slower after 35 despite effort.",
+        "desire_hi": "Steady sustainable progress without extreme routines.",
+        "friction_hi": "Frustration from slow visible change.",
+        "proof_needed_hi": "Needs realistic milestones and consistency proof.",
+        "tone_cue_hi": "reassuring and practical"
+      },
+      "copy": {
+        "EN": {
+          "headline": "I stopped feeling like progress was impossible.",
+          "support_line": "What helped was a routine I could actually continue.",
+          "context_line": "For people whose body feels slower than before, this shows a more practical path.",
+          "cta": "See How It Works"
+        },
+        "HI": {
+          "headline": "I stopped feeling like progress was impossible.",
+          "support_line": "What helped was a routine I could actually continue.",
+          "context_line": "For people whose body feels slower than before, this shows a more practical path.",
+          "cta": "See How It Works"
+        }
+      }
+    },
+    {
+      "format": "UGC",
+      "headline_angle": "mechanism",
+      "persona": {
+        "number": 23,
+        "name": "New Mother (6+ months postpartum)",
+        "pain_en": "Routine changed after childbirth and time is limited.",
+        "desire_en": "A gentle return to steady progress that fits daily life.",
+        "friction_en": "Harsh or complex plans feel unrealistic right now.",
+        "proof_needed_en": "Needs practical, supportive steps for a changed routine.",
+        "tone_cue_en": "gentle and encouraging",
+        "pain_hi": "Routine changed after childbirth and time is limited.",
+        "desire_hi": "A gentle return to steady progress that fits daily life.",
+        "friction_hi": "Harsh or complex plans feel unrealistic right now.",
+        "proof_needed_hi": "Needs practical, supportive steps for a changed routine.",
+        "tone_cue_hi": "gentle and encouraging"
+      },
+      "copy": {
+        "EN": {
+          "headline": "I eased back into my routine gently.",
+          "support_line": "I needed something simple enough to fit my changed day.",
+          "context_line": "For new mothers ready to focus on themselves again, this shows a gentler restart.",
+          "cta": "See How It Works"
+        },
+        "HI": {
+          "headline": "I eased back into my routine gently.",
+          "support_line": "I needed something simple enough to fit my changed day.",
+          "context_line": "For new mothers ready to focus on themselves again, this shows a gentler restart.",
+          "cta": "See How It Works"
+        }
+      }
+    },
+    {
+      "format": "UGC",
+      "headline_angle": "mechanism",
+      "persona": {
+        "number": 24,
+        "name": "Menopause",
+        "pain_en": "Weight feels harder to manage during menopause.",
+        "desire_en": "Visible progress with a manageable, sustainable routine.",
+        "friction_en": "Usual methods feel harsher and harder to continue.",
+        "proof_needed_en": "Needs doctor-led credibility and real-life usability.",
+        "tone_cue_en": "respectful and practical",
+        "pain_hi": "Weight feels harder to manage during menopause.",
+        "desire_hi": "Visible progress with a manageable, sustainable routine.",
+        "friction_hi": "Usual methods feel harsher and harder to continue.",
+        "proof_needed_hi": "Needs doctor-led credibility and real-life usability.",
+        "tone_cue_hi": "respectful and practical"
+      },
+      "copy": {
+        "EN": {
+          "headline": "I wanted something manageable at this stage.",
+          "support_line": "This felt easier to stay with than the usual advice.",
+          "context_line": "For women dealing with menopause-related weight gain, this offers a more workable path.",
+          "cta": "See How It Works"
+        },
+        "HI": {
+          "headline": "I wanted something manageable at this stage.",
+          "support_line": "This felt easier to stay with than the usual advice.",
+          "context_line": "For women dealing with menopause-related weight gain, this offers a more workable path.",
+          "cta": "See How It Works"
+        }
+      }
+    },
+    {
+      "format": "UGC",
+      "headline_angle": "mechanism",
+      "persona": {
+        "number": 25,
+        "name": "Natural Solution Seeker",
+        "pain_en": "Wants a natural path and avoids harsh methods.",
+        "desire_en": "Natural weight-loss support that still feels effective.",
+        "friction_en": "Worries natural options may be vague or weak.",
+        "proof_needed_en": "Needs clear Ayurvedic, no-synthetic trust cues.",
+        "tone_cue_en": "clear and trust-led",
+        "pain_hi": "Wants a natural path and avoids harsh methods.",
+        "desire_hi": "Natural weight-loss support that still feels effective.",
+        "friction_hi": "Worries natural options may be vague or weak.",
+        "proof_needed_hi": "Needs clear Ayurvedic, no-synthetic trust cues.",
+        "tone_cue_hi": "clear and trust-led"
+      },
+      "copy": {
+        "EN": {
+          "headline": "I wanted something natural that still worked.",
+          "support_line": "I liked that it felt Ayurvedic and structured.",
+          "context_line": "For people looking for a natural weight-loss option, this feels more serious and practical.",
+          "cta": "See How It Works"
+        },
+        "HI": {
+          "headline": "I wanted something natural that still worked.",
+          "support_line": "I liked that it felt Ayurvedic and structured.",
+          "context_line": "For people looking for a natural weight-loss option, this feels more serious and practical.",
+          "cta": "See How It Works"
+        }
+      }
+    },
+    {
+      "format": "UGC",
+      "headline_angle": "mechanism",
+      "persona": {
+        "number": 26,
+        "name": "Sustainable Weight Loss Seeker",
+        "pain_en": "Past quick losses came back too fast.",
+        "desire_en": "A more sustainable path without bounce-back anxiety.",
+        "friction_en": "Short-term fixes feel temporary and hard to maintain.",
+        "proof_needed_en": "Needs non-dependency and maintainability framing.",
+        "tone_cue_en": "steady and realistic",
+        "pain_hi": "Past quick losses came back too fast.",
+        "desire_hi": "A more sustainable path without bounce-back anxiety.",
+        "friction_hi": "Short-term fixes feel temporary and hard to maintain.",
+        "proof_needed_hi": "Needs non-dependency and maintainability framing.",
+        "tone_cue_hi": "steady and realistic"
+      },
+      "copy": {
+        "EN": {
+          "headline": "I did not want to lose and gain it back.",
+          "support_line": "I wanted something easier to maintain, not just quick for a few days.",
+          "context_line": "For people tired of the lose-regain cycle, this shows a more sustainable path.",
+          "cta": "See How It Works"
+        },
+        "HI": {
+          "headline": "I did not want to lose and gain it back.",
+          "support_line": "I wanted something easier to maintain, not just quick for a few days.",
+          "context_line": "For people tired of the lose-regain cycle, this shows a more sustainable path.",
+          "cta": "See How It Works"
+        }
+      }
+    }
+  ]
+}
