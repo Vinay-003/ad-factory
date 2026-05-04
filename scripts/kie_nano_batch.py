@@ -187,13 +187,14 @@ def build_image_inputs(active_images_dir: Path, mode: str, base_url: str) -> lis
     return result
 
 
-def load_active_images_config(url_file: Path) -> tuple[list[str], str, str]:
+def load_active_images_config(url_file: Path) -> tuple[list[str], str, str, str]:
     if not url_file.exists():
         raise RuntimeError(f"Image URL file not found: {url_file}")
     lines = [line.strip() for line in url_file.read_text(encoding="utf-8").splitlines()]
     urls: list[str] = []
     light_logo_url = ""
     dark_logo_url = ""
+    white_logo_url = ""
     for line in lines:
         if not line or line.startswith("#"):
             continue
@@ -207,12 +208,15 @@ def load_active_images_config(url_file: Path) -> tuple[list[str], str, str]:
             if normalized_key == "DARK_LOGO_URL":
                 dark_logo_url = normalized_value
                 continue
+            if normalized_key == "WHITE_LOGO_URL":
+                white_logo_url = normalized_value
+                continue
         urls.append(line)
     if not urls:
         raise RuntimeError(f"No URLs found in {url_file}")
     if len(urls) > 14:
         raise RuntimeError(f"Kie supports max 14 image_input URLs, found {len(urls)} in {url_file}")
-    return urls, light_logo_url, dark_logo_url
+    return urls, light_logo_url, dark_logo_url, white_logo_url
 
 
 def parse_prompt_files(batch_dir: Path, language_mode: str, root: Path, selected_prompt_files: set[str] | None = None) -> list[PromptFile]:
@@ -407,15 +411,18 @@ def compose_prompt(
     starting_prompt: str,
     prompt_file: Path,
     conversion_mode: str,
-    logo_variant: str,
+    light_logo_url: str,
 ) -> str:
     body = prompt_file.read_text(encoding="utf-8").strip()
     lock = conversion_lock_instruction(conversion_mode)
     logo_instruction = (
         "LOGO ASSET RULE (MANDATORY)\n"
-        f"- Use the preselected {logo_variant.upper()} logo reference from image_input as the only logo asset.\n"
+        f"- Use LIGHT_LOGO_URL only as the logo reference: {light_logo_url}\n"
+        "- Do not use dark-logo or white-logo variants in any scenario.\n"
         "- Never print URLs, file names, or any technical strings on the canvas.\n"
-        "- Render only the visual logo mark; no link text, no metadata text."
+        "- Render only the visual logo mark; no link text, no metadata text.\n"
+        "- Do not place any white box, white patch, solid rectangle, badge plate, or background panel behind the logo.\n"
+        "- Logo background must stay transparent and blend naturally with the scene."
     )
     big_box_visibility_instruction = (
         "BIG BOX LABEL VISIBILITY (NON-NEGOTIABLE)\n"
@@ -599,11 +606,10 @@ def persona_folder_name(persona_number: int | None) -> str:
     return "P00"
 
 
-def sanitize_logo_inputs(image_inputs: list[str], light_logo_url: str, dark_logo_url: str, selected_logo_url: str) -> list[str]:
-    blocked = {url for url in (light_logo_url, dark_logo_url, *LEGACY_LOGO_INPUT_URLS) if url}
+def sanitize_logo_inputs(image_inputs: list[str], logo_urls: list[str]) -> list[str]:
+    blocked = {url for url in (*logo_urls, *LEGACY_LOGO_INPUT_URLS) if url}
     sanitized = [url for url in image_inputs if url not in blocked]
-    if selected_logo_url:
-        sanitized = [selected_logo_url, *sanitized]
+    sanitized = [*logo_urls, *sanitized]
     deduped: list[str] = []
     seen: set[str] = set()
     for url in sanitized:
@@ -712,10 +718,11 @@ def main() -> int:
 
     light_logo_url = ""
     dark_logo_url = ""
+    white_logo_url = ""
     if has_per_prompt_refs:
         image_input_urls = []
     elif args.image_input_mode == "url" and active_images_file.exists():
-        image_input_urls, light_logo_url, dark_logo_url = load_active_images_config(active_images_file)
+        image_input_urls, light_logo_url, dark_logo_url, white_logo_url = load_active_images_config(active_images_file)
     else:
         image_input_urls = build_image_inputs(active_images_dir, args.image_input_mode, args.active_images_base_url)
 
@@ -723,9 +730,7 @@ def main() -> int:
     prompt_files = parse_prompt_files(batch_output_dir, args.language, root, selected_prompt_files if selected_prompt_files else None)
     grouped = trim_variations(iter_grouped(prompt_files), args.max_variations_per_format)
     starting_prompt = starting_prompt_file.read_text(encoding="utf-8")
-    opencode_api_url = (os.getenv("OPENCODE_API_URL") or DEFAULT_OPENCODE_API_URL).strip()
-    opencode_password = (os.getenv("OPENCODE_SERVER_PASSWORD") or "").strip()
-    minimax_model = discover_minimax_model()
+    logo_candidates = [light_logo_url] if light_logo_url else []
 
     generated_at = time.strftime("%Y-%m-%dT%H:%M:%SZ", time.gmtime())
 
@@ -736,19 +741,11 @@ def main() -> int:
         for prompt_file in files:
             prompt_body = prompt_file.path.read_text(encoding="utf-8")
             prompt_metadata = extract_prompt_metadata(prompt_body)
-            logo_variant, logo_variant_source = choose_logo_variant_with_minimax(
-                prompt_body,
-                prompt_metadata,
-                minimax_model,
-                opencode_api_url,
-                opencode_password,
-            )
-            selected_logo_url = dark_logo_url if logo_variant == "dark" else light_logo_url
             complete_prompt = compose_prompt(
                 starting_prompt,
                 prompt_file.path,
                 args.reference_conversion_mode,
-                logo_variant,
+                light_logo_url,
             )
             prompt_rel_path = str(prompt_file.path.relative_to(root))
             persona_number = prompt_file.persona_number
@@ -762,9 +759,7 @@ def main() -> int:
             image_input_for_prompt = per_prompt_inputs if per_prompt_inputs else image_input_urls
             image_input_for_prompt = sanitize_logo_inputs(
                 image_input_for_prompt,
-                light_logo_url,
-                dark_logo_url,
-                selected_logo_url,
+                logo_candidates,
             )
             if len(image_input_for_prompt) > 14:
                 raise RuntimeError(f"Kie supports max 14 image_input URLs, found {len(image_input_for_prompt)} for prompt: {prompt_rel_path}")
@@ -823,9 +818,10 @@ def main() -> int:
                         "seed": prompt_metadata.get("seed"),
                         "prompt_variation": prompt_file.variation,
                     },
-                    "logo_variant": logo_variant,
-                    "logo_variant_source": logo_variant_source,
-                    "logo_asset_url": selected_logo_url,
+                    "logo_variant": "light",
+                    "logo_variant_source": "forced_light",
+                    "logo_asset_url": light_logo_url,
+                    "logo_candidates": copy.deepcopy(logo_candidates),
                     "prompt_metadata": prompt_metadata,
                     "image_input_urls": copy.deepcopy(image_input_for_prompt),
                     "result_url": url,
