@@ -1,0 +1,300 @@
+OBESITY KILLER KIT — COMPLETE AD GENERATION PROMPT      
+
+      PART A — PRODUCT & BRAND SYSTEM      
+
+      A1. PRODUCT LOCK — ABSOLUTE RULE      
+
+      Use the PROVIDED product packshot images pixel-for-pixel. You are forbidden from:      
+
+
+      Redrawing, recreating, or regenerating any product or its packaging      
+
+      Changing, blurring, approximating, or "fixing" any text (Hindi or English)      
+
+      Altering logos, illustrations, colors, proportions, or label layouts      
+
+      Replacing unclear text with guesses      
+
+      Only permitted operations on product images:      
+
+
+      Placement and scaling      
+
+      Subtle drop shadows      
+
+      Mild lighting correction (warm, soft, directional)      
+
+      If any label text appears unclear — preserve the original image exactly as-is. Do NOT reinterpret it.      
+
+      A2. EXACT LABEL TEXT — RENDER THESE PERFECTLY      
+
+      Every character on every product must be razor-sharp and 100% faithful.      
+
+
+      Kit Box — Top strip: "Panacea for weight loss and obesity related      
+
+     conditions" / Logo block: "Dr. ARUN TYAGI'S" in red + "OBESITY KILLER      
+
+     KIT" in black / Badge: "ISO 9001:2008 Certified"      
+
+      Amla Bottle (red cap, far left) — "Dried Amla" / Retain amla fruit illustration sharp and unmodified      
+
+      OK Tablets Bottle — "OK TABLETS"      
+
+      OKP Bottle — "OKP" / Retain light pattern on label exactly as provided      
+
+      OK Liquid Sachet (green, far right) — "OK LIQUID" / Retain sharp lotus logo above text      
+
+
+      NEVER: blur, approximate, paraphrase, rewrite, change casing, change      
+
+     spacing, or grammatically alter any packaging text under any      
+
+     circumstance.      
+
+      A3. PRODUCT DIMENSIONS — FOR ACCURATE RELATIVE SIZING      
+
+      OK Kit Box — Cuboid — 20.3 x 10.1 x 14.8 cm      
+
+      OK Powder Bottle — Cylinder — Diameter 5 cm, Height 10 cm      
+
+      OK Tablet Bottle — Cylinder — Diameter 3 cm, Height 5 cm      
+
+      Amla Bottle — Cylinder — Diameter 3 cm, Height 5 cm      
+
+      OK Liquid Sachet — Vertical Rectangle — Width 10 cm, Height 15.3 cm      
+
+
+      All 5 products must appear together in every output. Size them in      
+
+     correct proportion to each other based on the dimensions above. The Kit      
+
+     Box is the largest element and acts as the anchor and backdrop. The      
+
+     bottles are notably smaller. The sachet is tall and narrow.      
+
+      Product count failure rule: every accepted output must contain exactly these five distinct products: Kit Box, Dried Amla bottle, OK Tablets bottle, OKP bottle, and OK Liquid sachet. Never duplicate OKP. Never omit Dried Amla. If two OKP bottles appear, if Dried Amla is missing, or if there are only four distinct products, reject and regenerate immediately.
+
+      A4. COLOR PALETTE — STRICT, NO EXCEPTIONS      
+
+      Background: #FFFBED to #FEEFD6 to #FCDBAC — smooth top-to-bottom gradient only      
+
+      Accents and CTA: #F79040 to #E66410      
+
+      Headlines: #973015      
+
+      Body text and bullets: #421808      
+
+      No colors outside this palette. No neon. No harsh gradients. No random accent colors anywhere.      
+
+      A5. BRAND LOGO PLACEMENT — MANDATORY ON EVERY AD      
+
+      Use the provided standalone brand logo reference image as the logo asset.      
+
+      Place this logo in the top-right corner in every ad output.      
+
+      Logo size: approximately 10% of canvas width (keep aspect ratio intact).      
+
+      Safe margins: 4% from top edge and 4% from right edge.      
+
+      Keep the logo crisp, fully visible, and never cropped.      
+
+      Do not overlap key product labels, headline text, or CTA.      
+
+      Add only a subtle shadow if needed for contrast; no glow, no badge, no frame.      
+
+      Keep spacing around the logo clean so it reads premium and intentional.      
+
+      Logo transparency rule: preserve the uploaded standalone logo PNG transparency exactly. Do not add any black, white, colored, boxed, badge, circular, rectangular, or solid background behind the logo. If the logo appears with a black background or any visible backing plate, reject and regenerate immediately.
+
+      Logo placement failure rule: if the logo is anywhere except the top-right corner with the safe margins above, reject and regenerate immediately. Never place the logo centered, bottom, left, or near the product cluster.
+
+      A7. LIGHTING      
+
+      Warm, soft, directional light — source from top-left      
+
+      Clean highlights on product labels and caps      
+
+      Subtle low-opacity drop shadows beneath products — realistic depth, not dramatic      
+
+      Forbidden: Harsh shadows, flat lighting, studio flash look, ring light glow      
+
+      A8. TYPOGRAPHY — AD COPY      
+
+      Font: Poppins only (clean sans, consistent across the entire creative).      
+
+      Maximum 2 weights: Regular and Bold only (avoid thin/light weights).      
+
+      Headline size: Large and mobile-legible      
+
+      Forbidden: Decorative fonts, serif fonts, outlined text, drop shadows on any ad copy text      
+
+      A9. AD COPY STYLE      
+
+      Keep all copy short, clean, benefit-led, and premium in tone.      
+
+      Example headline: "Your daily ritual for a lighter life."      
+
+      Bullets: Functional benefits only, 3 to 4 maximum      
+
+      CTA: Subtle and clear — example: "Explore the Kit"      
+
+      Avoid: Hype, exclamation spam, body-transformation before/after imagery, unrealistic claims, salesy or cheap language      
+
+      A10. MASTER FORBIDDEN LIST      
+
+      Do not recreate or redraw any product      
+
+      Do not blur, approximate, or rewrite any label text      
+
+      Do not use sale badges, burst graphics, or stickers      
+
+      Do not show body transformations or weight-loss visuals      
+
+      Do not use any color outside the defined palette      
+
+      Do not use more than 2 font weights      
+
+      Do not overcrowd the layout      
+
+      Do not generate AI-stylized versions of the products      
+
+      Do not use harsh gradients or random background colors      
+
+      Do not add emoji, overlays, or visual clutter of any kind      
+
+      Do not place keyboard, laptop, mouse, monitor, or workstation-heavy props in background unless explicitly requested by user      
+
+      No disclaimer copy line on-image unless user explicitly asks for disclaimer mode      
+
+      A11. PART A QUALITY CHECKLIST      
+
+      Verify every point before accepting output:      
+
+      All 5 products present, correctly proportioned, and completely unmodified      
+
+      All label text — Hindi and English — perfectly sharp and faithful to originals      
+
+      Color palette 100% adhered to with zero deviation      
+
+      Layout is calm, balanced, and premium      
+
+      No clutter, no hype, no forbidden elements present      
+
+      Output feels like a high-end D2C health brand — scroll-stopping but not loud      
+
+      If any single item above fails — regenerate immediately without compromise.      
+
+      Do not explain that you are accepting a flawed image. If any product count, product identity, requested background, logo placement, or logo transparency rule fails, silently regenerate the image until the output passes. Only final image output is acceptable.
+
+     Use the uploaded Obesity Killer product packshot images as absolute visual truth.
+
+PRODUCT LOCK BLOCK
+- Use the uploaded Obesity Killer product packshot images as absolute visual truth.
+- Use provided product references as exact appearance truth for pack shape, label, and color.
+- Do not redesign, redraw, relabel, or alter any product or packaging in any way.
+- Do not change brand name, label colors, illustrations, proportions, or any text (Hindi or English).
+- If any label text is unclear, preserve the original image as-is. Do not reinterpret it.
+- Only permitted: placement, scaling, subtle drop shadows, mild warm lighting correction.
+
+OUTPUT SPEC
+- Canvas: 1080 x 1350 pixels. Portrait. 4:5 ratio.
+- Style: UGC (creator-style authenticity, premium and clean).
+- Visual archetype: ugc_unboxing_reaction (Soft unboxing / discovery moment)
+- Full-bleed requirement: scene must reach all canvas edges; no inset poster card, no inner frame, no side matte bands, no faux border margins.
+- Text policy: low text by default; all copy minimal and mobile-readable at 375px width.
+- Rendering: no compression artifacts; no soft edges on text or product labels.
+- All 5 products present, proportionally sized per reference dimensions, unmodified.
+- Readability: maintain high-contrast foreground/background treatment for ad-platform legibility.
+
+FORMAT LAYOUT INSTRUCTIONS
+- Format: UGC.
+- Creator-style authenticity with premium cleanliness; avoid stock-template look.
+- Subject and product should feel naturally integrated into a believable routine moment.
+- Headline/support/context/CTA stack must stay compact and mobile-readable.
+- Hands must look anatomically correct; no extra fingers or warped nails.
+- Archetype: creator appears to be showing or opening the kit in a first-impression style frame.
+- One product can be held closer while the rest remain grouped visibly as the full set.
+- Preserve premium cleanliness so the ad feels authentic but not sloppy.
+
+PERSONA INPUT BLOCK
+- Persona: Craving-Control Struggler (Persona 1)
+- Pain: Daily cravings break every weight plan.
+- Desire: Steady appetite control without feeling deprived.
+- Friction: Willpower-only plans collapse by evening.
+- Proof needed: Needs visible early control over snack urges.
+- Tone cue: Practical, empathetic, and confidence-building
+
+EXACT ON-IMAGE COPY - DO NOT ALTER ANYTHING
+- Headline: My cravings eased, weight loss began
+- Support line: AM routine kept me snack-proof daily
+- Context line: Needs visible early control over snack urges.
+- CTA: Try it today
+Render every character exactly as written. No paraphrasing, no punctuation changes, no autocorrection.
+
+NEGATIVE CONSTRAINTS
+- Do not recreate or redraw any product.
+- Do not blur, approximate, or rewrite any label text.
+- Do not use sale badges, burst graphics, or stickers.
+- Do not show body transformations or weight-loss visuals.
+- Do not use colors outside the defined palette.
+- Do not use more than 2 font weights.
+- Do not overcrowd the layout.
+- Do not add edge glows, tinted borders, amber/orange side casts, or decorative vignette frames.
+- Do not render unnatural or anatomically incorrect hands.
+- Do not create inset-canvas look: no white frame border, no inner-card composition, no side fade bands, no outer padding effect.
+- Do not shrink main scene inside margins; composition must remain full-bleed to all four edges.
+- Do not place any translucent white panel behind or below the product cluster.
+- Do not make medical cure claims of any kind.
+- Do not use ring light, studio flash, or overproduced lighting.
+
+QUALITY BAR - verify before accepting output
+- All 5 products present, correctly proportioned, and completely unmodified.
+- All on-image text sharp and readable at 375px mobile size.
+- Product labels accurate, unmodified, and fully readable.
+- Layout calm, balanced, and premium.
+- No clutter, no hype, and no forbidden elements.
+- Single clear focal hierarchy aligned with the selected visual archetype.
+- If any item above fails, regenerate immediately without compromise.
+
+VISUAL DIRECTION BLOCK
+- Background slot: BG-257 - Night walk table entry
+- Background seed: 712739988
+- Seeded background direction (single sentence, exact): Entryway table at night, dim warm wall light on a minimal matte neutral platform with crisp silhouette separation, with subtle background blur with layered depth separation and low visual noise, lit by gentle low-intensity ambient warmth with balanced soft fill and no harsh hotspots, conveying consistent habit-building nighttime routine; tight product-forward crop with subtle macro feel and premium shallow focus, symmetrical commercial framing with stable side spacing and restrained detail near top and bottom limits, preserve a stable center-of-interest corridor with consistent margin protection on every side, keep the bottom 15% visually calm and free of critical detail for CTA flexibility, keep focal hierarchy compact and central so multi-placement crops preserve premium readability, if a readability panel is needed, keep it in the upper text region only, with a top-anchored vertical fade to transparent before the product cluster, keep all frame edges tonally neutral with no orange, amber, or sepia cast; no border glow and no vignette halo, warm amber-balanced grading with refined shadow warmth, designed for 4:5 feed framing with key content held inside the central safe field, centered to slightly above center, while top 10 percent, bottom 15 percent, and side edge zones remain low-priority; avoid edge glow frames and tinted border gradients, clean premium studio ad photography, ultra-detailed, flawless commercial finish.
+- Subject: Indian woman 27-33, warm assured expression, solid kurta, natural shoulder-length hair; natural and unposed.
+- Action: Hold the kit box toward camera with one hand; the other products arranged on a clean surface in-frame.
+- Camera: Handheld close-to-medium framing, phone-like realism, stable focus on labels.
+- Lighting: Warm, soft, directional (top-left) and label-safe.
+- Props: Minimal, non-competing; keep edge zones quiet.
+- Surfaces: Premium, clean texture; avoid busy patterns under text.
+- Text panel treatment: if used, keep panel in upper text zone only with vertical fade to transparent before products; never place white panel behind or below product cluster.
+- Edge color control: keep border tones neutral and natural; no orange/amber edge tint and no ornamental frame glow.
+- Edge structure control: enforce full-bleed composition to edges; reject outputs with visible inset border, side matte strip, or inner-frame card look.
+- Mood: Calm confidence and practical consistency; no hype.
+- Realism: True-to-life proportions; no stock-template look; natural skin and correct hand anatomy.
+- Selected visual archetype: ugc_unboxing_reaction - Soft unboxing / discovery moment
+- Archetype direction: discovery moment with one-hand reveal and the rest of the pack arranged as supporting proof.
+- Subject behavior: natural curiosity and calm approval, no exaggerated reaction faces.
+
+TYPOGRAPHY SHARPNESS BLOCK
+- Headline: Poppins Bold with high contrast against clean background area.
+- Support and CTA: Poppins Medium/Regular, same family.
+- Size: readable on a 375px mobile screen without zooming.
+- Placement: flat uncluttered zones only; avoid noisy textures.
+- Forbidden: thin fonts, script fonts, decorative typefaces, glow effects, outlined text, drop shadows on copy.
+- Mandatory: crisp hard text edges, zero softness, zero anti-alias blur on any character.
+- If any text is soft, blurry, or illegible, discard and regenerate immediately.
+
+Keep on-image text minimal and mobile-readable. Avoid dense copy blocks.
+Render CTA as a real filled button chip with rounded corners and strong contrast; never show CTA as standalone plain text.
+Typography must be pin-sharp. If any text appears soft, blurry, or smeared, regenerate.
+Keep text count minimal and increase font size rather than packing more copy.
+Use clean sans typography with strong stroke clarity; no thin/light weights for body text.
+Use Poppins only for on-image text: Headline in Poppins Bold, support/CTA in Poppins Medium or Regular.
+
+SAFE-ZONE ENFORCEMENT (NON-NEGOTIABLE)
+- Frame: 1080x1350 (4:5).
+- Restricted bands: top 10% (0-135px), bottom 15% (1148-1350px), side edges outer 8% (0-86px and 994-1080px).
+- Keep all products and all on-image text fully inside the central safe field: x=86-994 and y=135-1148.
+- Product cluster may be centered or left/right weighted according to the selected archetype, with mild upward bias allowed, but must not touch any restricted band.
+- Reject and regenerate if any headline, CTA, or product detail crosses restricted zones.

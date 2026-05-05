@@ -322,293 +322,121 @@ def build_driver(args: argparse.Namespace) -> webdriver.Chrome:
     return driver
 
 
-def open_gemini_with_retry(driver: webdriver.Chrome, retries: int = 3) -> None:
-    last_exc = None
-    for attempt in range(1, retries + 1):
-        try:
-            driver.get(GEMINI_URL)
-            time.sleep(1.5)
-            current = (driver.current_url or "").lower()
-            if current.startswith("data:") or current.startswith("about:blank"):
-                driver.execute_script("window.location.href = arguments[0];", GEMINI_URL)
-                time.sleep(2.0)
-            current = (driver.current_url or "").lower()
-            if "gemini.google.com" in current:
-                return
-        except Exception as exc:
-            last_exc = exc
-        print(f"Navigation attempt {attempt}/{retries} failed. Current URL: {driver.current_url}")
-        time.sleep(2.0)
-    if last_exc:
-        raise last_exc
-    raise RuntimeError(f"Could not navigate to {GEMINI_URL}; final URL was {driver.current_url}")
+def _is_fresh_chat_url(url: str) -> bool:
+    """Return True if the URL is a blank new-chat (no conversation ID).
 
-
-def focus_or_open_gemini_tab(driver: webdriver.Chrome) -> None:
-    try:
-        handles = driver.window_handles
-    except Exception:
-        handles = []
-
-    # Prefer an existing Gemini or Google login tab so we do not disrupt manual sign-in.
-    for h in handles:
-        try:
-            driver.switch_to.window(h)
-            current = (driver.current_url or "").lower()
-            if "gemini.google.com" in current or "accounts.google.com" in current:
-                return
-        except Exception:
-            continue
-
-    # Otherwise navigate the current tab to Gemini first. Only create a new tab if that fails.
-    try:
-        open_gemini_with_retry(driver)
-    except Exception:
-        try:
-            driver.switch_to.new_window("tab")
-        except Exception:
-            pass
-        open_gemini_with_retry(driver)
+    Fresh chat:  https://gemini.google.com/app
+                 https://gemini.google.com/app/
+    Old chat:    https://gemini.google.com/app/0085a5f7943d0d69
+                 https://gemini.google.com/app/c/abc123
+                 https://gemini.google.com/app/a/xyz
+    """
+    # Strip protocol + domain, keep path only
+    path = url.split("gemini.google.com")[-1].rstrip("/")
+    # /app with nothing after it == fresh
+    return path in ("/app", "") or path == "/app"
 
 
 def open_gemini_new_chat(driver: webdriver.Chrome) -> None:
-    driver.execute_script("window.open('');")
-    time.sleep(1.0)
-    handles = driver.window_handles
-    driver.switch_to.window(handles[-1])
-    driver.get(GEMINI_URL)
-    time.sleep(2.0)
+    """Guarantee we are on a brand-new Gemini chat before proceeding.
+
+    Steps
+    -----
+    1. Navigate the current tab to GEMINI_URL.
+    2. Wait 5 s for the page to stabilise.
+    3. CHECK THE URL.
+       - If it is clean (no conversation ID) → we are done.
+       - If it has an ID (old chat was restored) → navigate again.
+         Repeat up to 3 times total.
+    4. After confirming a clean URL, send Ctrl+Shift+O x2 as required.
+    5. Wait for the composer to be present before returning.
+
+    A "fresh chat" URL looks like:
+        https://gemini.google.com/app          ← no trailing ID
+    An "old chat" URL looks like:
+        https://gemini.google.com/app/0085a5f7943d0d69
+    """
+    composer_css = (
+        "rich-textarea div[contenteditable='true'], "
+        "div[contenteditable='true'][role='textbox'], "
+        "div[contenteditable='true'], "
+        "textarea"
+    )
+
+    for attempt in range(1, 4):
+        print(f"  [new-chat] Attempt {attempt}: navigating to {GEMINI_URL}")
+        driver.get(GEMINI_URL)
+
+        # Wait 5 s for the page to stabilise (SPA may redirect after load)
+        time.sleep(5.0)
+
+        current_url = driver.current_url or ""
+        print(f"  [new-chat] URL after load: {current_url}")
+
+        if _is_fresh_chat_url(current_url):
+            print("  [new-chat] Fresh chat confirmed by URL ✓")
+            break
+        else:
+            print(f"  [new-chat] Old chat detected (attempt {attempt}/3), retrying…")
+            if attempt == 3:
+                # Last resort: force a hard reload of the exact base URL
+                driver.execute_script(f"window.location.replace('{GEMINI_URL}');")
+                time.sleep(5.0)
+                print(f"  [new-chat] After force-replace: {driver.current_url}")
+
     dismiss_open_overlays(driver)
-    body = driver.find_element(By.TAG_NAME, "body")
-    body.send_keys(Keys.CONTROL, Keys.SHIFT, "o")
-    time.sleep(5)
-    body.send_keys(Keys.CONTROL, Keys.SHIFT, "o")
-    time.sleep(2.0)
-    dismiss_open_overlays(driver)
 
-
-def close_active_tab(driver: webdriver.Chrome) -> None:
+    # Ensure keyboard focus is on the page body (not the address bar)
     try:
-        handles = driver.window_handles
-    except Exception:
-        handles = []
-
-    if len(handles) <= 1:
-        return
-
-    try:
-        driver.close()
-    except Exception:
-        return
-
-    try:
-        remaining = driver.window_handles
-        if remaining:
-            driver.switch_to.window(remaining[-1])
+        driver.find_element(By.TAG_NAME, "body").click()
     except Exception:
         pass
+    time.sleep(0.3)
 
+    # Ctrl+Shift+O — first press (required by workflow)
+    _send_ctrl_shift_o(driver)
+    print("  [new-chat] Sent Ctrl+Shift+O #1")
+    time.sleep(2.0)
 
-def gemini_app_ready(driver: webdriver.Chrome) -> bool:
+    # Ctrl+Shift+O — second press (required by workflow)
+    _send_ctrl_shift_o(driver)
+    print("  [new-chat] Sent Ctrl+Shift+O #2")
+    time.sleep(2.0)
+
+    dismiss_open_overlays(driver)
+
+    # Wait for the composer — confirms page is ready to receive input
     try:
-        current = (driver.current_url or "").lower()
-    except Exception:
-        return False
+        WebDriverWait(driver, 20).until(
+            EC.presence_of_element_located((By.CSS_SELECTOR, composer_css))
+        )
+        print("  [new-chat] Composer ready.")
+    except TimeoutException:
+        print("  [new-chat] Composer not detected, continuing anyway.")
 
-    if "gemini.google.com" not in current:
-        return False
-
-    selectors = [
-        "rich-textarea div[contenteditable='true']",
-        "div[contenteditable='true'][role='textbox']",
-        "div[contenteditable='true'][aria-label*='message']",
-        "textarea[aria-label*='message']",
-        "textarea[placeholder*='Message']",
-        "button[aria-label*='New chat']",
-        "button[aria-label*='New conversation']",
-    ]
-    for sel in selectors:
-        try:
-            elems = driver.find_elements(By.CSS_SELECTOR, sel)
-            if any(e.is_displayed() for e in elems):
-                return True
-        except Exception:
-            continue
-    return False
+    print(f"  [new-chat] Final URL: {driver.current_url}")
 
 
-def wait_for_manual_login(driver: webdriver.Chrome, timeout: int = 600, strict: bool = False) -> None:
-    print("\nWaiting for Gemini login/readiness...")
-    print("If login page is open, complete login in the browser. Script will auto-continue.")
-
-    deadline = time.time() + timeout
-    next_log = time.time() + 5
-    while time.time() < deadline:
-        try:
-            if gemini_app_ready(driver):
-                print(f"Gemini UI looks ready at {driver.current_url}. Continuing.")
-                return
-        except Exception:
-            pass
-        if time.time() >= next_log:
-            try:
-                current = driver.current_url
-            except Exception:
-                current = "<unavailable>"
-            print(f"Still waiting for Gemini UI readiness... current URL: {current}")
-            next_log = time.time() + 5
-        time.sleep(2.0)
-    msg = f"Timed out after {timeout}s waiting for Gemini readiness"
-    if strict:
-        raise TimeoutException(msg)
-    print(f"{msg}; continuing in auto mode.")
-    return
-
-
-def click_new_chat_if_present(driver: webdriver.Chrome) -> None:
-    selectors = [
-        "button[aria-label*='New chat']",
-        "button[aria-label*='New conversation']",
-        "a[aria-label*='New chat']",
-    ]
-    for sel in selectors:
-        buttons = driver.find_elements(By.CSS_SELECTOR, sel)
-        if buttons:
-            try:
-                buttons[0].click()
-                time.sleep(1.0)
-            except Exception:
-                pass
-            return
-
-    # Text fallback
-    click_text_options(
-        driver,
-        ["New chat", "New conversation"],
-        fail_silently=True,
-    )
-
-
-def ensure_sidebar_open(driver: webdriver.Chrome) -> None:
-    # If sidebar's New chat is visible, nothing to do.
-    visible_new = driver.execute_script(
-        "const nodes=[...document.querySelectorAll('button,a,div,[role=button]')];"
-        "return nodes.some(n=>{"
-        " const t=(n.innerText||'').trim().toLowerCase();"
-        " if(!t.includes('new chat')) return false;"
-        " const r=n.getBoundingClientRect();"
-        " const s=getComputedStyle(n);"
-        " return r.width>0 && r.height>0 && s.visibility!=='hidden' && s.display!=='none' && r.left < 260;"
-        "});"
-    )
-    if visible_new:
+def _send_ctrl_shift_o(driver: webdriver.Chrome) -> None:
+    """Send Ctrl+Shift+O to the page, with a JS fallback."""
+    # Refocus body first so the shortcut lands on the right element.
+    try:
+        body = driver.find_element(By.TAG_NAME, "body")
+        body.click()
+        time.sleep(0.2)
+        # selenium Keys: combine as a chord
+        body.send_keys(Keys.CONTROL + Keys.SHIFT + "o")
         return
-
-    # Open sidebar/hamburger.
-    click_first_visible_css(
-        driver,
-        [
-            "button[aria-label*='menu']",
-            "button[aria-label*='Menu']",
-            "button[aria-label*='sidebar']",
-            "button[aria-label*='navigation']",
-        ],
-        timeout=3,
-    )
-    time.sleep(0.6)
-
-
-def click_sidebar_new_chat(driver: webdriver.Chrome) -> bool:
-    # Click only the New chat entry in the left sidebar region.
-    xpaths = [
-        "//*[self::a or self::button or @role='button'][normalize-space()='New chat']",
-        "//nav//*[self::a or self::button or @role='button'][normalize-space()='New chat']",
-        "//*[contains(@class,'drawer') or contains(@class,'sidebar') or contains(@class,'nav')]//*[self::a or self::button or @role='button'][normalize-space()='New chat']",
-    ]
-    for xp in xpaths:
-        for el in driver.find_elements(By.XPATH, xp):
-            try:
-                if not el.is_displayed() or not el.is_enabled():
-                    continue
-                rect = el.rect or {}
-                if rect.get("x", 9999) > 330:
-                    continue
-                driver.execute_script("arguments[0].scrollIntoView({block:'center'});", el)
-                el.click()
-                return True
-            except Exception:
-                try:
-                    driver.execute_script("arguments[0].click();", el)
-                    return True
-                except Exception:
-                    continue
-
-    script = """
-        const nodes = [...document.querySelectorAll('button,a,div,[role="button"]')];
-        const candidates = nodes.filter(n => {
-          const txt = (n.innerText || '').trim().toLowerCase();
-          if (txt !== 'new chat') return false;
-          const r = n.getBoundingClientRect();
-          const s = getComputedStyle(n);
-          return r.width > 0 && r.height > 0 && s.visibility !== 'hidden' && s.display !== 'none' && r.left < 280;
-        });
-        if (!candidates.length) return false;
-        candidates.sort((a,b) => a.getBoundingClientRect().top - b.getBoundingClientRect().top);
-        candidates[0].click();
-        return true;
-    """
-    try:
-        return bool(driver.execute_script(script))
     except Exception:
-        return False
-
-
-def old_chat_title_visible(driver: webdriver.Chrome) -> bool:
-    script = """
-        const els = [...document.querySelectorAll('main h1, main h2, header h1, header h2, [role="heading"]')];
-        const texts = els
-          .map(e => (e.innerText || '').trim())
-          .filter(Boolean)
-          .filter(t => t.toLowerCase() !== 'gemini')
-          .filter(t => t.toLowerCase() !== 'pro')
-          .filter(t => t.length > 8);
-        return texts.length > 0;
-    """
+        pass
+    # JS fallback — dispatch on document
     try:
-        return bool(driver.execute_script(script))
+        driver.execute_script(
+            "document.dispatchEvent(new KeyboardEvent('keydown', "
+            "{key: 'o', code: 'KeyO', ctrlKey: true, shiftKey: true, bubbles: true, cancelable: true}));"
+        )
     except Exception:
-        return False
-
-
-def ensure_new_chat_strict(driver: webdriver.Chrome) -> None:
-    # Open sidebar, click New chat once, then wait for the UI to settle.
-    dismiss_open_overlays(driver)
-    ensure_sidebar_open(driver)
-    clicked = click_sidebar_new_chat(driver)
-    if not clicked:
-        click_new_chat_if_present(driver)
-
-    # Let Gemini finish the route transition before touching anything else.
-    time.sleep(2.5)
-    dismiss_open_overlays(driver)
-
-    # If we still landed on an old chat route, do one hard reset only.
-    current = ""
-    try:
-        current = (driver.current_url or "").lower()
-    except Exception:
-        current = ""
-
-    if "/app/a/" in current and old_chat_title_visible(driver):
-        driver.get(GEMINI_URL)
-        time.sleep(2.5)
-        dismiss_open_overlays(driver)
-        ensure_sidebar_open(driver)
-        clicked = click_sidebar_new_chat(driver)
-        if not clicked:
-            click_new_chat_if_present(driver)
-        time.sleep(2.5)
-        dismiss_open_overlays(driver)
+        pass
 
 
 def click_text_options(
@@ -1039,14 +867,25 @@ def click_send(driver: webdriver.Chrome, composer) -> None:
         composer.send_keys(Keys.CONTROL, Keys.ENTER)
 
 
+def build_cookie_header(driver: webdriver.Chrome) -> str:
+    try:
+        cookies = driver.get_cookies()
+        return "; ".join(f"{c['name']}={c['value']}" for c in cookies)
+    except Exception:
+        return ""
+
+
 def get_image_sources(driver: webdriver.Chrome) -> List[str]:
+    """Collect all candidate generated-image URLs from the current tab."""
     script = """
         const imgs = Array.from(document.querySelectorAll('main img, img'));
         const out = [];
         for (const img of imgs) {
           const src = img.currentSrc || img.src || '';
           if (!src) continue;
-          if (src.includes('gstatic.com') || src.includes('googlelogo')) continue;
+          // Skip Google UI chrome
+          if (src.includes('gstatic.com') || src.includes('googlelogo') ||
+              src.includes('googleapis.com/download') === false && src.includes('accounts.google')) continue;
           if (src.startsWith('http') || src.startsWith('data:image/') || src.startsWith('blob:')) out.push(src);
         }
         return Array.from(new Set(out));
@@ -1058,12 +897,15 @@ def get_image_sources(driver: webdriver.Chrome) -> List[str]:
 
 
 def wait_for_new_generated_image(driver: webdriver.Chrome, before_sources: List[str], timeout: int) -> str:
+    """Wait until a new image appears in the page that wasn't there before sending."""
     before = set(before_sources)
     start = time.time()
     while time.time() - start < timeout:
+        # Check current tab first
         current = get_image_sources(driver)
         fresh = [src for src in current if src not in before]
         if fresh:
+            print(f"  [wait-img] Found new image src: {fresh[-1][:80]}…")
             return fresh[-1]
         time.sleep(2.0)
     raise TimeoutException("Timed out waiting for generated image")
@@ -1084,157 +926,151 @@ def infer_ext_from_src(src: str, content_type: str = "") -> str:
     return ext if ext else ".png"
 
 
-def build_cookie_header(driver: webdriver.Chrome) -> str:
-    cookies = driver.get_cookies()
-    return "; ".join(f"{c['name']}={c['value']}" for c in cookies)
-
-
 def download_generated_image(driver: webdriver.Chrome, src: str, out_path_no_ext: Path) -> Path:
-    current_url = (driver.current_url or "").lower()
-    if "/app/a/" in current_url:
-        for handle in driver.window_handles:
-            try:
-                driver.switch_to.window(handle)
-                url = (driver.current_url or "").lower()
-                if "gemini" in url and "/app/a/" not in url:
-                    break
-            except Exception:
-                continue
+    """Save the generated image to out_path_no_ext + inferred extension.
 
-    if src.startswith("blob:"):
-        data_url = driver.execute_async_script(
-            "const url = arguments[0];"
-            "const done = arguments[arguments.length - 1];"
-            "fetch(url).then(r => r.blob()).then(blob => {"
-            "  const reader = new FileReader();"
-            "  reader.onloadend = () => done(reader.result);"
-            "  reader.onerror = () => done(null);"
-            "  reader.readAsDataURL(blob);"
-            "}).catch(() => done(null));",
-            src,
-        )
-        if isinstance(data_url, str) and data_url.startswith("data:image/"):
+    Strategy (in order):
+      1. fetch() the src inside the page → FileReader → base64 → write directly to out_dir.
+         Works for blob: and data: URLs.  Fast, no ~/Downloads involved.
+      2. Click the Gemini "Download" button (works for http URLs served by Google).
+         Snapshot ~/Downloads before clicking, wait for a NEW file, copy to out_dir.
+      3. Element screenshot — last resort, lower quality but always works.
+    """
+
+    def _save_data_url(data_url: str) -> "Path | None":
+        if not (isinstance(data_url, str) and data_url.startswith("data:image/")):
+            return None
+        try:
             header, b64data = data_url.split(",", 1)
             ext = infer_ext_from_src(header)
-            out_path = out_path_no_ext.with_suffix(ext)
-            out_path.write_bytes(base64.b64decode(b64data))
-            return out_path
+            out = out_path_no_ext.with_suffix(ext)
+            out.write_bytes(base64.b64decode(b64data))
+            print(f"  [dl] ✓ data-URL  {out.stat().st_size // 1024} KB → {out.name}")
+            return out
+        except Exception as exc:
+            print(f"  [dl] data-URL decode error: {exc}")
+            return None
 
-        original_tab = driver.current_window_handle
-        initial_tabs = len(driver.window_handles)
+    # ── 1. fetch() inside page (blob / data / http) ───────────────────────────
+    print(f"  [dl] Trying fetch() for src type: {src[:10]}…")
+    try:
+        data_url = driver.execute_async_script(
+            """
+            const src  = arguments[0];
+            const done = arguments[arguments.length - 1];
+            fetch(src, {credentials: 'include'})
+                .then(r  => r.blob())
+                .then(b  => { const fr = new FileReader();
+                              fr.onloadend = () => done(fr.result);
+                              fr.onerror   = () => done(null);
+                              fr.readAsDataURL(b); })
+                .catch(()  => done(null));
+            """,
+            src,
+        )
+        result = _save_data_url(data_url)
+        if result:
+            return result
+    except Exception as exc:
+        print(f"  [dl] fetch() threw: {exc}")
 
-        try:
-            large_img = driver.execute_script("""
-                var imgs = document.querySelectorAll('img');
-                for (var img of imgs) {
-                    var r = img.getBoundingClientRect();
-                    if (r.width > 300 && img.src.startsWith('blob:')) {
-                        return img;
+    # ── 2. Gemini Download button → ~/Downloads ───────────────────────────────
+    print("  [dl] Trying Gemini download button…")
+    dl_dir = Path.home() / "Downloads"
+    dl_dir.mkdir(exist_ok=True)
+    existing_files = {p for p in dl_dir.iterdir() if p.is_file()}
+
+    # Click the image to open the full-size viewer / dialog
+    try:
+        img_el = driver.execute_script(
+            """
+            const imgs = Array.from(document.querySelectorAll('img'));
+            // Prefer the image matching our src; fall back to largest visible img
+            return imgs.find(i => (i.currentSrc||i.src) === arguments[0])
+                || imgs.filter(i => i.getBoundingClientRect().width > 150)
+                       .sort((a,b) => b.getBoundingClientRect().width - a.getBoundingClientRect().width)[0]
+                || null;
+            """,
+            src,
+        )
+        if img_el:
+            driver.execute_script("arguments[0].scrollIntoView({block:'center'});", img_el)
+            time.sleep(0.5)
+            img_el.click()
+            time.sleep(2.5)
+    except Exception as exc:
+        print(f"  [dl] img click: {exc}")
+
+    # Find and click the Download button
+    dl_clicked = False
+    try:
+        dl_clicked = driver.execute_script(
+            """
+            const candidates = [
+                document.querySelector('[role="dialog"]'),
+                document.body
+            ];
+            for (const root of candidates) {
+                if (!root) continue;
+                for (const el of root.querySelectorAll('button, a[href]')) {
+                    const t = (el.getAttribute('aria-label')||el.innerText||'').trim().toLowerCase();
+                    if (t === 'download' || t.startsWith('download')) {
+                        el.click(); return true;
                     }
                 }
-                return null;
-            """)
-            if large_img:
-                driver.execute_script("arguments[0].scrollIntoView({block:'center'});", large_img)
-                time.sleep(0.5)
-                driver.execute_script("arguments[0].click();", large_img)
-                time.sleep(2)
+            }
+            return false;
+            """
+        )
+    except Exception as exc:
+        print(f"  [dl] download btn: {exc}")
 
-                current_tabs = len(driver.window_handles)
-                if current_tabs > initial_tabs:
-                    for handle in driver.window_handles:
-                        if handle != original_tab:
-                            try:
-                                driver.switch_to.window(handle)
-                                if "gemini" not in (driver.current_url or "").lower():
-                                    driver.close()
-                            except Exception:
-                                pass
-                    driver.switch_to.window(original_tab)
-                    time.sleep(0.5)
+    if dl_clicked:
+        print("  [dl] Download button clicked, waiting for file…")
+        deadline = time.time() + 45
+        while time.time() < deadline:
+            time.sleep(2.0)
+            current_files = {p for p in dl_dir.iterdir() if p.is_file()}
+            new_files = [
+                p for p in (current_files - existing_files)
+                if p.suffix.lower() not in (".crdownload", ".tmp", ".part")
+            ]
+            if new_files:
+                newest = max(new_files, key=lambda p: p.stat().st_mtime)
+                out = out_path_no_ext.with_suffix(newest.suffix)
+                shutil.copy2(newest, out)
+                print(f"  [dl] ✓ download-btn  {out.stat().st_size // 1024} KB → {out.name}")
+                return out
+        print("  [dl] No new file in ~/Downloads after 45 s.")
+    else:
+        print("  [dl] Download button not found.")
 
-                clicked = driver.execute_script("""
-                    var dialog = document.querySelector('[role=dialog]');
-                    if (!dialog) return false;
-                    var buttons = dialog.querySelectorAll('button');
-                    for (var b of buttons) {
-                        var aria = b.getAttribute('aria-label') || '';
-                        if (aria.includes('Download')) {
-                            b.click();
-                            return true;
-                        }
-                    }
-                    return false;
-                """)
-                if clicked:
-                    time.sleep(2)
-                    current_tabs = len(driver.window_handles)
-                    if current_tabs > initial_tabs:
-                        for handle in driver.window_handles:
-                            if handle != original_tab:
-                                try:
-                                    driver.switch_to.window(handle)
-                                    if "gemini" not in (driver.current_url or "").lower():
-                                        driver.close()
-                                except Exception:
-                                    pass
-                        driver.switch_to.window(original_tab)
-                    time.sleep(3)
-                    # Check Downloads folder for most recent image
-                    dl_dir = Path("/home/mylappy/Downloads")
-                    if dl_dir.exists():
-                        files = sorted(dl_dir.glob("*.png"), key=lambda p: p.stat().st_mtime, reverse=True)
-                        # Also check for jpg/jpeg
-                        if not files:
-                            files = sorted(dl_dir.glob("*.jpg"), key=lambda p: p.stat().st_mtime, reverse=True)
-                        if not files:
-                            files = sorted(dl_dir.glob("*.jpeg"), key=lambda p: p.stat().st_mtime, reverse=True)
-                        if files:
-                            latest = files[0]
-                            out_path = out_path_no_ext.with_suffix(latest.suffix)
-                            shutil.copy(latest, out_path)
-                            if out_path.exists() and out_path.stat().st_size > 100000:  # Full images are ~6MB
-                                return out_path
-        except Exception as e:
-            pass
+    # ── 3. Element screenshot ────────────────────────────────────────────────
+    print("  [dl] Trying element screenshot…")
+    try:
+        img_el = driver.execute_script(
+            """
+            const imgs = Array.from(document.querySelectorAll('img'));
+            return imgs.find(i => (i.currentSrc||i.src) === arguments[0])
+                || imgs.filter(i => i.getBoundingClientRect().width > 150)
+                       .sort((a,b) => b.getBoundingClientRect().width - a.getBoundingClientRect().width)[0]
+                || null;
+            """,
+            src,
+        )
+        if img_el:
+            out = out_path_no_ext.with_suffix(".png")
+            img_el.screenshot(str(out))
+            if out.exists() and out.stat().st_size > 0:
+                print(f"  [dl] ✓ screenshot  {out.stat().st_size // 1024} KB → {out.name}")
+                return out
+    except Exception as exc:
+        print(f"  [dl] screenshot error: {exc}")
 
-        # Last fallback: screenshot the exact rendered image element that uses this blob URL.
-        elems = driver.find_elements(By.CSS_SELECTOR, "img")
-        for el in elems:
-            try:
-                current_src = driver.execute_script("return arguments[0].currentSrc || arguments[0].src || '';", el)
-                if current_src != src:
-                    continue
-                out_path = out_path_no_ext.with_suffix(".png")
-                el.screenshot(str(out_path))
-                if out_path.exists() and out_path.stat().st_size > 0:
-                    return out_path
-            except Exception:
-                continue
-
-        raise RuntimeError("Could not convert blob image to a downloadable data URL or screenshot the blob image element")
-
-    if src.startswith("data:image/"):
-        header, b64data = src.split(",", 1)
-        ext = infer_ext_from_src(header)
-        out_path = out_path_no_ext.with_suffix(ext)
-        out_path.write_bytes(base64.b64decode(b64data))
-        return out_path
-
-    req = urllib.request.Request(
-        src,
-        headers={
-            "User-Agent": "Mozilla/5.0",
-            "Referer": GEMINI_URL,
-            "Cookie": build_cookie_header(driver),
-        },
+    raise RuntimeError(
+        f"All 3 download strategies failed for src={src[:80]!r}. "
+        "The image is visible in the browser — save it manually if needed."
     )
-    with urllib.request.urlopen(req, timeout=180) as resp:
-        data = resp.read()
-        ext = infer_ext_from_src(src, resp.headers.get("Content-Type", ""))
-    out_path = out_path_no_ext.with_suffix(ext)
-    out_path.write_bytes(data)
-    return out_path
 
 
 def run() -> None:
@@ -1293,7 +1129,7 @@ def run() -> None:
                             click_send(driver, composer)
                             time.sleep(5)
                             print("Waiting for image generation...")
-                            time.sleep(100)
+                            time.sleep(360)
 
                             image_src = wait_for_new_generated_image(driver, before_sources, args.timeout)
                             saved_path = download_generated_image(driver, image_src, out_base)
