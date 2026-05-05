@@ -21,7 +21,7 @@ CONTEXT SNAPSHOT (FOR EXTRACTION)
 - Maintenance: maintain caloric balance, balanced diet, daily activity; no automatic bounce back from stopping alone.
 - Trust proof: 70,000+ users served, 200 video testimonials, doctor authority, tracker-led support, 7-day refund policy.
 - Messaging guardrails: no body-shaming, no cure claims, no anti-gym framing, no competitor bashing.
-- ON-IMAGE COPY MANDATE (NON-NEGOTIABLE): every headline and subheadline must explicitly mention weight loss, obesity reduction, or clear weight outcome language. Avoid abstract copy that hides the core product goal.
+- ON-IMAGE COPY MANDATE (NON-NEGOTIABLE): every headline/subheadline pair must make weight loss, obesity reduction, or a clear weight outcome unmistakable. The headline may lead with tension, proof, system identity, deadline, or feeling when the support line anchors the weight-loss context clearly.
 - ON-IMAGE COPY MANDATE (NON-NEGOTIABLE): approved explicit phrases include weight loss support, obesity management support, lose weight, reduce excess weight, 3 to 5 kg in 15 days, appetite control for weight loss.
 - ON-IMAGE COPY MANDATE (NON-NEGOTIABLE): do not use vague transformational lines without naming weight loss or obesity context.
 
@@ -300,12 +300,27 @@ Protected priority order for feature-led copy:
 
 Headline and subheadline rules:
 - Headlines must be oriented around concrete product features or product-mechanic outcomes, not spreadsheet-style placeholder patterns.
-- Headlines must explicitly name weight loss, obesity reduction, excess-weight reduction, appetite control for weight loss, or a 15-day weight outcome.
-- Subheadlines must complement the headline with a second feature lane; they must not restate the same line with tiny wording changes.
+- The headline/support pair must explicitly name weight loss, obesity reduction, excess-weight reduction, appetite control for weight loss, or a 15-day weight outcome. Do not force every standalone headline to carry every keyword when the paired support line makes the intent clear.
+- Subheadlines must complement the headline with a second feature lane such as proof, routine, mechanism, event timing, ease, safety, or guided support; they must not restate the same line with tiny wording changes.
+- Use a deliberate hierarchy: headline = one sharp hook; support line = concrete reason to believe; CTA = next step. Do not randomize multiple claims into one headline.
 - Do not let all ads under the same format repeat the same headline skeleton or the same subheadline skeleton.
 - Rotate feature lanes across ads in the same format so the set does not collapse into one repetitive routine theme.
 - Do not let secondary benefits overshadow the main promise of fast visible weight loss with a safer, easier, more guided experience.
 - Do not make homemade-food compatibility the center of brand positioning even when it is used as a benefit lane.
+
+Concept variation framework:
+- For every persona and ad, choose one audience stage, one lead angle, and one message structure before writing. Use the selection as direction only, not as visible text.
+- The concept path should be selected per persona/ad and may rotate across runs so repeated generation does not collapse into the same execution.
+- Audience stage options: unaware (surface a hidden weight-loss friction), problem-aware (name the known problem and point toward a clearer fix), solution-aware (show why this system is easier, safer, or more guided than known fixes), product-aware (give a push through proof, urgency, trust, or simplicity).
+- Lead angle options: pain point, desired outcome, social proof, authority, story, curiosity, comparison, offer.
+- Structure options: PAS (problem, agitate, solve), BAB (before, after/progress, bridge), FAB (feature, advantage, benefit), 4 U's (useful, urgent when honest, unique, ultra-specific).
+- The selected concept path should control the hierarchy and rhythm, but the actual headline and support line must be written fresh from the product facts, persona pain, feature lane, and proof points.
+- Do not copy prompt wording or previous ad wording into the final headline. The AI was already choosing the right direction; this framework exists to improve execution without hardcoding example lines.
+
+Style guardrails:
+- Write human-edited lines, not AI slogans. Avoid unlock, transform your journey, revolutionary, holistic wellness, game-changing, effortlessly, tailored solution, and vague transformation copy.
+- Prefer short spoken phrasing with natural line breaks over keyword-stuffed copy.
+- If a line sounds like a spreadsheet label, rewrite it as a real ad headline.
 
 Format-level execution:
 - HERO: one primary feature in the headline, one secondary feature in the support line.

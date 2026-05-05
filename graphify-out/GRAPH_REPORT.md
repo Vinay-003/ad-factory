@@ -1,11 +1,11 @@
 # Graph Report - info  (2026-05-05)
 
 ## Corpus Check
-- 18 files · ~21,546,175 words
+- 18 files · ~21,705,077 words
 - Verdict: corpus is large enough that graph structure adds value.
 
 ## Summary
-- 339 nodes · 658 edges · 43 communities detected
+- 338 nodes · 651 edges · 43 communities detected
 - Extraction: 96% EXTRACTED · 4% INFERRED · 0% AMBIGUOUS · INFERRED: 27 edges (avg confidence: 0.8)
 - Token cost: 0 input · 0 output
 
@@ -55,7 +55,7 @@
 - [[_COMMUNITY_Community 48|Community 48]]
 
 ## God Nodes (most connected - your core abstractions)
-1. `run()` - 32 edges
+1. `run()` - 26 edges
 2. `api_run_execute()` - 25 edges
 3. `main()` - 23 edges
 4. `write_text()` - 22 edges
@@ -82,11 +82,11 @@
 
 ### Community 0 - "Community 0"
 Cohesion: 0.06
-Nodes (68): api_defaults(), api_file_content(), api_opencode_catalog(), api_run(), api_run_execute(), api_runs(), assembler_language_mode(), build_copy_requirements() (+60 more)
+Nodes (70): api_defaults(), api_file_content(), api_opencode_catalog(), api_run(), api_run_execute(), api_runs(), assembler_language_mode(), build_copy_requirements() (+62 more)
 
 ### Community 1 - "Community 1"
 Cohesion: 0.1
-Nodes (41): auto_launch_debug_browser(), build_driver(), build_local_image_paths(), click_first_visible_css(), click_send(), click_text_options(), close_active_tab(), collect_upload_images_from_dir() (+33 more)
+Nodes (38): auto_launch_debug_browser(), build_driver(), build_local_image_paths(), click_first_visible_css(), click_send(), click_text_options(), collect_upload_images_from_dir(), debugger_endpoint_reachable() (+30 more)
 
 ### Community 2 - "Community 2"
 Cohesion: 0.11
@@ -253,7 +253,7 @@ Cohesion: 1.0
 Nodes (1): # IMPORTANT: capture baseline after uploads and prompt insertion.
 
 ## Knowledge Gaps
-- **32 isolated node(s):** `Extract Basic snapshot bullet lines from existing persona file.      Keeps exist`, `Open a brand-new tab, navigate to Gemini, return the new handle.`, `Navigate to a clean new-chat state.     Strategy: just GET the base Gemini URL —`, `Click the 'New chat' sidebar button once. No retry loops.`, `Click the model picker and select Pro. Returns True if Pro is confirmed visible.` (+27 more)
+- **38 isolated node(s):** `Extract Basic snapshot bullet lines from existing persona file.      Keeps exist`, `Return True if the URL is a blank new-chat (no conversation ID).      Fresh chat`, `Guarantee we are on a brand-new Gemini chat before proceeding.      Steps     --`, `Send Ctrl+Shift+O to the page, with a JS fallback.`, `Collect all candidate generated-image URLs from the current tab.` (+33 more)
   These have ≤1 connection - possible missing edges or undocumented components.
 - **Thin community `Community 18`** (1 nodes): `Open a brand-new tab, navigate to Gemini, return the new handle.`
   Too small to be a meaningful cluster - may be noise or needs more connections extracted.
@@ -322,16 +322,16 @@ Nodes (1): # IMPORTANT: capture baseline after uploads and prompt insertion.
 _Questions this graph is uniquely positioned to answer:_
 
 - **Why does `write_text()` connect `Community 4` to `Community 0`, `Community 1`, `Community 2`, `Community 3`, `Community 7`, `Community 8`, `Community 9`, `Community 11`?**
-  _High betweenness centrality (0.427) - this node is a cross-community bridge._
+  _High betweenness centrality (0.428) - this node is a cross-community bridge._
 - **Why does `run()` connect `Community 1` to `Community 0`, `Community 2`, `Community 4`, `Community 7`?**
-  _High betweenness centrality (0.190) - this node is a cross-community bridge._
+  _High betweenness centrality (0.180) - this node is a cross-community bridge._
 - **Why does `main()` connect `Community 7` to `Community 4`?**
-  _High betweenness centrality (0.138) - this node is a cross-community bridge._
+  _High betweenness centrality (0.139) - this node is a cross-community bridge._
 - **Are the 6 inferred relationships involving `run()` (e.g. with `run_cmd()` and `run_opencode_discovery_cmd()`) actually correct?**
   _`run()` has 6 INFERRED edges - model-reasoned connections that need verification._
 - **Are the 20 inferred relationships involving `write_text()` (e.g. with `run_gemini_generation()` and `call_opencode_repair_copy()`) actually correct?**
   _`write_text()` has 20 INFERRED edges - model-reasoned connections that need verification._
-- **What connects `Extract Basic snapshot bullet lines from existing persona file.      Keeps exist`, `Open a brand-new tab, navigate to Gemini, return the new handle.`, `Navigate to a clean new-chat state.     Strategy: just GET the base Gemini URL —` to the rest of the system?**
-  _32 weakly-connected nodes found - possible documentation gaps or missing edges._
+- **What connects `Extract Basic snapshot bullet lines from existing persona file.      Keeps exist`, `Return True if the URL is a blank new-chat (no conversation ID).      Fresh chat`, `Guarantee we are on a brand-new Gemini chat before proceeding.      Steps     --` to the rest of the system?**
+  _38 weakly-connected nodes found - possible documentation gaps or missing edges._
 - **Should `Community 0` be split into smaller, more focused modules?**
   _Cohesion score 0.06 - nodes in this community are weakly interconnected._
