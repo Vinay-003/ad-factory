@@ -3,7 +3,7 @@
     "phase": "production",
     "write_enabled": true,
     "note": "Production mode active. Read before generation and append one entry after every generation.",
-    "last_updated": "2026-04-23T20:07:20Z"
+    "last_updated": "2026-05-04T12:34:35Z"
   },
   "rules": {
     "dedupe_scope": [
@@ -2500,6 +2500,118 @@
       "language": "BOTH",
       "output_quality": "pending",
       "notes": "assembled_from=copy_persona_16_26_ugc_xlsx_en.json; batch=v11; aspect_ratio=4:5; seed=936247981; visual_archetype=ugc_selfie_hold"
+    },
+    {
+      "id": "entry_079",
+      "timestamp": "2026-05-04T11:21:30Z",
+      "format": "HERO",
+      "persona_number": 1,
+      "persona_name": "Craving-Control Struggler",
+      "headline_angle": "Feature-led AM routine with 15-day weight-loss outcome framing",
+      "visual_archetype": "hero_center_stage",
+      "headline_en": "15-Day Weight Loss Kickstart: OK Liquid AM Routine",
+      "headline_hi": "15 दिनों में वज़न घटाने की शुरुआत: OK Liquid AM रूटीन",
+      "support_line_en": "Empty-stomach start + 4-hour no-solid window to help cravings stay lower and snacking feel easier to skip.",
+      "support_line_hi": "खाली पेट शुरुआत + 4 घंटे बिना ठोस भोजन की विंडो, ताकि cravings कम लगें और snacking छोड़ना आसान हो।",
+      "cta_en": "Start 15-Day Routine",
+      "cta_hi": "15-दिन का रूटीन शुरू करें",
+      "disclaimer_en": "",
+      "disclaimer_hi": "",
+      "caption_en": "",
+      "caption_hi": "",
+      "bullets_en": [],
+      "bullets_hi": [],
+      "background_slot": "BG-067",
+      "background_name": "Soft taupe wall",
+      "background_source": "catalog",
+      "fresh_background_signature": null,
+      "language": "BOTH",
+      "output_quality": "pending",
+      "notes": "assembled_from=copy_batch.json; batch=v12; aspect_ratio=4:5; seed=1860195375; visual_archetype=hero_center_stage"
+    },
+    {
+      "id": "entry_080",
+      "timestamp": "2026-05-04T11:21:30Z",
+      "format": "HERO",
+      "persona_number": 2,
+      "persona_name": "Busy Professional",
+      "headline_angle": "Time-bound outcome for busy schedules (15-day weight loss) + consistency help",
+      "visual_archetype": "hero_soft_lifestyle_frame",
+      "headline_en": "15-Day Weight-Loss Progress for Packed Workdays",
+      "headline_hi": "व्यस्त दिनों में 15 दिनों में वज़न घटाने की प्रगति",
+      "support_line_en": "Guided support keeps it low-effort and consistent, so cravings feel quieter without complex routines.",
+      "support_line_hi": "Guided support इसे आसान और लगातार बनाए रखता है, ताकि cravings कम महसूस हों बिना मुश्किल रूटीन के।",
+      "cta_en": "Start the 15-Day Plan",
+      "cta_hi": "15-दिन की योजना शुरू करें",
+      "disclaimer_en": "",
+      "disclaimer_hi": "",
+      "caption_en": "",
+      "caption_hi": "",
+      "bullets_en": [],
+      "bullets_hi": [],
+      "background_slot": "BG-464",
+      "background_name": "Minimalist dark floor",
+      "background_source": "catalog",
+      "fresh_background_signature": null,
+      "language": "BOTH",
+      "output_quality": "pending",
+      "notes": "assembled_from=copy_batch.json; batch=v12; aspect_ratio=4:5; seed=1860195375; visual_archetype=hero_soft_lifestyle_frame"
+    },
+    {
+      "id": "entry_081",
+      "timestamp": "2026-05-04T12:34:35Z",
+      "format": "UGC",
+      "persona_number": 1,
+      "persona_name": "Craving-Control Struggler",
+      "headline_angle": "Practical morning anchor that cuts cravings to support weight loss",
+      "visual_archetype": "ugc_unboxing_reaction",
+      "headline_en": "My cravings eased, weight loss began",
+      "headline_hi": "मेरी क्रेविंग घटी, वजन कम हुआ",
+      "support_line_en": "AM routine kept me snack-proof daily",
+      "support_line_hi": "AM रूटीन से स्नैकिंग रोज़ घट गई",
+      "cta_en": "Try it today",
+      "cta_hi": "आज ही आज़माएँ",
+      "disclaimer_en": "",
+      "disclaimer_hi": "",
+      "caption_en": "",
+      "caption_hi": "",
+      "bullets_en": [],
+      "bullets_hi": [],
+      "background_slot": "BG-257",
+      "background_name": "Night walk table entry",
+      "background_source": "catalog",
+      "fresh_background_signature": null,
+      "language": "BOTH",
+      "output_quality": "pending",
+      "notes": "assembled_from=copy_batch.json; batch=v13; aspect_ratio=4:5; seed=67139294; visual_archetype=ugc_unboxing_reaction"
+    },
+    {
+      "id": "entry_082",
+      "timestamp": "2026-05-04T12:34:35Z",
+      "format": "UGC",
+      "persona_number": 2,
+      "persona_name": "Busy Professional",
+      "headline_angle": "Deadline-proof 15-day weight loss with a simple AM start + guided check-ins",
+      "visual_archetype": "ugc_desk_review",
+      "headline_en": "15-day weight loss on deadlines",
+      "headline_hi": "डेडलाइन में भी 15-दिन वज़न घटाएं",
+      "support_line_en": "AM OK Liquid: empty stomach, 4h no solids",
+      "support_line_hi": "AM OK Liquid: खाली पेट, 4 घंटे सॉलिड नहीं",
+      "cta_en": "Try the routine",
+      "cta_hi": "रूटीन ट्राय करें",
+      "disclaimer_en": "",
+      "disclaimer_hi": "",
+      "caption_en": "",
+      "caption_hi": "",
+      "bullets_en": [],
+      "bullets_hi": [],
+      "background_slot": "BG-072",
+      "background_name": "Balcony dusk",
+      "background_source": "catalog",
+      "fresh_background_signature": null,
+      "language": "BOTH",
+      "output_quality": "pending",
+      "notes": "assembled_from=copy_batch.json; batch=v13; aspect_ratio=4:5; seed=67139294; visual_archetype=ugc_desk_review"
     }
   ],
   "indexes": {
@@ -2532,11 +2644,11 @@
           "BG-180",
           "BG-153",
           "BG-462",
-          "BG-348"
+          "BG-348",
+          "BG-067",
+          "BG-464"
         ],
         "remaining": [
-          "BG-067",
-          "BG-464",
           "BG-470",
           "BG-301",
           "BG-269",
@@ -2946,11 +3058,11 @@
           "BG-396",
           "BG-132",
           "BG-013",
-          "BG-420"
+          "BG-420",
+          "BG-257",
+          "BG-072"
         ],
         "remaining": [
-          "BG-257",
-          "BG-072",
           "BG-144",
           "BG-019",
           "BG-318",
@@ -3273,6 +3385,18 @@
           "timestamp": "2026-04-23T19:52:28Z",
           "background_slot": "BG-348",
           "background_source": "catalog"
+        },
+        {
+          "entry_id": "entry_079",
+          "timestamp": "2026-05-04T11:21:30Z",
+          "background_slot": "BG-067",
+          "background_source": "catalog"
+        },
+        {
+          "entry_id": "entry_080",
+          "timestamp": "2026-05-04T11:21:30Z",
+          "background_slot": "BG-464",
+          "background_source": "catalog"
         }
       ],
       "FEAT": [
@@ -3589,6 +3713,18 @@
           "timestamp": "2026-04-23T20:07:20Z",
           "background_slot": "BG-420",
           "background_source": "catalog"
+        },
+        {
+          "entry_id": "entry_081",
+          "timestamp": "2026-05-04T12:34:35Z",
+          "background_slot": "BG-257",
+          "background_source": "catalog"
+        },
+        {
+          "entry_id": "entry_082",
+          "timestamp": "2026-05-04T12:34:35Z",
+          "background_slot": "BG-072",
+          "background_source": "catalog"
         }
       ]
     },
@@ -3671,7 +3807,11 @@
         "I eased back into my routine gently.",
         "I wanted something manageable at this stage.",
         "I wanted something natural that still worked.",
-        "I did not want to lose and gain it back."
+        "I did not want to lose and gain it back.",
+        "15-Day Weight Loss Kickstart: OK Liquid AM Routine",
+        "15-Day Weight-Loss Progress for Packed Workdays",
+        "My cravings eased, weight loss began",
+        "15-day weight loss on deadlines"
       ],
       "cta_en": [
         "See The Steps",
@@ -3751,7 +3891,11 @@
         "See How It Works",
         "See How It Works",
         "See How It Works",
-        "See How It Works"
+        "See How It Works",
+        "Start 15-Day Routine",
+        "Start the 15-Day Plan",
+        "Try it today",
+        "Try the routine"
       ],
       "support_line_en": [
         "Doctor-formulated Ayurvedic weight-loss system designed to help you lose 3 to 5 kg with 1 Kit without feeling hungry, weak, or out of control.",
@@ -3805,7 +3949,11 @@
         "I needed something simple enough to fit my changed day.",
         "This felt easier to stay with than the usual advice.",
         "I liked that it felt Ayurvedic and structured.",
-        "I wanted something easier to maintain, not just quick for a few days."
+        "I wanted something easier to maintain, not just quick for a few days.",
+        "Empty-stomach start + 4-hour no-solid window to help cravings stay lower and snacking feel easier to skip.",
+        "Guided support keeps it low-effort and consistent, so cravings feel quieter without complex routines.",
+        "AM routine kept me snack-proof daily",
+        "AM OK Liquid: empty stomach, 4h no solids"
       ],
       "bullets_en": [
         "OK Liquid helps you feel full, so random eating comes down.",

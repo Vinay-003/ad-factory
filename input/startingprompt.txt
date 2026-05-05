@@ -73,6 +73,8 @@ OBESITY KILLER KIT — COMPLETE AD GENERATION PROMPT
 
      bottles are notably smaller. The sachet is tall and narrow.      
 
+      Product count failure rule: every accepted output must contain exactly these five distinct products: Kit Box, Dried Amla bottle, OK Tablets bottle, OKP bottle, and OK Liquid sachet. Never duplicate OKP. Never omit Dried Amla. If two OKP bottles appear, if Dried Amla is missing, or if there are only four distinct products, reject and regenerate immediately.
+
       A4. COLOR PALETTE — STRICT, NO EXCEPTIONS      
 
       Background: #FFFBED to #FEEFD6 to #FCDBAC — smooth top-to-bottom gradient only      
@@ -102,6 +104,10 @@ OBESITY KILLER KIT — COMPLETE AD GENERATION PROMPT
       Add only a subtle shadow if needed for contrast; no glow, no badge, no frame.      
 
       Keep spacing around the logo clean so it reads premium and intentional.      
+
+      Logo transparency rule: preserve the uploaded standalone logo PNG transparency exactly. Do not add any black, white, colored, boxed, badge, circular, rectangular, or solid background behind the logo. If the logo appears with a black background or any visible backing plate, reject and regenerate immediately.
+
+      Logo placement failure rule: if the logo is anywhere except the top-right corner with the safe margins above, reject and regenerate immediately. Never place the logo centered, bottom, left, or near the product cluster.
 
       A7. LIGHTING      
 
@@ -178,5 +184,7 @@ OBESITY KILLER KIT — COMPLETE AD GENERATION PROMPT
       Output feels like a high-end D2C health brand — scroll-stopping but not loud      
 
       If any single item above fails — regenerate immediately without compromise.      
+
+      Do not explain that you are accepting a flawed image. If any product count, product identity, requested background, logo placement, or logo transparency rule fails, silently regenerate the image until the output passes. Only final image output is acceptable.
 
      Use the uploaded Obesity Killer product packshot images as absolute visual truth.      

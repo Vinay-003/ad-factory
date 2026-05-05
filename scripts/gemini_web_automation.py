@@ -371,10 +371,20 @@ def focus_or_open_gemini_tab(driver: webdriver.Chrome) -> None:
         open_gemini_with_retry(driver)
 
 
-def open_fresh_gemini_tab(driver: webdriver.Chrome) -> None:
-    driver.switch_to.new_window("tab")
+def open_gemini_new_chat(driver: webdriver.Chrome) -> None:
+    driver.execute_script("window.open('');")
+    time.sleep(1.0)
+    handles = driver.window_handles
+    driver.switch_to.window(handles[-1])
     driver.get(GEMINI_URL)
     time.sleep(2.0)
+    dismiss_open_overlays(driver)
+    body = driver.find_element(By.TAG_NAME, "body")
+    body.send_keys(Keys.CONTROL, Keys.SHIFT, "o")
+    time.sleep(5)
+    body.send_keys(Keys.CONTROL, Keys.SHIFT, "o")
+    time.sleep(2.0)
+    dismiss_open_overlays(driver)
 
 
 def close_active_tab(driver: webdriver.Chrome) -> None:
@@ -1080,6 +1090,17 @@ def build_cookie_header(driver: webdriver.Chrome) -> str:
 
 
 def download_generated_image(driver: webdriver.Chrome, src: str, out_path_no_ext: Path) -> Path:
+    current_url = (driver.current_url or "").lower()
+    if "/app/a/" in current_url:
+        for handle in driver.window_handles:
+            try:
+                driver.switch_to.window(handle)
+                url = (driver.current_url or "").lower()
+                if "gemini" in url and "/app/a/" not in url:
+                    break
+            except Exception:
+                continue
+
     if src.startswith("blob:"):
         data_url = driver.execute_async_script(
             "const url = arguments[0];"
@@ -1099,9 +1120,10 @@ def download_generated_image(driver: webdriver.Chrome, src: str, out_path_no_ext
             out_path.write_bytes(base64.b64decode(b64data))
             return out_path
 
-        # Fallback: click image to open modal, then click download button in modal
+        original_tab = driver.current_window_handle
+        initial_tabs = len(driver.window_handles)
+
         try:
-            # Find large image element (>300px) which is the generated image
             large_img = driver.execute_script("""
                 var imgs = document.querySelectorAll('img');
                 for (var img of imgs) {
@@ -1113,13 +1135,24 @@ def download_generated_image(driver: webdriver.Chrome, src: str, out_path_no_ext
                 return null;
             """)
             if large_img:
-                # Scroll to it and click to open full view modal
                 driver.execute_script("arguments[0].scrollIntoView({block:'center'});", large_img)
                 time.sleep(0.5)
                 driver.execute_script("arguments[0].click();", large_img)
                 time.sleep(2)
 
-                # Click download button in modal
+                current_tabs = len(driver.window_handles)
+                if current_tabs > initial_tabs:
+                    for handle in driver.window_handles:
+                        if handle != original_tab:
+                            try:
+                                driver.switch_to.window(handle)
+                                if "gemini" not in (driver.current_url or "").lower():
+                                    driver.close()
+                            except Exception:
+                                pass
+                    driver.switch_to.window(original_tab)
+                    time.sleep(0.5)
+
                 clicked = driver.execute_script("""
                     var dialog = document.querySelector('[role=dialog]');
                     if (!dialog) return false;
@@ -1134,7 +1167,19 @@ def download_generated_image(driver: webdriver.Chrome, src: str, out_path_no_ext
                     return false;
                 """)
                 if clicked:
-                    time.sleep(3)  # Wait for download to complete
+                    time.sleep(2)
+                    current_tabs = len(driver.window_handles)
+                    if current_tabs > initial_tabs:
+                        for handle in driver.window_handles:
+                            if handle != original_tab:
+                                try:
+                                    driver.switch_to.window(handle)
+                                    if "gemini" not in (driver.current_url or "").lower():
+                                        driver.close()
+                                except Exception:
+                                    pass
+                        driver.switch_to.window(original_tab)
+                    time.sleep(3)
                     # Check Downloads folder for most recent image
                     dl_dir = Path("/home/mylappy/Downloads")
                     if dl_dir.exists():
@@ -1220,14 +1265,6 @@ def run() -> None:
 
         driver = build_driver(args)
         try:
-            focus_or_open_gemini_tab(driver)
-            open_gemini_with_retry(driver)
-            wait_for_manual_login(
-                driver,
-                timeout=args.manual_login_timeout,
-                strict=(args.login_wait_mode == "strict"),
-            )
-
             for idx, job in enumerate(jobs, start=1):
                 print(f"\n[{idx}/{len(jobs)}] Processing {job.prompt_path.name}")
                 prompt_text = job.prompt_path.read_text(encoding="utf-8")
@@ -1238,15 +1275,11 @@ def run() -> None:
                     last_exc: Exception | None = None
                     for attempt in range(1, 3):
                         try:
-                            open_fresh_gemini_tab(driver)
-                            wait_for_manual_login(
-                                driver,
-                                timeout=args.manual_login_timeout,
-                                strict=(args.login_wait_mode == "strict"),
-                            )
+                            open_gemini_new_chat(driver)
                             before_sources = get_image_sources(driver)
 
                             upload_images(driver, upload_paths)
+                            time.sleep(10)
                             dismiss_open_overlays(driver)
                             composer = find_composer(driver)
                             set_prompt_text(driver, composer, prompt_text)
@@ -1258,9 +1291,14 @@ def run() -> None:
                                 raise TimeoutException("Could not confirm Pro model selection in Gemini UI")
 
                             click_send(driver, composer)
+                            time.sleep(5)
+                            print("Waiting for image generation...")
+                            time.sleep(100)
 
                             image_src = wait_for_new_generated_image(driver, before_sources, args.timeout)
                             saved_path = download_generated_image(driver, image_src, out_base)
+                            print("Waiting after download...")
+                            time.sleep(30)
 
                             metadata = {
                                 "status": "success",
@@ -1281,11 +1319,6 @@ def run() -> None:
                                 break
                             auto_launch_debug_browser(args)
                             driver = build_driver(args)
-                            wait_for_manual_login(
-                                driver,
-                                timeout=args.manual_login_timeout,
-                                strict=(args.login_wait_mode == "strict"),
-                            )
                         except Exception as exc:
                             last_exc = exc
                             break

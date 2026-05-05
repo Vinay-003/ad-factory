@@ -1,0 +1,8 @@
+{
+  "status": "error",
+  "prompt_file": "/home/mylappy/myspace/info/runtime/gemini_selected_prompts/v13_4_5_1777962284_a2654c60/OUTPUT_UGC_P01_EN.txt",
+  "persona_id": "P01",
+  "error": "Message: invalid session id\nStacktrace:\n#0 0x57486d6ca79a <unknown>\n#1 0x57486d0c6020 <unknown>\n#2 0x57486d10b7b0 <unknown>\n#3 0x57486d13f406 <unknown>\n#4 0x57486d139a38 <unknown>\n#5 0x57486d138e4c <unknown>\n#6 0x57486d08c5f5 <unknown>\n#7 0x57486d68e06b <unknown>\n#8 0x57486d69101d <unknown>\n#9 0x57486d67a718 <unknown>\n#10 0x57486d691bb0 <unknown>\n#11 0x57486d661150 <unknown>\n#12 0x57486d089e94 <unknown>\n#13 0x7a80bc62a1ca <unknown>\n#14 0x7a80bc62a28b __libc_start_main\n#15 0x57486d0491ea _start\n",
+  "current_url": null,
+  "timestamp": 1777962658
+}

@@ -7,12 +7,14 @@ import os
 import random
 import re
 import subprocess
+import sys
 import tempfile
 import time
 import urllib.request
 import hashlib
 import mimetypes
 import uuid
+import urllib.request
 from datetime import datetime, timezone
 from pathlib import Path
 from typing import Any
@@ -34,7 +36,11 @@ DEFAULT_PRODUCT_INFO = MASTER_PRODUCT_INFO if MASTER_PRODUCT_INFO.exists() else 
 DEFAULT_MECHANISM = ROOT / "PRODUCT_MECHANISM_V1.txt"
 DEFAULT_FAQ = ROOT / "faq.txt"
 DEFAULT_PLAYBOOK = ROOT / "AD_CREATIVE_SYSTEM_PLAYBOOK.md"
-DEFAULT_ACTIVE_IMAGES = ROOT / "input" / "activeimages.txt"
+DEFAULT_IMAGE_SOURCES_FILE = ROOT / "input" / "image_sources.txt"
+LEGACY_ACTIVE_IMAGES_FILE = ROOT / "input" / "activeimages.txt"
+INPUT_IMAGES_DIR = ROOT / "input" / "images"
+GENERATED_IMAGES_ROOT = ROOT / "generated_images"
+LEGACY_GENERATED_IMAGE_ROOT = ROOT / "generated_image"
 
 
 FORMATS = ["HERO", "BA", "TEST", "FEAT", "UGC"]
@@ -68,6 +74,7 @@ def make_run_id() -> str:
 def ensure_dirs() -> None:
     RUNS_ROOT.mkdir(parents=True, exist_ok=True)
     RUNTIME_ROOT.mkdir(parents=True, exist_ok=True)
+    INPUT_IMAGES_DIR.mkdir(parents=True, exist_ok=True)
 
 
 def load_env_file(path: Path) -> None:
@@ -427,8 +434,162 @@ def read_active_images(path: Path) -> list[str]:
     return [line for line in lines if line and not line.startswith("#")]
 
 
+def default_image_sources_file() -> Path:
+    if DEFAULT_IMAGE_SOURCES_FILE.exists():
+        return DEFAULT_IMAGE_SOURCES_FILE
+    return LEGACY_ACTIVE_IMAGES_FILE
+
+
+def list_input_images() -> list[str]:
+    if not INPUT_IMAGES_DIR.exists():
+        return []
+    allowed = {".png", ".jpg", ".jpeg", ".webp", ".bmp", ".gif"}
+    items = [
+        p for p in sorted(INPUT_IMAGES_DIR.iterdir())
+        if p.is_file() and p.suffix.lower() in allowed
+    ]
+    return [str(p.relative_to(ROOT)).replace("\\", "/") for p in items]
+
+
+def store_uploaded_input_images(files: list[UploadFile], clear_existing: bool) -> list[str]:
+    ensure_dirs()
+    if clear_existing and INPUT_IMAGES_DIR.exists():
+        for existing in INPUT_IMAGES_DIR.iterdir():
+            if existing.is_file():
+                existing.unlink(missing_ok=True)
+
+    allowed = {".png", ".jpg", ".jpeg", ".webp", ".bmp", ".gif"}
+    saved: list[str] = []
+    for upload in files:
+        filename = Path(upload.filename or "").name
+        if not filename:
+            continue
+        ext = Path(filename).suffix.lower()
+        if ext not in allowed:
+            continue
+        target = INPUT_IMAGES_DIR / filename
+        counter = 1
+        while target.exists():
+            target = INPUT_IMAGES_DIR / f"{Path(filename).stem}_{counter}{ext}"
+            counter += 1
+        data = upload.file.read()
+        target.write_bytes(data)
+        saved.append(str(target.relative_to(ROOT)).replace("\\", "/"))
+    return saved
+
+
 def run_cmd(cmd: list[str], cwd: Path) -> subprocess.CompletedProcess[str]:
     return subprocess.run(cmd, cwd=str(cwd), text=True, capture_output=True, check=False)
+
+
+def generated_image_roots() -> list[Path]:
+    return [GENERATED_IMAGES_ROOT, LEGACY_GENERATED_IMAGE_ROOT]
+
+
+def image_static_route_for_path(path: str) -> str:
+    normalized = path.replace("\\", "/")
+    if normalized.startswith("generated_images/"):
+        return f"/generated_images/{normalized.removeprefix('generated_images/')}"
+    if normalized.startswith("generated_image/"):
+        return f"/generated_image/{normalized.removeprefix('generated_image/')}"
+    return f"/generated_images/{normalized}"
+
+
+def gemini_debugger_args() -> list[str]:
+    address = resolve_gemini_debugger_address()
+    return ["--attach-debugger-address", address]
+
+
+def debugger_endpoint_reachable(address: str) -> bool:
+    if not address:
+        return False
+    url = f"http://{address}/json/version"
+    try:
+        with urllib.request.urlopen(url, timeout=1.5) as resp:
+            return resp.status == 200
+    except Exception:
+        return False
+
+
+def resolve_gemini_debugger_address() -> str:
+    configured = str(os.getenv("GEMINI_DEBUGGER_ADDRESS") or "").strip()
+    candidates = [configured] if configured else []
+    candidates.extend(["127.0.0.1:9222", "localhost:9222", "127.0.0.1:9223", "localhost:9223"])
+    for candidate in candidates:
+        if candidate and debugger_endpoint_reachable(candidate):
+            return candidate
+    # No reachable endpoint now: return preferred default so automation script
+    # can auto-launch a debuggable Chrome session and continue.
+    return configured or "127.0.0.1:9222"
+
+
+def run_gemini_generation(
+    *,
+    batch: str,
+    prompt_files: list[str],
+    aspect_ratio: str,
+    image_sources_file: str | None,
+    prompt_reference_map: Path | None = None,
+) -> subprocess.CompletedProcess[str]:
+    debugger_args = gemini_debugger_args()
+    aspect_folder = "9_16" if aspect_ratio == "9:16" else "4_5"
+    prompt_work_dir = RUNTIME_ROOT / "gemini_selected_prompts" / f"{batch}_{aspect_folder}_{int(time.time())}_{uuid.uuid4().hex[:8]}"
+    prompt_work_dir.mkdir(parents=True, exist_ok=True)
+
+    starting_prompt_path = ROOT / "input" / "startingprompt.txt"
+    starting_prompt = starting_prompt_path.read_text(encoding="utf-8").strip() if starting_prompt_path.exists() else ""
+    for prompt_file in prompt_files:
+        source = Path(prompt_file)
+        if not source.is_absolute():
+            source = ROOT / source
+        source = source.resolve()
+        if not source.exists():
+            raise RuntimeError(f"Prompt file not found: {source}")
+        prompt_text = source.read_text(encoding="utf-8")
+        combined = f"{starting_prompt}\n\n{prompt_text.strip()}\n" if starting_prompt else prompt_text
+        (prompt_work_dir / source.name).write_text(combined, encoding="utf-8")
+
+    out_dir = LEGACY_GENERATED_IMAGE_ROOT / batch / f"GEMINI_{aspect_folder}"
+    image_source_arg = image_sources_file
+    if prompt_reference_map is not None:
+        try:
+            reference_payload = json.loads(prompt_reference_map.read_text(encoding="utf-8"))
+        except Exception as exc:
+            raise RuntimeError(f"Could not read prompt reference map: {exc}") from exc
+        flattened_sources: list[str] = []
+        if isinstance(reference_payload, dict):
+            for value in reference_payload.values():
+                if isinstance(value, list):
+                    for item in value:
+                        if isinstance(item, str) and item.strip() and item.strip() not in flattened_sources:
+                            flattened_sources.append(item.strip())
+        if flattened_sources:
+            source_file = prompt_work_dir / "image_sources.txt"
+            source_file.write_text("\n".join(flattened_sources) + "\n", encoding="utf-8")
+            image_source_arg = str(source_file)
+
+    cmd = [
+        sys.executable,
+        "scripts/gemini_web_automation.py",
+        "--prompt-dir",
+        str(prompt_work_dir),
+        "--prompt-glob",
+        "*.txt",
+        "--out-dir",
+        str(out_dir),
+        "--timeout",
+        str(int(os.getenv("GEMINI_GENERATION_TIMEOUT_SECONDS") or "420")),
+        "--manual-login-timeout",
+        str(int(os.getenv("GEMINI_MANUAL_LOGIN_TIMEOUT_SECONDS") or "180")),
+        "--browser",
+        "chrome",
+        "--upload-dir",
+        str(INPUT_IMAGES_DIR),
+        *debugger_args,
+    ]
+    if image_source_arg:
+        cmd.extend(["--image-source-file", image_source_arg])
+    return run_cmd(cmd, cwd=ROOT)
 
 
 def build_multipart_form(fields: dict[str, str], file_field: str, file_path: Path) -> tuple[bytes, str]:
@@ -488,45 +649,46 @@ def upload_image_to_cloudinary(image_path: Path, cloud_name: str, api_key: str, 
 
 
 def load_batch_image_summary(batch: str) -> list[dict[str, Any]]:
-    summary_path = ROOT / "generated_image" / batch / "batch_run_summary.json"
+    summary_path = LEGACY_GENERATED_IMAGE_ROOT / batch / "batch_run_summary.json"
     if not summary_path.exists():
         jobs_by_prompt: dict[str, dict[str, Any]] = {}
-        generated_batch_dir = ROOT / "generated_image" / batch
-        if not generated_batch_dir.exists():
-            return []
-        for meta_file in sorted(generated_batch_dir.glob("**/*.json")):
-            try:
-                payload = json.loads(meta_file.read_text(encoding="utf-8"))
-            except Exception:
+        for generated_root in generated_image_roots():
+            generated_batch_dir = generated_root / batch
+            if not generated_batch_dir.exists():
                 continue
-            if not isinstance(payload, dict):
-                continue
-            if str(payload.get("record_type") or "").strip() != "generated_image":
-                continue
+            for meta_file in sorted(generated_batch_dir.glob("**/*.json")):
+                try:
+                    payload = json.loads(meta_file.read_text(encoding="utf-8"))
+                except Exception:
+                    continue
+                if not isinstance(payload, dict):
+                    continue
+                if str(payload.get("record_type") or "").strip() != "generated_image":
+                    continue
 
-            prompt_file = str(payload.get("prompt_file") or "").strip().replace("\\", "/")
-            saved_file = str(payload.get("saved_file") or "").strip().replace("\\", "/")
-            if not prompt_file or not saved_file:
-                continue
+                prompt_file = str(payload.get("prompt_file_relative") or payload.get("prompt_file") or "").strip().replace("\\", "/")
+                saved_file = str(payload.get("saved_file") or "").strip().replace("\\", "/")
+                if not prompt_file or not saved_file:
+                    continue
 
-            existing = jobs_by_prompt.get(prompt_file)
-            if not existing:
-                existing = {
-                    "prompt_file": prompt_file,
-                    "saved_files": [],
-                    "format": payload.get("format"),
-                    "language": payload.get("language"),
-                    "variation": payload.get("variation"),
-                    "task_id": payload.get("task_id"),
-                    "prompt_metadata": payload.get("prompt_metadata") or {},
-                }
-                jobs_by_prompt[prompt_file] = existing
-            saved_files = existing.get("saved_files")
-            if not isinstance(saved_files, list):
-                saved_files = []
-                existing["saved_files"] = saved_files
-            if saved_file not in saved_files:
-                saved_files.append(saved_file)
+                existing = jobs_by_prompt.get(prompt_file)
+                if not existing:
+                    existing = {
+                        "prompt_file": prompt_file,
+                        "saved_files": [],
+                        "format": payload.get("format"),
+                        "language": payload.get("language"),
+                        "variation": payload.get("variation"),
+                        "task_id": payload.get("task_id"),
+                        "prompt_metadata": payload.get("prompt_metadata") or {},
+                    }
+                    jobs_by_prompt[prompt_file] = existing
+                saved_files = existing.get("saved_files")
+                if not isinstance(saved_files, list):
+                    saved_files = []
+                    existing["saved_files"] = saved_files
+                if saved_file not in saved_files:
+                    saved_files.append(saved_file)
 
         return list(jobs_by_prompt.values())
     try:
@@ -1357,11 +1519,12 @@ def collect_run_result(run_dir: Path, batch_name: str, image_generated: bool) ->
 
     image_files: list[str] = []
     if image_generated:
-        image_dir = ROOT / "generated_image" / batch_name
-        if image_dir.exists():
-            for ext in ("*.png", "*.jpg", "*.jpeg", "*.webp"):
-                for file in sorted(image_dir.glob(f"**/{ext}")):
-                    image_files.append(str(file.relative_to(ROOT)))
+        for generated_root in generated_image_roots():
+            image_dir = generated_root / batch_name
+            if image_dir.exists():
+                for ext in ("*.png", "*.jpg", "*.jpeg", "*.webp"):
+                    for file in sorted(image_dir.glob(f"**/{ext}")):
+                        image_files.append(str(file.relative_to(ROOT)))
 
     result = {
         "run_id": run_dir.name,
@@ -1386,13 +1549,14 @@ def scan_prompt_files_for_batch(batch_name: str) -> list[str]:
 
 
 def scan_image_files_for_batch(batch_name: str) -> list[str]:
-    image_dir = ROOT / "generated_image" / batch_name
     image_files: list[str] = []
-    if not image_dir.exists():
-        return image_files
-    for ext in ("*.png", "*.jpg", "*.jpeg", "*.webp"):
-        for file in sorted(image_dir.glob(f"**/{ext}")):
-            image_files.append(str(file.relative_to(ROOT)))
+    for generated_root in generated_image_roots():
+        image_dir = generated_root / batch_name
+        if not image_dir.exists():
+            continue
+        for ext in ("*.png", "*.jpg", "*.jpeg", "*.webp"):
+            for file in sorted(image_dir.glob(f"**/{ext}")):
+                image_files.append(str(file.relative_to(ROOT)))
     return image_files
 
 
@@ -1685,7 +1849,8 @@ def api_defaults() -> dict[str, Any]:
     return {
         "personas": personas,
         "formats": FORMATS,
-        "active_images": read_active_images(DEFAULT_ACTIVE_IMAGES),
+        "image_sources": read_active_images(default_image_sources_file()),
+        "input_images": list_input_images(),
         "default_files": {
             "product_info": str(DEFAULT_PRODUCT_INFO.relative_to(ROOT)),
             "mechanism": str(DEFAULT_MECHANISM.relative_to(ROOT)),
@@ -1705,17 +1870,28 @@ def api_opencode_catalog() -> dict[str, Any]:
 def api_runs() -> dict[str, Any]:
     ensure_dirs()
     runs: list[dict[str, Any]] = []
-    seen_batches: set[str] = set()
     for run_dir in sorted(RUNS_ROOT.glob("run_*"), reverse=True):
         manifest = run_dir / "manifest.json"
         if manifest.exists():
             payload = json.loads(manifest.read_text(encoding="utf-8"))
             refreshed = refresh_manifest_file_state(run_dir, payload)
-            batch_name = str(refreshed.get("batch") or "").strip()
-            if refreshed.get("prompt_files") and (not batch_name or batch_name not in seen_batches):
+            if refreshed.get("prompt_files"):
                 runs.append(refreshed)
-                if batch_name:
-                    seen_batches.add(batch_name)
+
+    def batch_sort_key(run: dict[str, Any]) -> tuple[int, float]:
+        batch = str(run.get("batch") or "").strip().lower()
+        match = re.match(r"^v(\d+)$", batch)
+        batch_num = int(match.group(1)) if match else -1
+        updated = str(run.get("updated_at") or "")
+        ts = 0.0
+        if updated:
+            try:
+                ts = datetime.fromisoformat(updated.replace("Z", "+00:00")).timestamp()
+            except Exception:
+                ts = 0.0
+        return (batch_num, ts)
+
+    runs.sort(key=batch_sort_key, reverse=True)
     return {"runs": runs}
 
 
@@ -2052,10 +2228,6 @@ def api_run_generate_images_45(run_id: str, payload: dict[str, Any] = Body(...))
     if not batch:
         raise HTTPException(status_code=400, detail="Run has no batch folder")
 
-    kie_api_key = str(os.getenv("KIE_API_KEY") or "").strip()
-    if not kie_api_key:
-        raise HTTPException(status_code=400, detail="KIE_API_KEY missing. Set it in root .env.dashboard")
-
     prompt_files = payload.get("prompt_files")
     if not isinstance(prompt_files, list) or not prompt_files:
         raise HTTPException(status_code=400, detail="prompt_files must be a non-empty array")
@@ -2064,33 +2236,20 @@ def api_run_generate_images_45(run_id: str, payload: dict[str, Any] = Body(...))
     if not selected_45:
         raise HTTPException(status_code=400, detail="No valid 4:5 prompt files selected")
 
-    active_images_file = str(manifest.get("active_images_file") or DEFAULT_ACTIVE_IMAGES)
-    cmd = [
-        "python3",
-        "scripts/kie_nano_batch.py",
-        "--batch",
-        batch,
-        "--api-key",
-        kie_api_key,
-        "--active-images-file",
-        active_images_file,
-        "--language",
-        "BOTH",
-        "--aspect-ratio",
-        "4:5",
-        "--resolution",
-        "4K",
-        "--max-variations-per-format",
-        "999",
-        "--prompt-files",
-        *selected_45,
-    ]
-    result = run_cmd(cmd, cwd=ROOT)
+    try:
+        result = run_gemini_generation(
+            batch=batch,
+            prompt_files=selected_45,
+            aspect_ratio="4:5",
+            image_sources_file=None,
+        )
+    except RuntimeError as exc:
+        raise HTTPException(status_code=400, detail=str(exc)) from exc
     if result.returncode != 0:
         error_text = result.stderr or result.stdout
         (run_dir / "logs" / "image_generation_45_error.txt").write_text(error_text, encoding="utf-8")
         short_error = "\n".join([line for line in error_text.splitlines() if line.strip()][-12:])
-        raise HTTPException(status_code=500, detail=f"Image generation failed (4:5): {short_error}")
+        raise HTTPException(status_code=500, detail=f"Gemini image generation failed (4:5): {short_error}")
 
     refreshed = collect_run_result(run_dir, batch, True)
     refreshed["generated_images_for_prompts_45"] = selected_45
@@ -2109,19 +2268,6 @@ def api_run_generate_images_916_from_45(run_id: str, payload: dict[str, Any] = B
     batch = str(manifest.get("batch") or "").strip()
     if not batch:
         raise HTTPException(status_code=400, detail="Run has no batch folder")
-
-    kie_api_key = str(os.getenv("KIE_API_KEY") or "").strip()
-    if not kie_api_key:
-        raise HTTPException(status_code=400, detail="KIE_API_KEY missing. Set it in root .env.dashboard")
-
-    cloudinary_cloud_name = str(os.getenv("CLOUDINARY_CLOUD_NAME") or "").strip()
-    cloudinary_api_key = str(os.getenv("CLOUDINARY_API_KEY") or "").strip()
-    cloudinary_api_secret = str(os.getenv("CLOUDINARY_API_SECRET") or "").strip()
-    if not cloudinary_cloud_name or not cloudinary_api_key or not cloudinary_api_secret:
-        raise HTTPException(
-            status_code=400,
-            detail="Cloudinary credentials missing. Set CLOUDINARY_CLOUD_NAME/CLOUDINARY_API_KEY/CLOUDINARY_API_SECRET in root .env.dashboard",
-        )
 
     prompt_files = payload.get("prompt_files")
     if not isinstance(prompt_files, list) or not prompt_files:
@@ -2143,7 +2289,6 @@ def api_run_generate_images_916_from_45(run_id: str, payload: dict[str, Any] = B
             job_by_prompt[prompt_file] = job
 
     prompt_reference_map: dict[str, list[str]] = {}
-    uploaded_refs: dict[str, str] = {}
     for prompt_45 in selected_45:
         prompt_96 = prompt_45.replace("/45/", "/96/")
         if prompt_96 not in selected_96:
@@ -2158,9 +2303,7 @@ def api_run_generate_images_916_from_45(run_id: str, payload: dict[str, Any] = B
         image_path = ROOT / image_rel
         if not image_path.exists() or not image_path.is_file():
             continue
-        cloudinary_url = upload_image_to_cloudinary(image_path, cloudinary_cloud_name, cloudinary_api_key, cloudinary_api_secret)
-        prompt_reference_map[prompt_96] = [cloudinary_url]
-        uploaded_refs[prompt_96] = cloudinary_url
+        prompt_reference_map[prompt_96] = [str(image_path)]
 
     if not prompt_reference_map:
         raise HTTPException(status_code=400, detail="Could not build 9:16 reference images from selected 4:5 outputs")
@@ -2168,38 +2311,25 @@ def api_run_generate_images_916_from_45(run_id: str, payload: dict[str, Any] = B
     map_path = run_dir / "context" / "prompt_reference_map_916.json"
     map_path.write_text(json.dumps(prompt_reference_map, ensure_ascii=False, indent=2) + "\n", encoding="utf-8")
 
-    cmd = [
-        "python3",
-        "scripts/kie_nano_batch.py",
-        "--batch",
-        batch,
-        "--api-key",
-        kie_api_key,
-        "--language",
-        "BOTH",
-        "--aspect-ratio",
-        "9:16",
-        "--resolution",
-        "4K",
-        "--max-variations-per-format",
-        "999",
-        "--prompt-files",
-        *sorted(prompt_reference_map.keys()),
-        "--prompt-reference-map",
-        str(map_path),
-        "--reference-conversion-mode",
-        "outpaint_45_to_96",
-    ]
-    result = run_cmd(cmd, cwd=ROOT)
+    try:
+        result = run_gemini_generation(
+            batch=batch,
+            prompt_files=sorted(prompt_reference_map.keys()),
+            aspect_ratio="9:16",
+            image_sources_file=None,
+            prompt_reference_map=map_path,
+        )
+    except RuntimeError as exc:
+        raise HTTPException(status_code=400, detail=str(exc)) from exc
     if result.returncode != 0:
         error_text = result.stderr or result.stdout
         (run_dir / "logs" / "image_generation_916_from_45_error.txt").write_text(error_text, encoding="utf-8")
         short_error = "\n".join([line for line in error_text.splitlines() if line.strip()][-12:])
-        raise HTTPException(status_code=500, detail=f"Image generation failed (9:16 from 4:5 refs): {short_error}")
+        raise HTTPException(status_code=500, detail=f"Gemini image generation failed (9:16 from 4:5 refs): {short_error}")
 
     refreshed = collect_run_result(run_dir, batch, True)
     refreshed["generated_images_for_prompts_916"] = sorted(prompt_reference_map.keys())
-    refreshed["uploaded_reference_urls_916"] = uploaded_refs
+    refreshed["reference_images_916"] = prompt_reference_map
     merged = merge_manifest(run_dir, manifest, refreshed)
     return merged
 
@@ -2225,7 +2355,9 @@ async def api_run_execute(
     product_info_file: UploadFile | None = File(None),
     mechanism_file: UploadFile | None = File(None),
     faq_file: UploadFile | None = File(None),
-    active_images_file: UploadFile | None = File(None),
+    image_source_file: UploadFile | None = File(None),
+    input_image_files: list[UploadFile] | None = File(None),
+    clear_input_images: bool = Form(False),
 ) -> dict[str, Any]:
     ensure_dirs()
     try:
@@ -2242,19 +2374,14 @@ async def api_run_execute(
     product_path = save_upload(run_dir / "inputs" / "productinfomain.txt", product_info_file)
     mechanism_path = save_upload(run_dir / "inputs" / "PRODUCT_MECHANISM_V1.txt", mechanism_file)
     faq_path = save_upload(run_dir / "inputs" / "faq.txt", faq_file)
-    active_images_path = save_upload(run_dir / "inputs" / "activeimages.txt", active_images_file)
+    image_sources_path = save_upload(run_dir / "inputs" / "image_sources.txt", image_source_file)
+    saved_input_images = store_uploaded_input_images(input_image_files or [], clear_input_images)
 
     product_file = coalesce_path(product_path, DEFAULT_PRODUCT_INFO)
     mechanism_file_path = coalesce_path(mechanism_path, DEFAULT_MECHANISM)
     faq_file_path = coalesce_path(faq_path, DEFAULT_FAQ)
 
-    if not active_images_path:
-        override_urls = cfg.get("active_image_urls") or []
-        if override_urls:
-            lines = [line.strip() for line in override_urls if str(line).strip()]
-            active_images_path = run_dir / "inputs" / "activeimages.txt"
-            active_images_path.write_text("\n".join(lines) + "\n", encoding="utf-8")
-    active_images_file_path = coalesce_path(active_images_path, DEFAULT_ACTIVE_IMAGES)
+    image_sources_file_path = coalesce_path(image_sources_path, default_image_sources_file())
 
     try:
         plan = resolve_format_plan(cfg)
@@ -2459,7 +2586,7 @@ async def api_run_execute(
                     "--api-key",
                     kie_api_key,
                     "--active-images-file",
-                    str(active_images_file_path),
+                    str(image_sources_file_path),
                     "--language",
                     cfg.get("image_language", "EN"),
                     "--max-variations-per-format",
@@ -2476,12 +2603,17 @@ async def api_run_execute(
     manifest["llm_mode"] = llm_mode
     manifest["context_source"] = product_ctx_source
     manifest["context_extractor_model"] = extractor_model
-    manifest["active_images_file"] = str(active_images_file_path)
+    manifest["image_sources_file"] = str(image_sources_file_path)
+    manifest["input_images_dir"] = str(INPUT_IMAGES_DIR.relative_to(ROOT)).replace("\\", "/")
+    manifest["input_images_uploaded"] = saved_input_images
     (run_dir / "manifest.json").write_text(json.dumps(manifest, ensure_ascii=False, indent=2) + "\n", encoding="utf-8")
     return manifest
 
 
 app.mount("/storage", StaticFiles(directory=str(STORAGE_ROOT)), name="storage")
 app.mount("/output", StaticFiles(directory=str(ROOT / "output")), name="output")
-app.mount("/generated_image", StaticFiles(directory=str(ROOT / "generated_image")), name="generated_image")
+GENERATED_IMAGES_ROOT.mkdir(parents=True, exist_ok=True)
+LEGACY_GENERATED_IMAGE_ROOT.mkdir(parents=True, exist_ok=True)
+app.mount("/generated_images", StaticFiles(directory=str(GENERATED_IMAGES_ROOT)), name="generated_images")
+app.mount("/generated_image", StaticFiles(directory=str(LEGACY_GENERATED_IMAGE_ROOT)), name="generated_image")
 app.mount("/", StaticFiles(directory=str(ROOT / "dashboard" / "frontend"), html=True), name="frontend")

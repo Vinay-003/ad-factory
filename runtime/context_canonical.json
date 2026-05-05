@@ -1,6 +1,6 @@
 {
   "metadata": {
-    "generated_at": "2026-04-23T15:45:29Z",
+    "generated_at": "2026-05-04T12:33:57Z",
     "extractor_model": "openai/gpt-5.2",
     "source_files": [
       "/home/mylappy/myspace/info/productmaster.txt",
@@ -42,7 +42,25 @@
   },
   "conflicts": [],
   "dropped_claims": [],
-  "coverage_check": {},
+  "coverage_check": {
+    "required_present": {
+      "3_to_5kg_15days": false,
+      "adults_18plus_bmi_gt_25": false,
+      "insulin_exclusion": false,
+      "pregnancy_postpartum_exclusion": false,
+      "morning_liquid_4h_no_solids": false,
+      "night_powder_tablet": false,
+      "31_unique_44_total": false,
+      "refund_7day_with_tracker": false,
+      "not_fat_burner_positioning": false,
+      "on_image_copy_explicit_weightloss": false,
+      "headline_strategy_preserved": false,
+      "am_pm_routine_priority": false,
+      "cravings_down_priority": false,
+      "support_priority": false
+    },
+    "notes": "Source content files were not provided (only the system/payload prompt). Unable to extract or reconcile claims without productinfomain.txt, PRODUCT_MECHANISM_V1.txt, and faq.txt."
+  },
   "generation_context": {
     "product_info": [],
     "mechanism": [],

@@ -1,0 +1,9 @@
+{
+  "status": "error",
+  "prompt_file": "/home/mylappy/myspace/info/output/v12/45/OUTPUT_HERO_P02_EN.txt",
+  "persona_id": "P02",
+  "error": "Message: no such window: target window already closed\nfrom unknown error: web view not found\n  (Session info: chrome=147.0.7727.137)\nStacktrace:\n#0 0x58aaf648579a <unknown>\n#1 0x58aaf5e81215 <unknown>\n#2 0x58aaf5e54b18 <unknown>\n#3 0x58aaf5f02678 <unknown>\n#4 0x58aaf5f1c178 <unknown>\n#5 0x58aaf5ec755f <unknown>\n#6 0x58aaf5ec8321 <unknown>\n#7 0x58aaf644906b <unknown>\n#8 0x58aaf644c01d <unknown>\n#9 0x58aaf6435718 <unknown>\n#10 0x58aaf644cbb0 <unknown>\n#11 0x58aaf641c150 <unknown>\n#12 0x58aaf64725e8 <unknown>\n#13 0x58aaf64727b8 <unknown>\n#14 0x58aaf64841de <unknown>\n#15 0x7c221749caa4 <unknown>\n#16 0x7c2217529c6c <unknown>\n",
+  "screenshot": null,
+  "current_url": null,
+  "timestamp": 1777897357
+}

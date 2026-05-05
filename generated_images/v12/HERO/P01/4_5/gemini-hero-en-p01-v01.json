@@ -1,0 +1,9 @@
+{
+  "status": "error",
+  "prompt_file": "/home/mylappy/myspace/info/output/v12/45/OUTPUT_HERO_P01_EN.txt",
+  "persona_id": "P01",
+  "error": "Message: Timed out waiting for generated image\n",
+  "screenshot": null,
+  "current_url": "https://gemini.google.com/gem/2488aa7406e9/f4f860b355d35222",
+  "timestamp": 1777897161
+}

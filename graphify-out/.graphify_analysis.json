@@ -1,0 +1,484 @@
+{
+  "communities": {
+    "0": [
+      "gemini_web_automation_auto_launch_debug_browser",
+      "gemini_web_automation_build_cookie_header",
+      "gemini_web_automation_build_driver",
+      "gemini_web_automation_build_local_image_paths",
+      "gemini_web_automation_click_first_visible_css",
+      "gemini_web_automation_click_new_chat_if_present",
+      "gemini_web_automation_click_send",
+      "gemini_web_automation_click_sidebar_new_chat",
+      "gemini_web_automation_click_text_options",
+      "gemini_web_automation_close_active_tab",
+      "gemini_web_automation_collect_upload_images_from_dir",
+      "gemini_web_automation_debugger_endpoint_reachable",
+      "gemini_web_automation_discover_prompt_jobs",
+      "gemini_web_automation_dismiss_open_overlays",
+      "gemini_web_automation_download_generated_image",
+      "gemini_web_automation_download_to_temp",
+      "gemini_web_automation_ensure_new_chat_strict",
+      "gemini_web_automation_ensure_sidebar_open",
+      "gemini_web_automation_find_composer",
+      "gemini_web_automation_find_file_input_across_frames",
+      "gemini_web_automation_find_file_input_anywhere",
+      "gemini_web_automation_focus_or_open_gemini_tab",
+      "gemini_web_automation_force_fast_to_pro",
+      "gemini_web_automation_gemini_app_ready",
+      "gemini_web_automation_get_image_sources",
+      "gemini_web_automation_infer_ext_from_src",
+      "gemini_web_automation_is_url",
+      "gemini_web_automation_old_chat_title_visible",
+      "gemini_web_automation_open_attachment_ui",
+      "gemini_web_automation_open_fresh_gemini_tab",
+      "gemini_web_automation_open_gemini_with_retry",
+      "gemini_web_automation_parse_args",
+      "gemini_web_automation_parse_image_source_file",
+      "gemini_web_automation_pro_model_selected",
+      "gemini_web_automation_promptjob",
+      "gemini_web_automation_resolve_browser_binary",
+      "gemini_web_automation_run",
+      "gemini_web_automation_select_pro_model_and_create_image_tool",
+      "gemini_web_automation_set_prompt_text",
+      "gemini_web_automation_upload_images",
+      "gemini_web_automation_wait_for_manual_login",
+      "gemini_web_automation_wait_for_new_generated_image",
+      "scripts_gemini_web_automation_py"
+    ],
+    "1": [
+      "kie_nano_batch_build_image_inputs",
+      "kie_nano_batch_choose_logo_variant_with_minimax",
+      "kie_nano_batch_compose_prompt",
+      "kie_nano_batch_conversion_lock_instruction",
+      "kie_nano_batch_create_task",
+      "kie_nano_batch_discover_minimax_model",
+      "kie_nano_batch_download_file",
+      "kie_nano_batch_ensure_dir",
+      "kie_nano_batch_extension_from_url",
+      "kie_nano_batch_extract_prompt_metadata",
+      "kie_nano_batch_fetch_latest_batch",
+      "kie_nano_batch_find_line_value",
+      "kie_nano_batch_get_task_info",
+      "kie_nano_batch_heuristic_logo_variant",
+      "kie_nano_batch_image_mime_type",
+      "kie_nano_batch_iter_grouped",
+      "kie_nano_batch_load_active_images_config",
+      "kie_nano_batch_load_env_file",
+      "kie_nano_batch_load_prompt_reference_map",
+      "kie_nano_batch_main",
+      "kie_nano_batch_opencode_env",
+      "kie_nano_batch_parse_args",
+      "kie_nano_batch_parse_json_object_from_text",
+      "kie_nano_batch_parse_opencode_json_output",
+      "kie_nano_batch_parse_prompt_files",
+      "kie_nano_batch_parse_result_urls",
+      "kie_nano_batch_persona_folder_name",
+      "kie_nano_batch_promptfile",
+      "kie_nano_batch_request_json",
+      "kie_nano_batch_sanitize_logo_inputs",
+      "kie_nano_batch_strip_ansi",
+      "kie_nano_batch_trim_variations",
+      "kie_nano_batch_wait_for_task",
+      "kie_nano_batch_write_json",
+      "scripts_kie_nano_batch_py"
+    ],
+    "2": [
+      "generate_ads_add_used_text",
+      "generate_ads_append_background_index",
+      "generate_ads_aspect_ratio_folder",
+      "generate_ads_base_layout_lines_for_format",
+      "generate_ads_build_seeded_background_sentence",
+      "generate_ads_build_ugc_subject_line",
+      "generate_ads_copyblock",
+      "generate_ads_ensure_slot_tracker",
+      "generate_ads_find_visual_archetype",
+      "generate_ads_get_background_by_id",
+      "generate_ads_list_batches",
+      "generate_ads_load_json",
+      "generate_ads_main",
+      "generate_ads_next_batch_name",
+      "generate_ads_next_entry_id",
+      "generate_ads_now_utc_iso",
+      "generate_ads_outpaint_lock_block",
+      "generate_ads_parse_args",
+      "generate_ads_parse_copy_block",
+      "generate_ads_pick_background_slot",
+      "generate_ads_pick_visual_archetype",
+      "generate_ads_prompt_filename",
+      "generate_ads_registry_used_text",
+      "generate_ads_render_prompt",
+      "generate_ads_require_int",
+      "generate_ads_require_str",
+      "generate_ads_safezone_enforcement_block",
+      "generate_ads_split_ba_contrast_lines",
+      "generate_ads_stable_fmt_seed",
+      "generate_ads_stable_signature_seed",
+      "generate_ads_strip_ba_panel_label",
+      "generate_ads_uniqueness_check",
+      "generate_ads_validate_prompt_text",
+      "generate_ads_write_json",
+      "scripts_generate_ads_py"
+    ],
+    "3": [
+      "app_api_file_content",
+      "app_api_run",
+      "app_api_run_execute",
+      "app_api_runs",
+      "app_assembler_language_mode",
+      "app_build_copy_requirements",
+      "app_build_multipart_form",
+      "app_build_persona_payload",
+      "app_coalesce_path",
+      "app_ensure_dirs",
+      "app_load_env_file",
+      "app_make_run_id",
+      "app_now_iso",
+      "app_parse_json_stdout",
+      "app_parse_persona_library",
+      "app_parse_uniqueness_collisions",
+      "app_persona_number_from_candidate",
+      "app_refresh_manifest_file_state",
+      "app_resolve_format_plan",
+      "app_resolve_language_mode",
+      "app_resolve_safe_path",
+      "app_save_upload",
+      "app_scan_image_files_for_batch",
+      "app_scan_prompt_files_for_batch",
+      "app_startup",
+      "app_strip_internal_marker",
+      "app_strip_internal_markers_from_payload",
+      "app_strip_price_tokens",
+      "app_upload_image_to_cloudinary",
+      "app_validate_generated_copy_payload",
+      "dashboard_backend_app_py"
+    ],
+    "4": [
+      "extract_product_context_append_unique",
+      "extract_product_context_clean_lines",
+      "extract_product_context_compact_lines",
+      "extract_product_context_default_product_path",
+      "extract_product_context_extract_faq_sections",
+      "extract_product_context_extract_headline_strategy",
+      "extract_product_context_extract_keyword_lines",
+      "extract_product_context_extract_line_groups",
+      "extract_product_context_extract_mechanism_sections",
+      "extract_product_context_extract_priority_block",
+      "extract_product_context_extract_product_sections",
+      "extract_product_context_extract_section_by_title",
+      "extract_product_context_extract_snapshot_block",
+      "extract_product_context_extract_theme_lines",
+      "extract_product_context_extract_trigger_rules",
+      "extract_product_context_main",
+      "extract_product_context_merge_product_directives",
+      "extract_product_context_split_numbered_sections",
+      "extract_product_context_unique_lines",
+      "scripts_extract_product_context_py"
+    ],
+    "5": [
+      "app_applytheme",
+      "app_chip",
+      "app_fetchdefaults",
+      "app_fileinput",
+      "app_getformatsbypersona",
+      "app_getpersonaselection",
+      "app_inittheme",
+      "app_loadruns",
+      "app_renderglobalformats",
+      "app_renderlanguagemodes",
+      "app_rendermodeloptions",
+      "app_renderpersonas",
+      "app_renderrun",
+      "app_renderruncarousel",
+      "app_runpipeline",
+      "app_setselectoptions",
+      "app_setstatus",
+      "app_updaterunnav",
+      "dashboard_frontend_app_js"
+    ],
+    "6": [
+      "app_api_run_generate_916",
+      "app_api_run_generate_916_selected",
+      "app_api_run_generate_images_45",
+      "app_api_run_generate_images_916_from_45",
+      "app_api_run_update_prompt_copies",
+      "app_apply_visual_locks",
+      "app_collect_run_result",
+      "app_filter_copy_json_for_selected_ads",
+      "app_force_aspect_ratio",
+      "app_generate_916_for_run",
+      "app_load_batch_image_summary",
+      "app_load_run_language_mode",
+      "app_map_45_to_96_prompts",
+      "app_merge_manifest",
+      "app_rerender_prompts_for_run",
+      "app_run_cmd",
+      "app_validate_selected_45_prompts",
+      "kie_nano_batch_write_text"
+    ],
+    "7": [
+      "build_canonical_context_build_generation_context",
+      "build_canonical_context_build_prompt",
+      "build_canonical_context_default_product_path",
+      "build_canonical_context_ensure_list_of_strings",
+      "build_canonical_context_main",
+      "build_canonical_context_merge_product_directives",
+      "build_canonical_context_normalize_canonical",
+      "build_canonical_context_now_iso",
+      "build_canonical_context_parse_args",
+      "build_canonical_context_parse_json_object_from_text",
+      "build_canonical_context_parse_opencode_stream",
+      "build_canonical_context_run_cmd",
+      "extract_format_rules_bullets",
+      "extract_format_rules_extract_section",
+      "extract_format_rules_main",
+      "scripts_build_canonical_context_py",
+      "scripts_extract_format_rules_py"
+    ],
+    "8": [
+      "scripts_upgrade_safezone_backgrounds_py",
+      "upgrade_safezone_backgrounds_build_final_prompt",
+      "upgrade_safezone_backgrounds_choose_seed",
+      "upgrade_safezone_backgrounds_composition_variants",
+      "upgrade_safezone_backgrounds_crop_safety_variants",
+      "upgrade_safezone_backgrounds_cta_safe_space_variants",
+      "upgrade_safezone_backgrounds_detect_layout_mode",
+      "upgrade_safezone_backgrounds_layout_intent_variants",
+      "upgrade_safezone_backgrounds_main",
+      "upgrade_safezone_backgrounds_parse_args",
+      "upgrade_safezone_backgrounds_pick_background",
+      "upgrade_safezone_backgrounds_upgraded_variant"
+    ],
+    "9": [
+      "app_api_defaults",
+      "app_api_opencode_catalog",
+      "app_build_opencode_catalog",
+      "app_list_models_for_provider",
+      "app_list_opencode_models",
+      "app_list_opencode_provider_labels",
+      "app_opencode_discovery_env",
+      "app_provider_id_from_label",
+      "app_read_active_images",
+      "app_run_opencode_discovery_cmd",
+      "app_strip_ansi"
+    ],
+    "10": [
+      "app_build_template_copy",
+      "app_choose_text",
+      "app_clean_bullets",
+      "app_clean_str",
+      "app_ensure_testimonial_attribution",
+      "app_ensure_testimonial_headline",
+      "app_normalize_generated_copy",
+      "app_persona_name_from_candidate",
+      "app_shorten_copy_line",
+      "app_strip_ba_panel_label"
+    ],
+    "11": [
+      "app_build_generation_payload_for_llm",
+      "app_call_opencode_compatible",
+      "app_call_opencode_repair_copy",
+      "app_choose_extractor_model",
+      "app_choose_openai_gpt52",
+      "app_extract_generated_ad_candidate",
+      "app_hydrate_generated_ad_candidate",
+      "app_parse_json_object_from_text",
+      "app_parse_opencode_json_output",
+      "app_sanitize_dashboard_model"
+    ],
+    "12": [
+      "app_api_run_prompt_copies",
+      "app_collect_45_visual_locks",
+      "app_extract_on_image_copy_lines",
+      "app_extract_selected_ad_keys_from_45_prompts",
+      "app_parse_background_lock_from_prompt",
+      "app_parse_persona_number_from_prompt",
+      "app_parse_prompt_field",
+      "app_parse_prompt_filename"
+    ],
+    "13": [
+      "registry_banlist_load_json",
+      "registry_banlist_main",
+      "registry_banlist_parse_args",
+      "scripts_registry_banlist_py"
+    ],
+    "14": [
+      "scripts_stop_dashboard_stack_ps1",
+      "stop_dashboard_stack_stop_frompidfile"
+    ],
+    "15": [
+      "scripts_bootstrap_stack_ps1"
+    ],
+    "16": [
+      "dashboard_init_py"
+    ],
+    "17": [
+      "dashboard_backend_init_py"
+    ]
+  },
+  "cohesion": {
+    "0": 0.1,
+    "1": 0.11,
+    "2": 0.12,
+    "3": 0.12,
+    "4": 0.23,
+    "5": 0.19,
+    "6": 0.25,
+    "7": 0.21,
+    "8": 0.38,
+    "9": 0.25,
+    "10": 0.29,
+    "11": 0.27,
+    "12": 0.29,
+    "13": 0.83,
+    "14": 1.0,
+    "15": 1.0,
+    "16": 1.0,
+    "17": 1.0
+  },
+  "gods": [
+    {
+      "id": "gemini_web_automation_run",
+      "label": "run()",
+      "degree": 29
+    },
+    {
+      "id": "generate_ads_main",
+      "label": "main()",
+      "degree": 23
+    },
+    {
+      "id": "app_api_run_execute",
+      "label": "api_run_execute()",
+      "degree": 23
+    },
+    {
+      "id": "kie_nano_batch_main",
+      "label": "main()",
+      "degree": 21
+    },
+    {
+      "id": "kie_nano_batch_write_text",
+      "label": "write_text()",
+      "degree": 20
+    },
+    {
+      "id": "app_api_run_generate_916_selected",
+      "label": "api_run_generate_916_selected()",
+      "degree": 12
+    },
+    {
+      "id": "build_canonical_context_main",
+      "label": "main()",
+      "degree": 11
+    },
+    {
+      "id": "app_call_opencode_compatible",
+      "label": "call_opencode_compatible()",
+      "degree": 11
+    },
+    {
+      "id": "app_generate_916_for_run",
+      "label": "generate_916_for_run()",
+      "degree": 11
+    },
+    {
+      "id": "extract_product_context_main",
+      "label": "main()",
+      "degree": 10
+    }
+  ],
+  "surprises": [
+    {
+      "source": "discover_minimax_model()",
+      "target": "run()",
+      "source_files": [
+        "/home/mylappy/myspace/info/scripts/kie_nano_batch.py",
+        "/home/mylappy/myspace/info/scripts/gemini_web_automation.py"
+      ],
+      "confidence": "INFERRED",
+      "relation": "calls",
+      "why": "inferred connection - not explicitly stated in source; bridges separate communities"
+    },
+    {
+      "source": "choose_logo_variant_with_minimax()",
+      "target": "run()",
+      "source_files": [
+        "/home/mylappy/myspace/info/scripts/kie_nano_batch.py",
+        "/home/mylappy/myspace/info/scripts/gemini_web_automation.py"
+      ],
+      "confidence": "INFERRED",
+      "relation": "calls",
+      "why": "inferred connection - not explicitly stated in source; bridges separate communities"
+    },
+    {
+      "source": "run()",
+      "target": "write_text()",
+      "source_files": [
+        "/home/mylappy/myspace/info/scripts/gemini_web_automation.py",
+        "/home/mylappy/myspace/info/scripts/kie_nano_batch.py"
+      ],
+      "confidence": "INFERRED",
+      "relation": "calls",
+      "why": "inferred connection - not explicitly stated in source; bridges separate communities"
+    },
+    {
+      "source": "main()",
+      "target": "write_text()",
+      "source_files": [
+        "/home/mylappy/myspace/info/scripts/upgrade_safezone_backgrounds.py",
+        "/home/mylappy/myspace/info/scripts/kie_nano_batch.py"
+      ],
+      "confidence": "INFERRED",
+      "relation": "calls",
+      "why": "inferred connection - not explicitly stated in source; bridges separate communities"
+    },
+    {
+      "source": "write_json()",
+      "target": "write_text()",
+      "source_files": [
+        "/home/mylappy/myspace/info/scripts/generate_ads.py",
+        "/home/mylappy/myspace/info/scripts/kie_nano_batch.py"
+      ],
+      "confidence": "INFERRED",
+      "relation": "calls",
+      "why": "inferred connection - not explicitly stated in source; bridges separate communities"
+    }
+  ],
+  "questions": [
+    {
+      "type": "bridge_node",
+      "question": "Why does `write_text()` connect `Community 6` to `Community 0`, `Community 1`, `Community 2`, `Community 3`, `Community 7`, `Community 8`, `Community 11`, `Community 13`?",
+      "why": "High betweenness centrality (0.519) - this node is a cross-community bridge."
+    },
+    {
+      "type": "bridge_node",
+      "question": "Why does `run()` connect `Community 0` to `Community 1`, `Community 9`, `Community 6`, `Community 7`?",
+      "why": "High betweenness centrality (0.252) - this node is a cross-community bridge."
+    },
+    {
+      "type": "bridge_node",
+      "question": "Why does `main()` connect `Community 7` to `Community 6`?",
+      "why": "High betweenness centrality (0.186) - this node is a cross-community bridge."
+    },
+    {
+      "type": "verify_inferred",
+      "question": "Are the 6 inferred relationships involving `run()` (e.g. with `discover_minimax_model()` and `choose_logo_variant_with_minimax()`) actually correct?",
+      "why": "`run()` has 6 INFERRED edges - model-reasoned connections that need verification."
+    },
+    {
+      "type": "verify_inferred",
+      "question": "Are the 18 inferred relationships involving `write_text()` (e.g. with `run()` and `main()`) actually correct?",
+      "why": "`write_text()` has 18 INFERRED edges - model-reasoned connections that need verification."
+    },
+    {
+      "type": "low_cohesion",
+      "question": "Should `Community 0` be split into smaller, more focused modules?",
+      "why": "Cohesion score 0.1 - nodes in this community are weakly interconnected."
+    },
+    {
+      "type": "low_cohesion",
+      "question": "Should `Community 1` be split into smaller, more focused modules?",
+      "why": "Cohesion score 0.11 - nodes in this community are weakly interconnected."
+    }
+  ]
+}

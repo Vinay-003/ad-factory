@@ -32,9 +32,11 @@
         </section>
 
         <section class="card card-images">
-          <h2>3) Active Images</h2>
-          <textarea id="activeImages" rows="6"></textarea>
-          <p class="hint">One URL per line. Defaults prefilled from input/activeimages.txt</p>
+          <h2>3) Input Images (Gemini Upload Set)</h2>
+          <label>Add images to <code>input/images</code></label>
+          <input id="inputImageFiles" type="file" multiple accept="image/*" />
+          <label><input id="clearInputImages" type="checkbox" /> Clear previously stored images before adding these</label>
+          <p class="hint">By default, uploaded images are added to existing images in input/images and all are used for Gemini uploads.</p>
         </section>
       </div>
 
@@ -62,7 +64,7 @@
             <label>Product Info <input id="productFile" type="file" /></label>
             <label>Mechanism <input id="mechanismFile" type="file" /></label>
             <label>FAQ <input id="faqFile" type="file" /></label>
-            <label>Active Images TXT <input id="activeImagesFile" type="file" /></label>
+            <label>Image Sources TXT (optional) <input id="imageSourcesFile" type="file" /></label>
           </div>
           <div id="defaultsInfo" class="hint"></div>
         </section>

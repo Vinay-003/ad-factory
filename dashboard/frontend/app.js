@@ -1,6 +1,7 @@
 const personaListEl = document.getElementById("personaList");
 const globalFormatsEl = document.getElementById("globalFormats");
-const activeImagesEl = document.getElementById("activeImages");
+const inputImageFilesEl = document.getElementById("inputImageFiles");
+const clearInputImagesEl = document.getElementById("clearInputImages");
 const defaultsInfoEl = document.getElementById("defaultsInfo");
 const statusEl = document.getElementById("status");
 const runsEl = document.getElementById("runs");
@@ -188,8 +189,8 @@ async function fetchDefaults() {
   renderPersonas();
   renderGlobalFormats();
   renderLanguageModes();
-  activeImagesEl.value = (defaultData.active_images || []).join("\n");
-  defaultsInfoEl.textContent = `Using defaults: product=${defaultData.default_files.product_info}, mechanism=${defaultData.default_files.mechanism}, faq=${defaultData.default_files.faq}`;
+  const imageCount = (defaultData.input_images || []).length;
+  defaultsInfoEl.textContent = `Using defaults: product=${defaultData.default_files.product_info}, mechanism=${defaultData.default_files.mechanism}, faq=${defaultData.default_files.faq}, input/images=${imageCount} file(s)`;
 
   const opencode = defaultData.opencode || {};
   modelsByProvider = opencode.models_by_provider || {};
@@ -219,7 +220,6 @@ async function runPipeline() {
     language_mode: selectedLanguageMode,
     global_formats: [...selectedGlobalFormats],
     formats_by_persona: getFormatsByPersona(),
-    active_image_urls: activeImagesEl.value.split("\n").map((x) => x.trim()).filter(Boolean),
     generate_images: false,
     opencode_api_url: document.getElementById("opencodeApiUrl").value.trim(),
     opencode_api_key: document.getElementById("opencodeApiKey").value.trim(),
@@ -233,12 +233,17 @@ async function runPipeline() {
     ["product_info_file", fileInput("productFile")],
     ["mechanism_file", fileInput("mechanismFile")],
     ["faq_file", fileInput("faqFile")],
-    ["active_images_file", fileInput("activeImagesFile")],
+    ["image_source_file", fileInput("imageSourcesFile")],
   ];
 
   uploads.forEach(([name, input]) => {
     if (input.files && input.files[0]) form.append(name, input.files[0]);
   });
+
+  if (inputImageFilesEl?.files?.length) {
+    [...inputImageFilesEl.files].forEach((file) => form.append("input_image_files", file));
+  }
+  form.append("clear_input_images", clearInputImagesEl?.checked ? "true" : "false");
 
   setStatus("Running pipeline... this can take time.");
   const res = await fetch("/api/runs/execute", { method: "POST", body: form });
@@ -331,10 +336,10 @@ function renderRun(run) {
       generate916PromptBtn.textContent = "Generate 9:16 prompts for selected";
       const generate45Btn = document.createElement("button");
       generate45Btn.type = "button";
-      generate45Btn.textContent = "Generate 4:5 for selected";
+      generate45Btn.textContent = "Generate 4:5 in Gemini";
       const generate916Btn = document.createElement("button");
       generate916Btn.type = "button";
-      generate916Btn.textContent = "Generate 9:16 from selected 4:5 images";
+      generate916Btn.textContent = "Generate 9:16 in Gemini from 4:5 images";
       controls.append(selectAllBtn, clearBtn, saveBtn, generate916PromptBtn, generate45Btn, generate916Btn);
       promptActions.appendChild(controls);
 
@@ -465,7 +470,7 @@ function renderRun(run) {
           return;
         }
         generate45Btn.disabled = true;
-        setStatus(`Generating 4:5 images for ${selected.length} selected prompt(s) from ${run.run_id}...`);
+        setStatus(`Generating 4:5 images in Gemini for ${selected.length} selected prompt(s) from ${run.run_id}...`);
         try {
           const res = await fetch(`/api/runs/${run.run_id}/generate-images-45`, {
             method: "POST",
@@ -484,7 +489,7 @@ function renderRun(run) {
             setStatus(`Failed: ${data.detail || "image generation error"}`);
             return;
           }
-          setStatus(`Done\nRun: ${data.run_id}\nBatch: ${data.batch}\nGenerated 4:5 for selected prompts: ${selected.length}`);
+          setStatus(`Done\nRun: ${data.run_id}\nBatch: ${data.batch}\nGenerated 4:5 in Gemini for selected prompts: ${selected.length}`);
           await loadRuns();
         } catch (err) {
           setStatus(String(err));
@@ -500,7 +505,7 @@ function renderRun(run) {
           return;
         }
         generate916Btn.disabled = true;
-        setStatus(`Generating 9:16 from selected 4:5 image references for ${selected.length} prompt(s)...`);
+        setStatus(`Generating 9:16 in Gemini from selected 4:5 image references for ${selected.length} prompt(s)...`);
         try {
           const res = await fetch(`/api/runs/${run.run_id}/generate-images-916-from-45`, {
             method: "POST",
@@ -519,7 +524,7 @@ function renderRun(run) {
             setStatus(`Failed: ${data.detail || "9:16 generation error"}`);
             return;
           }
-          setStatus(`Done\nRun: ${data.run_id}\nBatch: ${data.batch}\nGenerated 9:16 from selected 4:5 refs`);
+          setStatus(`Done\nRun: ${data.run_id}\nBatch: ${data.batch}\nGenerated 9:16 in Gemini from selected 4:5 refs`);
           await loadRuns();
         } catch (err) {
           setStatus(String(err));
@@ -539,9 +544,11 @@ function renderRun(run) {
     p.style.marginTop = "6px";
     p.innerHTML = `<strong>Image files</strong>`;
     div.appendChild(p);
-    run.image_files.slice(0, 20).forEach((path) => {
+    run.image_files.forEach((path) => {
       const a = document.createElement("a");
-      a.href = `/generated_image/${path.replace(/^generated_image\//, "")}`;
+      a.href = path.startsWith("generated_images/")
+        ? `/generated_images/${path.replace(/^generated_images\//, "")}`
+        : `/generated_image/${path.replace(/^generated_image\//, "")}`;
       a.target = "_blank";
       a.textContent = path;
       div.appendChild(a);
@@ -554,7 +561,11 @@ function renderRun(run) {
 
 function updateRunNav() {
   const total = runsData.length;
-  if (runIndexEl) runIndexEl.textContent = total ? `${currentRunIndex + 1} / ${total}` : "0 / 0";
+  const latestBatch = total ? (runsData[0].batch || "-") : "-";
+  if (runIndexEl) {
+    const position = total ? `${currentRunIndex + 1}/${total}` : "0/0";
+    runIndexEl.textContent = `${position} | latest batch ${latestBatch}`;
+  }
   if (runPrevEl) runPrevEl.disabled = total <= 1;
   if (runNextEl) runNextEl.disabled = total <= 1;
 }
@@ -572,6 +583,8 @@ function renderRunCarousel() {
 
   if (currentRunIndex < 0) currentRunIndex = 0;
   if (currentRunIndex >= runsData.length) currentRunIndex = runsData.length - 1;
+
+  // Lazy render: only current run card is mounted.
   runsEl.appendChild(renderRun(runsData[currentRunIndex]));
   updateRunNav();
 }
@@ -581,9 +594,7 @@ async function loadRuns() {
   if (!res.ok) return;
   const data = await res.json();
   runsData = data.runs || [];
-  if (currentRunIndex >= runsData.length) {
-    currentRunIndex = Math.max(0, runsData.length - 1);
-  }
+  currentRunIndex = 0;
   renderRunCarousel();
 }
 
