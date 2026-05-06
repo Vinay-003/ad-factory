@@ -1049,6 +1049,68 @@ def strip_internal_markers_from_payload(payload: dict[str, Any]) -> dict[str, An
     return payload
 
 
+CTA_VARIANTS: dict[str, dict[str, list[str]]] = {
+    "EN": {
+        "HERO": ["Start Today", "See The 15-Day Plan", "Begin The Kit"],
+        "BA": ["See The Shift", "Start The Reset", "View The Change"],
+        "TEST": ["See The Proof", "Read The Routine", "Start With Proof"],
+        "FEAT": ["View Kit Steps", "See The Protocol", "Check The Steps"],
+        "UGC": ["See My Routine", "Watch The Routine", "Try The Steps"],
+    },
+    "HI": {
+        "HERO": ["आज शुरू करें", "15 दिन का प्लान देखें", "किट शुरू करें"],
+        "BA": ["बदलाव देखें", "रीसेट शुरू करें", "फर्क देखें"],
+        "TEST": ["प्रमाण देखें", "दिनचर्या पढ़ें", "भरोसे से शुरू करें"],
+        "FEAT": ["किट कदम देखें", "प्रोटोकॉल देखें", "कदम देखें"],
+        "UGC": ["मेरी दिनचर्या देखें", "दिनचर्या देखें", "कदम अपनाएं"],
+    },
+}
+
+
+def registry_banlist_values(context: dict[str, Any]) -> set[str]:
+    banlist = context.get("banlist") if isinstance(context.get("banlist"), dict) else {}
+    buckets = banlist.get("buckets") if isinstance(banlist.get("buckets"), dict) else {}
+    values: set[str] = set()
+    for arr in buckets.values():
+        if not isinstance(arr, list):
+            continue
+        for item in arr:
+            if isinstance(item, str) and item.strip():
+                values.add(item.strip())
+    return values
+
+
+def enforce_unique_ctas(payload: dict[str, Any], context: dict[str, Any]) -> dict[str, Any]:
+    ads = payload.get("ads") if isinstance(payload.get("ads"), list) else []
+    blocked = registry_banlist_values(context)
+    seen: set[str] = set()
+    for ad in ads:
+        if not isinstance(ad, dict):
+            continue
+        fmt = _clean_str(ad.get("format")).upper()
+        copy = ad.get("copy") if isinstance(ad.get("copy"), dict) else {}
+        for lang in ["EN", "HI"]:
+            block = copy.get(lang) if isinstance(copy.get(lang), dict) else None
+            if not block:
+                continue
+            current = _clean_str(block.get("cta"))
+            if current and current not in seen and current not in blocked:
+                seen.add(current)
+                continue
+            variants = CTA_VARIANTS.get(lang, {}).get(fmt, [])
+            chosen = ""
+            for candidate in variants:
+                if candidate not in seen and candidate not in blocked:
+                    chosen = candidate
+                    break
+            if not chosen:
+                suffix = len(seen) + 1
+                chosen = f"{variants[0] if variants else 'Start'} {suffix}"
+            block["cta"] = chosen
+            seen.add(chosen)
+    return payload
+
+
 def parse_uniqueness_collisions(error_text: str) -> list[dict[str, Any]]:
     collisions: list[dict[str, Any]] = []
     for raw_line in error_text.splitlines():
@@ -1207,6 +1269,103 @@ def _clean_bullets(value: Any) -> list[str]:
     return out
 
 
+def concept_ids_from_requirements(copy_req: dict[str, Any]) -> dict[str, str]:
+    concept = copy_req.get("concept_variation") if isinstance(copy_req.get("concept_variation"), dict) else {}
+
+    def nested_id(key: str, fallback: str) -> str:
+        item = concept.get(key) if isinstance(concept.get(key), dict) else {}
+        value = item.get("id") if isinstance(item, dict) else ""
+        return _clean_str(value) or fallback
+
+    return {
+        "awareness_stage": nested_id("audience_stage", "problem_aware"),
+        "concept_angle": nested_id("lead_angle", "desired_outcome"),
+        "concept_structure": nested_id("message_structure", "four_us"),
+    }
+
+
+FEATURE_TEMPLATE_COPY: dict[str, dict[str, str]] = {
+    "am_routine": {
+        "headline_en": "Start mornings with a clearer 15-day weight-loss routine.",
+        "support_en": "OK Liquid helps structure the first step so weight-loss follow-through feels easier.",
+        "headline_hi": "सुबह से 15 दिन की वजन-घटाने की दिनचर्या साफ करें।",
+        "support_hi": "OK Liquid पहला कदम साफ करता है ताकि वजन-घटाने की दिनचर्या निभाना आसान लगे।",
+    },
+    "pm_routine": {
+        "headline_en": "Night digestion support can make weight control easier.",
+        "support_en": "Tablet and powder support the routine while reducing next-day weight-loss friction.",
+        "headline_hi": "रात का पाचन-सपोर्ट वजन नियंत्रण आसान बनाता है।",
+        "support_hi": "Tablet और powder दिनचर्या को सहारा देते हैं ताकि अगले दिन वजन-घटाने की रुकावट कम रहे।",
+    },
+    "cravings_down": {
+        "headline_en": "Fewer cravings make weight loss feel easier.",
+        "support_en": "Ayurvedic hunger support helps reduce random eating that slows weight-loss progress.",
+        "headline_hi": "कम लालसा से वजन घटाना आसान लगता है।",
+        "support_hi": "आयुर्वेदिक भूख-सपोर्ट अचानक खाने की आदत कम करके वजन-घटाने में मदद करता है।",
+    },
+    "guided_support": {
+        "headline_en": "Guided steps make weight loss less guesswork.",
+        "support_en": "Tracker and WhatsApp support help the 15-day kit stay practical every day.",
+        "headline_hi": "साफ कदमों से वजन घटाने में अंदाजा कम होता है।",
+        "support_hi": "Tracker और WhatsApp सपोर्ट 15 दिन की किट को रोज व्यावहारिक बनाए रखते हैं।",
+    },
+    "structured_system": {
+        "headline_en": "A clear 15-day system beats random dieting.",
+        "support_en": "Doctor-formulated steps connect appetite control, digestion support, and weight-loss routine.",
+        "headline_hi": "साफ 15 दिन का सिस्टम अनियमित डाइटिंग से बेहतर है।",
+        "support_hi": "डॉक्टर-फॉर्मुलेटेड कदम भूख नियंत्रण, पाचन-सपोर्ट और वजन-घटाने की दिनचर्या जोड़ते हैं।",
+    },
+    "homemade_food": {
+        "headline_en": "Weight loss should fit normal homemade meals.",
+        "support_en": "The kit supports appetite control without forcing crash-diet pressure.",
+        "headline_hi": "वजन घटाना सामान्य घर के खाने में फिट होना चाहिए।",
+        "support_hi": "किट भूख नियंत्रण में सहायक है, कठोर डाइट दबाव के बिना।",
+    },
+    "natural_safe": {
+        "headline_en": "Ayurvedic weight-loss support without harsh shortcuts.",
+        "support_en": "Natural kit steps support cravings, digestion, and practical obesity-reduction efforts.",
+        "headline_hi": "कठोर shortcuts के बिना आयुर्वेदिक वजन-सपोर्ट।",
+        "support_hi": "प्राकृतिक किट लालसा, पाचन और मोटापा-कम करने के प्रयासों में सहारा देती है।",
+    },
+    "proof_guarantee": {
+        "headline_en": "A 15-day kit with proof-led weight-loss support.",
+        "support_en": "70,000+ users and refund terms help make the first step feel safer.",
+        "headline_hi": "प्रमाण-आधारित वजन-सपोर्ट वाली 15 दिन की किट।",
+        "support_hi": "70,000+ उपयोगकर्ता और रिफंड शर्तें पहला कदम सुरक्षित महसूस कराते हैं।",
+    },
+}
+
+
+def feature_template(feature_key: str) -> dict[str, str]:
+    return FEATURE_TEMPLATE_COPY.get(feature_key) or FEATURE_TEMPLATE_COPY["structured_system"]
+
+
+def template_headline(feature_key: str, concept_angle: str, pain_en: str, lang: str) -> str:
+    tpl = feature_template(feature_key)
+    if lang == "HI":
+        return tpl["headline_hi"]
+    if concept_angle == "pain_point" and pain_en:
+        pain = pain_en.rstrip(".")
+        return shorten_copy_line(f"{pain}. The kit helps weight loss feel manageable.", limit=90)
+    if concept_angle == "social_proof":
+        return "70,000+ users trust this 15-day weight-loss kit."
+    if concept_angle == "authority":
+        return "Doctor-formulated Ayurvedic support for 15-day weight loss."
+    if concept_angle == "comparison":
+        return "A clear kit routine beats random dieting."
+    if concept_angle == "offer":
+        return "Start the 15-day weight-loss kit with refund terms."
+    return tpl["headline_en"]
+
+
+def template_support(feature_key: str, secondary_key: str, lang: str) -> str:
+    primary = feature_template(feature_key)
+    secondary = feature_template(secondary_key)
+    if lang == "HI":
+        return shorten_copy_line(secondary["support_hi"] or primary["support_hi"], limit=100)
+    return shorten_copy_line(secondary["support_en"] or primary["support_en"], limit=100)
+
+
 def ensure_testimonial_headline(headline: str, lang: str, persona: dict[str, Any]) -> str:
     clean = shorten_copy_line(headline, limit=90)
     if lang == "EN":
@@ -1340,6 +1499,11 @@ def normalize_generated_copy(
         if angle:
             ad["headline_angle"] = angle
 
+        for key in ["awareness_stage", "concept_angle", "concept_structure"]:
+            value = _clean_str(candidate.get(key))
+            if value:
+                ad[key] = value
+
         cand_copy = candidate.get("copy") if isinstance(candidate.get("copy"), dict) else {}
         for lang in ["EN", "HI"]:
             base_lang = ad["copy"][lang]
@@ -1390,6 +1554,9 @@ def build_template_copy(context: dict[str, Any], run_id: str) -> dict[str, Any]:
         persona_name = persona["persona_name"]
         unique = f"{token}-{idx:02d}-{fmt.lower()}"
         copy_req = item.get("copy_requirements") if isinstance(item.get("copy_requirements"), dict) else {}
+        concept_ids = concept_ids_from_requirements(copy_req)
+        primary_key = _clean_str(copy_req.get("primary_feature_key")) or "structured_system"
+        secondary_key = _clean_str(copy_req.get("secondary_feature_key")) or "cravings_down"
         primary_feature = _clean_str(copy_req.get("primary_feature")) or "Guided system"
         headline_driver = _clean_str(copy_req.get("headline_driver")) or "guided weight-loss support"
         support_driver = _clean_str(copy_req.get("support_driver")) or "clear routine and follow-through"
@@ -1400,53 +1567,71 @@ def build_template_copy(context: dict[str, Any], run_id: str) -> dict[str, Any]:
         proof_en = choose_text(persona.get("trust_anchors", []), "Needs proof through clear structure and believable support.")
         tone_en = "Practical, empathetic, and confidence-building"
 
-        pain_hi = choose_text(persona.get("hindi_ready", []), "रूटीन निभाना मुश्किल लग रहा है।")
-        desire_hi = "ऐसा आसान सिस्टम जो रोज निभ सके।"
+        pain_hi = "रोज की वजन-घटाने की दिनचर्या टूटना आसान है।"
+        desire_hi = "ऐसा आसान सिस्टम चाहिए जो रोज निभ सके।"
         friction_hi = "पहले के प्लान बहुत सख्त और मुश्किल थे।"
-        proof_hi = "साफ तरीका, भरोसेमंद सपोर्ट और व्यावहारिक प्रूफ चाहिए।"
+        proof_hi = "साफ कदम, भरोसेमंद सपोर्ट और व्यावहारिक प्रमाण चाहिए।"
         tone_hi = "सरल, भरोसेमंद, और व्यावहारिक"
 
+        concept_angle = concept_ids["concept_angle"]
+        headline_en = template_headline(primary_key, concept_angle, pain_en, "EN")
+        headline_hi = template_headline(primary_key, concept_angle, pain_en, "HI")
+        if fmt == "BA":
+            headline_en = "A clear kit routine beats random dieting."
+            headline_hi = "साफ किट दिनचर्या अनियमित डाइटिंग से बेहतर है।"
+        elif fmt == "FEAT":
+            headline_en = "Three kit steps support 15-day weight loss."
+            headline_hi = "तीन किट कदम 15 दिन के वजन-सपोर्ट में मदद करते हैं।"
+        elif fmt == "UGC":
+            headline_en = "Late-night cravings can feel easier to control."
+            headline_hi = "रात की लालसा नियंत्रित करना आसान लग सकता है।"
+        cta_by_format = {
+            "HERO": ("Start Today", "आज शुरू करें"),
+            "BA": ("See The Shift", "बदलाव देखें"),
+            "TEST": ("See The Proof", "प्रमाण देखें"),
+            "FEAT": ("View Kit Steps", "किट कदम देखें"),
+            "UGC": ("See My Routine", "मेरी दिनचर्या देखें"),
+        }
+        cta_en, cta_hi = cta_by_format.get(fmt, ("Start Today", "आज शुरू करें"))
         if fmt == "TEST":
-            headline_en = f"I needed {primary_feature.lower()} that made weight loss feel doable {unique}."
-            headline_hi = f"मुझे ऐसा {primary_feature} चाहिए था जिससे weight loss doable लगे {unique}।"
-        else:
-            headline_en = f"{primary_feature} for visible weight-loss progress {unique}."
-            headline_hi = f"Visible weight-loss progress के लिए {primary_feature} {unique}।"
-        cta_en = f"Start Now {unique}"
-        cta_hi = f"अभी शुरू करें {unique}"
+            headline_en = shorten_copy_line(f"I trusted the 15-day kit because the steps felt clear for weight loss.", limit=90)
+            headline_hi = "मैंने 15 दिन की किट पर भरोसा किया क्योंकि वजन-घटाने के कदम साफ लगे।"
 
         copy_en: dict[str, Any]
         copy_hi: dict[str, Any]
         if fmt in {"HERO", "UGC"}:
-            support_en = f"{support_driver.capitalize()} while the main routine stays tied to weight loss {unique}."
-            support_hi = f"{support_driver} के साथ मुख्य routine weight loss से जुड़ा रहता है {unique}।"
+            support_en = template_support(primary_key, secondary_key, "EN")
+            support_hi = template_support(primary_key, secondary_key, "HI")
+            if fmt == "UGC":
+                support_en = "A simple first step helps keep late-night weight-loss control practical."
+                support_hi = "एक सरल पहला कदम रात के वजन-नियंत्रण को व्यावहारिक रखता है।"
             copy_en = {"headline": headline_en, "support_line": support_en, "cta": cta_en}
             copy_hi = {"headline": headline_hi, "support_line": support_hi, "cta": cta_hi}
         elif fmt == "BA":
             bullets_en = [
-                f"{pain_en} {unique}.",
-                f"{friction_en} {unique}.",
-                f"{headline_driver.capitalize()} supports the weight-loss shift {unique}.",
-                f"{support_driver.capitalize()} makes follow-through more realistic {unique}.",
+                pain_en.rstrip("."),
+                friction_en.rstrip("."),
+                feature_template(primary_key)["support_en"].rstrip("."),
+                feature_template(secondary_key)["support_en"].rstrip("."),
             ]
             bullets_hi = [
-                f"{pain_hi} {unique}।",
-                f"{friction_hi} {unique}।",
-                f"{headline_driver} weight-loss shift में support करता है {unique}।",
-                f"{support_driver} follow-through को practical बनाता है {unique}।",
+                pain_hi.rstrip("।"),
+                friction_hi.rstrip("।"),
+                feature_template(primary_key)["support_hi"].rstrip("।"),
+                feature_template(secondary_key)["support_hi"].rstrip("।"),
             ]
             copy_en = {"headline": headline_en, "bullets": bullets_en, "cta": cta_en}
             copy_hi = {"headline": headline_hi, "bullets": bullets_hi, "cta": cta_hi}
         elif fmt == "FEAT":
             bullets_en = [
-                f"Morning OK Liquid helps reduce hunger and random snacking for weight loss {unique}.",
-                f"Night Tablet + Powder support digestion and lighter mornings in obesity routine {unique}.",
-                f"Built for visible 15-day weight-loss support without crash-diet pressure {unique}.",
+                "Morning OK Liquid helps reduce hunger and random snacking for weight loss.",
+                "Night Tablet + Powder support digestion and lighter mornings in obesity routine.",
+                "Built for visible 15-day weight-loss support without crash-diet pressure.",
             ]
             bullets_hi = [
-                f"सुबह का OK Liquid वजन घटाने के लिए भूख और स्नैकिंग कम करने में सहायक है {unique}।",
-                f"रात का Tablet + Powder obesity रूटीन में पाचन और हल्की सुबह के लिए सपोर्ट देता है {unique}।",
-                f"crash diet दबाव के बिना 15 दिन की visible weight-loss support के लिए बनाया गया {unique}।",
+                "सुबह का OK Liquid वजन घटाने के लिए भूख और अचानक खाने की आदत कम करने में सहायक है।",
+                "रात का Tablet + Powder मोटापा-नियंत्रण दिनचर्या में पाचन-सपोर्ट देता है।",
+                "कठोर डाइट दबाव के बिना 15 दिन के वजन-सपोर्ट के लिए बनाया गया।",
             ]
             copy_en = {"headline": headline_en, "bullets": bullets_en, "cta": cta_en}
             copy_hi = {"headline": headline_hi, "bullets": bullets_hi, "cta": cta_hi}
@@ -1454,13 +1639,13 @@ def build_template_copy(context: dict[str, Any], run_id: str) -> dict[str, Any]:
             copy_en = {
                 "headline": headline_en,
                 "attribution": "Doctor-formulated Ayurvedic obesity and weight-loss protocol",
-                "trust_line": f"Structured morning-night steps for visible weight-loss progress and obesity control {unique}.",
+                "trust_line": "Structured morning-night steps for visible weight-loss progress and obesity control.",
                 "cta": cta_en,
             }
             copy_hi = {
                 "headline": headline_hi,
-                "attribution": "डॉक्टर-फॉर्मुलेटेड आयुर्वेदिक obesity और weight-loss प्रोटोकॉल",
-                "trust_line": f"सुबह-रात के स्पष्ट स्टेप्स से visible वजन घटाने और obesity नियंत्रण का भरोसेमंद सपोर्ट {unique}।",
+                "attribution": "डॉक्टर-फॉर्मुलेटेड आयुर्वेदिक मोटापा और वजन-घटाने का प्रोटोकॉल",
+                "trust_line": "सुबह-रात के स्पष्ट कदमों से वजन घटाने और मोटापा नियंत्रण का भरोसेमंद सपोर्ट।",
                 "cta": cta_hi,
             }
 
@@ -1468,6 +1653,9 @@ def build_template_copy(context: dict[str, Any], run_id: str) -> dict[str, Any]:
             {
                 "format": fmt,
                 "headline_angle": "mechanism",
+                "awareness_stage": concept_ids["awareness_stage"],
+                "concept_angle": concept_ids["concept_angle"],
+                "concept_structure": concept_ids["concept_structure"],
                 "persona": {
                     "number": persona_num,
                     "name": persona_name,
@@ -1499,7 +1687,7 @@ def call_opencode_compatible(config: dict[str, Any], context: dict[str, Any], ru
     language_mode = resolve_language_mode(config)
     system = (
         "You generate ad copy JSON only. Return valid JSON with keys default_aspect_ratio and ads. "
-        "Each ads item must include format, headline_angle, persona fields and copy.EN/copy.HI fields compatible with assembler. "
+        "Each ads item must include format, headline_angle, awareness_stage, concept_angle, concept_structure, persona fields and copy.EN/copy.HI fields compatible with assembler. "
         "Every ad unit must make the obesity and weight-loss intent obvious to a first-time viewer. "
         "At minimum, headline or support line must explicitly mention weight loss, obesity reduction, excess-weight reduction, or a direct 15-day result framing. "
         "Avoid abstract lines that hide the product goal. "
@@ -1515,7 +1703,8 @@ def call_opencode_compatible(config: dict[str, Any], context: dict[str, Any], ru
         "For the same format across runs, rotate variation lane and wording rhythm while preserving format-specific structure. "
         "Each ad item includes copy_requirements; treat primary_feature/headline_driver as the headline lane and secondary_feature/support_driver as the supporting lane. "
         "Use headline_execution_rules, headline_concept_framework, and each ad's copy_requirements.concept_variation as the execution model. "
-        "The concept variation tells you the awareness stage, lead angle, and message structure; it is direction only, not copy to reuse. "
+        "The concept variation tells you the awareness stage, lead angle, and message structure; copy its ids into awareness_stage, concept_angle, and concept_structure, but treat the directions as guidance only, not copy to reuse. "
+        "Use the 4U writing lens before finalizing every headline: Useful, honestly Urgent, Unique, and Ultra-specific. This is a writing instruction, not a label to output. "
         "Good headlines should sound edited by a human, not generated: concrete, restrained, mobile-readable, and shaped like a line someone would approve on an actual ad. "
         "Avoid AI-slop wording such as unlock, transform your journey, revolutionary, holistic wellness, game-changing, effortlessly, tailored solution, and vague transformation slogans. "
         "Do not force every headline to carry every keyword; the headline/support pair must make the weight-loss intent obvious together. "
@@ -2613,9 +2802,15 @@ async def api_run_execute(
         json.dumps(full_context, ensure_ascii=False, indent=2) + "\n", encoding="utf-8"
     )
 
+    llm_mode = "opencode"
     copy_json = call_opencode_compatible(cfg, full_context, run_dir)
     if not copy_json:
-        raise HTTPException(status_code=502, detail="OpenCode copy generation failed. Prompt production stopped; check run logs.")
+        llm_mode = "fallback_template"
+        (run_dir / "logs" / "opencode_fallback.txt").write_text(
+            "OpenCode copy generation unavailable; using deterministic schema-compatible fallback copy.\n",
+            encoding="utf-8",
+        )
+        copy_json = build_template_copy(full_context, run_id)
     generated_copy_error = validate_generated_copy_payload(copy_json, ads_context)
     if generated_copy_error:
         (run_dir / "logs" / "opencode_error.txt").write_text(
@@ -2623,9 +2818,9 @@ async def api_run_execute(
             encoding="utf-8",
         )
         raise HTTPException(status_code=502, detail="OpenCode copy generation returned incomplete copy. Prompt production stopped; check run logs.")
-    llm_mode = "opencode"
     copy_json = normalize_generated_copy(copy_json, full_context, run_id)
     copy_json = strip_internal_markers_from_payload(copy_json)
+    copy_json = enforce_unique_ctas(copy_json, full_context)
 
     copy_file = run_dir / "context" / "copy_batch.json"
     copy_file.write_text(json.dumps(copy_json, ensure_ascii=False, indent=2) + "\n", encoding="utf-8")
@@ -2651,6 +2846,7 @@ async def api_run_execute(
             if repaired:
                 copy_json = normalize_generated_copy(repaired, full_context, run_id)
                 copy_json = strip_internal_markers_from_payload(copy_json)
+                copy_json = enforce_unique_ctas(copy_json, full_context)
                 copy_file.write_text(json.dumps(copy_json, ensure_ascii=False, indent=2) + "\n", encoding="utf-8")
 
                 retry = run_cmd(
@@ -2711,6 +2907,7 @@ async def api_run_execute(
 
     manifest = collect_run_result(run_dir, batch_name, image_generated)
     manifest["llm_mode"] = llm_mode
+    manifest["copy_source"] = "deterministic fallback template" if llm_mode == "fallback_template" else "opencode generated copy"
     manifest["context_source"] = product_ctx_source
     manifest["context_extractor_model"] = extractor_model
     manifest["image_sources_file"] = str(image_sources_file_path)

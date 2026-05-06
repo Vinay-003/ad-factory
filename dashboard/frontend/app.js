@@ -259,7 +259,7 @@ async function runPipeline() {
     setStatus(`Failed: ${data.detail || "unknown error"}`);
     return;
   }
-  setStatus(`Done\nRun: ${data.run_id}\nBatch: ${data.batch}\nLLM mode: ${data.llm_mode}\nPrompts: ${data.prompt_files.length}\nImages: ${data.image_files.length}`);
+  setStatus(`Done\nRun: ${data.run_id}\nBatch: ${data.batch}\nLLM mode: ${data.llm_mode}\nCopy source: ${data.copy_source || data.llm_mode}\nPrompts: ${data.prompt_files.length}\nImages: ${data.image_files.length}`);
   await loadRuns();
 }
 

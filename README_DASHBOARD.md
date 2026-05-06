@@ -101,9 +101,9 @@ The dashboard does deterministic retrieval first, then generation.
     - `scripts/extract_format_rules.py` from `AD_CREATIVE_SYSTEM_PLAYBOOK.md`
     - `scripts/extract_product_context.py` as fallback
 3. Backend builds compact `run_context.json` in run storage.
-4. OpenCode generates copy JSON only.
-5. Backend normalizes schema and trims long copy lines.
-6. Assembler script creates final prompt files.
+4. OpenCode generates copy JSON only, including the selected `awareness_stage`, `concept_angle`, and `concept_structure` from the concept framework.
+5. Backend normalizes schema, carries concept IDs forward, and trims long copy lines.
+6. Assembler validates uniqueness, concept-combo rotation, and 4U headline quality before creating final prompt files.
 
 This removes token-heavy "read whole docs" behavior and sends only relevant slices to model.
 

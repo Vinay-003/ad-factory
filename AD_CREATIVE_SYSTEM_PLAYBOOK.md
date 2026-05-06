@@ -221,19 +221,81 @@ Selection rule:
 
 ---
 
+## 6A) Awareness-Stage Layer
+
+Every production ad must declare one reader awareness stage before copy is written. This is separate from persona.
+
+Persona answers who is being addressed. Awareness stage answers how much persuasion context they already have.
+
+Allowed awareness stages:
+- `unaware`: reader does not yet realize the hidden weight-management friction. Lead by naming an ignored cause such as random eating, hunger spikes, or routine breakdown.
+- `problem_aware`: reader knows the problem but not the fix. Validate the pain, then introduce the approved product mechanism.
+- `solution_aware`: reader knows fixes exist but not why this kit is different. Compare against stricter, messier, or less guided alternatives.
+- `product_aware`: reader already knows the kit or brand. Use proof, urgency, trust, guarantee terms, or simplicity to create the final push.
+
+Awareness-stage selection rules:
+- If user provides an awareness stage, use it exactly unless it conflicts with format or compliance rules.
+- If missing, infer from persona pain, friction, and proof-needed fields.
+- Trust-first, doctor-backed, natural-solution, guarantee, or budget/value personas usually map to `product_aware` or `solution_aware`.
+- Craving, snacking, schedule, routine, stress, or beginner personas usually map to `problem_aware`.
+- Broad educational concepts that expose an overlooked behavior loop may use `unaware`.
+
+Awareness-stage writing map:
+- `unaware`: headline names the hidden issue; support line connects it to weight-management purpose.
+- `problem_aware`: headline validates the known pain; support line introduces the kit mechanism.
+- `solution_aware`: headline contrasts old fixes with this system; support line explains why the routine is easier, safer-feeling, or more guided.
+- `product_aware`: headline leads with proof, deadline, offer, or trust; support line reduces the final buying hesitation.
+
+Concept path lock:
+- Each ad must choose exactly one concept path: `awareness_stage + concept_angle + concept_structure`.
+- Do not mix multiple awareness stages or multiple lead angles inside one headline.
+- The chosen concept path is direction only. Do not render framework labels on-image.
+
+---
+
 ## 7) Headline Engine
 
 Each headline must do 2 jobs:
 1. Scroll stop with persona pain
 2. Show how Obesity Killer solves that pain using an approved mechanism
 
-Formula: Hook (pain) + Mechanism (how) + Outcome/time
+Formula: Persona pain + Awareness stage + Concept angle + Copy structure + Approved mechanism/outcome
+
+Headline construction sequence:
+1. Select persona and define pain/desire/friction/proof needed/tone cue.
+2. Select or infer `awareness_stage`.
+3. Select `concept_angle` from the 8-angle menu.
+4. Select `concept_structure` from PAS / BAB / FAB / 4U's.
+5. Compose headline and support line as one hierarchy: headline earns attention, support line explains the product reason to believe.
+
+Concept angle menu:
+- `pain_point`: lead with the specific problem.
+- `desired_outcome`: lead with the result or felt outcome.
+- `social_proof`: lead with others' trust, user scale, or review logic.
+- `authority`: lead with doctor formulation, Ayurveda credibility, or expertise.
+- `story`: lead with a real-life routine moment or first-person situation.
+- `curiosity`: lead with an information gap or mechanism question.
+- `comparison`: lead by contrasting the kit with harder alternatives.
+- `offer`: lead with result window, guarantee terms, kit completeness, or practical reason to act.
+
+Concept structure menu:
+- `pas`: Problem -> Agitate -> Solve. Name the pain, sharpen why it keeps happening, then introduce approved kit mechanism.
+- `bab`: Before -> After -> Bridge. Show current friction, desired progress state, then the kit/routine bridge.
+- `fab`: Feature -> Advantage -> Benefit. State concrete product feature, why it helps, and weight-management benefit.
+- `four_us`: Useful, Urgent, Unique, Ultra-specific. Make the headline immediately relevant, honestly time-sensitive, differentiated, and concrete.
 
 Freshness rule:
 - Do not use a fixed headline bank as final output.
 - Generate new headlines every request from persona pain + mechanism + outcome.
 - Avoid repeating opening patterns across consecutive ads.
 - Rotate angle each time: pain, objection, mechanism, time, proof, sacrifice reduction.
+
+4U writing lens:
+- Useful: reader understands why the line matters right now.
+- Urgent: the line gives a real reason to act now or start soon. No fake scarcity.
+- Unique: a generic competitor could not say the exact same line unchanged.
+- Ultra-specific: line uses concrete detail such as 15 days, cravings, routine step, kit system, doctor-formulated proof, or user scale.
+- Use these as instructions while writing. Do not run a hard vocabulary scorer or block prompt assembly only because wording is new.
 
 Examples (direction only, do not copy-paste):
 - "Cravings control nahi ho rahe? 15 din mein routine palat sakta hai."
@@ -340,6 +402,9 @@ In production mode:
       "persona_number": 2,
       "persona_name": "Busy Professional",
       "headline_angle": "sacrifice_reduction",
+      "awareness_stage": "problem_aware",
+      "concept_angle": "desired_outcome",
+      "concept_structure": "four_us",
       "headline_en": "Weight loss without life disruption.",
       "headline_hi": "जीवन बिगाड़े बिना वज़न घटाएं।",
       "support_line_en": "Control cravings, support metabolism daily.",
@@ -375,8 +440,11 @@ In production mode:
   "indexes": {
     "backgrounds_by_format": {},
     "slot_exhaustion_tracker": {},
-    "used_text": {},
-    "copy_patterns": {
+      "used_text": {},
+      "concept_combos": {
+        "recent": []
+      },
+      "copy_patterns": {
       "by_format_language": {},
       "recent_opening_4tok": {},
       "recent_skeletons": {},
@@ -396,6 +464,9 @@ In production mode:
 - persona_number: 1-26
 - persona_name: readable name
 - headline_angle: pain / objection / mechanism / time / proof / sacrifice_reduction
+- awareness_stage: unaware / problem_aware / solution_aware / product_aware
+- concept_angle: pain_point / desired_outcome / social_proof / authority / story / curiosity / comparison / offer
+- concept_structure: pas / bab / fab / four_us
 - headline_en: exact English headline used
 - headline_hi: exact Hindi headline used
 - support_line_en/support_line_hi: exact support line used on image
@@ -426,6 +497,7 @@ In production mode:
 - Same opening_pattern_4tok + same format/language = hard block in recent window (last 10 entries).
 - Same copy_skeleton + same format/language = hard block if repeated in last 5 entries.
 - Same hook_structure_class + proof_style_class + cta_voice_class trio = hard block in last 12 entries (prevents "same ad with new words" effect).
+- Same `awareness_stage + concept_angle + concept_structure + format` = hard block in the recent concept-combo window (last 8 concept combos for that format).
 
 ### Copy diversity matrix (mandatory for scaled production)
 
@@ -451,10 +523,37 @@ Every ad must be tagged before finalization using these 4 axes and rotated inten
   - `discovery_action`
 - copy_skeleton (examples):
   - `pain_mechanism_time`
+  - `pain_agitate_solve`
   - `objection_flip_mechanism`
   - `proof_then_routine`
   - `micro_story_then_action`
   - `problem_reframe_then_next_step`
+
+Concept-combo matrix (mandatory for headline ideation):
+- awareness_stage:
+  - `unaware`
+  - `problem_aware`
+  - `solution_aware`
+  - `product_aware`
+- concept_angle:
+  - `pain_point`
+  - `desired_outcome`
+  - `social_proof`
+  - `authority`
+  - `story`
+  - `curiosity`
+  - `comparison`
+  - `offer`
+- concept_structure:
+  - `pas`
+  - `bab`
+  - `fab`
+  - `four_us`
+
+Concept-combo rule:
+- Treat `awareness_stage + concept_angle + concept_structure` as the creative idea ID.
+- Rotate concept combos intentionally across a batch.
+- If the same format is repeated in one run, do not reuse the same concept combo unless user explicitly requests a controlled duplicate test.
 
 Batch diversity minimum:
 - In any 5-ad batch, at least 4 unique `hook_structure_class` values.
@@ -1013,6 +1112,9 @@ Validation checklist (machine-checkable):
 - `CHK-24` support_line_outcome_anchor: support lines must not be generic routine-only language; they must connect approved mechanism logic to weight-loss / excess-weight / obesity-reduction intent using compliant wording.
 - `CHK-25` safe_zone_rules_present: prompt must include the correct safe-zone rule set for the selected canvas ratio before write.
 - `CHK-26` critical_elements_inside_safe_zone: headline, support line, CTA, logos, and product-signaling elements must stay out of declared top/bottom/side risk bands for 4:5 and 9:16 outputs.
+- `CHK-27` concept_fields_present: each ad declares `awareness_stage`, `concept_angle`, and `concept_structure` or has them inferred from `copy_requirements.concept_variation` before assembly.
+- `CHK-28` concept_combo_rotation: same `awareness_stage + concept_angle + concept_structure + format` does not repeat in the recent concept-combo window unless the run is explicitly marked as a controlled duplicate test.
+- `CHK-29` reserved: 4U is a writing instruction for the AI/operator, not a machine-blocking validation gate. Do not fail prompt assembly solely because a generated headline uses words outside a scorer vocabulary.
 
 Operational examples of CHK-22 failure (reject and regenerate):
 - `Raat ko control nahi ho raha?`
@@ -1111,6 +1213,33 @@ Mandatory visual-direction block (add by default):
 - "Define background behavior (clean, low-noise, non-distracting, premium texture)."
 - "Define realism constraints (natural skin, correct hand anatomy, true-to-life proportions)."
 - "Define what to avoid visually (stock-template look, clutter, random stickers, noisy overlays)."
+
+---
+
+## 15A) Quick Ideation Mode
+
+Purpose:
+- Use this mode only when the user asks for headline ideas, concept routes, hooks, or brainstorming before production.
+- This mode generates creative options without assembling image prompts.
+
+Input model:
+- Pick 1 `awareness_stage` from Section 6A.
+- Pick 1 `concept_angle` from Section 7.
+- Pick 1 `concept_structure` from Section 7.
+- Optional: pick persona and format.
+
+Output model:
+- Generate 5-10 headline/support-line pairs.
+- Each option must include the chosen awareness stage, concept angle, concept structure, and one sentence explaining the test hypothesis.
+- Do not write to `output/vN/`.
+- Do not select backgrounds.
+- Do not call image APIs.
+- Do not append to registry unless the user promotes an option to production.
+
+Promotion to production:
+- When the user selects an ideation option, convert it into the normal production copy payload.
+- Carry forward `awareness_stage`, `concept_angle`, and `concept_structure`.
+- Run all production dedupe and registry checks before prompt assembly.
 
 ---
 
@@ -1241,6 +1370,11 @@ Follow these rules strictly:
 - For each ad, use one persona input block (pain, desire, friction, proof needed, tone cue).
 - Build persona inputs from the selected persona and the 5-field model (pain, desire, friction, proof needed, tone cue).
 - Headline must do two things: scroll stop + pain-solution fit.
+- Every ad must use one concept path: awareness_stage + concept_angle + concept_structure.
+- Awareness stages are unaware, problem_aware, solution_aware, and product_aware. If missing, infer from persona pain/friction/proof needed.
+- Concept angles are pain_point, desired_outcome, social_proof, authority, story, curiosity, comparison, and offer.
+- Concept structures are pas, bab, fab, and four_us.
+- Use the 4U lens while writing headlines: Useful, honestly Urgent, Unique, and Ultra-specific. This is an AI/operator writing guideline, not a machine-scored blocker.
 - Caption must increase Value = (Dream Outcome x Likelihood) / (Time Delay x Sacrifice).
 - Keep language simple, active, specific, and short.
 - Reject generic templates; prioritize clear hierarchy and premium composition.
@@ -1254,6 +1388,7 @@ Follow these rules strictly:
 - Select a background slot from the Background Variation Engine (Section 9 of playbook) using exhaustive format-wise rotation (no repeat until all allowed slots for that format are used once). State which slot you selected.
 - Enforce strict text uniqueness: headline/support/CTA/caption/bullets in EN and HI must never repeat any previously used string.
 - Check the registry at `AD_GENERATION_REGISTRY.JSON` before generation to avoid persona, angle, and background repetition.
+- Track concept combos in the registry; avoid repeating the same awareness_stage + concept_angle + concept_structure + format in the recent window.
 - Registry is in production mode. Write one entry after each generation.
 - When user says "create ads", write to next available `output/vN/` (max existing + 1). Never overwrite old version folders.
 - "Create registry" or "update registry" must target existing root `AD_GENERATION_REGISTRY.JSON` only.
@@ -1283,6 +1418,7 @@ How to avoid repetition at scale:
 - Never reuse old text directly (headline, support line, CTA, caption, bullets).
 - Recompute all copy every generation from persona fields and approved claims.
 - Use registry for both angle-level dedupe and strict text-level dedupe.
+- Use registry for concept-combo dedupe: awareness_stage + concept_angle + concept_structure + format.
 - Rotate catalog background slots with exhaustive format-wise cycles (no repeat until pool exhaustion, then reset cycle).
 
 ---
@@ -1307,6 +1443,9 @@ Starting state example (append entries in live production):
     "backgrounds_by_format": {},
     "slot_exhaustion_tracker": {},
     "used_text": {},
+    "concept_combos": {
+      "recent": []
+    },
     "copy_patterns": {
       "by_format_language": {},
       "recent_opening_4tok": {},
@@ -1323,6 +1462,7 @@ Registry indexing requirement (production):
 - Maintain `indexes.backgrounds_by_format` for per-format background tracking.
 - Maintain `indexes.slot_exhaustion_tracker` for catalog cycle state per format.
 - Maintain `indexes.used_text` for global text uniqueness tracking.
+- Maintain `indexes.concept_combos.recent` for recent concept path tracking.
 - Maintain `indexes.copy_patterns` for structural diversity tracking (opening patterns, skeletons, hook/proof/CTA classes).
 - Treat every string in `indexes.used_text` as permanently blocked from reuse.
 
@@ -1330,5 +1470,6 @@ Production live rules:
 - Keep `mode.write_enabled` true.
 - Set `mode.last_updated` to current timestamp on every write.
 - Append one entry per generation to `entries`.
+- Append one concept-combo record per generation to `indexes.concept_combos.recent`.
 - Never overwrite existing entries — append only.
 - Read registry before every generation to check deduplication rules.

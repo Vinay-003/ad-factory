@@ -1,7 +1,7 @@
 {
   "metadata": {
-    "generated_at": "2026-05-05T11:49:28Z",
-    "extractor_model": "openai/gpt-5.4",
+    "generated_at": "2026-05-06T07:17:28Z",
+    "extractor_model": "openai/gpt-5.2",
     "source_files": [
       "/home/mylappy/myspace/info/productmaster.txt",
       "/home/mylappy/myspace/info/PRODUCT_MECHANISM_V1.txt",
@@ -42,7 +42,25 @@
   },
   "conflicts": [],
   "dropped_claims": [],
-  "coverage_check": {},
+  "coverage_check": {
+    "required_present": {
+      "3_to_5kg_15days": false,
+      "adults_18plus_bmi_gt_25": false,
+      "insulin_exclusion": false,
+      "pregnancy_postpartum_exclusion": false,
+      "morning_liquid_4h_no_solids": false,
+      "night_powder_tablet": false,
+      "31_unique_44_total": false,
+      "refund_7day_with_tracker": false,
+      "not_fat_burner_positioning": false,
+      "on_image_copy_explicit_weightloss": false,
+      "headline_strategy_preserved": false,
+      "am_pm_routine_priority": false,
+      "cravings_down_priority": false,
+      "support_priority": false,
+      "feature_based_headlines": false
+    }
+  },
   "generation_context": {
     "product_info": [],
     "mechanism": [],

@@ -3,7 +3,7 @@
     "phase": "production",
     "write_enabled": true,
     "note": "Production mode active. Read before generation and append one entry after every generation.",
-    "last_updated": "2026-05-05T11:50:51Z"
+    "last_updated": "2026-05-06T07:20:12Z"
   },
   "rules": {
     "dedupe_scope": [
@@ -2772,6 +2772,181 @@
       "language": "BOTH",
       "output_quality": "pending",
       "notes": "assembled_from=copy_batch.json; batch=v14; aspect_ratio=4:5; seed=969169114; visual_archetype=ugc_desk_review"
+    },
+    {
+      "id": "entry_088",
+      "timestamp": "2026-05-06T07:20:12Z",
+      "format": "HERO",
+      "persona_number": 1,
+      "persona_name": "Craving-Control Struggler",
+      "headline_angle": "Comparison-led simple-start routine",
+      "awareness_stage": "problem_aware",
+      "concept_angle": "comparison",
+      "concept_structure": "fab",
+      "visual_archetype": "hero_close_crop_pedestal",
+      "headline_en": "Morning, empty-stomach OK Liquid: a simpler start to weight loss than strict diets.",
+      "headline_hi": "सुबह खाली पेट OK Liquid: कड़ी डाइट के बिना वज़न घटाने की आसान शुरुआत।",
+      "support_line_en": "Helps keep cravings quieter so snacking doesn’t break your calorie deficit by evening.",
+      "support_line_hi": "क्रेविंग्स कम महसूस हों, ताकि शाम तक स्नैकिंग से कैलोरी-डेफिसिट न टूटे।",
+      "cta_en": "See the 15-day routine",
+      "cta_hi": "15-दिन की रूटीन देखें",
+      "disclaimer_en": "",
+      "disclaimer_hi": "",
+      "caption_en": "",
+      "caption_hi": "",
+      "bullets_en": [],
+      "bullets_hi": [],
+      "background_slot": "BG-301",
+      "background_name": "Warm vanilla studio",
+      "background_source": "catalog",
+      "fresh_background_signature": null,
+      "language": "BOTH",
+      "output_quality": "pending",
+      "notes": "assembled_from=copy_batch.json; batch=v15; aspect_ratio=4:5; seed=765700195; visual_archetype=hero_close_crop_pedestal"
+    },
+    {
+      "id": "entry_089",
+      "timestamp": "2026-05-06T07:20:12Z",
+      "format": "BA",
+      "persona_number": 1,
+      "persona_name": "Craving-Control Struggler",
+      "headline_angle": "Social-proof-led craving control for weight loss",
+      "awareness_stage": "problem_aware",
+      "concept_angle": "social_proof",
+      "concept_structure": "bab",
+      "visual_archetype": "ba_soft_diagonal_transition",
+      "headline_en": "What people who finally stuck to weight loss changed first",
+      "headline_hi": "जिन लोगों ने वेट लॉस टिकाया, उन्होंने सबसे पहले यह बदला",
+      "support_line_en": "",
+      "support_line_hi": "",
+      "cta_en": "Start the 15-day routine",
+      "cta_hi": "15-दिन का रूटीन शुरू करें",
+      "disclaimer_en": "",
+      "disclaimer_hi": "",
+      "caption_en": "",
+      "caption_hi": "",
+      "bullets_en": [
+        "By evening: cravings spike and the weight-loss plan slips",
+        "Late-night snacking cancels the day’s effort",
+        "AM routine: start structured, cravings feel quieter sooner",
+        "Evening: fewer impulse bites, easier calorie control for weight loss"
+      ],
+      "bullets_hi": [
+        "शाम होते ही: क्रेविंग्स बढ़ती हैं और वेट-लॉस प्लान टूटता है",
+        "लेट-नाइट स्नैकिंग दिनभर की मेहनत बिगाड़ देती है",
+        "AM रूटीन: सुबह से स्ट्रक्चर, क्रेविंग्स जल्दी शांत लगती हैं",
+        "शाम: कम इम्पल्स बाइट्स, वेट लॉस के लिए कैलोरी कंट्रोल आसान"
+      ],
+      "background_slot": "BG-306",
+      "background_name": "Kitchen prep morning rush",
+      "background_source": "catalog",
+      "fresh_background_signature": null,
+      "language": "BOTH",
+      "output_quality": "pending",
+      "notes": "assembled_from=copy_batch.json; batch=v15; aspect_ratio=4:5; seed=765700195; visual_archetype=ba_soft_diagonal_transition"
+    },
+    {
+      "id": "entry_090",
+      "timestamp": "2026-05-06T07:20:12Z",
+      "format": "UGC",
+      "persona_number": 3,
+      "persona_name": "Emotional Eater / Stress Snacker",
+      "headline_angle": "creator micro-story: stress-snacking down, weight loss on",
+      "awareness_stage": "problem_aware",
+      "concept_angle": "desired_outcome",
+      "concept_structure": "fab",
+      "visual_archetype": "ugc_unboxing_reaction",
+      "headline_en": "My stress-snacks dropped, weight loss started",
+      "headline_hi": "मेरी स्ट्रेस स्नैकिंग घटी, वज़न कम हुआ",
+      "support_line_en": "AM routine kept cravings quiet by 11",
+      "support_line_hi": "सुबह की रूटीन से 11 बजे तक cravings कम",
+      "cta_en": "Try the kit",
+      "cta_hi": "किट आज़माएँ",
+      "disclaimer_en": "",
+      "disclaimer_hi": "",
+      "caption_en": "",
+      "caption_hi": "",
+      "bullets_en": [],
+      "bullets_hi": [],
+      "background_slot": "BG-019",
+      "background_name": "Hotel travel routine",
+      "background_source": "catalog",
+      "fresh_background_signature": null,
+      "language": "BOTH",
+      "output_quality": "pending",
+      "notes": "assembled_from=copy_batch.json; batch=v15; aspect_ratio=4:5; seed=765700195; visual_archetype=ugc_unboxing_reaction"
+    },
+    {
+      "id": "entry_091",
+      "timestamp": "2026-05-06T07:20:12Z",
+      "format": "TEST",
+      "persona_number": 4,
+      "persona_name": "Plateau Victim",
+      "headline_angle": "plateau_restart_story_15_day",
+      "awareness_stage": "solution_aware",
+      "concept_angle": "story",
+      "concept_structure": "four_us",
+      "visual_archetype": "test_minimal_review_poster",
+      "headline_en": "“Week 3, my scale stopped. The daily WhatsApp check-ins helped restart my weight loss in 15 days.”",
+      "headline_hi": "“तीसरे हफ्ते में वजन अटक गया था। रोज़ के WhatsApp चेक-इन से 15 दिनों में मेरी weight loss फिर से शुरू हुई।”",
+      "support_line_en": "Made for obesity / excess-weight reduction with a clear daily system.",
+      "support_line_hi": "Obesity / excess-weight reduction के लिए एक साफ़, रोज़ फॉलो होने वाला सिस्टम।",
+      "cta_en": "Start the 15-day reset",
+      "cta_hi": "15-day reset शुरू करें",
+      "disclaimer_en": "",
+      "disclaimer_hi": "",
+      "caption_en": "",
+      "caption_hi": "",
+      "bullets_en": [],
+      "bullets_hi": [],
+      "background_slot": "BG-305",
+      "background_name": "Desk with reading glasses",
+      "background_source": "catalog",
+      "fresh_background_signature": null,
+      "language": "BOTH",
+      "output_quality": "pending",
+      "notes": "assembled_from=copy_batch.json; batch=v15; aspect_ratio=4:5; seed=765700195; visual_archetype=test_minimal_review_poster"
+    },
+    {
+      "id": "entry_092",
+      "timestamp": "2026-05-06T07:20:12Z",
+      "format": "FEAT",
+      "persona_number": 4,
+      "persona_name": "Plateau Victim",
+      "headline_angle": "Social proof-led plateau restart",
+      "awareness_stage": "solution_aware",
+      "concept_angle": "social_proof",
+      "concept_structure": "four_us",
+      "visual_archetype": "feat_mechanism_steps",
+      "headline_en": "Plateau-stuck? Many restarted weight loss with this 15-day AM routine",
+      "headline_hi": "वज़न घटाना रुक गया? कई लोगों ने 15 दिनों की AM रूटीन से फिर से वज़न कम करना शुरू किया",
+      "support_line_en": "",
+      "support_line_hi": "",
+      "cta_en": "See the AM + PM routine",
+      "cta_hi": "AM + PM रूटीन देखें",
+      "disclaimer_en": "",
+      "disclaimer_hi": "",
+      "caption_en": "",
+      "caption_hi": "",
+      "bullets_en": [
+        "AM Start: OK Liquid first thing on an empty stomach",
+        "4-Hour Window: no solid food, so the routine stays consistent",
+        "PM Step: lighter evenings to support next-day adherence",
+        "15-Day Reset: a simple daily protocol to help move a plateau"
+      ],
+      "bullets_hi": [
+        "AM स्टार्ट: सुबह खाली पेट OK Liquid",
+        "4-घंटे का विंडो: ठोस खाना नहीं, ताकि रूटीन स्थिर रहे",
+        "PM स्टेप: रात हल्की, ताकि अगले दिन पालन आसान लगे",
+        "15-दिन का रीसेट: प्लेटो तोड़ने में मदद करने वाला सरल डेली प्रोटोकॉल"
+      ],
+      "background_slot": "BG-092",
+      "background_name": "Minimal tile and wood",
+      "background_source": "catalog",
+      "fresh_background_signature": null,
+      "language": "BOTH",
+      "output_quality": "pending",
+      "notes": "assembled_from=copy_batch.json; batch=v15; aspect_ratio=4:5; seed=765700195; visual_archetype=feat_mechanism_steps"
     }
   ],
   "indexes": {
@@ -2807,10 +2982,10 @@
           "BG-348",
           "BG-067",
           "BG-464",
-          "BG-470"
+          "BG-470",
+          "BG-301"
         ],
         "remaining": [
-          "BG-301",
           "BG-269",
           "BG-475",
           "BG-027",
@@ -2991,10 +3166,10 @@
           "BG-446",
           "BG-173",
           "BG-375",
-          "BG-357"
+          "BG-357",
+          "BG-092"
         ],
         "remaining": [
-          "BG-092",
           "BG-049",
           "BG-119",
           "BG-394",
@@ -3221,10 +3396,10 @@
           "BG-420",
           "BG-257",
           "BG-072",
-          "BG-144"
+          "BG-144",
+          "BG-019"
         ],
         "remaining": [
-          "BG-019",
           "BG-318",
           "BG-299",
           "BG-140",
@@ -3390,10 +3565,10 @@
       "TEST": {
         "cycle_number": 1,
         "used": [
-          "BG-131"
+          "BG-131",
+          "BG-305"
         ],
         "remaining": [
-          "BG-305",
           "BG-458",
           "BG-195",
           "BG-091",
@@ -3581,10 +3756,10 @@
       "BA": {
         "cycle_number": 1,
         "used": [
-          "BG-207"
+          "BG-207",
+          "BG-306"
         ],
         "remaining": [
-          "BG-306",
           "BG-289",
           "BG-211",
           "BG-054",
@@ -3986,6 +4161,12 @@
           "timestamp": "2026-05-05T11:50:51Z",
           "background_slot": "BG-470",
           "background_source": "catalog"
+        },
+        {
+          "entry_id": "entry_088",
+          "timestamp": "2026-05-06T07:20:12Z",
+          "background_slot": "BG-301",
+          "background_source": "catalog"
         }
       ],
       "FEAT": [
@@ -4149,6 +4330,12 @@
           "entry_id": "entry_086",
           "timestamp": "2026-05-05T11:50:51Z",
           "background_slot": "BG-357",
+          "background_source": "catalog"
+        },
+        {
+          "entry_id": "entry_092",
+          "timestamp": "2026-05-06T07:20:12Z",
+          "background_slot": "BG-092",
           "background_source": "catalog"
         }
       ],
@@ -4326,6 +4513,12 @@
           "timestamp": "2026-05-05T11:50:51Z",
           "background_slot": "BG-144",
           "background_source": "catalog"
+        },
+        {
+          "entry_id": "entry_090",
+          "timestamp": "2026-05-06T07:20:12Z",
+          "background_slot": "BG-019",
+          "background_source": "catalog"
         }
       ],
       "TEST": [
@@ -4333,6 +4526,12 @@
           "entry_id": "entry_084",
           "timestamp": "2026-05-05T11:50:51Z",
           "background_slot": "BG-131",
+          "background_source": "catalog"
+        },
+        {
+          "entry_id": "entry_091",
+          "timestamp": "2026-05-06T07:20:12Z",
+          "background_slot": "BG-305",
           "background_source": "catalog"
         }
       ],
@@ -4342,6 +4541,61 @@
           "timestamp": "2026-05-05T11:50:51Z",
           "background_slot": "BG-207",
           "background_source": "catalog"
+        },
+        {
+          "entry_id": "entry_089",
+          "timestamp": "2026-05-06T07:20:12Z",
+          "background_slot": "BG-306",
+          "background_source": "catalog"
+        }
+      ]
+    },
+    "concept_combos": {
+      "recent": [
+        {
+          "entry_id": "entry_088",
+          "timestamp": "2026-05-06T07:20:12Z",
+          "format": "HERO",
+          "persona_number": 1,
+          "awareness_stage": "problem_aware",
+          "concept_angle": "comparison",
+          "concept_structure": "fab"
+        },
+        {
+          "entry_id": "entry_089",
+          "timestamp": "2026-05-06T07:20:12Z",
+          "format": "BA",
+          "persona_number": 1,
+          "awareness_stage": "problem_aware",
+          "concept_angle": "social_proof",
+          "concept_structure": "bab"
+        },
+        {
+          "entry_id": "entry_090",
+          "timestamp": "2026-05-06T07:20:12Z",
+          "format": "UGC",
+          "persona_number": 3,
+          "awareness_stage": "problem_aware",
+          "concept_angle": "desired_outcome",
+          "concept_structure": "fab"
+        },
+        {
+          "entry_id": "entry_091",
+          "timestamp": "2026-05-06T07:20:12Z",
+          "format": "TEST",
+          "persona_number": 4,
+          "awareness_stage": "solution_aware",
+          "concept_angle": "story",
+          "concept_structure": "four_us"
+        },
+        {
+          "entry_id": "entry_092",
+          "timestamp": "2026-05-06T07:20:12Z",
+          "format": "FEAT",
+          "persona_number": 4,
+          "awareness_stage": "solution_aware",
+          "concept_angle": "social_proof",
+          "concept_structure": "four_us"
         }
       ]
     },
@@ -4433,7 +4687,12 @@
         "\"After every trip, my weight bounced back. Daily WhatsApp check-ins helped me restart weight loss within 15 days.\"",
         "It may not be a slow metabolism. It may be cravings blocking weight loss.",
         "Your weight loss may be stalling before breakfast",
-        "Strict plans never kept me going"
+        "Strict plans never kept me going",
+        "Morning, empty-stomach OK Liquid: a simpler start to weight loss than strict diets.",
+        "What people who finally stuck to weight loss changed first",
+        "My stress-snacks dropped, weight loss started",
+        "“Week 3, my scale stopped. The daily WhatsApp check-ins helped restart my weight loss in 15 days.”",
+        "Plateau-stuck? Many restarted weight loss with this 15-day AM routine"
       ],
       "cta_en": [
         "See The Steps",
@@ -4522,7 +4781,12 @@
         "See the 15-day reset",
         "See the routine",
         "See the 15-day weight-loss routine",
-        "Watch my reset"
+        "Watch my reset",
+        "See the 15-day routine",
+        "Start the 15-day routine",
+        "Try the kit",
+        "Start the 15-day reset",
+        "See the AM + PM routine"
       ],
       "support_line_en": [
         "Doctor-formulated Ayurvedic weight-loss system designed to help you lose 3 to 5 kg with 1 Kit without feeling hungry, weak, or out of control.",
@@ -4583,7 +4847,10 @@
         "AM OK Liquid: empty stomach, 4h no solids",
         "After festive or travel weight gain, fewer cravings through the day can help you stay consistent and see 15-day weight-loss progress.",
         "Made for obesity reduction and excess-weight reset after festivals, travel, and routine slips.",
-        "This morning routine cut cravings, helped weight loss"
+        "This morning routine cut cravings, helped weight loss",
+        "Helps keep cravings quieter so snacking doesn’t break your calorie deficit by evening.",
+        "AM routine kept cravings quiet by 11",
+        "Made for obesity / excess-weight reduction with a clear daily system."
       ],
       "bullets_en": [
         "OK Liquid helps you feel full, so random eating comes down.",
@@ -4697,7 +4964,44 @@
         "AM Liquid: starts the day with a fixed first step instead of random eating.",
         "4-hour window: gives the morning routine enough time to support excess-weight reduction.",
         "PM step: helps nights feel lighter so next-day weight-loss discipline is easier.",
-        "Structured kit: reduces theory overload with a simple plan you can actually follow."
+        "Structured kit: reduces theory overload with a simple plan you can actually follow.",
+        "By evening: cravings spike and the weight-loss plan slips",
+        "Late-night snacking cancels the day’s effort",
+        "AM routine: start structured, cravings feel quieter sooner",
+        "Evening: fewer impulse bites, easier calorie control for weight loss",
+        "AM Start: OK Liquid first thing on an empty stomach",
+        "4-Hour Window: no solid food, so the routine stays consistent",
+        "PM Step: lighter evenings to support next-day adherence",
+        "15-Day Reset: a simple daily protocol to help move a plateau"
+      ],
+      "headline_hi": [
+        "सुबह खाली पेट OK Liquid: कड़ी डाइट के बिना वज़न घटाने की आसान शुरुआत।",
+        "जिन लोगों ने वेट लॉस टिकाया, उन्होंने सबसे पहले यह बदला",
+        "मेरी स्ट्रेस स्नैकिंग घटी, वज़न कम हुआ",
+        "“तीसरे हफ्ते में वजन अटक गया था। रोज़ के WhatsApp चेक-इन से 15 दिनों में मेरी weight loss फिर से शुरू हुई।”",
+        "वज़न घटाना रुक गया? कई लोगों ने 15 दिनों की AM रूटीन से फिर से वज़न कम करना शुरू किया"
+      ],
+      "cta_hi": [
+        "15-दिन की रूटीन देखें",
+        "15-दिन का रूटीन शुरू करें",
+        "किट आज़माएँ",
+        "15-day reset शुरू करें",
+        "AM + PM रूटीन देखें"
+      ],
+      "support_line_hi": [
+        "क्रेविंग्स कम महसूस हों, ताकि शाम तक स्नैकिंग से कैलोरी-डेफिसिट न टूटे।",
+        "सुबह की रूटीन से 11 बजे तक cravings कम",
+        "Obesity / excess-weight reduction के लिए एक साफ़, रोज़ फॉलो होने वाला सिस्टम।"
+      ],
+      "bullets_hi": [
+        "शाम होते ही: क्रेविंग्स बढ़ती हैं और वेट-लॉस प्लान टूटता है",
+        "लेट-नाइट स्नैकिंग दिनभर की मेहनत बिगाड़ देती है",
+        "AM रूटीन: सुबह से स्ट्रक्चर, क्रेविंग्स जल्दी शांत लगती हैं",
+        "शाम: कम इम्पल्स बाइट्स, वेट लॉस के लिए कैलोरी कंट्रोल आसान",
+        "AM स्टार्ट: सुबह खाली पेट OK Liquid",
+        "4-घंटे का विंडो: ठोस खाना नहीं, ताकि रूटीन स्थिर रहे",
+        "PM स्टेप: रात हल्की, ताकि अगले दिन पालन आसान लगे",
+        "15-दिन का रीसेट: प्लेटो तोड़ने में मदद करने वाला सरल डेली प्रोटोकॉल"
       ]
     }
   }

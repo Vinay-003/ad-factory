@@ -36,6 +36,33 @@ OUTPUT_DIR = ROOT / "output"
 
 SUPPORTED_FORMATS = {"HERO", "BA", "TEST", "FEAT", "UGC"}
 SUPPORTED_LANGS = {"EN", "HI"}
+SUPPORTED_AWARENESS_STAGES = {"unaware", "problem_aware", "solution_aware", "product_aware"}
+SUPPORTED_CONCEPT_ANGLES = {
+    "pain_point",
+    "desired_outcome",
+    "social_proof",
+    "authority",
+    "story",
+    "curiosity",
+    "comparison",
+    "offer",
+}
+SUPPORTED_CONCEPT_STRUCTURES = {"pas", "bab", "fab", "four_us"}
+HEADLINE_ANGLE_TO_CONCEPT = {
+    "pain": "pain_point",
+    "objection": "comparison",
+    "mechanism": "curiosity",
+    "time": "offer",
+    "proof": "social_proof",
+    "sacrifice_reduction": "comparison",
+}
+FORMAT_DEFAULT_STRUCTURE = {
+    "HERO": "four_us",
+    "BA": "bab",
+    "TEST": "pas",
+    "FEAT": "fab",
+    "UGC": "pas",
+}
 
 FORMAT_VISUAL_ARCHETYPES: dict[str, list[dict[str, Any]]] = {
     "HERO": [
@@ -557,6 +584,84 @@ def require_int(obj: dict[str, Any], key: str, ctx: str) -> int:
     return val
 
 
+def clean_id(value: Any) -> str:
+    if not isinstance(value, str):
+        return ""
+    return re.sub(r"[^a-z0-9_]+", "_", value.strip().lower()).strip("_")
+
+
+def infer_awareness_stage(persona: dict[str, Any]) -> str:
+    text = " ".join(str(persona.get(k) or "") for k in ["pain_en", "friction_en", "proof_needed_en", "tone_cue_en"]).lower()
+    if any(term in text for term in ["doctor", "trust", "proof", "safe", "natural", "guarantee", "budget", "value"]):
+        return "product_aware"
+    if any(term in text for term in ["past", "failed", "plateau", "rebound", "stubborn", "skeptic", "strict"]):
+        return "solution_aware"
+    if any(term in text for term in ["craving", "hunger", "snack", "stress", "busy", "schedule", "time", "routine"]):
+        return "problem_aware"
+    return "unaware"
+
+
+def resolve_concept_fields(ad: dict[str, Any], fmt: str, persona: dict[str, Any]) -> dict[str, Any]:
+    awareness = clean_id(ad.get("awareness_stage"))
+    angle = clean_id(ad.get("concept_angle"))
+    structure = clean_id(ad.get("concept_structure"))
+    explicit = bool(awareness or angle or structure)
+
+    if awareness not in SUPPORTED_AWARENESS_STAGES:
+        awareness = infer_awareness_stage(persona)
+
+    if angle not in SUPPORTED_CONCEPT_ANGLES:
+        headline_angle = clean_id(ad.get("headline_angle"))
+        angle = HEADLINE_ANGLE_TO_CONCEPT.get(headline_angle, "desired_outcome")
+
+    if structure not in SUPPORTED_CONCEPT_STRUCTURES:
+        structure = FORMAT_DEFAULT_STRUCTURE.get(fmt, "four_us")
+
+    return {
+        "awareness_stage": awareness,
+        "concept_angle": angle,
+        "concept_structure": structure,
+        "explicit": explicit,
+    }
+
+
+def append_concept_combo_index(
+    registry: dict[str, Any],
+    entry_id: str,
+    timestamp: str,
+    fmt: str,
+    persona_number: int,
+    concept: dict[str, Any],
+) -> None:
+    recent = registry.setdefault("indexes", {}).setdefault("concept_combos", {}).setdefault("recent", [])
+    recent.append(
+        {
+            "entry_id": entry_id,
+            "timestamp": timestamp,
+            "format": fmt,
+            "persona_number": persona_number,
+            "awareness_stage": concept["awareness_stage"],
+            "concept_angle": concept["concept_angle"],
+            "concept_structure": concept["concept_structure"],
+        }
+    )
+    if len(recent) > 500:
+        del recent[:-500]
+
+
+def concept_combo_collides(registry: dict[str, Any], fmt: str, concept: dict[str, Any], recent_window: int = 8) -> bool:
+    recent = (((registry.get("indexes") or {}).get("concept_combos") or {}).get("recent") or [])
+    same_format = [item for item in recent if isinstance(item, dict) and str(item.get("format") or "").upper() == fmt]
+    for item in same_format[-recent_window:]:
+        if (
+            clean_id(item.get("awareness_stage")) == concept["awareness_stage"]
+            and clean_id(item.get("concept_angle")) == concept["concept_angle"]
+            and clean_id(item.get("concept_structure")) == concept["concept_structure"]
+        ):
+            return True
+    return False
+
+
 def parse_copy_block(fmt: str, lang: str, raw: dict[str, Any]) -> CopyBlock:
     ctx = f"ads[].copy.{lang} for format={fmt}"
     headline = require_str(raw, "headline", ctx)
@@ -613,14 +718,27 @@ def registry_used_text(registry: dict[str, Any]) -> dict[str, set[str]]:
     return out
 
 
+def registry_all_used_text(used: dict[str, set[str]]) -> set[str]:
+    all_text: set[str] = set()
+    for values in used.values():
+        all_text.update(v for v in values if v.strip())
+    return all_text
+
+
 def uniqueness_check(
     used: dict[str, set[str]],
+    all_used: set[str],
     bucket: str,
     value: str,
     collisions: list[str],
     ctx: str,
 ) -> None:
-    if value.strip() and value.strip() in used.get(bucket, set()):
+    clean = value.strip()
+    if not clean:
+        return
+    if clean in all_used:
+        collisions.append(f"{ctx} collides with registry used_text across all buckets: {value!r}")
+    elif clean in used.get(bucket, set()):
         collisions.append(f"{ctx} collides with registry used_text.{bucket}: {value!r}")
 
 
@@ -748,6 +866,7 @@ def render_prompt(
     aspect_ratio: str,
     persona: dict[str, Any],
     copy: CopyBlock,
+    concept: dict[str, Any],
     bg: dict[str, Any],
     bg_seed: int,
     seeded_sentence: str,
@@ -895,6 +1014,10 @@ def render_prompt(
             f"- Friction: {friction}",
             f"- Proof needed: {proof}",
             f"- Tone cue: {tone}",
+            f"- Awareness stage: {concept['awareness_stage']}",
+            f"- Concept angle: {concept['concept_angle']}",
+            f"- Concept structure: {concept['concept_structure']}",
+            "- Concept path is strategy only; do not render these labels on-image.",
         ]
     )
     lines.append("")
@@ -1036,10 +1159,15 @@ def main() -> int:
 
     seed = args.seed if args.seed is not None else random.SystemRandom().randint(10_000_000, 2_147_483_647)
     used = registry_used_text(registry)
+    all_used = registry_all_used_text(used)
     render_langs = ["EN", "HI"] if args.language_mode == "BOTH" else [args.language_mode]
 
     # Validate copy payload + uniqueness against registry BEFORE consuming background slots.
     collisions: list[str] = []
+    concept_collisions: list[str] = []
+    run_concept_keys: set[tuple[str, str, str, str]] = set()
+    run_used_text: dict[str, set[str]] = {}
+    run_all_text: set[str] = set()
     for i, ad in enumerate(ads):
         ctx = f"ads[{i}]"
         if not isinstance(ad, dict):
@@ -1061,6 +1189,15 @@ def main() -> int:
         for k in ["pain_en", "desire_en", "friction_en", "proof_needed_en", "tone_cue_en", "pain_hi", "desire_hi", "friction_hi", "proof_needed_hi", "tone_cue_hi"]:
             require_str(persona, k, f"{ctx}.persona")
 
+        concept = resolve_concept_fields(ad, fmt, persona)
+        if concept["explicit"]:
+            concept_key = (fmt, concept["awareness_stage"], concept["concept_angle"], concept["concept_structure"])
+            if concept_key in run_concept_keys:
+                concept_collisions.append(f"{ctx} repeats concept combo in this run: {concept_key}")
+            run_concept_keys.add(concept_key)
+            if concept_combo_collides(registry, fmt, concept):
+                concept_collisions.append(f"{ctx} repeats recent registry concept combo for {fmt}: {concept_key}")
+
         copy = ad.get("copy")
         if not isinstance(copy, dict):
             raise RuntimeError(f"{ctx}.copy must be an object with EN/HI blocks")
@@ -1068,6 +1205,21 @@ def main() -> int:
             if lang not in copy or not isinstance(copy[lang], dict):
                 raise RuntimeError(f"{ctx}.copy must include {lang} object")
             cb = parse_copy_block(fmt, lang, copy[lang])
+
+            def check_run_text(bucket: str, value: str, text_ctx: str) -> None:
+                clean = (value or "").strip()
+                if not clean:
+                    return
+                if clean in run_all_text:
+                    collisions.append(f"{text_ctx} duplicates another text string in this copy batch: {clean!r}")
+                run_all_text.add(clean)
+                seen = run_used_text.setdefault(bucket, set())
+                if clean in seen:
+                    collisions.append(f"{text_ctx} duplicates another item in this copy batch: {clean!r}")
+                seen.add(clean)
+
+            check_run_text("headline_en" if lang == "EN" else "headline_hi", cb.headline, f"{ctx}.copy.{lang}.headline")
+            check_run_text("cta_en" if lang == "EN" else "cta_hi", cb.cta, f"{ctx}.copy.{lang}.cta")
 
             # format-specific required fields (do not invent)
             if fmt in {"HERO", "UGC"} and not cb.support_line:
@@ -1082,21 +1234,31 @@ def main() -> int:
                     raise RuntimeError(f"{ctx}.copy.{lang}.trust_line required for TEST")
 
             # Registry uniqueness checks (exact string match).
-            uniqueness_check(used, "headline_en" if lang == "EN" else "headline_hi", cb.headline, collisions, f"{ctx}.copy.{lang}.headline")
+            uniqueness_check(used, all_used, "headline_en" if lang == "EN" else "headline_hi", cb.headline, collisions, f"{ctx}.copy.{lang}.headline")
+            uniqueness_check(used, all_used, "cta_en" if lang == "EN" else "cta_hi", cb.cta, collisions, f"{ctx}.copy.{lang}.cta")
 
             if fmt in {"HERO", "UGC"}:
-                uniqueness_check(used, "support_line_en" if lang == "EN" else "support_line_hi", cb.support_line, collisions, f"{ctx}.copy.{lang}.support_line")
+                check_run_text("support_line_en" if lang == "EN" else "support_line_hi", cb.support_line, f"{ctx}.copy.{lang}.support_line")
+                uniqueness_check(used, all_used, "support_line_en" if lang == "EN" else "support_line_hi", cb.support_line, collisions, f"{ctx}.copy.{lang}.support_line")
             if fmt in {"BA", "FEAT"}:
                 bucket = "bullets_en" if lang == "EN" else "bullets_hi"
                 for b in cb.bullets or []:
-                    uniqueness_check(used, bucket, b, collisions, f"{ctx}.copy.{lang}.bullets")
+                    check_run_text(bucket, b, f"{ctx}.copy.{lang}.bullets")
+                    uniqueness_check(used, all_used, bucket, b, collisions, f"{ctx}.copy.{lang}.bullets")
             if fmt == "TEST":
-                uniqueness_check(used, "support_line_en" if lang == "EN" else "support_line_hi", cb.trust_line, collisions, f"{ctx}.copy.{lang}.trust_line")
+                check_run_text("support_line_en" if lang == "EN" else "support_line_hi", cb.trust_line, f"{ctx}.copy.{lang}.trust_line")
+                uniqueness_check(used, all_used, "support_line_en" if lang == "EN" else "support_line_hi", cb.trust_line, collisions, f"{ctx}.copy.{lang}.trust_line")
 
     if collisions and not args.skip_uniqueness_check:
         msg = "Copy batch failed uniqueness checks against registry (regenerate via your LLM step):\n- " + "\n- ".join(collisions[:50])
         if len(collisions) > 50:
             msg += f"\n... and {len(collisions)-50} more collisions"
+        raise RuntimeError(msg)
+
+    if concept_collisions and not args.skip_uniqueness_check:
+        msg = "Copy batch failed concept-combo checks (regenerate via your LLM step):\n- " + "\n- ".join(concept_collisions[:50])
+        if len(concept_collisions) > 50:
+            msg += f"\n... and {len(concept_collisions)-50} more collisions"
         raise RuntimeError(msg)
 
     batch_name = args.batch or next_batch_name(OUTPUT_DIR)
@@ -1120,6 +1282,7 @@ def main() -> int:
         persona = ad["persona"]
         persona_number = int(persona["number"])
         angle = (ad.get("headline_angle") or "").strip()
+        concept = resolve_concept_fields(ad, fmt, persona)
 
         for stale_lang in ["EN", "HI"]:
             if stale_lang in render_langs:
@@ -1173,6 +1336,7 @@ def main() -> int:
                 aspect_ratio,
                 persona,
                 cb,
+                concept,
                 bg,
                 bg_seed,
                 seeded_sentence,
@@ -1195,6 +1359,9 @@ def main() -> int:
             "persona_number": persona["number"],
             "persona_name": persona["name"],
             "headline_angle": angle or None,
+            "awareness_stage": concept["awareness_stage"],
+            "concept_angle": concept["concept_angle"],
+            "concept_structure": concept["concept_structure"],
             "visual_archetype": visual_archetype["id"],
             "headline_en": ad["copy"]["EN"]["headline"],
             "headline_hi": ad["copy"]["HI"]["headline"],
@@ -1219,6 +1386,7 @@ def main() -> int:
 
         registry.setdefault("entries", []).append(entry)
         append_background_index(registry, fmt, entry_id, timestamp, bg["id"])
+        append_concept_combo_index(registry, entry_id, timestamp, fmt, int(persona["number"]), concept)
 
         # used_text updates
         if "EN" in render_langs:
