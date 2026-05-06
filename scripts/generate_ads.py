@@ -649,19 +649,6 @@ def append_concept_combo_index(
         del recent[:-500]
 
 
-def concept_combo_collides(registry: dict[str, Any], fmt: str, concept: dict[str, Any], recent_window: int = 8) -> bool:
-    recent = (((registry.get("indexes") or {}).get("concept_combos") or {}).get("recent") or [])
-    same_format = [item for item in recent if isinstance(item, dict) and str(item.get("format") or "").upper() == fmt]
-    for item in same_format[-recent_window:]:
-        if (
-            clean_id(item.get("awareness_stage")) == concept["awareness_stage"]
-            and clean_id(item.get("concept_angle")) == concept["concept_angle"]
-            and clean_id(item.get("concept_structure")) == concept["concept_structure"]
-        ):
-            return True
-    return False
-
-
 def parse_copy_block(fmt: str, lang: str, raw: dict[str, Any]) -> CopyBlock:
     ctx = f"ads[].copy.{lang} for format={fmt}"
     headline = require_str(raw, "headline", ctx)
@@ -1164,8 +1151,6 @@ def main() -> int:
 
     # Validate copy payload + uniqueness against registry BEFORE consuming background slots.
     collisions: list[str] = []
-    concept_collisions: list[str] = []
-    run_concept_keys: set[tuple[str, str, str, str]] = set()
     run_used_text: dict[str, set[str]] = {}
     run_all_text: set[str] = set()
     for i, ad in enumerate(ads):
@@ -1189,14 +1174,7 @@ def main() -> int:
         for k in ["pain_en", "desire_en", "friction_en", "proof_needed_en", "tone_cue_en", "pain_hi", "desire_hi", "friction_hi", "proof_needed_hi", "tone_cue_hi"]:
             require_str(persona, k, f"{ctx}.persona")
 
-        concept = resolve_concept_fields(ad, fmt, persona)
-        if concept["explicit"]:
-            concept_key = (fmt, concept["awareness_stage"], concept["concept_angle"], concept["concept_structure"])
-            if concept_key in run_concept_keys:
-                concept_collisions.append(f"{ctx} repeats concept combo in this run: {concept_key}")
-            run_concept_keys.add(concept_key)
-            if concept_combo_collides(registry, fmt, concept):
-                concept_collisions.append(f"{ctx} repeats recent registry concept combo for {fmt}: {concept_key}")
+        resolve_concept_fields(ad, fmt, persona)
 
         copy = ad.get("copy")
         if not isinstance(copy, dict):
@@ -1253,12 +1231,6 @@ def main() -> int:
         msg = "Copy batch failed uniqueness checks against registry (regenerate via your LLM step):\n- " + "\n- ".join(collisions[:50])
         if len(collisions) > 50:
             msg += f"\n... and {len(collisions)-50} more collisions"
-        raise RuntimeError(msg)
-
-    if concept_collisions and not args.skip_uniqueness_check:
-        msg = "Copy batch failed concept-combo checks (regenerate via your LLM step):\n- " + "\n- ".join(concept_collisions[:50])
-        if len(concept_collisions) > 50:
-            msg += f"\n... and {len(concept_collisions)-50} more collisions"
         raise RuntimeError(msg)
 
     batch_name = args.batch or next_batch_name(OUTPUT_DIR)

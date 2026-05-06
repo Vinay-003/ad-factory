@@ -51,8 +51,14 @@ HEADLINE_EXECUTION_RULES = [
     "Pick one concept path for the ad: one audience stage, one lead angle, and one message structure. Do not mix multiple hooks into one headline and do not randomize claims across the layout.",
     "The headline can lead with tension, proof, identity, deadline, or desired feeling, but the paired support line must make weight loss, obesity reduction, or a 15-day weight outcome unmistakable.",
     "Support lines must add a second lane such as routine, proof, mechanism, ease, event timing, or non-draining reassurance; never paraphrase the headline.",
+    "Headline carries one clean idea only; move mechanism, proof, routine timing, and extra explanation into support line or bullets.",
+    "Most headlines should be 5-12 words unless a longer testimonial quote still sounds natural and edited.",
+    "Use human-edited ad rhythm: simple, declarative, specific, and easy to read at mobile size.",
+    "Prefer patterns like authority stamp, pain question, stubborn-weight proof, deadline direct, sacrifice reduction, emotional outcome, or messy-life curiosity.",
+    "Support lines should use one clear proof lane: simple 2-step routine, 5-minute ease, doctor-formulated system, 70,000+ users, visible 15-day progress, cravings/fullness, digestion support, or less sacrifice.",
     "Use plain human phrasing. Avoid AI-ad words like unlock, transform your journey, revolutionary, holistic wellness, game-changing, effortlessly, and tailored solution.",
     "Prefer crisp spoken lines with natural rhythm over SEO-style keyword stuffing. If the line sounds like a spreadsheet label, rewrite it.",
+    "Before returning JSON, do a final human editor pass: shorten headline, remove generic phrases, keep one central idea, and ensure support line adds proof/mechanism/ease instead of repeating the headline.",
     "Use the concept framework only as direction. Do not output framework labels and do not copy any reference wording from the prompt.",
 ]
 
@@ -1077,6 +1083,20 @@ def registry_banlist_values(context: dict[str, Any]) -> set[str]:
         for item in arr:
             if isinstance(item, str) and item.strip():
                 values.add(item.strip())
+    registry_path = ROOT / "AD_GENERATION_REGISTRY.JSON"
+    if registry_path.exists():
+        try:
+            registry = json.loads(registry_path.read_text(encoding="utf-8"))
+        except Exception:
+            registry = {}
+        used_text = ((registry.get("indexes") or {}).get("used_text") or {}) if isinstance(registry, dict) else {}
+        if isinstance(used_text, dict):
+            for arr in used_text.values():
+                if not isinstance(arr, list):
+                    continue
+                for item in arr:
+                    if isinstance(item, str) and item.strip():
+                        values.add(item.strip())
     return values
 
 
@@ -1705,6 +1725,12 @@ def call_opencode_compatible(config: dict[str, Any], context: dict[str, Any], ru
         "Use headline_execution_rules, headline_concept_framework, and each ad's copy_requirements.concept_variation as the execution model. "
         "The concept variation tells you the awareness stage, lead angle, and message structure; copy its ids into awareness_stage, concept_angle, and concept_structure, but treat the directions as guidance only, not copy to reuse. "
         "Use the 4U writing lens before finalizing every headline: Useful, honestly Urgent, Unique, and Ultra-specific. This is a writing instruction, not a label to output. "
+        "Write headlines like a human editor revised them from rough AI copy: one clean idea, short, concrete, and spoken. "
+        "Do not make the headline carry the whole pitch; put proof, mechanism, and timing in support_line, trust_line, or bullets. "
+        "Use these pattern families as execution guidance only, not text to copy: authority stamp; protocol identity; pain question; stubborn-weight proof; deadline direct; sacrifice reduction; emotional outcome; messy-life curiosity. "
+        "Good support-line patterns include: product identity plus ease, simple 2-step routine, about 5-minute effort, doctor credibility plus 70,000+ users, visible 15-day progress, morning fullness plus night digestion support, or result plus less sacrifice. "
+        "Before returning JSON, perform a final headline editor pass: shorten, remove generic AI phrases, keep one central idea, move explanation into support line, and rewrite if headline/support say the same thing. "
+        "Avoid weak planning-label headlines like 'support for visible progress', 'guided support for practical progress', or 'start mornings with a clearer routine'; make them sound like finished ad copy instead. "
         "Good headlines should sound edited by a human, not generated: concrete, restrained, mobile-readable, and shaped like a line someone would approve on an actual ad. "
         "Avoid AI-slop wording such as unlock, transform your journey, revolutionary, holistic wellness, game-changing, effortlessly, tailored solution, and vague transformation slogans. "
         "Do not force every headline to carry every keyword; the headline/support pair must make the weight-loss intent obvious together. "
@@ -1766,6 +1792,8 @@ def call_opencode_compatible(config: dict[str, Any], context: dict[str, Any], ru
             "Do not reuse the same angle family such as guided support, structured system, cravings control, proof, natural-safe, homemade-food fit, or AM/PM mechanism as the lead angle if it already appeared in generated_same_format_so_far for this format.\n"
             "Do not reuse the same sentence pattern or opening structure from generated_same_format_so_far.\n"
             "Before writing, read copy_requirements.concept_variation and make the headline/support hierarchy match that chosen concept path.\n"
+            "Final editor pass before JSON: rewrite the headline into a finished human ad line, usually 5-12 words, one central idea only. Move mechanism/proof/timing details into support line or bullets.\n"
+            "Use support copy to explain why the headline is believable: 2-step routine, 5-minute ease, doctor-formulated proof, 70,000+ users, 15-day progress, cravings/fullness, digestion support, or less sacrifice.\n"
             "Reject your own first draft if the headline reads like a generic AI slogan, a keyword list, or a paraphrase of the support line.\n"
             "Do not return framework labels, rationale, or explanations."
         )

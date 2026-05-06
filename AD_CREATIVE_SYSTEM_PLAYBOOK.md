@@ -297,6 +297,61 @@ Freshness rule:
 - Ultra-specific: line uses concrete detail such as 15 days, cravings, routine step, kit system, doctor-formulated proof, or user scale.
 - Use these as instructions while writing. Do not run a hard vocabulary scorer or block prompt assembly only because wording is new.
 
+### Headline Execution Layer (mandatory)
+
+The concept framework chooses the strategic route. The execution layer decides whether the final headline sounds like a real paid ad.
+
+Headline role:
+- The headline should carry one strong idea only: tension, proof, identity, deadline, outcome, or sacrifice reduction.
+- Keep most headlines between 5 and 12 words. Longer is allowed only when the rhythm still feels like a finished ad line.
+- The headline should sound edited by a human, not like a planning label or SEO phrase.
+- Do not force the full mechanism into the headline. Move mechanism, proof, and timing details into the support line.
+- Prefer plain sentence rhythm over cleverness, slogans, or stacked keyword phrases.
+- Use sentence case by default. Title case is allowed only when it intentionally reads like a poster headline.
+
+Support-line role:
+- The support line explains why the headline is believable.
+- It must add one second-lane reason to believe: simple routine, doctor credibility, 70,000+ users, 15-day progress, reduced cravings, digestion support, low-guesswork protocol, or less sacrifice.
+- Do not paraphrase the headline.
+- Do not use support lines as generic wellness copy. Keep weight loss, obesity reduction, excess-weight reduction, or 15-day progress obvious.
+
+Human headline pattern families (direction only, do not copy exactly):
+- Authority stamp: `Doctor-formulated. Ayurvedic. Proven at scale.` Pattern: credibility + category + proof.
+- Protocol identity: `Doctor-formulated, protocol-led system.` Pattern: expert source + structured method.
+- Pain question: `Too tired to track everything for weight loss?` Pattern: too tired/too busy/too overwhelmed + hard behavior.
+- Stubborn-weight proof: `When weight feels stubborn, you need something proven.` Pattern: when problem feels hard + trusted solution.
+- Deadline direct: `Need visible weight loss in 15 days?` Pattern: need + concrete outcome + timeframe.
+- Sacrifice reduction: `3 to 5 kg with 1 Kit, without turning life upside down.` Pattern: specific result + simple vehicle + avoided sacrifice.
+- Emotional outcome: `Feel lighter. Look more like yourself again.` Pattern: felt result + identity restoration.
+- Messy-life mechanism: `Why this works even when life stays messy.` Pattern: curiosity + real-life friction.
+
+Support-line pattern families (direction only, do not copy exactly):
+- Product identity + ease: `A guided Ayurvedic weight-loss system with clear morning and evening steps.`
+- Routine simplicity: `A simple 2-step routine that takes about 5 minutes a day.`
+- Authority + proof + time: `Created by Dr. Arun Tyagi and trusted by 70,000+ Indians for visible progress in 15 days.`
+- Mechanism + practical benefit: `Morning support helps fullness; night support helps digestion and next-day follow-through.`
+- Result + sacrifice reduction: `Designed for 3 to 5 kg weight-loss support without feeling weak, drained, or overwhelmed.`
+- Event/deadline support: `Designed for people who want guided progress before a wedding, trip, or important event.`
+
+Human editor pass (mandatory before returning copy JSON):
+- Rewrite every headline once as a performance-ad editor.
+- Remove generic AI phrases, abstract benefit language, and planning labels.
+- Make the headline shorter and more spoken.
+- Keep one central idea in the headline.
+- Move extra explanation into support line or bullets.
+- If headline and support line say the same thing, rewrite the support line with proof, mechanism, or ease.
+
+Bad-to-better rewrite guidance (direction only):
+- Weak: `Start mornings with a clearer 15-day weight-loss routine.` Better pattern: `Too tired to track every weight-loss step?`
+- Weak: `Ayurvedic support for daily appetite control.` Better pattern: `When cravings run the day, weight loss feels impossible.`
+- Weak: `Guided support for practical progress.` Better pattern: `Clear steps when dieting feels like too much work.`
+- Weak: `Fast visible progress for busy people.` Better pattern: `Need visible progress in 15 days?`
+- Weak: `A simple routine for your lifestyle.` Better pattern: `A 5-minute routine for stubborn weight days.`
+
+Preferred CTA family:
+- Prefer direct, low-friction CTAs: `See How It Works`, `See The Steps`, `View Details`, `See The Routine`, `Start Today`.
+- Vary CTAs enough to avoid registry collisions, but keep the style simple and non-salesy.
+
 Examples (direction only, do not copy-paste):
 - "Cravings control nahi ho rahe? 15 din mein routine palat sakta hai."
 - "Time nahi hai gym ka? Weight routine fir bhi possible hai."
@@ -497,7 +552,7 @@ In production mode:
 - Same opening_pattern_4tok + same format/language = hard block in recent window (last 10 entries).
 - Same copy_skeleton + same format/language = hard block if repeated in last 5 entries.
 - Same hook_structure_class + proof_style_class + cta_voice_class trio = hard block in last 12 entries (prevents "same ad with new words" effect).
-- Same `awareness_stage + concept_angle + concept_structure + format` = hard block in the recent concept-combo window (last 8 concept combos for that format).
+- Same `awareness_stage + concept_angle + concept_structure + format` = creative warning only. Prefer rotating the idea path, but do not block prompt assembly if generated copy is otherwise valid and unique.
 
 ### Copy diversity matrix (mandatory for scaled production)
 
@@ -553,7 +608,7 @@ Concept-combo matrix (mandatory for headline ideation):
 Concept-combo rule:
 - Treat `awareness_stage + concept_angle + concept_structure` as the creative idea ID.
 - Rotate concept combos intentionally across a batch.
-- If the same format is repeated in one run, do not reuse the same concept combo unless user explicitly requests a controlled duplicate test.
+- If the same format is repeated in one run, prefer a different concept combo unless user explicitly requests a controlled duplicate test. This is an instruction to the AI/operator, not a machine-blocking validation gate.
 
 Batch diversity minimum:
 - In any 5-ad batch, at least 4 unique `hook_structure_class` values.
@@ -1113,7 +1168,7 @@ Validation checklist (machine-checkable):
 - `CHK-25` safe_zone_rules_present: prompt must include the correct safe-zone rule set for the selected canvas ratio before write.
 - `CHK-26` critical_elements_inside_safe_zone: headline, support line, CTA, logos, and product-signaling elements must stay out of declared top/bottom/side risk bands for 4:5 and 9:16 outputs.
 - `CHK-27` concept_fields_present: each ad declares `awareness_stage`, `concept_angle`, and `concept_structure` or has them inferred from `copy_requirements.concept_variation` before assembly.
-- `CHK-28` concept_combo_rotation: same `awareness_stage + concept_angle + concept_structure + format` does not repeat in the recent concept-combo window unless the run is explicitly marked as a controlled duplicate test.
+- `CHK-28` reserved: concept-combo rotation is a writing/operation instruction, not a machine-blocking validation gate.
 - `CHK-29` reserved: 4U is a writing instruction for the AI/operator, not a machine-blocking validation gate. Do not fail prompt assembly solely because a generated headline uses words outside a scorer vocabulary.
 
 Operational examples of CHK-22 failure (reject and regenerate):
@@ -1388,7 +1443,7 @@ Follow these rules strictly:
 - Select a background slot from the Background Variation Engine (Section 9 of playbook) using exhaustive format-wise rotation (no repeat until all allowed slots for that format are used once). State which slot you selected.
 - Enforce strict text uniqueness: headline/support/CTA/caption/bullets in EN and HI must never repeat any previously used string.
 - Check the registry at `AD_GENERATION_REGISTRY.JSON` before generation to avoid persona, angle, and background repetition.
-- Track concept combos in the registry; avoid repeating the same awareness_stage + concept_angle + concept_structure + format in the recent window.
+- Track concept combos in the registry; use them as creative guidance to avoid repeating the same awareness_stage + concept_angle + concept_structure + format in the recent window.
 - Registry is in production mode. Write one entry after each generation.
 - When user says "create ads", write to next available `output/vN/` (max existing + 1). Never overwrite old version folders.
 - "Create registry" or "update registry" must target existing root `AD_GENERATION_REGISTRY.JSON` only.
@@ -1418,7 +1473,7 @@ How to avoid repetition at scale:
 - Never reuse old text directly (headline, support line, CTA, caption, bullets).
 - Recompute all copy every generation from persona fields and approved claims.
 - Use registry for both angle-level dedupe and strict text-level dedupe.
-- Use registry for concept-combo dedupe: awareness_stage + concept_angle + concept_structure + format.
+- Use registry for concept-combo awareness and creative guidance: awareness_stage + concept_angle + concept_structure + format.
 - Rotate catalog background slots with exhaustive format-wise cycles (no repeat until pool exhaustion, then reset cycle).
 
 ---
