@@ -308,6 +308,10 @@ Headline role:
 - Do not force the full mechanism into the headline. Move mechanism, proof, and timing details into the support line.
 - Prefer plain sentence rhythm over cleverness, slogans, or stacked keyword phrases.
 - Use sentence case by default. Title case is allowed only when it intentionally reads like a poster headline.
+- Do not lead with instructional verbs (Start, Begin, Kickstart, Follow). Headlines should read like statements or questions, not how-to steps.
+- Do not place AM/PM timing, 4-hour windows, or protocol mechanics in the headline. Those belong in support lines or bullets.
+- Do not put product component names (OK Liquid / OK Tablet / OK Powder / OKP) in headlines. Keep those in support lines or bullets.
+- Never surface internal persona notes, proof-needed notes, or any planning text as on-image copy.
 
 Support-line role:
 - The support line explains why the headline is believable.

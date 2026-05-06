@@ -56,6 +56,9 @@ HEADLINE_EXECUTION_RULES = [
     "Use human-edited ad rhythm: simple, declarative, specific, and easy to read at mobile size.",
     "Prefer patterns like authority stamp, pain question, stubborn-weight proof, deadline direct, sacrifice reduction, emotional outcome, or messy-life curiosity.",
     "Support lines should use one clear proof lane: simple 2-step routine, 5-minute ease, doctor-formulated system, 70,000+ users, visible 15-day progress, cravings/fullness, digestion support, or less sacrifice.",
+    "Do not lead headlines with instructional verbs like Start/Begin/Kickstart/Follow; headlines should sound like statements or questions, not how-to steps.",
+    "Do not put AM/PM timing, 4-hour windows, or protocol mechanics in the headline. Keep those in support lines or bullets.",
+    "Avoid policy/meta text in on-image copy (eg. persona notes, proof-needed notes)."
     "Use plain human phrasing. Avoid AI-ad words like unlock, transform your journey, revolutionary, holistic wellness, game-changing, effortlessly, and tailored solution.",
     "Prefer crisp spoken lines with natural rhythm over SEO-style keyword stuffing. If the line sounds like a spreadsheet label, rewrite it.",
     "Before returning JSON, do a final human editor pass: shorten headline, remove generic phrases, keep one central idea, and ensure support line adds proof/mechanism/ease instead of repeating the headline.",
@@ -1043,6 +1046,12 @@ def strip_internal_markers_from_payload(payload: dict[str, Any]) -> dict[str, An
                 if key in block and isinstance(block.get(key), str):
                     value = strip_internal_marker(block[key])
                     block[key] = strip_price_tokens(value)
+            if isinstance(block.get("context_line"), str):
+                context_line = strip_price_tokens(strip_internal_marker(block["context_line"]))
+                if re.search(r"\bneeds\b|proof needed|tone cue|persona", context_line, flags=re.IGNORECASE):
+                    block["context_line"] = ""
+                else:
+                    block["context_line"] = context_line
             if isinstance(block.get("bullets"), list):
                 cleaned_bullets = []
                 for item in block["bullets"]:
@@ -1727,6 +1736,10 @@ def call_opencode_compatible(config: dict[str, Any], context: dict[str, Any], ru
         "Use the 4U writing lens before finalizing every headline: Useful, honestly Urgent, Unique, and Ultra-specific. This is a writing instruction, not a label to output. "
         "Write headlines like a human editor revised them from rough AI copy: one clean idea, short, concrete, and spoken. "
         "Do not make the headline carry the whole pitch; put proof, mechanism, and timing in support_line, trust_line, or bullets. "
+        "Do not lead headlines with instructional verbs (Start, Begin, Kickstart, Follow). Use statements or questions that sound like finished ad copy. "
+        "Do not place AM/PM timing, 4-hour windows, or protocol mechanics in headlines; those belong in support_line or bullets. "
+        "Do not put product component names (OK Liquid / OK Tablet / OK Powder / OKP) in the headline; keep them in support_line or bullets. "
+        "Never output internal persona notes or proof-needed notes as on-image copy. "
         "Use these pattern families as execution guidance only, not text to copy: authority stamp; protocol identity; pain question; stubborn-weight proof; deadline direct; sacrifice reduction; emotional outcome; messy-life curiosity. "
         "Good support-line patterns include: product identity plus ease, simple 2-step routine, about 5-minute effort, doctor credibility plus 70,000+ users, visible 15-day progress, morning fullness plus night digestion support, or result plus less sacrifice. "
         "Before returning JSON, perform a final headline editor pass: shorten, remove generic AI phrases, keep one central idea, move explanation into support line, and rewrite if headline/support say the same thing. "
@@ -1746,6 +1759,16 @@ def call_opencode_compatible(config: dict[str, Any], context: dict[str, Any], ru
     cli_password = api_key or os.getenv("OPENCODE_SERVER_PASSWORD", "").strip()
     generated_ads: list[dict[str, Any]] = []
     errors: list[str] = []
+
+    strict_schema_note = (
+        "STRICT_SCHEMA: Return JSON only. Do not include copy_requirements, disclaimers, or extra keys. "
+        "persona must be an object with number, name, pain_en, desire_en, friction_en, proof_needed_en, tone_cue_en, "
+        "pain_hi, desire_hi, friction_hi, proof_needed_hi, tone_cue_hi. "
+        "copy.EN and copy.HI must contain only the required fields for the format. "
+        "If format is HERO or UGC: headline, support_line, cta. "
+        "If format is BA/FEAT: headline, bullets (list), cta. "
+        "If format is TEST: headline, attribution, trust_line, cta."
+    )
 
     for index, ad_item in enumerate(context.get("ads") or [], start=1):
         previous_same_format: list[dict[str, Any]] = []
@@ -1811,23 +1834,46 @@ def call_opencode_compatible(config: dict[str, Any], context: dict[str, Any], ru
         ]
         if cli_password:
             cli_cmd.extend(["--password", cli_password])
+        def run_once(prompt: str) -> tuple[dict[str, Any] | None, str, str]:
+            cmd = [
+                "opencode",
+                "run",
+                "--pure",
+                "--attach",
+                api_url,
+                "--model",
+                model,
+                "--format",
+                "json",
+                prompt,
+            ]
+            if cli_password:
+                cmd.extend(["--password", cli_password])
+            result = run_cmd(cmd, cwd=ROOT)
+            stdout = result.stdout or ""
+            stderr = result.stderr or ""
+            if result.returncode != 0:
+                errors.append(
+                    f"Ad {index}: return code {result.returncode}\nSTDOUT:\n{stdout}\nSTDERR:\n{stderr}"
+                )
+                return None, stdout, stderr
+            parsed = parse_opencode_json_output(stdout)
+            return (extract_generated_ad_candidate(parsed) if parsed else None), stdout, stderr
+
         try:
-            cli_result = run_cmd(cli_cmd, cwd=ROOT)
+            candidate, last_stdout, last_stderr = run_once(cli_prompt)
         except OSError as exc:
             errors.append(f"Ad {index}: launch failed: {exc}")
             continue
 
-        if cli_result.returncode != 0:
-            errors.append(
-                f"Ad {index}: return code {cli_result.returncode}\nSTDOUT:\n{cli_result.stdout}\nSTDERR:\n{cli_result.stderr}"
-            )
+        if not candidate:
+            retry_prompt = f"{cli_prompt}\n\n{strict_schema_note}\n"
+            candidate, last_stdout, last_stderr = run_once(retry_prompt)
+
+        if not candidate:
+            errors.append(f"Ad {index}: returned no usable ad JSON\nSTDOUT:\n{last_stdout}\nSTDERR:\n{last_stderr}")
             continue
 
-        parsed = parse_opencode_json_output(cli_result.stdout)
-        candidate = extract_generated_ad_candidate(parsed) if parsed else None
-        if not candidate:
-            errors.append(f"Ad {index}: returned no usable ad JSON\nSTDOUT:\n{cli_result.stdout}\nSTDERR:\n{cli_result.stderr}")
-            continue
         generated_ads.append(hydrate_generated_ad_candidate(candidate, ad_item))
 
     if errors:
