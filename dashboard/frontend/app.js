@@ -12,6 +12,12 @@ const themeToggleEl = document.getElementById("themeToggle");
 const languageModesEl = document.getElementById("languageModes");
 const providerSelectEl = document.getElementById("opencodeProvider");
 const modelSelectEl = document.getElementById("opencodeModel");
+const hypothesisTypeEl = document.getElementById("hypothesisType");
+const hypothesisVariantEl = document.getElementById("hypothesisVariant");
+const hypothesisTestGroupEl = document.getElementById("hypothesisTestGroup");
+const hypothesisVariantRowEl = document.getElementById("hypothesisVariantRow");
+const hypothesisGroupRowEl = document.getElementById("hypothesisGroupRow");
+const hypothesisSummaryEl = document.getElementById("hypothesisSummary");
 
 const formats = ["HERO", "BA", "TEST", "FEAT", "UGC"];
 const languageModes = ["ALL", "EN", "HI", "HINGLISH"];
@@ -21,6 +27,7 @@ let selectedLanguageMode = "ALL";
 let modelsByProvider = {};
 let runsData = [];
 let currentRunIndex = 0;
+let hypothesisConfig = { type: "none", variant: "", test_group: "all" };
 
 function setSelectOptions(selectEl, values, selectedValue) {
   selectEl.innerHTML = "";
@@ -134,6 +141,91 @@ function renderLanguageModes() {
   });
 }
 
+function renderHypothesisUI() {
+  if (!hypothesisTypeEl || !defaultData) return;
+  const vars = defaultData.hypothesis?.variables || {};
+  const groups = defaultData.hypothesis?.test_groups || [];
+
+  // Populate hypothesis type dropdown
+  hypothesisTypeEl.innerHTML = "";
+  Object.entries(vars).forEach(([key, defn]) => {
+    const opt = document.createElement("option");
+    opt.value = key;
+    opt.textContent = defn.label || key;
+    if (hypothesisConfig.type === key) opt.selected = true;
+    hypothesisTypeEl.appendChild(opt);
+  });
+
+  // Populate test groups
+  if (hypothesisTestGroupEl) {
+    hypothesisTestGroupEl.innerHTML = "";
+    groups.forEach((g) => {
+      const opt = document.createElement("option");
+      opt.value = g.id;
+      opt.textContent = g.label;
+      if (hypothesisConfig.test_group === g.id) opt.selected = true;
+      hypothesisTestGroupEl.appendChild(opt);
+    });
+  }
+
+  updateHypothesisVariantOptions();
+  updateHypothesisSummary();
+}
+
+function updateHypothesisVariantOptions() {
+  if (!hypothesisVariantEl || !defaultData) return;
+  const type = hypothesisTypeEl.value;
+  const vars = defaultData.hypothesis?.variables || {};
+  const defn = vars[type];
+
+  if (!defn || !defn.options || defn.options.length === 0) {
+    hypothesisVariantRowEl?.classList.add("hidden");
+    hypothesisGroupRowEl?.classList.add("hidden");
+    return;
+  }
+
+  hypothesisVariantRowEl?.classList.remove("hidden");
+  hypothesisGroupRowEl?.classList.remove("hidden");
+
+  hypothesisVariantEl.innerHTML = "";
+  defn.options.forEach((opt) => {
+    const option = document.createElement("option");
+    option.value = opt.id;
+    option.textContent = opt.label;
+    if (hypothesisConfig.variant === opt.id) option.selected = true;
+    hypothesisVariantEl.appendChild(option);
+  });
+}
+
+function updateHypothesisSummary() {
+  if (!hypothesisSummaryEl || !defaultData) return;
+  const type = hypothesisTypeEl.value;
+  const vars = defaultData.hypothesis?.variables || {};
+  const defn = vars[type];
+
+  if (!defn || type === "none") {
+    hypothesisSummaryEl.textContent = "No hypothesis test active. Ads will generate normally.";
+    return;
+  }
+
+  const variant = hypothesisVariantEl.value;
+  const group = hypothesisTestGroupEl.value;
+  const variantLabel = defn.options?.find((o) => o.id === variant)?.label || variant;
+  const groupLabel = defaultData.hypothesis?.test_groups?.find((g) => g.id === group)?.label || group;
+
+  hypothesisSummaryEl.textContent = `Testing: ${defn.label}. Variant: ${variantLabel}. Group: ${groupLabel}.`;
+}
+
+function getHypothesisConfig() {
+  const type = hypothesisTypeEl?.value || "none";
+  if (type === "none") return { type: "none", variant: "", test_group: "all" };
+  return {
+    type,
+    variant: hypothesisVariantEl?.value || "",
+    test_group: hypothesisTestGroupEl?.value || "all",
+  };
+}
+
 function renderPersonas() {
   personaListEl.innerHTML = "";
   defaultData.personas.forEach((p) => {
@@ -189,6 +281,7 @@ async function fetchDefaults() {
   renderPersonas();
   renderGlobalFormats();
   renderLanguageModes();
+  renderHypothesisUI();
   const imageCount = (defaultData.input_images || []).length;
   defaultsInfoEl.textContent = `Using defaults: product=${defaultData.default_files.product_info}, mechanism=${defaultData.default_files.mechanism}, faq=${defaultData.default_files.faq}, input/images=${imageCount} file(s)`;
 
@@ -224,6 +317,7 @@ async function runPipeline() {
     opencode_api_url: document.getElementById("opencodeApiUrl").value.trim(),
     opencode_api_key: document.getElementById("opencodeApiKey").value.trim(),
     opencode_model: (modelSelectEl.value || "").trim(),
+    hypothesis: getHypothesisConfig(),
   };
 
   const form = new FormData();
@@ -633,6 +727,21 @@ if (themeToggleEl) {
     const current = document.body.getAttribute("data-theme") === "dark" ? "dark" : "light";
     applyTheme(current === "dark" ? "light" : "dark");
   });
+}
+
+if (hypothesisTypeEl) {
+  hypothesisTypeEl.addEventListener("change", () => {
+    updateHypothesisVariantOptions();
+    updateHypothesisSummary();
+  });
+}
+
+if (hypothesisVariantEl) {
+  hypothesisVariantEl.addEventListener("change", updateHypothesisSummary);
+}
+
+if (hypothesisTestGroupEl) {
+  hypothesisTestGroupEl.addEventListener("change", updateHypothesisSummary);
 }
 
 initTheme();

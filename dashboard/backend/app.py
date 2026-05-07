@@ -91,6 +91,87 @@ HEADLINE_CONCEPT_FRAMEWORK = {
 }
 
 
+HYPOTHESIS_VARIABLES: dict[str, dict[str, Any]] = {
+    "none": {
+        "label": "No hypothesis test",
+        "description": "Generate ads normally without controlled A/B testing.",
+        "options": [],
+    },
+    "hook_structure": {
+        "label": "Hook Structure (H1)",
+        "description": "Test which headline opening pattern performs best: question vs. proof vs. contrast vs. confession vs. command.",
+        "options": [
+            {"id": "question_lead", "label": "Question Lead", "hint": "Headline opens with a question"},
+            {"id": "proof_lead", "label": "Proof Lead", "hint": "Headline opens with credibility or numbers"},
+            {"id": "contrast_loop", "label": "Contrast Loop", "hint": "Headline uses before/after tension"},
+            {"id": "confession_lead", "label": "Confession Lead", "hint": "Headline uses first-person admission"},
+            {"id": "command_lead", "label": "Command Lead", "hint": "Headline uses direct instruction"},
+        ],
+    },
+    "concept_angle": {
+        "label": "Concept Angle (H2)",
+        "description": "Test which messaging angle drives better results: pain vs. outcome vs. proof vs. authority vs. curiosity.",
+        "options": [
+            {"id": "pain_point", "label": "Pain Point", "hint": "Lead with the specific problem"},
+            {"id": "desired_outcome", "label": "Desired Outcome", "hint": "Lead with the result or felt outcome"},
+            {"id": "social_proof", "label": "Social Proof", "hint": "Lead with others' trust or usage"},
+            {"id": "authority", "label": "Authority", "hint": "Lead with expertise or doctor credibility"},
+            {"id": "curiosity", "label": "Curiosity", "hint": "Lead with a question or mechanism gap"},
+            {"id": "comparison", "label": "Comparison", "hint": "Lead by contrasting with harder alternatives"},
+            {"id": "offer", "label": "Offer", "hint": "Lead with practical reason to act"},
+        ],
+    },
+    "awareness_stage": {
+        "label": "Awareness Stage (H3)",
+        "description": "Test whether matching the ad to the audience's funnel stage improves performance.",
+        "options": [
+            {"id": "unaware", "label": "Unaware", "hint": "Reader does not yet realize the hidden friction"},
+            {"id": "problem_aware", "label": "Problem Aware", "hint": "Reader knows the problem but not the fix"},
+            {"id": "solution_aware", "label": "Solution Aware", "hint": "Reader knows fixes exist but not why this kit is different"},
+            {"id": "product_aware", "label": "Product Aware", "hint": "Reader already knows the kit; give the final push"},
+        ],
+    },
+    "proof_style": {
+        "label": "Proof Style (H4)",
+        "description": "Test which trust framing works best for this persona: authority vs. social proof vs. mechanism explainer.",
+        "options": [
+            {"id": "authority_anchor", "label": "Authority Anchor", "hint": "Doctor credibility and Ayurveda trust"},
+            {"id": "social_proof", "label": "Social Proof", "hint": "70,000+ users and testimonials"},
+            {"id": "mechanism_explainer", "label": "Mechanism Explainer", "hint": "How the protocol works step-by-step"},
+            {"id": "routine_clarity", "label": "Routine Clarity", "hint": "Simple, clear daily steps"},
+            {"id": "objection_flip", "label": "Objection Flip", "hint": "Address skepticism directly"},
+        ],
+    },
+    "cta_voice": {
+        "label": "CTA Voice (H5)",
+        "description": "Test which call-to-action tone converts better: urgent vs. guided vs. reassuring vs. discovery.",
+        "options": [
+            {"id": "urgent_start", "label": "Urgent Start", "hint": "Start Today / Act Now"},
+            {"id": "guided_next_step", "label": "Guided Next Step", "hint": "See The Steps / View Details"},
+            {"id": "reassurance_start", "label": "Reassurance Start", "hint": "Check If It Fits / Try Risk-Free"},
+            {"id": "challenge_action", "label": "Challenge Action", "hint": "Take The 15-Day Test"},
+            {"id": "discovery_action", "label": "Discovery Action", "hint": "See How It Works / Learn More"},
+        ],
+    },
+    "headline_length": {
+        "label": "Headline Length (H6)",
+        "description": "Test short (5-8 words) vs. medium (9-12 words) vs. long (13+ words) headlines.",
+        "options": [
+            {"id": "short", "label": "Short (5-8 words)", "hint": "Concise, punchy headlines"},
+            {"id": "medium", "label": "Medium (9-12 words)", "hint": "Balanced detail headlines"},
+            {"id": "long", "label": "Long (13+ words)", "hint": "Descriptive, story-led headlines"},
+        ],
+    },
+}
+
+TEST_GROUPS = [
+    {"id": "control", "label": "Control"},
+    {"id": "variant_a", "label": "Variant A"},
+    {"id": "variant_b", "label": "Variant B"},
+    {"id": "all", "label": "Generate All"},
+]
+
+
 def resolve_language_mode(config: dict[str, Any]) -> str:
     mode = str(config.get("language_mode") or "ALL").strip().upper()
     if mode in {"EN", "HI", "HINGLISH", "ALL"}:
@@ -334,6 +415,7 @@ def build_generation_payload_for_llm(context: dict[str, Any]) -> dict[str, Any]:
             continue
         persona = item.get("persona") if isinstance(item.get("persona"), dict) else {}
         format_rules = item.get("format_rules") if isinstance(item.get("format_rules"), dict) else {}
+        hypothesis = item.get("hypothesis") if isinstance(item.get("hypothesis"), dict) else {}
         compact_ads.append(
             {
                 "format": item.get("format"),
@@ -352,6 +434,7 @@ def build_generation_payload_for_llm(context: dict[str, Any]) -> dict[str, Any]:
                     "rules": [str(rule).strip() for rule in (format_rules.get("rules") or [])[:18] if str(rule).strip()],
                 },
                 "copy_requirements": item.get("copy_requirements") or {},
+                "hypothesis": hypothesis,
             }
         )
 
@@ -880,6 +963,8 @@ def list_models_for_provider(provider: str) -> list[str]:
 
 
 def choose_openai_gpt52(models: list[str]) -> str:
+    if not models:
+        return ""
     preferred = "openai/gpt-5.2"
     if preferred in models:
         return preferred
@@ -893,12 +978,12 @@ def choose_openai_gpt52(models: list[str]) -> str:
     non_copilot = [m for m in models if not m.lower().startswith("github-copilot/")]
     if non_copilot:
         return non_copilot[0]
-    return preferred
+    return models[0]
 
 
 def sanitize_dashboard_model(selected: str, models: list[str]) -> str:
     chosen = (selected or "").strip()
-    if chosen and not chosen.lower().startswith("github-copilot/"):
+    if chosen and (not models or chosen in models):
         return chosen
     return choose_openai_gpt52(models)
 
@@ -930,6 +1015,13 @@ def build_opencode_catalog() -> dict[str, Any]:
         grouped.setdefault(provider, []).append(model)
     for provider in grouped:
         grouped[provider] = sorted(grouped[provider])
+    providers_with_models = [provider for provider, values in grouped.items() if values]
+    copilot_models = [model for model in models if model.lower().startswith("github-copilot/")]
+    if providers_with_models:
+        providers = sorted(providers_with_models)
+    elif copilot_models:
+        providers = ["github-copilot"]
+        grouped = {"github-copilot": sorted(copilot_models)}
     default_model = ""
     if models:
         default_model = choose_openai_gpt52(models)
@@ -1553,6 +1645,10 @@ def normalize_generated_copy(
         if not candidate:
             continue
 
+        hypothesis = candidate.get("hypothesis") if isinstance(candidate.get("hypothesis"), dict) else None
+        if hypothesis:
+            ad["hypothesis"] = hypothesis
+
         angle = _clean_str(candidate.get("headline_angle"))
         if angle:
             ad["headline_angle"] = angle
@@ -1707,30 +1803,32 @@ def build_template_copy(context: dict[str, Any], run_id: str) -> dict[str, Any]:
                 "cta": cta_hi,
             }
 
-        ads.append(
-            {
-                "format": fmt,
-                "headline_angle": "mechanism",
-                "awareness_stage": concept_ids["awareness_stage"],
-                "concept_angle": concept_ids["concept_angle"],
-                "concept_structure": concept_ids["concept_structure"],
-                "persona": {
-                    "number": persona_num,
-                    "name": persona_name,
-                    "pain_en": pain_en,
-                    "desire_en": desire_en,
-                    "friction_en": friction_en,
-                    "proof_needed_en": proof_en,
-                    "tone_cue_en": tone_en,
-                    "pain_hi": pain_hi,
-                    "desire_hi": desire_hi,
-                    "friction_hi": friction_hi,
-                    "proof_needed_hi": proof_hi,
-                    "tone_cue_hi": tone_hi,
-                },
-                "copy": {"EN": copy_en, "HI": copy_hi},
-            }
-        )
+        ad_payload = {
+            "format": fmt,
+            "headline_angle": "mechanism",
+            "awareness_stage": concept_ids["awareness_stage"],
+            "concept_angle": concept_ids["concept_angle"],
+            "concept_structure": concept_ids["concept_structure"],
+            "persona": {
+                "number": persona_num,
+                "name": persona_name,
+                "pain_en": pain_en,
+                "desire_en": desire_en,
+                "friction_en": friction_en,
+                "proof_needed_en": proof_en,
+                "tone_cue_en": tone_en,
+                "pain_hi": pain_hi,
+                "desire_hi": desire_hi,
+                "friction_hi": friction_hi,
+                "proof_needed_hi": proof_hi,
+                "tone_cue_hi": tone_hi,
+            },
+            "copy": {"EN": copy_en, "HI": copy_hi},
+        }
+        hypothesis = item.get("hypothesis") if isinstance(item.get("hypothesis"), dict) else None
+        if hypothesis:
+            ad_payload["hypothesis"] = hypothesis
+        ads.append(ad_payload)
 
     return {"default_aspect_ratio": "4:5", "ads": ads}
 
@@ -1762,6 +1860,11 @@ def call_opencode_compatible(config: dict[str, Any], context: dict[str, Any], ru
         "Each ad item includes copy_requirements; treat primary_feature/headline_driver as the headline lane and secondary_feature/support_driver as the supporting lane. "
         "Use headline_execution_rules, headline_concept_framework, and each ad's copy_requirements.concept_variation as the execution model. "
         "The concept variation tells you the awareness stage, lead angle, and message structure; copy its ids into awareness_stage, concept_angle, and concept_structure, but treat the directions as guidance only, not copy to reuse. "
+        "If copy_requirements.hypothesis is present and type is not 'none', obey it as a controlled test. "
+        "If concept_variation includes hook_structure_override, the headline opening must follow that pattern (question, proof, contrast, confession, or command lead). "
+        "If concept_variation includes proof_style_override, shape the trust/support line using that proof style. "
+        "If concept_variation includes cta_voice_override, make the CTA match that voice. "
+        "If concept_variation includes headline_length, keep the headline length in the requested range (short 5-8 words, medium 9-12 words, long 13+ words). "
         "Use the 4U writing lens before finalizing every headline: Useful, honestly Urgent, Unique, and Ultra-specific. This is a writing instruction, not a label to output. "
         "Write headlines like a human editor revised them from rough AI copy: one clean idea, short, concrete, and spoken. "
         "Do not make the headline carry the whole pitch; put proof, mechanism, and timing in support_line, trust_line, or bullets. "
@@ -2227,6 +2330,56 @@ def resolve_format_plan(config: dict[str, Any]) -> list[dict[str, Any]]:
     return out
 
 
+def expand_plan_with_hypothesis(plan: list[dict[str, Any]], hypothesis_cfg: dict[str, Any]) -> list[dict[str, Any]]:
+    """Expand ad plan to include hypothesis test variants.
+
+    When a hypothesis is active, generates controlled variants where only the
+    hypothesis variable changes. Each variant is tagged with hypothesis metadata.
+    """
+    hyp_type = str(hypothesis_cfg.get("type") or "none").strip().lower()
+    if hyp_type == "none" or hyp_type not in HYPOTHESIS_VARIABLES:
+        return plan
+
+    variable_def = HYPOTHESIS_VARIABLES[hyp_type]
+    selected_variant = str(hypothesis_cfg.get("variant") or "").strip()
+    test_group = str(hypothesis_cfg.get("test_group") or "all").strip()
+    available_options = [opt["id"] for opt in variable_def.get("options", [])]
+
+    if not available_options:
+        return plan
+
+    # Determine which variants to generate
+    variants_to_generate: list[str] = []
+    if selected_variant and selected_variant in available_options:
+        # Single variant test: control (first option) vs selected variant
+        if test_group in ("control", "all"):
+            variants_to_generate.append(available_options[0])
+        if test_group in ("variant_a", "variant_b", "all"):
+            variants_to_generate.append(selected_variant)
+    else:
+        # No specific variant selected — test all options
+        if test_group == "control":
+            variants_to_generate = [available_options[0]]
+        elif test_group == "all":
+            variants_to_generate = available_options[:3]  # cap at 3 to avoid explosion
+        else:
+            variants_to_generate = available_options[:2]  # default: first two
+
+    out: list[dict[str, Any]] = []
+    for item in plan:
+        for variant in variants_to_generate:
+            entry = dict(item)
+            entry["hypothesis"] = {
+                "type": hyp_type,
+                "variable_label": variable_def["label"],
+                "variant": variant,
+                "test_group": "control" if variant == available_options[0] else "variant",
+                "hypothesis_id": f"{hyp_type}-{variant}",
+            }
+            out.append(entry)
+    return out
+
+
 app = FastAPI(title="Ad Dashboard API", version="1.0.0")
 
 app.add_middleware(
@@ -2260,6 +2413,11 @@ def api_defaults() -> dict[str, Any]:
             "playbook": str(DEFAULT_PLAYBOOK.relative_to(ROOT)),
         },
         "opencode": opencode,
+        "hypothesis": {
+            "variables": HYPOTHESIS_VARIABLES,
+            "test_groups": TEST_GROUPS,
+            "default": {"type": "none", "variant": "", "test_group": "all"},
+        },
     }
 
 
@@ -2786,9 +2944,18 @@ async def api_run_execute(
     image_sources_file_path = coalesce_path(image_sources_path, default_image_sources_file())
 
     try:
-        plan = resolve_format_plan(cfg)
+        base_plan = resolve_format_plan(cfg)
     except RuntimeError as exc:
         raise HTTPException(status_code=400, detail=str(exc)) from exc
+
+    hypothesis_cfg = cfg.get("hypothesis") or {}
+    plan = expand_plan_with_hypothesis(base_plan, hypothesis_cfg)
+
+    # Save hypothesis config to run dir for reference
+    if hypothesis_cfg:
+        (run_dir / "context" / "hypothesis_config.json").write_text(
+            json.dumps(hypothesis_cfg, ensure_ascii=False, indent=2) + "\n", encoding="utf-8"
+        )
 
     product_ctx: dict[str, Any]
     product_ctx_source = "extract_product_context"
@@ -2879,12 +3046,38 @@ async def api_run_execute(
             cwd=ROOT,
         )
         format_payload = parse_json_stdout(format_result, f"extract_format_rules({fmt})")
+        copy_req = build_copy_requirements(persona_no, fmt, format_seen_counts[fmt], run_id)
+
+        # Inject hypothesis directive if active
+        hyp_meta = item.get("hypothesis")
+        if isinstance(hyp_meta, dict) and hyp_meta.get("type") != "none":
+            copy_req["hypothesis"] = hyp_meta
+            # Override the concept variation based on hypothesis type
+            concept = copy_req.get("concept_variation") or {}
+        hyp_type = hyp_meta.get("type")
+        variant = hyp_meta.get("variant")
+        if hyp_type == "awareness_stage" and variant:
+            concept["audience_stage"] = _framework_item("audience_stage", variant)
+        elif hyp_type == "concept_angle" and variant:
+            concept["lead_angle"] = _framework_item("lead_angle", variant)
+        elif hyp_type == "hook_structure" and variant:
+            # Store hook_structure directive for the assembler / LLM
+            concept["hook_structure_override"] = variant
+        elif hyp_type == "proof_style" and variant:
+            concept["proof_style_override"] = variant
+        elif hyp_type == "cta_voice" and variant:
+            concept["cta_voice_override"] = variant
+        elif hyp_type == "headline_length" and variant:
+            concept["headline_length"] = variant
+        copy_req["concept_variation"] = concept
+
         ads_context.append(
             {
                 "persona": persona_payload,
                 "format_rules": format_payload,
                 "format": fmt,
-                "copy_requirements": build_copy_requirements(persona_no, fmt, format_seen_counts[fmt], run_id),
+                "copy_requirements": copy_req,
+                "hypothesis": hyp_meta,
             }
         )
 

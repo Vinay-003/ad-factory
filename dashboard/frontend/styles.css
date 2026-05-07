@@ -507,6 +507,31 @@ button:hover {
   line-height: 1.45;
 }
 
+.hidden {
+  display: none;
+}
+
+.card-hypothesis {
+  border-left: 4px solid var(--accent-violet);
+}
+
+.card-hypothesis label {
+  margin-top: 8px;
+  display: block;
+  font-weight: 600;
+  font-size: 13px;
+}
+
+.card-hypothesis select {
+  margin-top: 4px;
+  margin-bottom: 10px;
+}
+
+#hypothesisSummary {
+  margin-top: 6px;
+  font-style: italic;
+}
+
 .status {
   margin-top: 12px;
   background: var(--status-bg);

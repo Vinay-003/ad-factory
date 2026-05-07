@@ -1136,6 +1136,117 @@ def prompt_filename(fmt: str, persona_number: int, lang: str) -> str:
     return f"OUTPUT_{fmt}_P{persona_number:02d}_{lang}.txt"
 
 
+def classify_hook_structure(headline: str) -> str:
+    """Classify headline opening pattern into hook_structure_class."""
+    text = (headline or "").strip().lower()
+    if not text:
+        return "proof_lead"
+    if text.startswith("why ") or text.startswith("what ") or text.startswith("how ") or text.startswith("when ") or "?" in text[:30]:
+        return "question_lead"
+    if text.startswith("finally") or text.startswith("trusted") or text.startswith("proven") or "70,000" in text or "doctor" in text:
+        return "proof_lead"
+    if "before" in text or "after" in text or "without" in text or "instead" in text:
+        return "contrast_loop"
+    if text.startswith("i ") or text.startswith("my ") or "felt" in text or "struggled" in text:
+        return "confession_lead"
+    if text.startswith("stop") or text.startswith("start") or text.startswith("try") or text.startswith("see"):
+        return "command_lead"
+    return "proof_lead"
+
+
+def classify_proof_style(headline: str, support_line: str) -> str:
+    """Classify trust framing into proof_style_class."""
+    combined = f"{(headline or '').lower()} {(support_line or '').lower()}"
+    if "doctor" in combined or "ayurvedic" in combined or "dr." in combined or "formulated" in combined:
+        return "authority_anchor"
+    if "70,000" in combined or "user" in combined or "people" in combined or "review" in combined or "trusted" in combined:
+        return "social_proof"
+    if "step" in combined or "routine" in combined or "morning" in combined or "night" in combined or "ok liquid" in combined:
+        return "mechanism_explainer"
+    if "simple" in combined or "clear" in combined or "5-minute" in combined or "easy" in combined:
+        return "routine_clarity"
+    if "but" in combined or "skeptical" in combined or "doubt" in combined or "worried" in combined:
+        return "objection_flip"
+    return "mechanism_explainer"
+
+
+def classify_cta_voice(cta: str) -> str:
+    """Classify CTA tone into cta_voice_class."""
+    text = (cta or "").strip().lower()
+    if "today" in text or "now" in text or "start" in text or "act" in text:
+        return "urgent_start"
+    if "see" in text or "view" in text or "check" in text or "steps" in text or "details" in text:
+        return "guided_next_step"
+    if "fit" in text or "risk" in text or "try" in text or "safe" in text:
+        return "reassurance_start"
+    if "test" in text or "challenge" in text or "15-day" in text:
+        return "challenge_action"
+    if "learn" in text or "how" in text or "works" in text or "discover" in text:
+        return "discovery_action"
+    return "guided_next_step"
+
+
+def get_opening_pattern_4tok(text: str) -> str:
+    """Extract first 4 normalized tokens from headline."""
+    words = re.findall(r"[a-zA-Z\u0900-\u097F]+", (text or "").strip().lower())
+    return "_".join(words[:4]) if words else ""
+
+
+def get_copy_skeleton(fmt: str, headline: str, support_line: str, bullets: list[str], cta: str) -> str:
+    """Derive high-level copy structure tag."""
+    has_question = "?" in (headline or "")
+    has_contrast = any(w in (headline or "").lower() for w in ["without", "instead", "but", "before", "after"])
+    has_mechanism = any(w in f"{(headline or '').lower()} {(support_line or '').lower()}" for w in ["routine", "step", "liquid", "tablet", "powder", "digestion", "cravings"])
+    has_time = any(w in f"{(headline or '').lower()} {(support_line or '').lower()}" for w in ["15-day", "15 day", "15 days", "morning", "night", "evening", "daily"])
+    has_proof = any(w in f"{(headline or '').lower()} {(support_line or '').lower()}" for w in ["doctor", "70,000", "proven", "trusted", "ayurvedic"])
+
+    if has_question and has_mechanism:
+        return "question_mechanism_cta"
+    if has_contrast and has_mechanism:
+        return "contrast_mechanism_cta"
+    if has_proof and has_time:
+        return "proof_time_cta"
+    if has_mechanism and has_time:
+        return "pain_mechanism_time"
+    if has_contrast:
+        return "pain_agitate_solve"
+    if has_proof:
+        return "proof_then_routine"
+    if has_time:
+        return "micro_story_then_action"
+    return "problem_reframe_then_next_step"
+
+
+def has_protocol_mechanics(text: str) -> bool:
+    lowered = (text or "").lower()
+    return any(w in lowered for w in ["am", "pm", "4-hour", "4 hour", "empty stomach", "no solid", "liquid", "tablet", "powder"])
+
+
+def has_social_proof_number(text: str) -> bool:
+    lowered = (text or "").lower()
+    return bool(re.search(r"\d{2,}|70,?000|lakh|crore", lowered))
+
+
+def get_background_scene_category(bg: dict[str, Any]) -> str:
+    """Infer scene category from background metadata."""
+    title = (bg.get("title") or "").lower()
+    if any(w in title for w in ["kitchen", "counter", "stove", "fridge", "dining"]):
+        return "kitchen"
+    if any(w in title for w in ["bedroom", "bed", "nightstand", "sleep"]):
+        return "bedroom"
+    if any(w in title for w in ["office", "desk", "workstation", "laptop", "computer"]):
+        return "office"
+    if any(w in title for w in ["studio", "backdrop", "seamless", "pedestal", "gradient"]):
+        return "studio"
+    if any(w in title for w in ["outdoor", "garden", "park", "nature", "balcony"]):
+        return "outdoor"
+    if any(w in title for w in ["living", "sofa", "couch", "lounge", "tv"]):
+        return "living_room"
+    if any(w in title for w in ["clinical", "medical", "hospital", "white room", "lab"]):
+        return "clinical"
+    return "lifestyle"
+
+
 def main() -> int:
     args = parse_args()
     copy_path = Path(args.copy_file)
@@ -1328,6 +1439,18 @@ def main() -> int:
             continue
 
         entry_id = next_entry_id(registry)
+        headline_en = ad["copy"]["EN"]["headline"]
+        headline_hi = ad["copy"]["HI"]["headline"]
+        support_en = ad["copy"]["EN"].get("support_line") or ad["copy"]["EN"].get("trust_line") or ""
+        support_hi = ad["copy"]["HI"].get("support_line") or ad["copy"]["HI"].get("trust_line") or ""
+        cta_en = ad["copy"]["EN"]["cta"]
+        cta_hi = ad["copy"]["HI"]["cta"]
+        bullets_en = ad["copy"]["EN"].get("bullets") or []
+        bullets_hi = ad["copy"]["HI"].get("bullets") or []
+
+        # Hypothesis metadata from ad payload (injected by backend when testing)
+        hyp_meta = ad.get("hypothesis") or {}
+
         entry = {
             "id": entry_id,
             "timestamp": timestamp,
@@ -1339,18 +1462,18 @@ def main() -> int:
             "concept_angle": concept["concept_angle"],
             "concept_structure": concept["concept_structure"],
             "visual_archetype": visual_archetype["id"],
-            "headline_en": ad["copy"]["EN"]["headline"],
-            "headline_hi": ad["copy"]["HI"]["headline"],
-            "support_line_en": ad["copy"]["EN"].get("support_line") or ad["copy"]["EN"].get("trust_line") or "",
-            "support_line_hi": ad["copy"]["HI"].get("support_line") or ad["copy"]["HI"].get("trust_line") or "",
-            "cta_en": ad["copy"]["EN"]["cta"],
-            "cta_hi": ad["copy"]["HI"]["cta"],
+            "headline_en": headline_en,
+            "headline_hi": headline_hi,
+            "support_line_en": support_en,
+            "support_line_hi": support_hi,
+            "cta_en": cta_en,
+            "cta_hi": cta_hi,
             "disclaimer_en": "",
             "disclaimer_hi": "",
             "caption_en": "",
             "caption_hi": "",
-            "bullets_en": ad["copy"]["EN"].get("bullets") or [],
-            "bullets_hi": ad["copy"]["HI"].get("bullets") or [],
+            "bullets_en": bullets_en,
+            "bullets_hi": bullets_hi,
             "background_slot": bg["id"],
             "background_name": bg.get("title", ""),
             "background_source": "catalog",
@@ -1358,6 +1481,24 @@ def main() -> int:
             "language": "BOTH",
             "output_quality": "pending",
             "notes": f"assembled_from={copy_path.name}; batch={batch_name}; aspect_ratio={aspect_ratio}; seed={seed}; visual_archetype={visual_archetype['id']}",
+            # Copy diversity fields (now populated automatically)
+            "opening_pattern_4tok_en": get_opening_pattern_4tok(headline_en),
+            "opening_pattern_4tok_hi": get_opening_pattern_4tok(headline_hi),
+            "copy_skeleton": get_copy_skeleton(fmt, headline_en, support_en, bullets_en, cta_en),
+            "hook_structure_class": classify_hook_structure(headline_en),
+            "proof_style_class": classify_proof_style(headline_en, support_en),
+            "cta_voice_class": classify_cta_voice(cta_en),
+            # New analytics fields
+            "headline_word_count": len((headline_en or "").split()),
+            "support_line_word_count": len((support_en or "").split()),
+            "has_protocol_mechanics": has_protocol_mechanics(support_en) or has_protocol_mechanics(" ".join(bullets_en)),
+            "has_social_proof_number": has_social_proof_number(headline_en) or has_social_proof_number(support_en),
+            "background_scene_category": get_background_scene_category(bg),
+            # Hypothesis testing fields
+            "hypothesis_id": hyp_meta.get("hypothesis_id") or "",
+            "test_group": hyp_meta.get("test_group") or "",
+            "variant_variable": hyp_meta.get("type") or "",
+            "variant_value": hyp_meta.get("variant") or "",
         }
 
         registry.setdefault("entries", []).append(entry)

@@ -32,7 +32,7 @@
         </section>
 
         <section class="card card-images">
-          <h2>3) Input Images (Gemini Upload Set)</h2>
+          <h2>4) Input Images (Gemini Upload Set)</h2>
           <label>Add images to <code>input/images</code></label>
           <input id="inputImageFiles" type="file" multiple accept="image/*" />
           <label><input id="clearInputImages" type="checkbox" /> Clear previously stored images before adding these</label>
@@ -41,8 +41,24 @@
       </div>
 
       <div class="column column-right">
+        <section class="card card-hypothesis">
+          <h2>2) Hypothesis Testing</h2>
+          <p class="hint">Select a variable to A/B test. The pipeline will generate controlled variants where only this variable changes.</p>
+          <label>Hypothesis Variable</label>
+          <select id="hypothesisType"></select>
+          <div id="hypothesisVariantRow" class="hidden">
+            <label>Variant to Test</label>
+            <select id="hypothesisVariant"></select>
+          </div>
+          <div id="hypothesisGroupRow" class="hidden">
+            <label>Test Group</label>
+            <select id="hypothesisTestGroup"></select>
+          </div>
+          <div id="hypothesisSummary" class="hint"></div>
+        </section>
+
         <section class="card card-execution">
-          <h2>2) Execution</h2>
+          <h2>3) Execution</h2>
           <label>OpenCode API URL (auto-wired by launcher; editable)</label>
           <input id="opencodeApiUrl" type="text" placeholder="http://127.0.0.1:4090" />
           <label>OpenCode API Key (optional)</label>
@@ -59,7 +75,7 @@
         </section>
 
         <section class="card card-uploads">
-          <h2>4) Optional File Uploads</h2>
+          <h2>5) Optional File Uploads</h2>
           <div class="uploads">
             <label>Product Info <input id="productFile" type="file" /></label>
             <label>Mechanism <input id="mechanismFile" type="file" /></label>
@@ -72,7 +88,7 @@
     </div>
 
     <section class="card card-runs">
-      <h2>5) Latest Runs</h2>
+      <h2>6) Latest Runs</h2>
       <div class="runs-toolbar">
         <button id="refreshRuns" class="ghost-btn" type="button">Refresh</button>
         <div class="carousel-controls">
