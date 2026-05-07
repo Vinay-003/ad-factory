@@ -59,9 +59,14 @@
 
         <section class="card card-execution">
           <h2>3) Execution</h2>
-          <label>OpenCode API URL (auto-wired by launcher; editable)</label>
+          <label>Server</label>
+          <select id="serverType">
+            <option value="opencode">OpenCode</option>
+            <option value="blackbox">Blackbox</option>
+          </select>
+          <label>API URL (auto-wired by launcher; editable)</label>
           <input id="opencodeApiUrl" type="text" placeholder="http://127.0.0.1:4090" />
-          <label>OpenCode API Key (optional)</label>
+          <label>API Key (optional - defaults to server password)</label>
           <input id="opencodeApiKey" type="password" placeholder="sk-..." />
           <label>Provider</label>
           <select id="opencodeProvider"></select>

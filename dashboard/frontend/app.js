@@ -28,6 +28,7 @@ let modelsByProvider = {};
 let runsData = [];
 let currentRunIndex = 0;
 let hypothesisConfig = { type: "none", variant: "", test_group: "all" };
+let currentServerType = "opencode";
 
 function setSelectOptions(selectEl, values, selectedValue) {
   selectEl.innerHTML = "";
@@ -295,6 +296,31 @@ async function fetchDefaults() {
 
   setSelectOptions(providerSelectEl, providers.length ? providers : [""], defaultProvider);
   renderModelOptions(defaultProvider, defaultModel);
+
+  // Server type change handler
+  document.getElementById("serverType").addEventListener("change", async (e) => {
+    currentServerType = e.target.value;
+    const apiUrlInput = document.getElementById("opencodeApiUrl");
+    
+    if (currentServerType === "blackbox") {
+      apiUrlInput.value = "http://127.0.0.1:4091";
+      try {
+        const res = await fetch("http://127.0.0.1:4091/v1/models", {
+          headers: { "Authorization": "Basic " + btoa("user:blackbox-local-pass") }
+        });
+        const data = await res.json();
+        const models = data.data || [];
+        modelsByProvider = { "blackbox": models.map(m => m.id) };
+        setSelectOptions(providerSelectEl, ["blackbox"], "blackbox");
+        setSelectOptions(modelSelectEl, models.map(m => m.id), models[0]?.id || "");
+      } catch (err) {
+        console.error("Failed to fetch Blackbox models:", err);
+      }
+    } else {
+      apiUrlInput.value = "http://127.0.0.1:4090";
+      fetchDefaults();
+    }
+  });
 }
 
 function fileInput(id) {
@@ -314,6 +340,7 @@ async function runPipeline() {
     global_formats: [...selectedGlobalFormats],
     formats_by_persona: getFormatsByPersona(),
     generate_images: false,
+    server_type: currentServerType,
     opencode_api_url: document.getElementById("opencodeApiUrl").value.trim(),
     opencode_api_key: document.getElementById("opencodeApiKey").value.trim(),
     opencode_model: (modelSelectEl.value || "").trim(),

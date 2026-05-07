@@ -1394,8 +1394,8 @@ def enforce_unique_ctas(payload: dict[str, Any], context: dict[str, Any]) -> dic
                     chosen = candidate
                     break
             if not chosen:
-                suffix = len(seen) + 1
-                chosen = f"{variants[0] if variants else 'Start'} {suffix}"
+                # Keep CTA natural if uniqueness pool is exhausted.
+                chosen = current or (variants[0] if variants else "See Details")
             block["cta"] = chosen
             seen.add(chosen)
     return payload
@@ -2002,12 +2002,200 @@ def build_template_copy(context: dict[str, Any], run_id: str) -> dict[str, Any]:
     return {"default_aspect_ratio": "4:5", "ads": ads}
 
 
+def call_blackbox_http(config: dict[str, Any], context: dict[str, Any], run_dir: Path) -> dict[str, Any] | None:
+    """Call Blackbox server via HTTP API"""
+    import requests
+    
+    api_url = (config.get("opencode_api_url") or "").strip()
+    api_key = (config.get("opencode_api_key") or "").strip() or "blackbox-local-pass"
+    model = (config.get("opencode_model") or "").strip() or "blackboxai/moonshotai/kimi-k2.6"
+    
+    print(f"[call_blackbox_http] api_url={api_url}, model={model}", file=sys.stderr)
+    
+    # Extract base URL
+    if not api_url:
+        return None
+    
+    # Build auth
+    auth = ("user", api_key)
+    
+    language_mode = resolve_language_mode(config)
+    system = (
+        "You generate ad copy JSON only. Return valid JSON with keys default_aspect_ratio and ads. "
+        "Each ads item must include format, headline_angle, awareness_stage, concept_angle, concept_structure, persona fields and copy.EN/copy.HI fields compatible with assembler. "
+        "Every ad unit must make the obesity and weight-loss intent obvious to a first-time viewer. "
+        "At minimum, headline or support line must explicitly mention weight loss, obesity reduction, excess-weight reduction, or a direct 15-day result framing. "
+        "Avoid abstract lines that hide the product goal. "
+        "Never include price in any on-image copy field (headline/support_line/trust_line/bullets/cta/attribution). "
+        "Do not use currency symbols or words like INR, price, only, discount, off, MRP in on-image copy. "
+        "For BA format, never prefix copy with BEFORE:/AFTER: labels (or Hindi equivalents). "
+        "For BA format, write explicit split contrast copy: bullet 1/2 = left-side struggle state, bullet 3/4 = right-side fix/progress state. "
+        "Use 2 or 4 BA bullets total (if 2, bullet 1 = struggle and bullet 2 = fix). "
+        "For TEST format, headline must read like a first-person review line suitable for quote card (not generic 'highly rated' phrasing). "
+        "For TEST format, attribution must be role/source-based without personal names; avoid repeating generic text like 'Representative user review' across ads. "
+        "If no real quote is provided in context, create one believable representative review line grounded in persona pain/desire and safe claims. "
+        "Keep each format's core shape intact, but vary headline/support/trust framing using persona pain, desire, friction, proof needed, and tone cue. "
+        "For the same format across runs, rotate variation lane and wording rhythm while preserving format-specific structure. "
+        "Each ad item includes copy_requirements; treat primary_feature/headline_driver as the headline lane and secondary_feature/support_driver as the supporting lane. "
+        "Use headline_execution_rules, headline_concept_framework, and each ad's copy_requirements.concept_variation as the execution model. "
+        "The concept variation tells you the awareness stage, lead angle, and message structure; copy its ids into awareness_stage, concept_angle, and concept_structure, but treat the directions as guidance only, not copy to reuse. "
+        "If copy_requirements.hypothesis is present and type is not 'none', obey it as a controlled test. "
+        "If concept_variation includes hook_structure_override, the headline opening must follow that pattern (question, proof, contrast, confession, or command lead), using concept_variation.hook_structure_guidance when present. "
+        "If concept_variation includes concept_angle_guidance, awareness_stage_guidance, or concept_structure_guidance, use it as concrete execution guidance. "
+        "If concept_variation includes proof_style_override, shape the trust/support line using that proof style and proof_style_guidance. "
+        "If concept_variation includes cta_voice_override, make the CTA match that voice and cta_voice_guidance. "
+        "Use the 4U writing lens before finalizing every headline: Useful, honestly Urgent, Unique, and Ultra-specific. This is a writing instruction, not a label to output. "
+        "Write headlines like a human editor revised them from rough AI copy: one clean idea, short, concrete, and spoken. "
+        "Do not make the headline carry the whole pitch; put proof, mechanism, and timing in support_line, trust_line, or bullets. "
+        "Do not lead headlines with instructional verbs (Start, Begin, Kickstart, Follow). Use statements or questions that sound like finished ad copy. "
+        "Do not place AM/PM timing, 4-hour windows, or protocol mechanics in headlines; those belong in support_line or bullets. "
+        "Do not put product component names (OK Liquid / OK Tablet / OK Powder / OKP) in the headline; keep them in support_line or bullets. "
+        "Never output internal persona notes or proof-needed notes as on-image copy. "
+        "Use these pattern families as execution guidance only, not text to copy: authority stamp; protocol identity; pain question; stubborn-weight proof; deadline direct; sacrifice reduction; emotional outcome; messy-life curiosity. "
+        "Good support-line patterns include: product identity plus ease, simple 2-step routine, about 5-minute effort, doctor credibility plus 70,000+ users, visible 15-day progress, morning fullness plus night digestion support, or result plus less sacrifice. "
+        "Before returning JSON, perform a final headline editor pass: shorten, remove generic AI phrases, keep one central idea, move explanation into support line, and rewrite if headline/support say the same thing. "
+        "Avoid weak planning-label headlines like 'support for visible progress', 'guided support for practical progress', or 'start mornings with a clearer routine'; make them sound like finished ad copy instead. "
+        "Good headlines should sound edited by a human, not generated: concrete, restrained, mobile-readable, and shaped like a line someone would approve on an actual ad. "
+        "Avoid AI-slop wording such as unlock, transform your journey, revolutionary, holistic wellness, game-changing, effortlessly, tailored solution, and vague transformation slogans. "
+        "Do not force every headline to carry every keyword; the headline/support pair must make the weight-loss intent obvious together. "
+        "Within the same format in a single batch, do not reuse the same headline skeleton or subheadline skeleton across personas. "
+        "Follow the master-doc benefit hierarchy first: fast visible results, cravings down, natural safe-feeling, homemade-food fit, structured low-guesswork system, guided support, emotional control, then secondary digestive benefits. "
+        "Use AM routine or PM routine only when the chosen feature lane genuinely needs mechanism detail. Do not default to AM/PM wording in every ad. "
+        "Do not flatten multiple ads under a format into near-duplicate headlines with only minor wording swaps. "
+        "For FEAT, make each bullet a different product feature. For HERO and UGC, support line must add a second feature instead of restating the headline. "
+        "Do not make homemade-food compatibility the center of brand positioning even when you use it as a benefit lane. "
+        "Do not let secondary digestive or emotional benefits overshadow the main promise of fast visible weight loss with a safer, easier, more guided experience. "
+        "Ensure obesity and weight-loss intent is obvious to someone who has never heard of the product."
+    )
+    
+    strict_schema_note = (
+        "STRICT_SCHEMA: Return JSON only. Do not include copy_requirements, disclaimers, or extra keys. "
+        "persona must be an object with number, name, pain_en, desire_en, friction_en, proof_needed_en, tone_cue_en, "
+        "pain_hi, desire_hi, friction_hi, proof_needed_hi, tone_cue_hi. "
+        "copy.EN and copy.HI must contain only the required fields for the format. "
+        "If format is HERO or UGC: headline, support_line, cta. "
+        "If format is BA/FEAT: headline, bullets (list), cta. "
+        "If format is TEST: headline, attribution, trust_line, cta."
+    )
+    
+    generated_ads: list[dict[str, Any]] = []
+    errors: list[str] = []
+    
+    for index, ad_item in enumerate(context.get("ads") or [], start=1):
+        previous_same_format: list[dict[str, Any]] = []
+        target_format = str(ad_item.get("format") or "").strip().upper()
+        for prev in generated_ads:
+            if not isinstance(prev, dict):
+                continue
+            if str(prev.get("format") or "").strip().upper() != target_format:
+                continue
+            prev_copy = prev.get("copy") if isinstance(prev.get("copy"), dict) else {}
+            prev_en = prev_copy.get("EN") if isinstance(prev_copy.get("EN"), dict) else {}
+            previous_same_format.append(prev_en.get("headline", ""))
+        
+        user_payload = {
+            "ad_index": index,
+            "ad_item": ad_item,
+            "generated_same_format_so_far": previous_same_format,
+            "constraints": {
+                "language": ["EN", "HI"],
+                "language_mode": language_mode,
+                "formats": FORMATS,
+                "return_json_only": True,
+            },
+        }
+        
+        cli_prompt = (
+            "SYSTEM:\n"
+            f"{system}\n\n"
+            "USER_PAYLOAD_JSON:\n"
+            f"{json.dumps(user_payload, ensure_ascii=False)}\n\n"
+            "Return only valid JSON. No markdown. No extra text.\n"
+            "Return one ad only. You may return either a single ad object or an object with default_aspect_ratio and a one-item ads array.\n"
+            "The current ad must use a new persuasion angle in both the headline and the support line / right-side shift / feature stack compared with generated_same_format_so_far.\n"
+            "Do not reuse the same angle family such as guided support, structured system, cravings control, proof, natural-safe, homemade-food fit, or AM/PM mechanism as the lead angle if it already appeared in generated_same_format_so_far for this format.\n"
+            "Do not reuse the same sentence pattern or opening structure from generated_same_format_so_far.\n"
+            "Before writing, read copy_requirements.concept_variation and make the headline/support hierarchy match that chosen concept path.\n"
+            "If hook_structure_override is present, the EN headline must visibly match it. For contrast_loop, use a clear but natural contrast word such as but, yet, still, without, before/after, or even with.\n"
+            "Final editor pass before JSON: rewrite the headline into a finished human ad line, usually 5-12 words, one central idea only. Move mechanism/proof/timing details into support line or bullets.\n"
+            "Use support copy to explain why the headline is believable: 2-step routine, 5-minute ease, doctor-formulated proof, 70,000+ users, 15-day progress, cravings/fullness, digestion support, or less sacrifice.\n"
+            "Reject your own first draft if the headline reads like a generic AI slogan, a keyword list, or a paraphrase of the support line.\n"
+            "Do not return framework labels, rationale, or explanations."
+        )
+        
+        def run_blackbox_once(prompt: str) -> tuple[dict[str, Any] | None, str, str]:
+            try:
+                response = requests.post(
+                    f"{api_url}/v1/chat/completions",
+                    auth=auth,
+                    json={
+                        "model": model,
+                        "messages": [{"role": "user", "content": prompt}],
+                        "max_tokens": 4000,
+                    },
+                    timeout=180,
+                )
+                if response.status_code != 200:
+                    errors.append(f"Ad {index}: HTTP {response.status_code}\n{response.text}")
+                    return None, "", response.text
+                
+                result = response.json()
+                content = result.get("choices", [{}])[0].get("message", {}).get("content", "")
+                
+                # Try to parse JSON from the response
+                parsed = parse_opencode_json_output(content)
+                return (extract_generated_ad_candidate(parsed) if parsed else None), content, ""
+            except Exception as e:
+                errors.append(f"Ad {index}: {e}")
+                return None, "", str(e)
+        
+        try:
+            candidate, last_stdout, last_stderr = run_blackbox_once(cli_prompt)
+        except Exception as exc:
+            errors.append(f"Ad {index}: launch failed: {exc}")
+            continue
+        
+        if not candidate:
+            retry_prompt = f"{cli_prompt}\n\n{strict_schema_note}\n"
+            candidate, last_stdout, last_stderr = run_blackbox_once(retry_prompt)
+        
+        mismatch = hypothesis_mismatch(candidate, ad_item) if candidate else None
+        if mismatch:
+            retry_prompt = (
+                f"{cli_prompt}\n\n"
+                f"REVISION_REQUIRED: {mismatch}\n"
+                "Rewrite only this ad so the headline matches the requested hook_structure_override while keeping schema valid."
+            )
+            candidate, last_stdout, last_stderr = run_blackbox_once(retry_prompt)
+        
+        if candidate:
+            generated_ads.append(candidate)
+        else:
+            errors.append(f"Ad {index}: returned no usable ad JSON\nSTDOUT:\n{last_stdout}\nSTDERR:\n{last_stderr}")
+    
+    if errors:
+        (run_dir / "logs" / "blackbox_error.txt").write_text("\n\n---\n\n".join(errors), encoding="utf-8")
+    
+    if not generated_ads:
+        return None
+    
+    return {"default_aspect_ratio": "4:5", "ads": generated_ads}
+
+
 def call_opencode_compatible(config: dict[str, Any], context: dict[str, Any], run_dir: Path) -> dict[str, Any] | None:
     api_url = (config.get("opencode_api_url") or "").strip()
     api_key = (config.get("opencode_api_key") or "").strip() or os.getenv("OPENCODE_SERVER_PASSWORD", "").strip()
     model = sanitize_dashboard_model((config.get("opencode_model") or "").strip(), list_opencode_models())
+    server_type = (config.get("server_type") or "opencode").strip().lower()
     if not api_url:
         return None
+
+    # Log for debugging
+    print(f"[call_opencode_compatible] server_type={server_type}, api_url={api_url}, model={model}", file=sys.stderr)
+
+    # Handle Blackbox via HTTP
+    if server_type == "blackbox":
+        return call_blackbox_http(config, context, run_dir)
 
     language_mode = resolve_language_mode(config)
     system = (

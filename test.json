@@ -1,0 +1,8 @@
+{
+  "name": "test",
+  "description": "A test JSON file",
+  "created_at": "2026-05-08",
+  "version": 1.0,
+  "active": true,
+  "items": []
+}
