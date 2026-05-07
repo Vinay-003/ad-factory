@@ -1,0 +1,19 @@
+{
+  "batch_id": "test_dry_run",
+  "ads": [
+    {
+      "format": "HERO",
+      "headline": "Lose 3-5 kg in 15 Days Naturally",
+      "copy": "Obesity Killer Kit uses Ayurvedic herbs to reduce hunger and cravings. No side effects. Made in India.",
+      "cta": "Order Now",
+      "persona_id": 1
+    },
+    {
+      "format": "BA",
+      "headline": "Before & After Journey",
+      "copy": "My weight loss journey with Obesity Killer Kit. From struggling to losing. Natural approach.",
+      "cta": "See Results",
+      "persona_id": 2
+    }
+  ]
+}

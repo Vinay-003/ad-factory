@@ -338,23 +338,13 @@ def _is_fresh_chat_url(url: str) -> bool:
 
 
 def open_gemini_new_chat(driver: webdriver.Chrome) -> None:
-    """Guarantee we are on a brand-new Gemini chat before proceeding.
+    """Open Gemini in a new browser tab/window for each prompt, then ensure composer is ready.
 
-    Steps
-    -----
-    1. Navigate the current tab to GEMINI_URL.
-    2. Wait 5 s for the page to stabilise.
-    3. CHECK THE URL.
-       - If it is clean (no conversation ID) → we are done.
-       - If it has an ID (old chat was restored) → navigate again.
-         Repeat up to 3 times total.
-    4. After confirming a clean URL, send Ctrl+Shift+O x2 as required.
-    5. Wait for the composer to be present before returning.
-
-    A "fresh chat" URL looks like:
-        https://gemini.google.com/app          ← no trailing ID
-    An "old chat" URL looks like:
-        https://gemini.google.com/app/0085a5f7943d0d69
+    User preference: do NOT close previous tabs. This function will:
+      1) Trigger "new chat" using Ctrl+Shift+O.
+      2) Wait for at least one new window handle; switch to the newest handle.
+      3) Validate URL freshness (best-effort) and retry navigation if needed.
+      4) Wait for composer presence.
     """
     composer_css = (
         "rich-textarea div[contenteditable='true'], "
@@ -363,51 +353,54 @@ def open_gemini_new_chat(driver: webdriver.Chrome) -> None:
         "textarea"
     )
 
-    for attempt in range(1, 4):
-        print(f"  [new-chat] Attempt {attempt}: navigating to {GEMINI_URL}")
-        driver.get(GEMINI_URL)
+    before_handles = set(driver.window_handles)
 
-        # Wait 5 s for the page to stabilise (SPA may redirect after load)
-        time.sleep(5.0)
-
-        current_url = driver.current_url or ""
-        print(f"  [new-chat] URL after load: {current_url}")
-
-        if _is_fresh_chat_url(current_url):
-            print("  [new-chat] Fresh chat confirmed by URL ✓")
-            break
-        else:
-            print(f"  [new-chat] Old chat detected (attempt {attempt}/3), retrying…")
-            if attempt == 3:
-                # Last resort: force a hard reload of the exact base URL
-                driver.execute_script(f"window.location.replace('{GEMINI_URL}');")
-                time.sleep(5.0)
-                print(f"  [new-chat] After force-replace: {driver.current_url}")
-
-    dismiss_open_overlays(driver)
-
-    # Ensure keyboard focus is on the page body (not the address bar)
+    # Ensure focus on body before shortcut.
     try:
         driver.find_element(By.TAG_NAME, "body").click()
     except Exception:
         pass
     time.sleep(0.3)
 
-    # Ctrl+Shift+O — first press (required by workflow)
+    # Ctrl+Shift+O — can open a new tab (preferred workflow)
+    print("  [new-chat] Triggering Ctrl+Shift+O to open new Gemini chat tab…")
     _send_ctrl_shift_o(driver)
-    print("  [new-chat] Sent Ctrl+Shift+O #1")
-    time.sleep(2.0)
+    time.sleep(1.5)
+    _send_ctrl_shift_o(driver)
+    time.sleep(2.5)
 
-    # Ctrl+Shift+O — second press (required by workflow)
-    _send_ctrl_shift_o(driver)
-    print("  [new-chat] Sent Ctrl+Shift+O #2")
-    time.sleep(2.0)
+    # Switch to newest handle (if a tab was opened)
+    after_handles = set(driver.window_handles)
+    new_handles = list(after_handles - before_handles)
+    if new_handles:
+        # Newest is typically the last handle discovered; best-effort
+        new_handle = sorted(new_handles, key=lambda h: driver.window_handles.index(h))[-1]
+        driver.switch_to.window(new_handle)
+        time.sleep(2.0)
+        print(f"  [new-chat] Switched to new handle: {new_handle}")
+    else:
+        print("  [new-chat] No new handle detected; staying in current tab.")
+
+    for attempt in range(1, 4):
+        print(f"  [new-chat] Attempt {attempt}: navigating to {GEMINI_URL}")
+        try:
+            driver.get(GEMINI_URL)
+        except Exception:
+            pass
+        time.sleep(5.0)
+
+        current_url = driver.current_url or ""
+        print(f"  [new-chat] URL after load: {current_url}")
+        if _is_fresh_chat_url(current_url):
+            print("  [new-chat] Fresh chat confirmed by URL ✓")
+            break
+        if attempt == 3:
+            print("  [new-chat] URL still looks old; proceeding anyway after retries.")
 
     dismiss_open_overlays(driver)
 
-    # Wait for the composer — confirms page is ready to receive input
     try:
-        WebDriverWait(driver, 20).until(
+        WebDriverWait(driver, 25).until(
             EC.presence_of_element_located((By.CSS_SELECTOR, composer_css))
         )
         print("  [new-chat] Composer ready.")
@@ -896,6 +889,60 @@ def get_image_sources(driver: webdriver.Chrome) -> List[str]:
         return []
 
 
+def _save_debug_screenshot(driver: webdriver.Chrome, out_path: Path) -> None:
+    out_path.parent.mkdir(parents=True, exist_ok=True)
+    driver.save_screenshot(str(out_path))
+    print(f"  [debug] screenshot → {out_path}")
+
+
+def _upload_appears_ok(driver: webdriver.Chrome) -> bool:
+    """Best-effort check that uploads have been attached in Gemini UI.
+
+    We look for:
+      - file name chips / upload thumbnails
+      - any <img> in main content that likely corresponds to attachments
+      - presence of common aria-label patterns
+    """
+    try:
+        # Thumbnails/images inside main area are a strong signal uploads started.
+        img_count = driver.execute_script(
+            """
+            const main = document.querySelector('main') || document.body;
+            const imgs = Array.from(main.querySelectorAll('img'));
+            // Filter out obvious Gemini UI/logo/gstatic by size heuristics.
+            let kept = 0;
+            for (const i of imgs) {
+              const r = i.getBoundingClientRect();
+              if (r && r.width > 24 && r.height > 24) kept++;
+            }
+            return kept;
+            """
+        )
+        if isinstance(img_count, (int, float)) and img_count >= 1:
+            return True
+    except Exception:
+        pass
+
+    try:
+        # Look for attachment/file chips text.
+        exists = driver.execute_script(
+            """
+            const txt = (s)=> (s||'').toLowerCase();
+            const needles = ['upload', 'attached', 'file', 'image'];
+            const els = Array.from(document.querySelectorAll('*'));
+            for (const el of els) {
+              const t = txt(el.getAttribute('aria-label')) || txt(el.innerText);
+              if (!t) continue;
+              if (needles.some(n => t.includes(n))) return true;
+            }
+            return false;
+            """
+        )
+        return bool(exists)
+    except Exception:
+        return False
+
+
 def wait_for_new_generated_image(driver: webdriver.Chrome, before_sources: List[str], timeout: int) -> str:
     """Wait until a new image appears in the page that wasn't there before sending."""
     before = set(before_sources)
@@ -1115,22 +1162,38 @@ def run() -> None:
                             before_sources = get_image_sources(driver)
 
                             upload_images(driver, upload_paths)
-                            time.sleep(10)
+
+                            # Upload verification (best-effort): thumbnails/chips should appear.
+                            # If not, capture screenshot and retry attempt.
+                            if not _upload_appears_ok(driver):
+                                # Save a diagnostic screenshot immediately (best-effort).
+                                diag = out_base.with_name(out_base.name + "-upload-failed.png")
+                                try:
+                                    _save_debug_screenshot(driver, diag)
+                                except Exception:
+                                    pass
+                                raise TimeoutException("Upload verification failed (no upload UI evidence found)")
+
+                            time.sleep(2.0)
                             dismiss_open_overlays(driver)
+
+                            # Composer + prompt
                             composer = find_composer(driver)
                             set_prompt_text(driver, composer, prompt_text)
 
-                            # User-required order: switch Fast -> Pro before send.
+                            # Switch model/tool AFTER typing prompt selection steps can re-render composer UI,
+                            # so we re-find composer right before sending.
                             force_fast_to_pro(driver)
                             select_pro_model_and_create_image_tool(driver)
                             if args.require_pro_model and not pro_model_selected(driver):
                                 raise TimeoutException("Could not confirm Pro model selection in Gemini UI")
 
-                            click_send(driver, composer)
-                            time.sleep(5)
-                            print("Waiting for image generation...")
-                            time.sleep(360)
+                            dismiss_open_overlays(driver)
+                            composer = find_composer(driver)  # re-find to avoid stale element issues
 
+                            click_send(driver, composer)
+                            time.sleep(2.0)
+                            print("Waiting for image generation...")
                             image_src = wait_for_new_generated_image(driver, before_sources, args.timeout)
                             saved_path = download_generated_image(driver, image_src, out_base)
                             print("Waiting after download...")

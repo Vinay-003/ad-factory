@@ -1,0 +1,8 @@
+- [ ] Update `scripts/gemini_web_automation.py` to enforce “fresh chat in same tab” per prompt and prevent opening extra Gemini tabs
+- [ ] Modify `open_gemini_new_chat()` to verify URL freshness and avoid tab-opening keyboard shortcut when not needed
+- [ ] Add a tab-count guard: close any extra windows/tabs opened during Ctrl+Shift+O/new-chat steps
+- [ ] Re-find composer right before sending (after Pro/tool selection)
+- [ ] Remove the unconditional `time.sleep(360)`; rely on `wait_for_new_generated_image(timeout=...)`
+- [ ] Add debug logs + screenshots on upload verification failure / retry
+- [ ] Add simple “upload succeeded” verification (presence of file chips or thumbnails)
+- [ ] Run script for 2 prompts and confirm: exactly one Gemini tab reused per prompt, correct fresh chat each time, downloads stored
