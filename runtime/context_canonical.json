@@ -1,6 +1,6 @@
 {
   "metadata": {
-    "generated_at": "2026-05-06T09:51:33Z",
+    "generated_at": "2026-05-06T10:22:43Z",
     "extractor_model": "openai/gpt-5.2",
     "source_files": [
       "/home/mylappy/myspace/info/productmaster.txt",
@@ -41,22 +41,7 @@
     "trigger_rules": []
   },
   "conflicts": [],
-  "dropped_claims": [
-    {
-      "text": "Source files content not provided (productinfomain.txt, PRODUCT_MECHANISM_V1.txt, faq.txt). Extraction cannot be performed without them.",
-      "reason": "low_confidence",
-      "source_file": "USER_PAYLOAD_JSON",
-      "line_start": 0,
-      "line_end": 0
-    },
-    {
-      "text": "Schema line in provided prompt is truncated; some coverage_check.required_present keys may be missing/unknown.",
-      "reason": "ambiguity",
-      "source_file": "USER_PAYLOAD_JSON",
-      "line_start": 0,
-      "line_end": 0
-    }
-  ],
+  "dropped_claims": [],
   "coverage_check": {
     "required_present": {
       "3_to_5kg_15days": false,

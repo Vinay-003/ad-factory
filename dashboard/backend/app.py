@@ -1140,6 +1140,35 @@ def enforce_unique_ctas(payload: dict[str, Any], context: dict[str, Any]) -> dic
     return payload
 
 
+PROOF_NOTE_MARKERS = [
+    "needs",
+    "proof needed",
+    "tone cue",
+    "persona",
+    "non-cure",
+    "compliant",
+    "weight-support framing",
+]
+
+
+def scrub_on_image_copy(payload: dict[str, Any]) -> dict[str, Any]:
+    ads = payload.get("ads") if isinstance(payload.get("ads"), list) else []
+    for ad in ads:
+        if not isinstance(ad, dict):
+            continue
+        copy = ad.get("copy") if isinstance(ad.get("copy"), dict) else {}
+        for lang in ["EN", "HI"]:
+            block = copy.get(lang)
+            if not isinstance(block, dict):
+                continue
+            ctx = block.get("context_line")
+            if isinstance(ctx, str) and ctx.strip():
+                lowered = ctx.lower()
+                if any(marker in lowered for marker in PROOF_NOTE_MARKERS):
+                    block.pop("context_line", None)
+    return payload
+
+
 def parse_uniqueness_collisions(error_text: str) -> list[dict[str, Any]]:
     collisions: list[dict[str, Any]] = []
     for raw_line in error_text.splitlines():
@@ -2895,6 +2924,7 @@ async def api_run_execute(
     copy_json = normalize_generated_copy(copy_json, full_context, run_id)
     copy_json = strip_internal_markers_from_payload(copy_json)
     copy_json = enforce_unique_ctas(copy_json, full_context)
+    copy_json = scrub_on_image_copy(copy_json)
 
     copy_file = run_dir / "context" / "copy_batch.json"
     copy_file.write_text(json.dumps(copy_json, ensure_ascii=False, indent=2) + "\n", encoding="utf-8")
@@ -2921,6 +2951,7 @@ async def api_run_execute(
                 copy_json = normalize_generated_copy(repaired, full_context, run_id)
                 copy_json = strip_internal_markers_from_payload(copy_json)
                 copy_json = enforce_unique_ctas(copy_json, full_context)
+                copy_json = scrub_on_image_copy(copy_json)
                 copy_file.write_text(json.dumps(copy_json, ensure_ascii=False, indent=2) + "\n", encoding="utf-8")
 
                 retry = run_cmd(

@@ -652,6 +652,10 @@ def append_concept_combo_index(
 def parse_copy_block(fmt: str, lang: str, raw: dict[str, Any]) -> CopyBlock:
     ctx = f"ads[].copy.{lang} for format={fmt}"
     headline = require_str(raw, "headline", ctx)
+    if re.search(r"\b(ok\s*liquid|ok\s*tablet|ok\s*powder|okp)\b", headline, flags=re.IGNORECASE):
+        raise RuntimeError(f"{ctx}.headline contains product component name; move it to support/bullets")
+    if re.search(r"\b(am|pm)\b|\b4\s*-?\s*hour\b|\bno\s*solid\b|\bempty\s*stomach\b", headline, flags=re.IGNORECASE):
+        raise RuntimeError(f"{ctx}.headline contains protocol mechanics; move to support/bullets")
     cta = require_str(raw, "cta", ctx)
     support_line = (raw.get("support_line") or "").strip() if isinstance(raw.get("support_line"), str) else ""
     context_line = (raw.get("context_line") or "").strip() if isinstance(raw.get("context_line"), str) else ""
@@ -902,13 +906,13 @@ def render_prompt(
             f"- CTA: {copy.cta}",
         ]
     elif fmt == "UGC":
-        context_line = copy.context_line or proof
         copy_lines = [
             f"- Headline: {copy.headline}",
             f"- Support line: {copy.support_line}",
-            f"- Context line: {context_line}",
             f"- CTA: {copy.cta}",
         ]
+        if copy.context_line:
+            copy_lines.insert(2, f"- Context line: {copy.context_line}")
     elif fmt == "BA":
         bullets = copy.bullets or []
         left_lines, right_lines = split_ba_contrast_lines(bullets)

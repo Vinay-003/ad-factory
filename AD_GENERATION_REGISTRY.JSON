@@ -3,7 +3,7 @@
     "phase": "production",
     "write_enabled": true,
     "note": "Production mode active. Read before generation and append one entry after every generation.",
-    "last_updated": "2026-05-06T09:53:29Z"
+    "last_updated": "2026-05-06T10:24:12Z"
   },
   "rules": {
     "dedupe_scope": [
@@ -3645,6 +3645,181 @@
       "language": "BOTH",
       "output_quality": "pending",
       "notes": "assembled_from=copy_batch.json; batch=v19; aspect_ratio=4:5; seed=1129300770; visual_archetype=ugc_desk_review"
+    },
+    {
+      "id": "entry_113",
+      "timestamp": "2026-05-06T10:24:12Z",
+      "format": "UGC",
+      "persona_number": 22,
+      "persona_name": "35+ Slow-Progress Persona",
+      "headline_angle": "35+ stuck progress, authority-backed push",
+      "awareness_stage": "product_aware",
+      "concept_angle": "authority",
+      "concept_structure": "pas",
+      "visual_archetype": "ugc_selfie_hold",
+      "headline_en": "35+ weight loss felt stuck for me.",
+      "headline_hi": "35+ में मेरा वज़न घटाना अटक गया था।",
+      "support_line_en": "Doctor-guided AM routine kept cravings down.",
+      "support_line_hi": "डॉक्टर-गाइडेड मॉर्निंग रूटीन से क्रेविंग्स कम हुईं।",
+      "cta_en": "Try The Steps",
+      "cta_hi": "मेरी दिनचर्या देखें",
+      "disclaimer_en": "",
+      "disclaimer_hi": "",
+      "caption_en": "",
+      "caption_hi": "",
+      "bullets_en": [],
+      "bullets_hi": [],
+      "background_slot": "BG-193",
+      "background_name": "Company cafeteria table",
+      "background_source": "catalog",
+      "fresh_background_signature": null,
+      "language": "BOTH",
+      "output_quality": "pending",
+      "notes": "assembled_from=copy_batch.json; batch=v20; aspect_ratio=4:5; seed=1327734414; visual_archetype=ugc_selfie_hold"
+    },
+    {
+      "id": "entry_114",
+      "timestamp": "2026-05-06T10:24:12Z",
+      "format": "HERO",
+      "persona_number": 23,
+      "persona_name": "New Mother (6+ months postpartum)",
+      "headline_angle": "Curiosity-led, feature-first question",
+      "awareness_stage": "problem_aware",
+      "concept_angle": "curiosity",
+      "concept_structure": "four_us",
+      "visual_archetype": "hero_left_copy_right_product",
+      "headline_en": "Why can one empty-stomach step help weight loss?",
+      "headline_hi": "खाली पेट की एक आदत weight loss में मदद क्यों कर सकती है?",
+      "support_line_en": "Try the OK Liquid AM routine: take it on an empty stomach, then keep a 4-hour no-solid-food window to curb cravings and cut snacking friction.",
+      "support_line_hi": "OK Liquid AM routine ट्राय करें: खाली पेट लें, फिर 4 घंटे तक ठोस खाना न लें ताकि cravings कम हों और बार-बार स्नैकिंग का झंझट घटे।",
+      "cta_en": "Check If It Fits Your Routine",
+      "cta_hi": "देखें क्या यह आपके रूटीन में फिट है",
+      "disclaimer_en": "",
+      "disclaimer_hi": "",
+      "caption_en": "",
+      "caption_hi": "",
+      "bullets_en": [],
+      "bullets_hi": [],
+      "background_slot": "BG-037",
+      "background_name": "Soft gray studio",
+      "background_source": "catalog",
+      "fresh_background_signature": null,
+      "language": "BOTH",
+      "output_quality": "pending",
+      "notes": "assembled_from=copy_batch.json; batch=v20; aspect_ratio=4:5; seed=1327734414; visual_archetype=hero_left_copy_right_product"
+    },
+    {
+      "id": "entry_115",
+      "timestamp": "2026-05-06T10:24:12Z",
+      "format": "BA",
+      "persona_number": 24,
+      "persona_name": "Menopause",
+      "headline_angle": "menopause_weight_gain_friction",
+      "awareness_stage": "product_aware",
+      "concept_angle": "pain_point",
+      "concept_structure": "fab",
+      "visual_archetype": "ba_soft_diagonal_transition",
+      "headline_en": "Menopause cravings can block weight loss.",
+      "headline_hi": "मेनोपॉज़ में cravings वजन घटाने को रोक सकती हैं।",
+      "support_line_en": "",
+      "support_line_hi": "",
+      "cta_en": "View The Change",
+      "cta_hi": "15-day plan देखें",
+      "disclaimer_en": "",
+      "disclaimer_hi": "",
+      "caption_en": "",
+      "caption_hi": "",
+      "bullets_en": [
+        "Left: Evening cravings hit hard; weight loss feels stuck.",
+        "Left: Harsh plans feel impossible to maintain.",
+        "Right: Morning routine feels clear; cravings stay calmer.",
+        "Right: Easier control supports excess-weight reduction."
+      ],
+      "bullets_hi": [
+        "Left: शाम को cravings बढ़ती हैं; weight loss अटकता लगता है।",
+        "Left: सख़्त तरीके लंबे समय तक निभाना मुश्किल लगता है।",
+        "Right: सुबह की routine साफ़ लगती है; cravings शांत रहती हैं।",
+        "Right: बेहतर कंट्रोल से excess weight reduction में मदद मिलती है।"
+      ],
+      "background_slot": "BG-125",
+      "background_name": "Wooden chopping board",
+      "background_source": "catalog",
+      "fresh_background_signature": null,
+      "language": "BOTH",
+      "output_quality": "pending",
+      "notes": "assembled_from=copy_batch.json; batch=v20; aspect_ratio=4:5; seed=1327734414; visual_archetype=ba_soft_diagonal_transition"
+    },
+    {
+      "id": "entry_116",
+      "timestamp": "2026-05-06T10:24:12Z",
+      "format": "TEST",
+      "persona_number": 25,
+      "persona_name": "Natural Solution Seeker",
+      "headline_angle": "Social proof push for known weight-loss kit",
+      "awareness_stage": "product_aware",
+      "concept_angle": "social_proof",
+      "concept_structure": "bab",
+      "visual_archetype": "test_minimal_review_poster",
+      "headline_en": "“Finally, my natural weight loss felt real.”",
+      "headline_hi": "“आखिरकार मेरा नेचुरल वेट लॉस सच में दिखा।”। यह मेरे वजन घटाने के लिए काम आया।",
+      "support_line_en": "Ayurveda-inspired support with clear guidance, not vague tips.",
+      "support_line_hi": "आयुर्वेद-प्रेरित सपोर्ट, साफ गाइडेंस के साथ, vague टिप्स नहीं।",
+      "cta_en": "Check if this plan fits you",
+      "cta_hi": "देखें यह प्लान आपके लिए सही है या नहीं",
+      "disclaimer_en": "",
+      "disclaimer_hi": "",
+      "caption_en": "",
+      "caption_hi": "",
+      "bullets_en": [],
+      "bullets_hi": [],
+      "background_slot": "BG-074",
+      "background_name": "Bedroom desk hybrid",
+      "background_source": "catalog",
+      "fresh_background_signature": null,
+      "language": "BOTH",
+      "output_quality": "pending",
+      "notes": "assembled_from=copy_batch.json; batch=v20; aspect_ratio=4:5; seed=1327734414; visual_archetype=test_minimal_review_poster"
+    },
+    {
+      "id": "entry_117",
+      "timestamp": "2026-05-06T10:24:12Z",
+      "format": "FEAT",
+      "persona_number": 26,
+      "persona_name": "Sustainable Weight Loss Seeker",
+      "headline_angle": "comparison_no_bounce_back",
+      "awareness_stage": "solution_aware",
+      "concept_angle": "comparison",
+      "concept_structure": "four_us",
+      "visual_archetype": "feat_mechanism_steps",
+      "headline_en": "Weight loss that doesn’t snap back fast.",
+      "headline_hi": "ऐसा वज़न घटाना जो जल्दी वापस न आए।",
+      "support_line_en": "",
+      "support_line_hi": "",
+      "cta_en": "Check The Steps",
+      "cta_hi": "किट कदम देखें",
+      "disclaimer_en": "",
+      "disclaimer_hi": "",
+      "caption_en": "",
+      "caption_hi": "",
+      "bullets_en": [
+        "AM: OK Liquid on empty stomach for a clear start",
+        "4-hour no-solid-food window to reduce daily slip-ups",
+        "PM routine to support lighter nights and next-day adherence",
+        "Repeatable system: less guesswork than crash diets"
+      ],
+      "bullets_hi": [
+        "AM: खाली पेट OK Liquid से दिन की साफ शुरुआत",
+        "4 घंटे का no-solid-food window ताकि बीच में चूक कम हो",
+        "PM रूटीन: हल्की रातें और अगले दिन बेहतर adherence",
+        "दोहराने लायक सिस्टम: crash diet से कम अनुमान"
+      ],
+      "background_slot": "BG-063",
+      "background_name": "Matte sandstone studio",
+      "background_source": "catalog",
+      "fresh_background_signature": null,
+      "language": "BOTH",
+      "output_quality": "pending",
+      "notes": "assembled_from=copy_batch.json; batch=v20; aspect_ratio=4:5; seed=1327734414; visual_archetype=feat_mechanism_steps"
     }
   ],
   "indexes": {
@@ -3685,10 +3860,10 @@
           "BG-269",
           "BG-475",
           "BG-027",
-          "BG-452"
+          "BG-452",
+          "BG-037"
         ],
         "remaining": [
-          "BG-037",
           "BG-162",
           "BG-446",
           "BG-227",
@@ -3869,10 +4044,10 @@
           "BG-049",
           "BG-119",
           "BG-394",
-          "BG-283"
+          "BG-283",
+          "BG-063"
         ],
         "remaining": [
-          "BG-063",
           "BG-180",
           "BG-269",
           "BG-369",
@@ -4099,10 +4274,10 @@
           "BG-318",
           "BG-299",
           "BG-140",
-          "BG-086"
+          "BG-086",
+          "BG-193"
         ],
         "remaining": [
-          "BG-193",
           "BG-381",
           "BG-054",
           "BG-036",
@@ -4268,10 +4443,10 @@
           "BG-458",
           "BG-195",
           "BG-091",
-          "BG-139"
+          "BG-139",
+          "BG-074"
         ],
         "remaining": [
-          "BG-074",
           "BG-137",
           "BG-220",
           "BG-349",
@@ -4459,10 +4634,10 @@
           "BG-289",
           "BG-211",
           "BG-054",
-          "BG-188"
+          "BG-188",
+          "BG-125"
         ],
         "remaining": [
-          "BG-125",
           "BG-195",
           "BG-403",
           "BG-466",
@@ -4889,6 +5064,12 @@
           "timestamp": "2026-05-06T09:53:29Z",
           "background_slot": "BG-452",
           "background_source": "catalog"
+        },
+        {
+          "entry_id": "entry_114",
+          "timestamp": "2026-05-06T10:24:12Z",
+          "background_slot": "BG-037",
+          "background_source": "catalog"
         }
       ],
       "FEAT": [
@@ -5082,6 +5263,12 @@
           "entry_id": "entry_111",
           "timestamp": "2026-05-06T09:53:29Z",
           "background_slot": "BG-283",
+          "background_source": "catalog"
+        },
+        {
+          "entry_id": "entry_117",
+          "timestamp": "2026-05-06T10:24:12Z",
+          "background_slot": "BG-063",
           "background_source": "catalog"
         }
       ],
@@ -5289,6 +5476,12 @@
           "timestamp": "2026-05-06T09:53:29Z",
           "background_slot": "BG-086",
           "background_source": "catalog"
+        },
+        {
+          "entry_id": "entry_113",
+          "timestamp": "2026-05-06T10:24:12Z",
+          "background_slot": "BG-193",
+          "background_source": "catalog"
         }
       ],
       "TEST": [
@@ -5327,6 +5520,12 @@
           "timestamp": "2026-05-06T09:53:29Z",
           "background_slot": "BG-139",
           "background_source": "catalog"
+        },
+        {
+          "entry_id": "entry_116",
+          "timestamp": "2026-05-06T10:24:12Z",
+          "background_slot": "BG-074",
+          "background_source": "catalog"
         }
       ],
       "BA": [
@@ -5364,6 +5563,12 @@
           "entry_id": "entry_109",
           "timestamp": "2026-05-06T09:53:29Z",
           "background_slot": "BG-188",
+          "background_source": "catalog"
+        },
+        {
+          "entry_id": "entry_115",
+          "timestamp": "2026-05-06T10:24:12Z",
+          "background_slot": "BG-125",
           "background_source": "catalog"
         }
       ]
@@ -5594,6 +5799,51 @@
           "awareness_stage": "product_aware",
           "concept_angle": "offer",
           "concept_structure": "pas"
+        },
+        {
+          "entry_id": "entry_113",
+          "timestamp": "2026-05-06T10:24:12Z",
+          "format": "UGC",
+          "persona_number": 22,
+          "awareness_stage": "product_aware",
+          "concept_angle": "authority",
+          "concept_structure": "pas"
+        },
+        {
+          "entry_id": "entry_114",
+          "timestamp": "2026-05-06T10:24:12Z",
+          "format": "HERO",
+          "persona_number": 23,
+          "awareness_stage": "problem_aware",
+          "concept_angle": "curiosity",
+          "concept_structure": "four_us"
+        },
+        {
+          "entry_id": "entry_115",
+          "timestamp": "2026-05-06T10:24:12Z",
+          "format": "BA",
+          "persona_number": 24,
+          "awareness_stage": "product_aware",
+          "concept_angle": "pain_point",
+          "concept_structure": "fab"
+        },
+        {
+          "entry_id": "entry_116",
+          "timestamp": "2026-05-06T10:24:12Z",
+          "format": "TEST",
+          "persona_number": 25,
+          "awareness_stage": "product_aware",
+          "concept_angle": "social_proof",
+          "concept_structure": "bab"
+        },
+        {
+          "entry_id": "entry_117",
+          "timestamp": "2026-05-06T10:24:12Z",
+          "format": "FEAT",
+          "persona_number": 26,
+          "awareness_stage": "solution_aware",
+          "concept_angle": "comparison",
+          "concept_structure": "four_us"
         }
       ]
     },
@@ -5710,7 +5960,12 @@
         "15-day weight-loss plan for desk-snack cravings",
         "“Stress-snacking eased, and my weight started dropping.”",
         "Weight loss stalled. I needed a clear reset.",
-        "My 15-day weight-loss reset with PCOD"
+        "My 15-day weight-loss reset with PCOD",
+        "35+ weight loss felt stuck for me.",
+        "Why can one empty-stomach step help weight loss?",
+        "Menopause cravings can block weight loss.",
+        "“Finally, my natural weight loss felt real.”",
+        "Weight loss that doesn’t snap back fast."
       ],
       "cta_en": [
         "See The Steps",
@@ -5824,7 +6079,12 @@
         "Check Your Plan",
         "See the plan",
         "See The Protocol",
-        "See the kit"
+        "See the kit",
+        "Try The Steps",
+        "Check If It Fits Your Routine",
+        "View The Change",
+        "Check if this plan fits you",
+        "Check The Steps"
       ],
       "support_line_en": [
         "Doctor-formulated Ayurvedic weight-loss system designed to help you lose 3 to 5 kg with 1 Kit without feeling hungry, weak, or out of control.",
@@ -5900,7 +6160,10 @@
         "Take it on an empty stomach, then keep a 4-hour no-solid-food window to help reduce cravings and support steady obesity weight reduction progress.",
         "When cravings break your plan, follow the AM routine: OK Liquid on an empty stomach, then avoid solid food for 4 hours. Built to reduce snacking friction so obesity and excess weight feel more manageable.",
         "Guided check-ins plus cravings support for better follow-through.",
-        "2-step AM routine; cravings stayed quieter"
+        "2-step AM routine; cravings stayed quieter",
+        "Doctor-guided AM routine kept cravings down.",
+        "Try the OK Liquid AM routine: take it on an empty stomach, then keep a 4-hour no-solid-food window to curb cravings and cut snacking friction.",
+        "Ayurveda-inspired support with clear guidance, not vague tips."
       ],
       "bullets_en": [
         "OK Liquid helps you feel full, so random eating comes down.",
@@ -6053,7 +6316,15 @@
         "AM: OK Liquid on empty stomach to restart focus",
         "4-hour no-solid-food window to cut guesswork",
         "PM routine to keep nights lighter and mornings easier",
-        "Simple daily check-in to stay consistent through plateaus"
+        "Simple daily check-in to stay consistent through plateaus",
+        "Left: Evening cravings hit hard; weight loss feels stuck.",
+        "Left: Harsh plans feel impossible to maintain.",
+        "Right: Morning routine feels clear; cravings stay calmer.",
+        "Right: Easier control supports excess-weight reduction.",
+        "AM: OK Liquid on empty stomach for a clear start",
+        "4-hour no-solid-food window to reduce daily slip-ups",
+        "PM routine to support lighter nights and next-day adherence",
+        "Repeatable system: less guesswork than crash diets"
       ],
       "headline_hi": [
         "सुबह खाली पेट OK Liquid: कड़ी डाइट के बिना वज़न घटाने की आसान शुरुआत।",

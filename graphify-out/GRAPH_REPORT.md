@@ -1,11 +1,11 @@
-# Graph Report - info  (2026-05-05)
+# Graph Report - info  (2026-05-07)
 
 ## Corpus Check
-- 18 files · ~21,705,077 words
+- 18 files · ~21,229,595 words
 - Verdict: corpus is large enough that graph structure adds value.
 
 ## Summary
-- 338 nodes · 651 edges · 43 communities detected
+- 350 nodes · 679 edges · 43 communities detected
 - Extraction: 96% EXTRACTED · 4% INFERRED · 0% AMBIGUOUS · INFERRED: 27 edges (avg confidence: 0.8)
 - Token cost: 0 input · 0 output
 
@@ -55,15 +55,15 @@
 - [[_COMMUNITY_Community 48|Community 48]]
 
 ## God Nodes (most connected - your core abstractions)
-1. `run()` - 26 edges
-2. `api_run_execute()` - 25 edges
-3. `main()` - 23 edges
+1. `api_run_execute()` - 28 edges
+2. `run()` - 26 edges
+3. `main()` - 26 edges
 4. `write_text()` - 22 edges
 5. `main()` - 21 edges
 6. `api_run_generate_916_selected()` - 12 edges
-7. `call_opencode_compatible()` - 11 edges
-8. `generate_916_for_run()` - 11 edges
-9. `main()` - 11 edges
+7. `generate_916_for_run()` - 11 edges
+8. `main()` - 11 edges
+9. `build_template_copy()` - 10 edges
 10. `collect_run_result()` - 10 edges
 
 ## Surprising Connections (you probably didn't know these)
@@ -82,19 +82,19 @@
 
 ### Community 0 - "Community 0"
 Cohesion: 0.06
-Nodes (70): api_defaults(), api_file_content(), api_opencode_catalog(), api_run(), api_run_execute(), api_runs(), assembler_language_mode(), build_copy_requirements() (+62 more)
+Nodes (76): api_defaults(), api_file_content(), api_opencode_catalog(), api_run(), api_run_execute(), api_runs(), assembler_language_mode(), build_copy_requirements() (+68 more)
 
 ### Community 1 - "Community 1"
 Cohesion: 0.1
 Nodes (38): auto_launch_debug_browser(), build_driver(), build_local_image_paths(), click_first_visible_css(), click_send(), click_text_options(), collect_upload_images_from_dir(), debugger_endpoint_reachable() (+30 more)
 
 ### Community 2 - "Community 2"
-Cohesion: 0.11
-Nodes (34): build_image_inputs(), choose_logo_variant_with_minimax(), compose_prompt(), conversion_lock_instruction(), create_task(), discover_minimax_model(), download_file(), ensure_dir() (+26 more)
+Cohesion: 0.1
+Nodes (39): add_used_text(), append_background_index(), append_concept_combo_index(), aspect_ratio_folder(), base_layout_lines_for_format(), build_seeded_background_sentence(), build_ugc_subject_line(), clean_id() (+31 more)
 
 ### Community 3 - "Community 3"
-Cohesion: 0.12
-Nodes (34): add_used_text(), append_background_index(), aspect_ratio_folder(), base_layout_lines_for_format(), build_seeded_background_sentence(), build_ugc_subject_line(), CopyBlock, ensure_slot_tracker() (+26 more)
+Cohesion: 0.11
+Nodes (34): build_image_inputs(), choose_logo_variant_with_minimax(), compose_prompt(), conversion_lock_instruction(), create_task(), discover_minimax_model(), download_file(), ensure_dir() (+26 more)
 
 ### Community 4 - "Community 4"
 Cohesion: 0.16
@@ -322,11 +322,11 @@ Nodes (1): # IMPORTANT: capture baseline after uploads and prompt insertion.
 _Questions this graph is uniquely positioned to answer:_
 
 - **Why does `write_text()` connect `Community 4` to `Community 0`, `Community 1`, `Community 2`, `Community 3`, `Community 7`, `Community 8`, `Community 9`, `Community 11`?**
-  _High betweenness centrality (0.428) - this node is a cross-community bridge._
-- **Why does `run()` connect `Community 1` to `Community 0`, `Community 2`, `Community 4`, `Community 7`?**
-  _High betweenness centrality (0.180) - this node is a cross-community bridge._
+  _High betweenness centrality (0.435) - this node is a cross-community bridge._
+- **Why does `run()` connect `Community 1` to `Community 0`, `Community 3`, `Community 4`, `Community 7`?**
+  _High betweenness centrality (0.176) - this node is a cross-community bridge._
 - **Why does `main()` connect `Community 7` to `Community 4`?**
-  _High betweenness centrality (0.139) - this node is a cross-community bridge._
+  _High betweenness centrality (0.136) - this node is a cross-community bridge._
 - **Are the 6 inferred relationships involving `run()` (e.g. with `run_cmd()` and `run_opencode_discovery_cmd()`) actually correct?**
   _`run()` has 6 INFERRED edges - model-reasoned connections that need verification._
 - **Are the 20 inferred relationships involving `write_text()` (e.g. with `run_gemini_generation()` and `call_opencode_repair_copy()`) actually correct?**
