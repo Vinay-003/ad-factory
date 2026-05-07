@@ -131,6 +131,13 @@ CTA_VOICE_GUIDANCE: dict[str, str] = {
     "discovery_action": "Invite learning: see how it works, learn the steps, discover the routine.",
 }
 
+CONCEPT_STRUCTURE_GUIDANCE: dict[str, str] = {
+    "pas": "Shape copy as problem first, consequence next, then product-led resolution.",
+    "bab": "Use before-to-after bridge flow: current struggle, better state, then the bridge routine.",
+    "fab": "Lead with concrete feature, explain practical advantage, then connect to weight-loss benefit.",
+    "four_us": "Keep wording useful, honestly urgent, unique enough to stand out, and ultra-specific.",
+}
+
 
 def classify_hook_structure(headline: str) -> str:
     """Classify a headline opening pattern for hypothesis sanity checks."""
@@ -237,6 +244,10 @@ def hypothesis_mismatch(candidate: dict[str, Any], planned_ad: dict[str, Any]) -
         actual = str(candidate.get("awareness_stage") or "").strip()
         if actual != expected:
             return f"Expected awareness_stage {expected}, but candidate returned {actual or 'blank'}"
+    if hyp_type == "concept_structure":
+        actual = str(candidate.get("concept_structure") or "").strip()
+        if actual != expected:
+            return f"Expected concept_structure {expected}, but candidate returned {actual or 'blank'}"
     if hyp_type == "proof_style":
         actual = classify_proof_style_text(copy_text_for_candidate(candidate, "EN"))
         if actual != expected:
@@ -308,6 +319,16 @@ HYPOTHESIS_VARIABLES: dict[str, dict[str, Any]] = {
             {"id": "reassurance_start", "label": "Reassurance Start", "hint": "Check If It Fits / Try Risk-Free"},
             {"id": "challenge_action", "label": "Challenge Action", "hint": "Take The 15-Day Test"},
             {"id": "discovery_action", "label": "Discovery Action", "hint": "See How It Works / Learn More"},
+        ],
+    },
+    "concept_structure": {
+        "label": "Concept Structure (H6)",
+        "description": "Test copy flow structure: PAS vs BAB vs FAB vs Four Us.",
+        "options": [
+            {"id": "pas", "label": "PAS", "hint": "Problem → Agitation → Solution"},
+            {"id": "bab", "label": "BAB", "hint": "Before → After → Bridge"},
+            {"id": "fab", "label": "FAB", "hint": "Feature → Advantage → Benefit"},
+            {"id": "four_us", "label": "Four Us", "hint": "Useful, urgent, unique, ultra-specific"},
         ],
     },
 }
@@ -2010,7 +2031,7 @@ def call_opencode_compatible(config: dict[str, Any], context: dict[str, Any], ru
         "The concept variation tells you the awareness stage, lead angle, and message structure; copy its ids into awareness_stage, concept_angle, and concept_structure, but treat the directions as guidance only, not copy to reuse. "
         "If copy_requirements.hypothesis is present and type is not 'none', obey it as a controlled test. "
         "If concept_variation includes hook_structure_override, the headline opening must follow that pattern (question, proof, contrast, confession, or command lead), using concept_variation.hook_structure_guidance when present. "
-        "If concept_variation includes concept_angle_guidance or awareness_stage_guidance, use it as concrete execution guidance. "
+        "If concept_variation includes concept_angle_guidance, awareness_stage_guidance, or concept_structure_guidance, use it as concrete execution guidance. "
         "If concept_variation includes proof_style_override, shape the trust/support line using that proof style and proof_style_guidance. "
         "If concept_variation includes cta_voice_override, make the CTA match that voice and cta_voice_guidance. "
         "Use the 4U writing lens before finalizing every headline: Useful, honestly Urgent, Unique, and Ultra-specific. This is a writing instruction, not a label to output. "
@@ -3226,6 +3247,10 @@ async def api_run_execute(
             concept["lead_angle"] = _framework_item("lead_angle", variant)
             if variant in CONCEPT_ANGLE_GUIDANCE:
                 concept["concept_angle_guidance"] = CONCEPT_ANGLE_GUIDANCE[variant]
+        elif hyp_type == "concept_structure" and variant:
+            concept["message_structure"] = _framework_item("message_structure", variant)
+            if variant in CONCEPT_STRUCTURE_GUIDANCE:
+                concept["concept_structure_guidance"] = CONCEPT_STRUCTURE_GUIDANCE[variant]
         elif hyp_type == "hook_structure" and variant:
             # Store hook_structure directive for the assembler / LLM
             concept["hook_structure_override"] = variant
