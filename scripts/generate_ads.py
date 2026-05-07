@@ -1145,7 +1145,8 @@ def classify_hook_structure(headline: str) -> str:
         return "question_lead"
     if text.startswith("finally") or text.startswith("trusted") or text.startswith("proven") or "70,000" in text or "doctor" in text:
         return "proof_lead"
-    if "before" in text or "after" in text or "without" in text or "instead" in text:
+    contrast_terms = ["before", "after", "without", "instead", " but ", " yet ", " still ", "doesn’t have to", "doesn't have to", "even with"]
+    if any(term in f" {text} " for term in contrast_terms):
         return "contrast_loop"
     if text.startswith("i ") or text.startswith("my ") or "felt" in text or "struggled" in text:
         return "confession_lead"
@@ -1161,12 +1162,12 @@ def classify_proof_style(headline: str, support_line: str) -> str:
         return "authority_anchor"
     if "70,000" in combined or "user" in combined or "people" in combined or "review" in combined or "trusted" in combined:
         return "social_proof"
-    if "step" in combined or "routine" in combined or "morning" in combined or "night" in combined or "ok liquid" in combined:
-        return "mechanism_explainer"
+    if "but" in combined or "skeptical" in combined or "doubt" in combined or "worried" in combined or "tried" in combined:
+        return "objection_flip"
     if "simple" in combined or "clear" in combined or "5-minute" in combined or "easy" in combined:
         return "routine_clarity"
-    if "but" in combined or "skeptical" in combined or "doubt" in combined or "worried" in combined:
-        return "objection_flip"
+    if "step" in combined or "routine" in combined or "morning" in combined or "night" in combined or "ok liquid" in combined:
+        return "mechanism_explainer"
     return "mechanism_explainer"
 
 
@@ -1175,14 +1176,14 @@ def classify_cta_voice(cta: str) -> str:
     text = (cta or "").strip().lower()
     if "today" in text or "now" in text or "start" in text or "act" in text:
         return "urgent_start"
-    if "see" in text or "view" in text or "check" in text or "steps" in text or "details" in text:
-        return "guided_next_step"
     if "fit" in text or "risk" in text or "try" in text or "safe" in text:
         return "reassurance_start"
     if "test" in text or "challenge" in text or "15-day" in text:
         return "challenge_action"
     if "learn" in text or "how" in text or "works" in text or "discover" in text:
         return "discovery_action"
+    if "see" in text or "view" in text or "check" in text or "steps" in text or "details" in text:
+        return "guided_next_step"
     return "guided_next_step"
 
 

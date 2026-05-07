@@ -58,7 +58,7 @@ HEADLINE_EXECUTION_RULES = [
     "Support lines should use one clear proof lane: simple 2-step routine, 5-minute ease, doctor-formulated system, 70,000+ users, visible 15-day progress, cravings/fullness, digestion support, or less sacrifice.",
     "Do not lead headlines with instructional verbs like Start/Begin/Kickstart/Follow; headlines should sound like statements or questions, not how-to steps.",
     "Do not put AM/PM timing, 4-hour windows, or protocol mechanics in the headline. Keep those in support lines or bullets.",
-    "Avoid policy/meta text in on-image copy (eg. persona notes, proof-needed notes)."
+    "Avoid policy/meta text in on-image copy (eg. persona notes, proof-needed notes).",
     "Use plain human phrasing. Avoid AI-ad words like unlock, transform your journey, revolutionary, holistic wellness, game-changing, effortlessly, and tailored solution.",
     "Prefer crisp spoken lines with natural rhythm over SEO-style keyword stuffing. If the line sounds like a spreadsheet label, rewrite it.",
     "Before returning JSON, do a final human editor pass: shorten headline, remove generic phrases, keep one central idea, and ensure support line adds proof/mechanism/ease instead of repeating the headline.",
@@ -89,6 +89,163 @@ HEADLINE_CONCEPT_FRAMEWORK = {
         {"id": "four_us", "direction": "Make it useful, urgent where honest, unique, and ultra-specific."},
     ],
 }
+
+HOOK_STRUCTURE_GUIDANCE: dict[str, str] = {
+    "question_lead": "Open with a plain question the buyer would actually ask. Keep it specific, not clever.",
+    "proof_lead": "Open with proof, authority, or a concrete result window before explaining the product reason elsewhere.",
+    "contrast_loop": "Open with a natural spoken contrast using but, yet, still, without, before/after, or even with. Show the old friction and the improved weight-loss path in one readable line. Avoid stiff grammar like a slogan template.",
+    "confession_lead": "Open like a believable first-person admission, not a polished testimonial headline.",
+    "command_lead": "Open with a direct, simple instruction only when it sounds like ad copy, not a how-to manual.",
+}
+
+CONCEPT_ANGLE_GUIDANCE: dict[str, str] = {
+    "pain_point": "Lead from one real buyer frustration. Keep it concrete and specific, not dramatic or shame-based.",
+    "desired_outcome": "Lead with the practical weight-loss outcome or felt relief. Keep it believable, not transformational hype.",
+    "social_proof": "Lead with trust, usage, testimonials, or crowd proof. Use proof as credibility, not empty popularity.",
+    "authority": "Lead with doctor-formulated, Ayurveda, or expert credibility. Keep it simple and ad-readable.",
+    "curiosity": "Lead with a specific mechanism gap or question that makes the reader want the explanation. Avoid clickbait.",
+    "comparison": "Lead by contrasting the kit with strict diets, random attempts, or high-friction routines. Avoid competitor bashing.",
+    "offer": "Lead with a clear reason to act: 15-day result window, kit completeness, or guarantee logic. Do not mention price.",
+}
+
+AWARENESS_STAGE_GUIDANCE: dict[str, str] = {
+    "unaware": "Name a hidden daily friction before talking like the reader already wants this kit.",
+    "problem_aware": "Start from a problem the reader already recognizes, then make the next step feel clear.",
+    "solution_aware": "Assume the reader has tried fixes. Show why this system is easier, safer, or more guided.",
+    "product_aware": "Assume the reader knows the kit. Give a proof, urgency, trust, or simplicity push to act.",
+}
+
+PROOF_STYLE_GUIDANCE: dict[str, str] = {
+    "authority_anchor": "Use doctor-formulated or Ayurvedic credibility as the trust lane. Avoid vague 'expert-backed' filler.",
+    "social_proof": "Use user count, testimonials, reviews, or served-users proof where safe. Make it specific.",
+    "mechanism_explainer": "Explain the product mechanism simply: hunger/cravings, routine, fullness, digestion, or adherence.",
+    "routine_clarity": "Make the proof feel easy to follow: clear steps, low guesswork, simple daily routine.",
+    "objection_flip": "Address a real doubt directly, then resolve it with proof or mechanism. Avoid sounding defensive.",
+}
+
+CTA_VOICE_GUIDANCE: dict[str, str] = {
+    "urgent_start": "Ask for action now/today without sounding pushy or using sale pressure.",
+    "guided_next_step": "Ask the user to see, check, or view the plan/protocol/steps.",
+    "reassurance_start": "Make the next step feel safe or low-risk: check fit, see if it suits, try safely.",
+    "challenge_action": "Frame the action as a 15-day test or challenge. Keep it compliant and simple.",
+    "discovery_action": "Invite learning: see how it works, learn the steps, discover the routine.",
+}
+
+
+def classify_hook_structure(headline: str) -> str:
+    """Classify a headline opening pattern for hypothesis sanity checks."""
+    text = (headline or "").strip().lower()
+    if not text:
+        return "proof_lead"
+    if text.startswith(("why ", "what ", "how ", "when ")) or "?" in text[:30]:
+        return "question_lead"
+    if text.startswith(("finally", "trusted", "proven")) or "70,000" in text or "doctor" in text:
+        return "proof_lead"
+    contrast_terms = ["before", "after", "without", "instead", " but ", " yet ", " still ", "doesn’t have to", "doesn't have to", "even with"]
+    if any(term in f" {text} " for term in contrast_terms):
+        return "contrast_loop"
+    if text.startswith(("i ", "my ")) or "felt" in text or "struggled" in text:
+        return "confession_lead"
+    if text.startswith(("stop", "start", "try", "see")):
+        return "command_lead"
+    return "proof_lead"
+
+
+def headline_for_candidate(candidate: dict[str, Any], lang: str = "EN") -> str:
+    copy = candidate.get("copy") if isinstance(candidate.get("copy"), dict) else {}
+    block = copy.get(lang) if isinstance(copy.get(lang), dict) else {}
+    return str(block.get("headline") or "").strip()
+
+
+def copy_text_for_candidate(candidate: dict[str, Any], lang: str = "EN") -> str:
+    copy = candidate.get("copy") if isinstance(candidate.get("copy"), dict) else {}
+    block = copy.get(lang) if isinstance(copy.get(lang), dict) else {}
+    parts: list[str] = []
+    for key in ["headline", "support_line", "trust_line", "attribution", "cta"]:
+        value = block.get(key)
+        if isinstance(value, str) and value.strip():
+            parts.append(value.strip())
+    bullets = block.get("bullets")
+    if isinstance(bullets, list):
+        parts.extend(str(item).strip() for item in bullets if str(item).strip())
+    return " ".join(parts)
+
+
+def cta_for_candidate(candidate: dict[str, Any], lang: str = "EN") -> str:
+    copy = candidate.get("copy") if isinstance(candidate.get("copy"), dict) else {}
+    block = copy.get(lang) if isinstance(copy.get(lang), dict) else {}
+    return str(block.get("cta") or "").strip()
+
+
+def classify_proof_style_text(text: str) -> str:
+    lower = (text or "").lower()
+    if "doctor" in lower or "ayurvedic" in lower or "dr." in lower or "formulated" in lower:
+        return "authority_anchor"
+    if "70,000" in lower or "user" in lower or "people" in lower or "review" in lower or "testimonial" in lower or "trusted" in lower:
+        return "social_proof"
+    if "but" in lower or "skeptical" in lower or "doubt" in lower or "worried" in lower or "tried" in lower:
+        return "objection_flip"
+    if "simple" in lower or "clear" in lower or "5-minute" in lower or "easy" in lower or "low guesswork" in lower:
+        return "routine_clarity"
+    if "step" in lower or "routine" in lower or "morning" in lower or "night" in lower or "ok liquid" in lower or "craving" in lower or "fullness" in lower:
+        return "mechanism_explainer"
+    return "mechanism_explainer"
+
+
+def classify_cta_voice_text(cta: str) -> str:
+    text = (cta or "").strip().lower()
+    if "today" in text or "now" in text or "start" in text or "act" in text:
+        return "urgent_start"
+    if "fit" in text or "risk" in text or "safe" in text or "suit" in text:
+        return "reassurance_start"
+    if "test" in text or "challenge" in text or "15-day" in text or "15 day" in text:
+        return "challenge_action"
+    if "learn" in text or "how" in text or "works" in text or "discover" in text:
+        return "discovery_action"
+    if "see" in text or "view" in text or "check" in text or "steps" in text or "details" in text or "plan" in text or "protocol" in text:
+        return "guided_next_step"
+    return "guided_next_step"
+
+
+def hook_structure_mismatch(candidate: dict[str, Any], planned_ad: dict[str, Any]) -> str | None:
+    hypothesis = planned_ad.get("hypothesis") if isinstance(planned_ad.get("hypothesis"), dict) else {}
+    if hypothesis.get("type") != "hook_structure":
+        return None
+    expected = str(hypothesis.get("variant") or "").strip()
+    if not expected:
+        return None
+    headline = headline_for_candidate(candidate, "EN")
+    actual = classify_hook_structure(headline)
+    if actual != expected:
+        return f"Expected hook_structure {expected}, but EN headline classified as {actual}: {headline!r}"
+    return None
+
+
+def hypothesis_mismatch(candidate: dict[str, Any], planned_ad: dict[str, Any]) -> str | None:
+    hypothesis = planned_ad.get("hypothesis") if isinstance(planned_ad.get("hypothesis"), dict) else {}
+    hyp_type = hypothesis.get("type")
+    expected = str(hypothesis.get("variant") or "").strip()
+    if not hyp_type or hyp_type == "none" or not expected:
+        return None
+    if hyp_type == "hook_structure":
+        return hook_structure_mismatch(candidate, planned_ad)
+    if hyp_type == "concept_angle":
+        actual = str(candidate.get("concept_angle") or "").strip()
+        if actual != expected:
+            return f"Expected concept_angle {expected}, but candidate returned {actual or 'blank'}"
+    if hyp_type == "awareness_stage":
+        actual = str(candidate.get("awareness_stage") or "").strip()
+        if actual != expected:
+            return f"Expected awareness_stage {expected}, but candidate returned {actual or 'blank'}"
+    if hyp_type == "proof_style":
+        actual = classify_proof_style_text(copy_text_for_candidate(candidate, "EN"))
+        if actual != expected:
+            return f"Expected proof_style {expected}, but EN copy classified as {actual}: {copy_text_for_candidate(candidate, 'EN')!r}"
+    if hyp_type == "cta_voice":
+        actual = classify_cta_voice_text(cta_for_candidate(candidate, "EN"))
+        if actual != expected:
+            return f"Expected cta_voice {expected}, but EN CTA classified as {actual}: {cta_for_candidate(candidate, 'EN')!r}"
+    return None
 
 
 HYPOTHESIS_VARIABLES: dict[str, dict[str, Any]] = {
@@ -151,15 +308,6 @@ HYPOTHESIS_VARIABLES: dict[str, dict[str, Any]] = {
             {"id": "reassurance_start", "label": "Reassurance Start", "hint": "Check If It Fits / Try Risk-Free"},
             {"id": "challenge_action", "label": "Challenge Action", "hint": "Take The 15-Day Test"},
             {"id": "discovery_action", "label": "Discovery Action", "hint": "See How It Works / Learn More"},
-        ],
-    },
-    "headline_length": {
-        "label": "Headline Length (H6)",
-        "description": "Test short (5-8 words) vs. medium (9-12 words) vs. long (13+ words) headlines.",
-        "options": [
-            {"id": "short", "label": "Short (5-8 words)", "hint": "Concise, punchy headlines"},
-            {"id": "medium", "label": "Medium (9-12 words)", "hint": "Balanced detail headlines"},
-            {"id": "long", "label": "Long (13+ words)", "hint": "Descriptive, story-led headlines"},
         ],
     },
 }
@@ -1861,10 +2009,10 @@ def call_opencode_compatible(config: dict[str, Any], context: dict[str, Any], ru
         "Use headline_execution_rules, headline_concept_framework, and each ad's copy_requirements.concept_variation as the execution model. "
         "The concept variation tells you the awareness stage, lead angle, and message structure; copy its ids into awareness_stage, concept_angle, and concept_structure, but treat the directions as guidance only, not copy to reuse. "
         "If copy_requirements.hypothesis is present and type is not 'none', obey it as a controlled test. "
-        "If concept_variation includes hook_structure_override, the headline opening must follow that pattern (question, proof, contrast, confession, or command lead). "
-        "If concept_variation includes proof_style_override, shape the trust/support line using that proof style. "
-        "If concept_variation includes cta_voice_override, make the CTA match that voice. "
-        "If concept_variation includes headline_length, keep the headline length in the requested range (short 5-8 words, medium 9-12 words, long 13+ words). "
+        "If concept_variation includes hook_structure_override, the headline opening must follow that pattern (question, proof, contrast, confession, or command lead), using concept_variation.hook_structure_guidance when present. "
+        "If concept_variation includes concept_angle_guidance or awareness_stage_guidance, use it as concrete execution guidance. "
+        "If concept_variation includes proof_style_override, shape the trust/support line using that proof style and proof_style_guidance. "
+        "If concept_variation includes cta_voice_override, make the CTA match that voice and cta_voice_guidance. "
         "Use the 4U writing lens before finalizing every headline: Useful, honestly Urgent, Unique, and Ultra-specific. This is a writing instruction, not a label to output. "
         "Write headlines like a human editor revised them from rough AI copy: one clean idea, short, concrete, and spoken. "
         "Do not make the headline carry the whole pitch; put proof, mechanism, and timing in support_line, trust_line, or bullets. "
@@ -1947,6 +2095,7 @@ def call_opencode_compatible(config: dict[str, Any], context: dict[str, Any], ru
             "Do not reuse the same angle family such as guided support, structured system, cravings control, proof, natural-safe, homemade-food fit, or AM/PM mechanism as the lead angle if it already appeared in generated_same_format_so_far for this format.\n"
             "Do not reuse the same sentence pattern or opening structure from generated_same_format_so_far.\n"
             "Before writing, read copy_requirements.concept_variation and make the headline/support hierarchy match that chosen concept path.\n"
+            "If hook_structure_override is present, the EN headline must visibly match it. For contrast_loop, use a clear but natural contrast word such as but, yet, still, without, before/after, or even with.\n"
             "Final editor pass before JSON: rewrite the headline into a finished human ad line, usually 5-12 words, one central idea only. Move mechanism/proof/timing details into support line or bullets.\n"
             "Use support copy to explain why the headline is believable: 2-step routine, 5-minute ease, doctor-formulated proof, 70,000+ users, 15-day progress, cravings/fullness, digestion support, or less sacrifice.\n"
             "Reject your own first draft if the headline reads like a generic AI slogan, a keyword list, or a paraphrase of the support line.\n"
@@ -2002,8 +2151,21 @@ def call_opencode_compatible(config: dict[str, Any], context: dict[str, Any], ru
             retry_prompt = f"{cli_prompt}\n\n{strict_schema_note}\n"
             candidate, last_stdout, last_stderr = run_once(retry_prompt)
 
+        mismatch = hypothesis_mismatch(candidate, ad_item) if candidate else None
+        if mismatch:
+            retry_prompt = (
+                f"{cli_prompt}\n\n"
+                f"REVISION_REQUIRED: {mismatch}\n"
+                "Rewrite only this ad so the headline matches the requested hook_structure_override while keeping schema valid.\n"
+            )
+            candidate, last_stdout, last_stderr = run_once(retry_prompt)
+            mismatch = hypothesis_mismatch(candidate, ad_item) if candidate else None
+
         if not candidate:
             errors.append(f"Ad {index}: returned no usable ad JSON\nSTDOUT:\n{last_stdout}\nSTDERR:\n{last_stderr}")
+            continue
+        if mismatch:
+            errors.append(f"Ad {index}: {mismatch}\nSTDOUT:\n{last_stdout}\nSTDERR:\n{last_stderr}")
             continue
 
         generated_ads.append(hydrate_generated_ad_candidate(candidate, ad_item))
@@ -2373,7 +2535,7 @@ def expand_plan_with_hypothesis(plan: list[dict[str, Any]], hypothesis_cfg: dict
                 "type": hyp_type,
                 "variable_label": variable_def["label"],
                 "variant": variant,
-                "test_group": "control" if variant == available_options[0] else "variant",
+                "test_group": "control" if variant == available_options[0] else (test_group if test_group in {"variant_a", "variant_b"} else "variant"),
                 "hypothesis_id": f"{hyp_type}-{variant}",
             }
             out.append(entry)
@@ -3058,17 +3220,25 @@ async def api_run_execute(
         variant = hyp_meta.get("variant")
         if hyp_type == "awareness_stage" and variant:
             concept["audience_stage"] = _framework_item("audience_stage", variant)
+            if variant in AWARENESS_STAGE_GUIDANCE:
+                concept["awareness_stage_guidance"] = AWARENESS_STAGE_GUIDANCE[variant]
         elif hyp_type == "concept_angle" and variant:
             concept["lead_angle"] = _framework_item("lead_angle", variant)
+            if variant in CONCEPT_ANGLE_GUIDANCE:
+                concept["concept_angle_guidance"] = CONCEPT_ANGLE_GUIDANCE[variant]
         elif hyp_type == "hook_structure" and variant:
             # Store hook_structure directive for the assembler / LLM
             concept["hook_structure_override"] = variant
+            if variant in HOOK_STRUCTURE_GUIDANCE:
+                concept["hook_structure_guidance"] = HOOK_STRUCTURE_GUIDANCE[variant]
         elif hyp_type == "proof_style" and variant:
             concept["proof_style_override"] = variant
+            if variant in PROOF_STYLE_GUIDANCE:
+                concept["proof_style_guidance"] = PROOF_STYLE_GUIDANCE[variant]
         elif hyp_type == "cta_voice" and variant:
             concept["cta_voice_override"] = variant
-        elif hyp_type == "headline_length" and variant:
-            concept["headline_length"] = variant
+            if variant in CTA_VOICE_GUIDANCE:
+                concept["cta_voice_guidance"] = CTA_VOICE_GUIDANCE[variant]
         copy_req["concept_variation"] = concept
 
         ads_context.append(
