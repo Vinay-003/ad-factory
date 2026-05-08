@@ -18,40 +18,22 @@ ROOT = Path(__file__).resolve().parents[1]
 
 
 def default_product_path() -> str:
-    master = ROOT / "productmaster.txt"
+    master = ROOT / "product master doc.txt"
     if master.exists():
         return str(master)
-    return "productinfomain.txt"
+    # legacy fallback for older repo states (avoid hard crashes)
+    legacy = ROOT / "productmaster.txt"
+    if legacy.exists():
+        return str(legacy)
+    legacy2 = ROOT / "productinfomain.txt"
+    if legacy2.exists():
+        return str(legacy2)
+    return "product master doc.txt"
 
 
 def merge_product_directives(product_path: Path, product_text: str) -> str:
-    legacy = ROOT / "productinfomain.txt"
-    if not legacy.exists():
-        return product_text
-    if product_path.resolve() == legacy.resolve():
-        return product_text
-
-    legacy_text = legacy.read_text(encoding="utf-8")
-
-    def extract_block(start_marker: str) -> str:
-        pattern = re.compile(rf"(^|\n)({re.escape(start_marker)}.*?)(?=\n\d+\.\s+|\Z)", re.DOTALL)
-        match = pattern.search(legacy_text)
-        if not match:
-            return ""
-        return match.group(2).strip()
-
-    snapshot_match = re.search(r"^CONTEXT SNAPSHOT \(FOR EXTRACTION\).*?(?=\nSingle Source of Truth: Product Foundation Document|\Z)", legacy_text, re.DOTALL | re.MULTILINE)
-    supplements = []
-    if snapshot_match and "CONTEXT SNAPSHOT (FOR EXTRACTION)" not in product_text:
-        supplements.append(snapshot_match.group(0).strip())
-    for marker in ["0. EXTRACTOR PRIORITY BLOCK", "24. HEADLINE STRATEGY AND PROTECTED THEMES"]:
-        if marker not in product_text:
-            block = extract_block(marker)
-            if block:
-                supplements.append(block)
-    if not supplements:
-        return product_text
-    return "\n\n".join(supplements + [product_text])
+    # Single source of truth: never merge from legacy mechanism/productinfomain/faq in this pipeline.
+    return product_text
 
 CANONICAL_BUCKETS = [
     "positioning",
@@ -83,8 +65,9 @@ CANONICAL_BUCKETS = [
 
 
 def parse_args() -> argparse.Namespace:
-    parser = argparse.ArgumentParser(description="Build canonical reconciled context via OpenCode model")
+    parser = argparse.ArgumentParser(description="Build canonical reconciled context via OpenCode model (single source of truth)")
     parser.add_argument("--product", default=default_product_path())
+    # Keep CLI flags for backward compatibility, but this script will not load them in single-source mode.
     parser.add_argument("--mechanism", default="PRODUCT_MECHANISM_V1.txt")
     parser.add_argument("--faq", default="faq.txt")
     parser.add_argument("--output", default="runtime/context_canonical.json")
@@ -246,7 +229,7 @@ def build_prompt(product_text: str, mechanism_text: str, faq_text: str) -> str:
     schema = {
         "metadata": {
             "extractor_model": "string",
-            "source_files": ["productinfomain.txt", "PRODUCT_MECHANISM_V1.txt", "faq.txt"],
+            "source_files": ["product master doc.txt"],
         },
         "canonical": {bucket: ["string"] for bucket in CANONICAL_BUCKETS},
         "conflicts": [
@@ -296,29 +279,21 @@ def build_prompt(product_text: str, mechanism_text: str, faq_text: str) -> str:
         "You are a strict information extraction and reconciliation engine for a regulated ad-copy pipeline.\n"
         "Return ONLY valid JSON with the required schema.\n"
         "Do not invent facts.\n"
-        "Prefer detailed preservation over compression. Keep explicit rules, triggers, exclusions, routine steps, hierarchy blocks, proof stacks, benefit ladders, and extraction priority blocks separate when the source provides them.\n"
-        "Resolve contradictions with this priority:\n"
-        "1) PRODUCT_MECHANISM_V1.txt for mechanism boundaries\n"
-        "2) productinfomain.txt CONTEXT SNAPSHOT / EXTRACTOR PRIORITY BLOCK / HEADLINE STRATEGY sections\n"
-        "3) productinfomain.txt remaining Single Source of Truth sections\n"
-        "4) faq.txt for operational protocol and objection handling\n"
-        "If ON-IMAGE COPY MANDATE is present, extract it into on_image_copy_requirements and preserve it in practical form.\n"
-        "Treat the headline families AM/PM routine, cravings down, and support as protected priorities in the exact order shown in the source. Do not reorder or abstract them away.\n"
-        "The extraction must keep headline/subheadline pairs feature-based, tied to product mechanics, and explicitly connected to weight loss or obesity reduction as a readable hierarchy.\n"
-        "Preserve any headline concept framework, hierarchy rule, or style guardrail exactly enough that downstream ad copy can use it as direction without copying example lines or creating generic AI slogans.\n"
-        "Do not compress rich product sections into 2-3 summary bullets when the source gives detailed execution rules, feature banks, interpretation rules, or priority ladders.\n"
-        "If the product file defines what to trigger, what to use, what not to use, or how headline/subheadline lanes should rotate, preserve those instructions with high fidelity.\n"
-        "Do not normalize strong product wording into vague transformation copy.\n"
-        "If a source says what to use, what not to use, when to use it, or what to avoid, preserve that as explicit guidance instead of collapsing it into a generic summary.\n"
-        "Legacy encyclopedia or training fragments must not override higher-priority claims.\n"
+        "Single-source mode: use ONLY `product master doc.txt`.\n"
+        "Prefer detailed preservation over compression. Keep explicit rules, triggers, exclusions, routine steps, hierarchy blocks, proof stacks, benefit ladders separate when the source provides them.\n"
+        "Resolve contradictions by using the most explicit statement in the master doc (no legacy files).\n"
+        "If ON-IMAGE COPY MANDATE is present in the master doc, extract it into on_image_copy_requirements.\n"
+        "Do not apply legacy headline-lane rotation rules that are not present in the master doc.\n"
+        "If the master doc includes brand interpretation rules or exclusions, preserve them as practical guidance.\n"
+        "Do not invent headline strategies not grounded in the master doc.\n"
     )
 
     payload = {
         "schema": schema,
         "sources": {
-            "productinfomain.txt": product_text,
-            "PRODUCT_MECHANISM_V1.txt": mechanism_text,
-            "faq.txt": faq_text,
+            "product master doc.txt": product_text,
+            "PRODUCT_MECHANISM_V1.txt": "", 
+            "faq.txt": "",
         },
     }
 
@@ -343,8 +318,9 @@ def main() -> int:
         raise RuntimeError("Missing --api-url for canonical extraction")
 
     product_text = merge_product_directives(product_path, product_path.read_text(encoding="utf-8"))
-    mechanism_text = mechanism_path.read_text(encoding="utf-8")
-    faq_text = faq_path.read_text(encoding="utf-8")
+    # single-source mode: do not load legacy mechanism/faq content
+    mechanism_text = ""
+    faq_text = ""
 
     prompt = build_prompt(product_text, mechanism_text, faq_text)
 
@@ -392,15 +368,11 @@ def main() -> int:
         "metadata": {
             "generated_at": now_iso(),
             "extractor_model": args.model.strip(),
-            "source_files": [
-                str(product_path),
-                str(mechanism_path),
-                str(faq_path),
-            ],
+            "source_files": [str(product_path)],
             "source_sizes": {
                 "product_chars": len(product_text),
-                "mechanism_chars": len(mechanism_text),
-                "faq_chars": len(faq_text),
+                "mechanism_chars": 0,
+                "faq_chars": 0,
             },
         },
         "canonical": canonical,
