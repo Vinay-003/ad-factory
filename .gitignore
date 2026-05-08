@@ -11,3 +11,6 @@ output/*
 trash/
 generated_image
 generated_image/*
+
+trash/*
+runtime/*

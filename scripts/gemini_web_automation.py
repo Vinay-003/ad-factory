@@ -207,19 +207,33 @@ def _format_sort_key(fmt: str) -> tuple[int, str]:
 
 def _parse_prompt_name(path: Path) -> tuple[str, str]:
     stem = path.stem
+
+    # Supported names include:
+    #   FINAL_BA_P07_EN.txt
+    #   OUTPUT_BA_P07_EN.txt
+    #   BA_P07_EN.txt
+    # The older parser treated OUTPUT_BA_P07_EN as format=OUTPUT, so every
+    # OUTPUT_*_P07_EN file collapsed into the same OUTPUT_P07 job key and the
+    # duplicate-skip logic processed only one prompt.
     patterns = [
-        r"^FINAL_(?P<fmt>[A-Za-z0-9]+)_P(?P<num>\d+)(?:_[A-Za-z0-9]+)?$",
+        r"^(?:FINAL|OUTPUT)_(?P<fmt>[A-Za-z0-9]+)_P(?P<num>\d+)(?:_[A-Za-z0-9]+)?$",
         r"^(?P<fmt>[A-Za-z0-9]+)_P(?P<num>\d+)(?:_[A-Za-z0-9]+)?$",
-        r"^(?P<fmt>[A-Za-z0-9]+).*?P(?P<num>\d+)",
     ]
     for pat in patterns:
-        m = re.search(pat, stem)
+        m = re.search(pat, stem, flags=re.IGNORECASE)
         if m:
             return m.group("fmt").upper(), f"P{int(m.group('num')):02d}"
 
-    m = re.search(r"P(\d+)", stem, flags=re.IGNORECASE)
-    persona_id = f"P{int(m.group(1)):02d}" if m else "P00"
-    fmt = re.sub(r"[^A-Za-z0-9]+", "_", stem).strip("_").upper() or "PROMPT"
+    # Defensive fallback: find a known format token anywhere before Pxx.
+    m_persona = re.search(r"(?:^|_)P(?P<num>\d+)(?:_|$)", stem, flags=re.IGNORECASE)
+    persona_id = f"P{int(m_persona.group('num')):02d}" if m_persona else "P00"
+    tokens = [t.upper() for t in re.split(r"[^A-Za-z0-9]+", stem) if t]
+    known_formats = ["BA", "FEAT", "HERO", "TEST", "UGC"]
+    for token in tokens:
+        if token in known_formats:
+            return token, persona_id
+
+    fmt = next((t for t in tokens if t not in {"FINAL", "OUTPUT", persona_id}), "PROMPT")
     return fmt, persona_id
 
 
@@ -2450,6 +2464,7 @@ def run() -> None:
                             print(f"  Waiting {args.sleep_after_download:g}s before next prompt tab...")
                             time.sleep(args.sleep_after_download)
                         success = True
+                        print("  [loop] Finished this prompt. Returning to job loop now.")
                         break
 
                     except (InvalidSessionIdException, WebDriverException) as exc:
