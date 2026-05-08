@@ -9,7 +9,7 @@ How to use this playbook in chat:
 - If user gives no specific inputs (persona/headline/format), generate a default starter batch immediately.
 - If user gives specific inputs (persona and/or headline and/or format), use those inputs first.
 - If user gives partial inputs, use what they gave and fill missing fields with defaults from this playbook.
-- Always keep claims restricted to `productinfomain.txt` and preserve product fidelity rules.
+- Always keep claims restricted to `product master doc.txt` and preserve product fidelity rules.
 
 Execution mode lock (important):
 - This repo uses the custom in-repo playbook + scripts workflow as primary execution path.
@@ -51,8 +51,8 @@ Current production mode:
 
 ## 2) Source of Truth (Do not invent)
 
-Use only approved claims and context from `productinfomain.txt`.
-Use `PRODUCT_MECHANISM_V1.txt` as the mechanism-model file derived from `productinfomain.txt`.
+Use only approved claims and context from `product master doc.txt`.
+Use mechanism details only when they are present in `product master doc.txt`.
 
 Persona language source:
 - Use the persona library in this playbook as the source of persona identity and intent.
@@ -61,12 +61,10 @@ Persona language source:
 - Do not depend on external deep-dive persona files during runtime.
 
 Mechanism grounding rules:
-- Use `productinfomain.txt`, `faq.txt`, and `PRODUCT_MECHANISM_V1.txt` together.
-- `productinfomain.txt` is the source for approved claims, mechanism boundaries, support details, and offer details.
-- `faq.txt` is the source for protocol details, Q&A handling, and usage caveats.
-- `PRODUCT_MECHANISM_V1.txt` is the source for simplified mechanism framing and behavior-change mapping.
-- Only use mechanism logic defined in `PRODUCT_MECHANISM_V1.txt`.
-- Do not invent new benefit logic outside that file.
+- Use `product master doc.txt` as the single product source.
+- `product master doc.txt` is the source for approved claims, mechanism boundaries, support details, and offer details.
+- Protocol details, Q&A handling, usage caveats, and mechanism framing must come from `product master doc.txt`.
+- Do not invent new benefit logic outside `product master doc.txt`.
 - Do not frame the product as a fat burner.
 - Do not use claims like `boosts metabolism`, `burns fat fast`, `accelerates fat loss`, or similar shortcuts.
 - Product logic must stay grounded in: reduced hunger, reduced cravings, reduced random eating, reduced intake, and digestion support.
@@ -125,7 +123,7 @@ Product fidelity rules:
 
 ## 4) Brand and Writing Rules
 
-From `productinfomain.txt`:
+From `product master doc.txt`:
 - Tone: empathetic coach, trustworthy, uplifting
 - Style: simple language, active voice, short sentences, no filler
 - Credibility: specifics over vague adjectives
@@ -202,12 +200,10 @@ Persona construction rule:
 Rendering workflow (mandatory):
 - Step 1: Read selected persona from the playbook persona library.
 - Step 2: Define pain/desire/friction/proof needed/tone cue for that persona.
-- Step 3: Read `productinfomain.txt` for approved claims and product boundaries.
-- Step 3b: Read `faq.txt` for protocol details, restrictions, and edge-case usage rules.
-- Step 4: Read `PRODUCT_MECHANISM_V1.txt` to lock the allowed product behavior.
-- Step 5: Compose all final ad copy freshly in the requested language.
+- Step 3: Read `product master doc.txt` for approved claims and product boundaries.
+- Step 4: Compose all final ad copy freshly in the requested language.
 - Keep pain, mechanism, and trust angle consistent across language outputs.
-- When protocol-specific details are needed (timing, fasting window, restrictions, caveats), pull them from `faq.txt` rather than inventing them.
+- When protocol-specific details are needed (timing, fasting window, restrictions, caveats), pull them from `product master doc.txt` rather than inventing them.
 
 Fresh composition rule (mandatory):
 - Every headline/support/CTA/bullet must be freshly composed from persona fields + mechanism strategy.
@@ -1069,7 +1065,7 @@ Decision policy (mandatory):
 - Do not narrate internal workflow steps (for example: "reading files", "extracting sections", "checking patterns"). Return only final outputs and blockers.
 
 Read-scope rule for `create ads` (mandatory):
-- Read only required sources: this playbook, `productinfomain.txt`, `faq.txt`, `PRODUCT_MECHANISM_V1.txt`, `BACKGROUND_VARIANTS.JSON`, `background_variant.json`, `AD_GENERATION_REGISTRY.JSON`.
+- Read only required sources: this playbook, `product master doc.txt`, `BACKGROUND_VARIANTS.JSON`, `background_variant.json`, `AD_GENERATION_REGISTRY.JSON`.
 - Do not mine old `output/v*` prompt files for style or structure unless user explicitly asks to replicate a specific past batch.
 - Historical checks must use registry indexes first; do not crawl old output folders by default.
 - Forbidden sources for normal create-ad runs: `generated_image/v*/prompt_task_*.txt`, `generated_image/v*/task_*.json`, `generated_image/v*/batch_run_summary.json`.

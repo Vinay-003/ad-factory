@@ -26,8 +26,7 @@ lose weight without feeling hungry, weak, confused, or forced into an unrealisti
 also relevant for people whose weight-loss journey is made harder by underlying biological
 or medical factors, because it aims to make the process easier to follow, more manageable,
 and more sustainable in real life.
-3. What is the customer really hiring this product to
-do?
+3. What is the customer really hiring this product to do?
 At a surface level, the customer is hiring Obesity Killer Kit to lose weight.
 At a deeper level, the customer is hiring it to help them lose weight in a way that feels fast,
 safe, believable, and easy enough to sustain in real life. They are not just buying a lower
@@ -545,8 +544,7 @@ You also clarified an important nuance:
 ● below that point, the weight-loss effect should not be positioned like the first few
 courses
 ● other benefits, such as detoxification, may still exist
-15. What is the maintenance story after the main
-course?
+15. What is the maintenance story after the main course?
 Section ID: MAINTENANCE_STORY
 TLDR
 The weight lost through Obesity Killer Kit is designed to be sustainable and not bounce back
@@ -671,3 +669,17 @@ product despite those conditions. It is not a cure-all
 ● Do not body shame
 ● Do not portray obesity as a lack of will power or intent. Acknowledge that it is a
 disease
+
+20. Brand design system
+Typography:
+- Headline: Poppins Bold
+- Body: Poppins Regular
+
+Palette:
+- #F5821F
+- #000000
+- #560E06
+- #008C44
+- #8DA738
+- #FFCC29
+- #FEFAE0

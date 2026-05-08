@@ -34,6 +34,7 @@ ENV_PATH = ROOT / ".env.dashboard"
 DEFAULT_PRODUCT_MASTER = ROOT / "product master doc.txt"
 DEFAULT_PLAYBOOK = ROOT / "AD_CREATIVE_SYSTEM_PLAYBOOK.md"
 DEFAULT_IMAGE_SOURCES_FILE = ROOT / "input" / "image_sources.txt"
+PRODUCT_CONTEXT_CACHE = RUNTIME_ROOT / "product_context_cache.json"
 LEGACY_ACTIVE_IMAGES_FILE = ROOT / "input" / "activeimages.txt"
 INPUT_IMAGES_DIR = ROOT / "input" / "images"
 GENERATED_IMAGES_ROOT = ROOT / "generated_images"
@@ -1192,6 +1193,46 @@ def save_upload(target: Path, upload: UploadFile | None) -> Path | None:
 
 def coalesce_path(uploaded: Path | None, default_path: Path) -> Path:
     return uploaded if uploaded and uploaded.exists() else default_path
+
+
+def file_sha256(path: Path) -> str:
+    return hashlib.sha256(path.read_bytes()).hexdigest()
+
+
+def product_context_cache_key(product_file: Path, config: dict[str, Any], extractor_model: str) -> dict[str, Any]:
+    return {
+        "source_hash": file_sha256(product_file),
+        "extractor_model": extractor_model,
+        "api_url": str((config.get("opencode_api_url") or DEFAULT_OPENCODE_API_URL)).strip(),
+        "single_source": True,
+    }
+
+
+def load_cached_product_context(cache_key: dict[str, Any]) -> dict[str, Any] | None:
+    if not PRODUCT_CONTEXT_CACHE.exists():
+        return None
+    try:
+        cached = json.loads(PRODUCT_CONTEXT_CACHE.read_text(encoding="utf-8"))
+    except Exception:
+        return None
+    if cached.get("cache_key") != cache_key:
+        return None
+    product_ctx = cached.get("product_ctx")
+    if not isinstance(product_ctx, dict) or not product_ctx:
+        return None
+    return cached
+
+
+def write_product_context_cache(cache_key: dict[str, Any], product_ctx: dict[str, Any], source: str, canonical_payload: Any = None) -> None:
+    PRODUCT_CONTEXT_CACHE.parent.mkdir(parents=True, exist_ok=True)
+    payload = {
+        "cache_key": cache_key,
+        "cached_at": now_iso(),
+        "source": source,
+        "product_ctx": product_ctx,
+        "canonical_payload": canonical_payload if isinstance(canonical_payload, dict) else None,
+    }
+    PRODUCT_CONTEXT_CACHE.write_text(json.dumps(payload, ensure_ascii=False, indent=2) + "\n", encoding="utf-8")
 
 
 def resolve_safe_path(relative_path: str) -> Path:
@@ -3654,61 +3695,77 @@ async def api_run_execute(
     product_ctx: dict[str, Any]
     product_ctx_source = "extract_product_context"
     extractor_model = choose_extractor_model(cfg)
-    canonical_path = RUNTIME_ROOT / "context_canonical.json"
-    canonical_cmd = [
-        "python3",
-        "scripts/build_canonical_context.py",
-        "--product",
-        str(product_file),
-        "--output",
-        str(canonical_path),
-        "--api-url",
-        str((cfg.get("opencode_api_url") or DEFAULT_OPENCODE_API_URL)).strip(),
-        "--model",
-        extractor_model,
-    ]
-    extractor_key = (cfg.get("opencode_api_key") or "").strip() or os.getenv("OPENCODE_SERVER_PASSWORD", "").strip()
-    if extractor_key:
-        canonical_cmd.extend(["--api-key", extractor_key])
+    cache_key = product_context_cache_key(product_file, cfg, extractor_model)
+    cached_context = load_cached_product_context(cache_key)
 
-    canonical_result = run_cmd(canonical_cmd, cwd=ROOT)
-    if canonical_result.returncode == 0 and canonical_path.exists():
-        try:
-            canonical_payload = json.loads(canonical_path.read_text(encoding="utf-8"))
-            generated_ctx = canonical_payload.get("generation_context")
-            if isinstance(generated_ctx, dict):
-                product_ctx = generated_ctx
-                product_ctx_source = "canonical_llm"
-                (run_dir / "context" / "context_canonical.json").write_text(
-                    json.dumps(canonical_payload, ensure_ascii=False, indent=2) + "\n", encoding="utf-8"
+    if cached_context:
+        product_ctx = cached_context["product_ctx"]
+        product_ctx_source = f"cached_{cached_context.get('source') or 'product_context'}"
+        cached_canonical = cached_context.get("canonical_payload")
+        if isinstance(cached_canonical, dict):
+            (run_dir / "context" / "context_canonical.json").write_text(
+                json.dumps(cached_canonical, ensure_ascii=False, indent=2) + "\n", encoding="utf-8"
+            )
+    else:
+        canonical_payload: dict[str, Any] | None = None
+        canonical_path = RUNTIME_ROOT / "context_canonical.json"
+        canonical_cmd = [
+            "python3",
+            "scripts/build_canonical_context.py",
+            "--product",
+            str(product_file),
+            "--output",
+            str(canonical_path),
+            "--api-url",
+            str((cfg.get("opencode_api_url") or DEFAULT_OPENCODE_API_URL)).strip(),
+            "--model",
+            extractor_model,
+        ]
+        extractor_key = (cfg.get("opencode_api_key") or "").strip() or os.getenv("OPENCODE_SERVER_PASSWORD", "").strip()
+        if extractor_key:
+            canonical_cmd.extend(["--api-key", extractor_key])
+
+        canonical_result = run_cmd(canonical_cmd, cwd=ROOT)
+        if canonical_result.returncode == 0 and canonical_path.exists():
+            try:
+                canonical_payload = json.loads(canonical_path.read_text(encoding="utf-8"))
+                generated_ctx = canonical_payload.get("generation_context")
+                if isinstance(generated_ctx, dict):
+                    product_ctx = generated_ctx
+                    product_ctx_source = "canonical_llm"
+                    (run_dir / "context" / "context_canonical.json").write_text(
+                        json.dumps(canonical_payload, ensure_ascii=False, indent=2) + "\n", encoding="utf-8"
+                    )
+                else:
+                    raise RuntimeError("Missing generation_context in canonical payload")
+            except Exception as exc:
+                (run_dir / "logs" / "canonical_context_error.txt").write_text(
+                    f"Canonical context parse failed: {exc}\nSTDOUT:\n{canonical_result.stdout}\n\nSTDERR:\n{canonical_result.stderr}",
+                    encoding="utf-8",
                 )
-            else:
-                raise RuntimeError("Missing generation_context in canonical payload")
-        except Exception as exc:
+                product_ctx = {}
+        else:
             (run_dir / "logs" / "canonical_context_error.txt").write_text(
-                f"Canonical context parse failed: {exc}\nSTDOUT:\n{canonical_result.stdout}\n\nSTDERR:\n{canonical_result.stderr}",
+                f"Canonical context generation failed\nSTDOUT:\n{canonical_result.stdout}\n\nSTDERR:\n{canonical_result.stderr}",
                 encoding="utf-8",
             )
             product_ctx = {}
-    else:
-        (run_dir / "logs" / "canonical_context_error.txt").write_text(
-            f"Canonical context generation failed\nSTDOUT:\n{canonical_result.stdout}\n\nSTDERR:\n{canonical_result.stderr}",
-            encoding="utf-8",
-        )
-        product_ctx = {}
 
-    if not product_ctx:
-        product_ctx_result = run_cmd(
-            [
-                "python3",
-                "scripts/extract_product_context.py",
-                "--product",
-                str(product_file),
-                "--json",
-            ],
-            cwd=ROOT,
-        )
-        product_ctx = parse_json_stdout(product_ctx_result, "extract_product_context")
+        if not product_ctx:
+            product_ctx_source = "extract_product_context"
+            product_ctx_result = run_cmd(
+                [
+                    "python3",
+                    "scripts/extract_product_context.py",
+                    "--product",
+                    str(product_file),
+                    "--json",
+                ],
+                cwd=ROOT,
+            )
+            product_ctx = parse_json_stdout(product_ctx_result, "extract_product_context")
+
+        write_product_context_cache(cache_key, product_ctx, product_ctx_source, canonical_payload)
 
     persona_library = parse_persona_library(DEFAULT_PLAYBOOK)
     ads_context: list[dict[str, Any]] = []

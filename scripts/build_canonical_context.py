@@ -18,21 +18,11 @@ ROOT = Path(__file__).resolve().parents[1]
 
 
 def default_product_path() -> str:
-    master = ROOT / "product master doc.txt"
-    if master.exists():
-        return str(master)
-    # legacy fallback for older repo states (avoid hard crashes)
-    legacy = ROOT / "productmaster.txt"
-    if legacy.exists():
-        return str(legacy)
-    legacy2 = ROOT / "productinfomain.txt"
-    if legacy2.exists():
-        return str(legacy2)
-    return "product master doc.txt"
+    return str(ROOT / "product master doc.txt")
 
 
 def merge_product_directives(product_path: Path, product_text: str) -> str:
-    # Single source of truth: never merge from legacy mechanism/productinfomain/faq in this pipeline.
+    # Single source of truth: never merge from legacy product docs in this pipeline.
     return product_text
 
 CANONICAL_BUCKETS = [
@@ -67,9 +57,6 @@ CANONICAL_BUCKETS = [
 def parse_args() -> argparse.Namespace:
     parser = argparse.ArgumentParser(description="Build canonical reconciled context via OpenCode model (single source of truth)")
     parser.add_argument("--product", default=default_product_path())
-    # Keep CLI flags for backward compatibility, but this script will not load them in single-source mode.
-    parser.add_argument("--mechanism", default="PRODUCT_MECHANISM_V1.txt")
-    parser.add_argument("--faq", default="faq.txt")
     parser.add_argument("--output", default="runtime/context_canonical.json")
     parser.add_argument("--api-url", default=os.getenv("OPENCODE_API_URL", ""))
     parser.add_argument("--api-key", default=os.getenv("OPENCODE_SERVER_PASSWORD", ""))
@@ -201,7 +188,7 @@ def build_generation_context(canonical: dict[str, list[str]]) -> dict[str, list[
         canonical["allowed_items"]
         + canonical["restricted_items"]
         + canonical["messaging_guardrails"]
-        + [f"Do not claim: {item}" for item in canonical["mechanism_disallowed_claims"]]
+        + canonical["mechanism_disallowed_claims"]
     )
 
     def uniq(lines: list[str]) -> list[str]:
@@ -255,23 +242,19 @@ def build_prompt(product_text: str, mechanism_text: str, faq_text: str) -> str:
         ],
         "coverage_check": {
             "required_present": {
-                "3_to_5kg_15days": True,
-                "adults_18plus_bmi_gt_25": True,
-                "insulin_exclusion": True,
-                "pregnancy_postpartum_exclusion": True,
-                "morning_liquid_4h_no_solids": True,
-                "night_powder_tablet": True,
-                "31_unique_44_total": True,
-                "refund_7day_with_tracker": True,
-                "not_fat_burner_positioning": True,
-                "on_image_copy_explicit_weightloss": True,
-                "headline_strategy_preserved": True,
-                "am_pm_routine_priority": True,
-                "cravings_down_priority": True,
-                "support_priority": True,
-                "feature_based_headlines": True,
+                "3_to_5kg_15days": "boolean",
+                "adults_18plus_bmi_gt_25": "boolean",
+                "insulin_exclusion": "boolean",
+                "pregnancy_postpartum_exclusion": "boolean",
+                "morning_liquid_4h_no_solids": "boolean",
+                "night_powder_tablet_or_powder": "boolean",
+                "31_unique_44_total": "boolean",
+                "refund_7day_with_tracker": "boolean",
+                "not_fat_burner_positioning": "boolean",
+                "on_image_copy_explicit_weightloss": "boolean",
+                "headline_strategy_preserved_if_present": "boolean",
             },
-            "missing_required": [],
+            "missing_required": ["string"],
         },
     }
 
@@ -280,20 +263,22 @@ def build_prompt(product_text: str, mechanism_text: str, faq_text: str) -> str:
         "Return ONLY valid JSON with the required schema.\n"
         "Do not invent facts.\n"
         "Single-source mode: use ONLY `product master doc.txt`.\n"
+        "Extract only claims, labels, rules, routines, and priorities explicitly present in the source text.\n"
+        "If a bucket is not explicitly supported by the source, return an empty list for that bucket.\n"
+        "If a coverage item is absent or ambiguous, set it false and list it in missing_required.\n"
         "Prefer detailed preservation over compression. Keep explicit rules, triggers, exclusions, routine steps, hierarchy blocks, proof stacks, benefit ladders separate when the source provides them.\n"
         "Resolve contradictions by using the most explicit statement in the master doc (no legacy files).\n"
         "If ON-IMAGE COPY MANDATE is present in the master doc, extract it into on_image_copy_requirements.\n"
         "Do not apply legacy headline-lane rotation rules that are not present in the master doc.\n"
         "If the master doc includes brand interpretation rules or exclusions, preserve them as practical guidance.\n"
         "Do not invent headline strategies not grounded in the master doc.\n"
+        "Do not create AM/PM priority language, customer pain points, or feature-lane hierarchy unless the exact idea appears in the master doc.\n"
     )
 
     payload = {
         "schema": schema,
         "sources": {
             "product master doc.txt": product_text,
-            "PRODUCT_MECHANISM_V1.txt": "", 
-            "faq.txt": "",
         },
     }
 
@@ -310,15 +295,12 @@ def main() -> int:
     args = parse_args()
 
     product_path = Path(args.product)
-    mechanism_path = Path(args.mechanism)
-    faq_path = Path(args.faq)
     output_path = Path(args.output)
 
     if not args.api_url.strip():
         raise RuntimeError("Missing --api-url for canonical extraction")
 
     product_text = merge_product_directives(product_path, product_path.read_text(encoding="utf-8"))
-    # single-source mode: do not load legacy mechanism/faq content
     mechanism_text = ""
     faq_text = ""
 

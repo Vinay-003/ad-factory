@@ -63,9 +63,7 @@ Bootstrap does all of this:
 ## How it works
 
 1. Dashboard loads defaults from:
-   - `productinfomain.txt`
-   - `PRODUCT_MECHANISM_V1.txt`
-   - `faq.txt`
+   - `product master doc.txt`
    - `input/activeimages.txt`
 
 2. Retrieval scripts extract only required slices:
@@ -97,7 +95,7 @@ The dashboard does deterministic retrieval first, then generation.
 
 1. User selects persona + format in UI.
 2. Backend runs context-building scripts:
-   - `scripts/build_canonical_context.py` (product + mechanism + FAQ reconciliation)
+   - `scripts/build_canonical_context.py` (single-source product extraction)
     - `scripts/extract_format_rules.py` from `AD_CREATIVE_SYSTEM_PLAYBOOK.md`
     - `scripts/extract_product_context.py` as fallback
 3. Backend builds compact `run_context.json` in run storage.
