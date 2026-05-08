@@ -415,15 +415,10 @@ def compose_prompt(
 ) -> str:
     body = prompt_file.read_text(encoding="utf-8").strip()
     lock = conversion_lock_instruction(conversion_mode)
-    logo_instruction = (
-        "LOGO ASSET RULE (MANDATORY)\n"
-        f"- Use LIGHT_LOGO_URL only as the logo reference: {light_logo_url}\n"
-        "- Do not use dark-logo or white-logo variants in any scenario.\n"
-        "- Never print URLs, file names, or any technical strings on the canvas.\n"
-        "- Render only the visual logo mark; no link text, no metadata text.\n"
-        "- Do not place any white box, white patch, solid rectangle, badge plate, or background panel behind the logo.\n"
-        "- Logo background must stay transparent and blend naturally with the scene."
-    )
+
+    # IMPORTANT: LOGO PLACEMENT INSTRUCTIONS REMOVED.
+    # This function must not inject logo rules into the generated prompt text.
+    # (Gemini automation uses the prompt text as-is.)
     big_box_visibility_instruction = (
         "BIG BOX LABEL VISIBILITY (NON-NEGOTIABLE)\n"
         "- Keep the main kit box label text fully visible and readable.\n"
@@ -432,8 +427,8 @@ def compose_prompt(
         "- Product overlap is allowed only if it does not occlude any kit-box text."
     )
     if lock:
-        return f"{starting_prompt.strip()}\n\n{logo_instruction}\n\n{big_box_visibility_instruction}\n\n{lock}\n\n{body}\n"
-    return f"{starting_prompt.strip()}\n\n{logo_instruction}\n\n{big_box_visibility_instruction}\n\n{body}\n"
+        return f"{starting_prompt.strip()}\n\n{big_box_visibility_instruction}\n\n{lock}\n\n{body}\n"
+    return f"{starting_prompt.strip()}\n\n{big_box_visibility_instruction}\n\n{body}\n"
 
 
 def _find_line_value(pattern: str, text: str) -> str | None:

@@ -12,11 +12,6 @@ OPENCODE_PORT="4090"
 DASHBOARD_HOST="127.0.0.1"
 DASHBOARD_PORT="8787"
 OPENCODE_PASSWORD="${OPENCODE_SERVER_PASSWORD:-opencode-local-pass}"
-BLACKBOX_HOST="127.0.0.1"
-BLACKBOX_PORT="4091"
-BLACKBOX_PASSWORD="${BLACKBOX_SERVER_PASSWORD:-blackbox-local-pass}"
-BLACKBOX_API_KEY="${BLACKBOX_API_KEY:-sk-r5EM_uLQNKnct30sEnkSYQ}"
-
 DEFAULT_XDG_DATA_HOME="${HOME}/.local/share"
 if [[ -f "$DEFAULT_XDG_DATA_HOME/opencode/auth.json" ]]; then
   CURRENT_XDG_DATA_HOME="${XDG_DATA_HOME:-$DEFAULT_XDG_DATA_HOME}"
@@ -28,10 +23,8 @@ fi
 
 OPENCODE_PID_FILE="$PID_DIR/opencode.pid"
 DASHBOARD_PID_FILE="$PID_DIR/dashboard.pid"
-BLACKBOX_PID_FILE="$PID_DIR/blackbox.pid"
 OPENCODE_LOG="$LOG_DIR/opencode.log"
 DASHBOARD_LOG="$LOG_DIR/dashboard.log"
-BLACKBOX_LOG="$LOG_DIR/blackbox.log"
 
 mkdir -p "$PID_DIR" "$LOG_DIR" "$RUNS_DIR"
 
@@ -79,17 +72,6 @@ start_dashboard() {
   echo $! >"$DASHBOARD_PID_FILE"
 }
 
-start_blackbox() {
-  if is_pid_running "$BLACKBOX_PID_FILE"; then
-    echo "Blackbox server already running (pid $(cat "$BLACKBOX_PID_FILE"))"
-    return
-  fi
-  echo "Starting Blackbox server on $BLACKBOX_HOST:$BLACKBOX_PORT"
-  BLACKBOX_API_KEY="$BLACKBOX_API_KEY" \
-    nohup python3 "$ROOT_DIR/dashboard_storage/blackbox_config/blackbox_server.py" >"$BLACKBOX_LOG" 2>&1 &
-  echo $! >"$BLACKBOX_PID_FILE"
-}
-
 wait_for_url() {
   local url="$1"
   local name="$2"
@@ -125,19 +107,14 @@ open_browser() {
 
 start_opencode
 start_dashboard
-start_blackbox
 
 wait_for_url "http://$DASHBOARD_HOST:$DASHBOARD_PORT/api/defaults" "Dashboard"
-wait_for_url -u "user:$BLACKBOX_PASSWORD" "http://$BLACKBOX_HOST:$BLACKBOX_PORT/v1/models" "Blackbox"
 
 echo
 echo "Dashboard URL: http://$DASHBOARD_HOST:$DASHBOARD_PORT"
 echo "OpenCode URL:  http://$OPENCODE_HOST:$OPENCODE_PORT"
-echo "Blackbox URL:  http://$BLACKBOX_HOST:$BLACKBOX_PORT"
 echo "OpenCode password: $OPENCODE_PASSWORD"
-echo "Blackbox password: $BLACKBOX_PASSWORD"
 echo "Dashboard log: $DASHBOARD_LOG"
 echo "OpenCode log:  $OPENCODE_LOG"
-echo "Blackbox log:  $BLACKBOX_LOG"
 
 open_browser "http://$DASHBOARD_HOST:$DASHBOARD_PORT"

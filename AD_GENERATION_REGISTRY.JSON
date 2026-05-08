@@ -400,11 +400,11 @@
           "BG-458",
           "BG-203",
           "BG-410",
-          "BG-455"
+          "BG-455",
+          "BG-294",
+          "BG-361"
         ],
         "remaining": [
-          "BG-294",
-          "BG-361",
           "BG-115",
           "BG-454",
           "BG-158",
@@ -611,11 +611,11 @@
         "cycle_number": 1,
         "used": [
           "BG-048",
-          "BG-008"
+          "BG-008",
+          "BG-181",
+          "BG-365"
         ],
         "remaining": [
-          "BG-181",
-          "BG-365",
           "BG-391",
           "BG-174",
           "BG-499",
@@ -1056,6 +1056,18 @@
           "timestamp": "2026-05-07T20:03:00Z",
           "background_slot": "BG-455",
           "background_source": "catalog"
+        },
+        {
+          "entry_id": "entry_046",
+          "timestamp": "2026-05-08T09:40:39Z",
+          "background_slot": "BG-294",
+          "background_source": "catalog"
+        },
+        {
+          "entry_id": "entry_047",
+          "timestamp": "2026-05-08T09:46:22Z",
+          "background_slot": "BG-361",
+          "background_source": "catalog"
         }
       ],
       "UGC": [
@@ -1069,6 +1081,18 @@
           "entry_id": "entry_043",
           "timestamp": "2026-05-07T22:02:32Z",
           "background_slot": "BG-008",
+          "background_source": "catalog"
+        },
+        {
+          "entry_id": "entry_044",
+          "timestamp": "2026-05-08T07:49:49Z",
+          "background_slot": "BG-181",
+          "background_source": "catalog"
+        },
+        {
+          "entry_id": "entry_045",
+          "timestamp": "2026-05-08T09:17:32Z",
+          "background_slot": "BG-365",
           "background_source": "catalog"
         }
       ]
@@ -1461,6 +1485,42 @@
           "awareness_stage": "problem_aware",
           "concept_angle": "pain_point",
           "concept_structure": "pas"
+        },
+        {
+          "entry_id": "entry_044",
+          "timestamp": "2026-05-08T07:49:49Z",
+          "format": "UGC",
+          "persona_number": 2,
+          "awareness_stage": "problem_aware",
+          "concept_angle": "social_proof",
+          "concept_structure": "four_us"
+        },
+        {
+          "entry_id": "entry_045",
+          "timestamp": "2026-05-08T09:17:32Z",
+          "format": "UGC",
+          "persona_number": 2,
+          "awareness_stage": "unaware",
+          "concept_angle": "story",
+          "concept_structure": "bab"
+        },
+        {
+          "entry_id": "entry_046",
+          "timestamp": "2026-05-08T09:40:39Z",
+          "format": "FEAT",
+          "persona_number": 2,
+          "awareness_stage": "unaware",
+          "concept_angle": "desired_outcome",
+          "concept_structure": "fab"
+        },
+        {
+          "entry_id": "entry_047",
+          "timestamp": "2026-05-08T09:46:22Z",
+          "format": "FEAT",
+          "persona_number": 2,
+          "awareness_stage": "problem_aware",
+          "concept_angle": "offer",
+          "concept_structure": "fab"
         }
       ]
     },
@@ -1508,7 +1568,11 @@
         "Still stuck on your weight-loss restart?",
         "I trusted the 15-day kit because the steps felt clear for weight loss.",
         "Meetings all day, weight loss still stuck?",
-        "Late-night cravings can feel easier to control."
+        "Late-night cravings can feel easier to control.",
+        "I snack less for weight loss.",
+        "Lunch meetings used to add weight.",
+        "Your packed days don't have to stall your weight loss.",
+        "No time for complicated weight-loss routines?"
       ],
       "cta_en": [
         "See the 15-Day Protocol",
@@ -1553,7 +1617,11 @@
         "Restart with the kit today",
         "See The Proof",
         "See the kit",
-        "See My Routine"
+        "See My Routine",
+        "See 15-day plan",
+        "Watch The Routine",
+        "Start Your Kit Today",
+        "Start Your 15-Day Routine"
       ],
       "support_line_en": [
         "Do the AM OK Liquid routine on an empty stomach, then keep a 4-hour no-solids window to support fullness and reduce snacking for weight loss.",
@@ -1579,7 +1647,9 @@
         "Morning OK Liquid anchors the routine, while craving control helps reduce snacking friction for obesity-reduction follow-through.",
         "Structured morning-night steps for visible weight-loss progress and obesity control.",
         "Morning kit cut my cravings in 15-day.",
-        "A simple first step helps keep late-night weight-loss control practical."
+        "A simple first step helps keep late-night weight-loss control practical.",
+        "Morning OK Liquid kept cravings quiet daily.",
+        "Now my AM routine cuts cravings for weight loss."
       ],
       "bullets_en": [
         "AM empty-stomach start: a clear restart cue when effort feels stalled",
@@ -1655,16 +1725,27 @@
         "Morning OK Liquid: a clear first step for excess-weight reduction",
         "Food-gap discipline: removes guessing from the plateau phase",
         "Night routine: supports lighter nights and steadier next-day adherence",
-        "Simple kit flow: keeps motivation from dropping after slow results"
+        "Simple kit flow: keeps motivation from dropping after slow results",
+        "5-minute morning empty-stomach step—then you're on with your day",
+        "31 natural Ayurvedic ingredients, no synthetic additives",
+        "70,000+ users, doctor-formulated protocol",
+        "Daily tracker and WhatsApp support for guided progress",
+        "OK Liquid on empty stomach first thing upon waking — appetite control for weight loss",
+        "Simple 2-step morning routine — fits even on your busiest work days",
+        "Helps reduce hunger and cravings — supports consistent caloric deficit adherence",
+        "Doctor-formulated system with 70,000+ users — visible 15-day progress for practical weight loss"
       ],
       "headline_hi": [
-        "रात की लालसा नियंत्रित करना आसान लग सकता है।"
+        "रात की लालसा नियंत्रित करना आसान लग सकता है।",
+        "मैं weight loss के लिए कम snack करती/करता हूँ।"
       ],
       "cta_hi": [
-        "मेरी दिनचर्या देखें"
+        "मेरी दिनचर्या देखें",
+        "15-day plan देखें"
       ],
       "support_line_hi": [
-        "एक सरल पहला कदम रात के वजन-नियंत्रण को व्यावहारिक रखता है।"
+        "एक सरल पहला कदम रात के वजन-नियंत्रण को व्यावहारिक रखता है।",
+        "सुबह OK Liquid से cravings रोज़ कम लगी।"
       ]
     }
   },
@@ -3832,6 +3913,210 @@
       "test_group": "control",
       "variant_variable": "concept_angle",
       "variant_value": "pain_point"
+    },
+    {
+      "id": "entry_044",
+      "timestamp": "2026-05-08T07:49:49Z",
+      "format": "UGC",
+      "persona_number": 2,
+      "persona_name": "Busy Professional",
+      "headline_angle": "confession-led: cravings down for weight loss",
+      "awareness_stage": "problem_aware",
+      "concept_angle": "social_proof",
+      "concept_structure": "four_us",
+      "visual_archetype": "ugc_desk_review",
+      "headline_en": "I snack less for weight loss.",
+      "headline_hi": "मैं weight loss के लिए कम snack करती/करता हूँ।",
+      "support_line_en": "Morning OK Liquid kept cravings quiet daily.",
+      "support_line_hi": "सुबह OK Liquid से cravings रोज़ कम लगी।",
+      "cta_en": "See 15-day plan",
+      "cta_hi": "15-day plan देखें",
+      "disclaimer_en": "",
+      "disclaimer_hi": "",
+      "caption_en": "",
+      "caption_hi": "",
+      "bullets_en": [],
+      "bullets_hi": [],
+      "background_slot": "BG-181",
+      "background_name": "Post-lunch kitchen moment",
+      "background_source": "catalog",
+      "fresh_background_signature": null,
+      "language": "BOTH",
+      "output_quality": "pending",
+      "notes": "assembled_from=copy_batch.json; batch=v54; aspect_ratio=4:5; seed=151575082; visual_archetype=ugc_desk_review",
+      "opening_pattern_4tok_en": "i_snack_less_for",
+      "opening_pattern_4tok_hi": "मैं_weight_loss_के",
+      "copy_skeleton": "pain_mechanism_time",
+      "hook_structure_class": "confession_lead",
+      "proof_style_class": "mechanism_explainer",
+      "cta_voice_class": "challenge_action",
+      "headline_word_count": 6,
+      "support_line_word_count": 7,
+      "has_protocol_mechanics": true,
+      "has_social_proof_number": false,
+      "background_scene_category": "kitchen",
+      "hypothesis_id": "hook_structure-confession_lead",
+      "test_group": "",
+      "variant_variable": "hook_structure",
+      "variant_value": "confession_lead"
+    },
+    {
+      "id": "entry_045",
+      "timestamp": "2026-05-08T09:17:32Z",
+      "format": "UGC",
+      "persona_number": 2,
+      "persona_name": "Busy Professional",
+      "headline_angle": "Workday friction (meetings -> extra snacking)",
+      "awareness_stage": "unaware",
+      "concept_angle": "story",
+      "concept_structure": "bab",
+      "visual_archetype": "ugc_selfie_hold",
+      "headline_en": "Lunch meetings used to add weight.",
+      "headline_hi": "लंच मीटिंग्स के बाद वजन बढ़ता था।",
+      "support_line_en": "Now my AM routine cuts cravings for weight loss.",
+      "support_line_hi": "अब मेरी सुबह की रूटीन cravings घटाकर वजन घटाने में मदद करती है।",
+      "cta_en": "Watch The Routine",
+      "cta_hi": "किट देखें",
+      "disclaimer_en": "",
+      "disclaimer_hi": "",
+      "caption_en": "",
+      "caption_hi": "",
+      "bullets_en": [],
+      "bullets_hi": [],
+      "background_slot": "BG-365",
+      "background_name": "Compact studio apartment",
+      "background_source": "catalog",
+      "fresh_background_signature": null,
+      "language": "BOTH",
+      "output_quality": "pending",
+      "notes": "assembled_from=copy_batch.json; batch=v55; aspect_ratio=4:5; seed=817851357; visual_archetype=ugc_selfie_hold",
+      "opening_pattern_4tok_en": "lunch_meetings_used_to",
+      "opening_pattern_4tok_hi": "लंच_मीटिंग्स_के_बाद",
+      "copy_skeleton": "problem_reframe_then_next_step",
+      "hook_structure_class": "proof_lead",
+      "proof_style_class": "mechanism_explainer",
+      "cta_voice_class": "guided_next_step",
+      "headline_word_count": 6,
+      "support_line_word_count": 9,
+      "has_protocol_mechanics": true,
+      "has_social_proof_number": false,
+      "background_scene_category": "studio",
+      "hypothesis_id": "awareness_stage-unaware",
+      "test_group": "",
+      "variant_variable": "awareness_stage",
+      "variant_value": "unaware"
+    },
+    {
+      "id": "entry_046",
+      "timestamp": "2026-05-08T09:40:39Z",
+      "format": "FEAT",
+      "persona_number": 2,
+      "persona_name": "Busy Professional",
+      "headline_angle": "desired_outcome",
+      "awareness_stage": "unaware",
+      "concept_angle": "desired_outcome",
+      "concept_structure": "fab",
+      "visual_archetype": "feat_mechanism_steps",
+      "headline_en": "Your packed days don't have to stall your weight loss.",
+      "headline_hi": "भरी दिनचर्या में वजन घटाना रुक नहीं सकता।",
+      "support_line_en": "",
+      "support_line_hi": "",
+      "cta_en": "Start Your Kit Today",
+      "cta_hi": "अपना किट शुरू करें",
+      "disclaimer_en": "",
+      "disclaimer_hi": "",
+      "caption_en": "",
+      "caption_hi": "",
+      "bullets_en": [
+        "5-minute morning empty-stomach step—then you're on with your day",
+        "31 natural Ayurvedic ingredients, no synthetic additives",
+        "70,000+ users, doctor-formulated protocol",
+        "Daily tracker and WhatsApp support for guided progress"
+      ],
+      "bullets_hi": [
+        "5 मिनट का सुबह का खाली पेट कदम—फिर आप अपने दिन में जुट जाते हैं",
+        "31 प्राकृतिक आयुर्वेदिक सामग्री, कोई सिंथेटिक योजक नहीं",
+        "70,000+ उपयोगकर्ता, डॉक्टर-निर्मित प्रोटोकॉल",
+        "दैनिक ट्रैकर और WhatsApp सहायता से मार्गदर्शित प्रगति"
+      ],
+      "background_slot": "BG-294",
+      "background_name": "Neutral wood grain macro",
+      "background_source": "catalog",
+      "fresh_background_signature": null,
+      "language": "BOTH",
+      "output_quality": "pending",
+      "notes": "assembled_from=copy_batch.json; batch=v56; aspect_ratio=4:5; seed=728353374; visual_archetype=feat_mechanism_steps",
+      "opening_pattern_4tok_en": "your_packed_days_don",
+      "opening_pattern_4tok_hi": "भरी_दिनचर्या_में_वजन",
+      "copy_skeleton": "problem_reframe_then_next_step",
+      "hook_structure_class": "proof_lead",
+      "proof_style_class": "mechanism_explainer",
+      "cta_voice_class": "urgent_start",
+      "headline_word_count": 10,
+      "support_line_word_count": 0,
+      "has_protocol_mechanics": false,
+      "has_social_proof_number": false,
+      "background_scene_category": "lifestyle",
+      "hypothesis_id": "awareness_stage-unaware",
+      "test_group": "",
+      "variant_variable": "awareness_stage",
+      "variant_value": "unaware"
+    },
+    {
+      "id": "entry_047",
+      "timestamp": "2026-05-08T09:46:22Z",
+      "format": "FEAT",
+      "persona_number": 2,
+      "persona_name": "Busy Professional",
+      "headline_angle": "15-day result window offer for busy schedules",
+      "awareness_stage": "problem_aware",
+      "concept_angle": "offer",
+      "concept_structure": "fab",
+      "visual_archetype": "feat_callout_annotations",
+      "headline_en": "No time for complicated weight-loss routines?",
+      "headline_hi": "जटिल वजन घटाने की दिनचर्या के लिए समय नहीं?",
+      "support_line_en": "",
+      "support_line_hi": "",
+      "cta_en": "Start Your 15-Day Routine",
+      "cta_hi": "अपनी 15-दिन की दिनचर्या शुरू करें",
+      "disclaimer_en": "",
+      "disclaimer_hi": "",
+      "caption_en": "",
+      "caption_hi": "",
+      "bullets_en": [
+        "OK Liquid on empty stomach first thing upon waking — appetite control for weight loss",
+        "Simple 2-step morning routine — fits even on your busiest work days",
+        "Helps reduce hunger and cravings — supports consistent caloric deficit adherence",
+        "Doctor-formulated system with 70,000+ users — visible 15-day progress for practical weight loss"
+      ],
+      "bullets_hi": [
+        "पेट खाली पहली चीज़ सुबह OK Liquid लें — वजन घटाने के लिए भूख नियंत्रण",
+        "आसान 2-चरण की सुबह की दिनचर्या — सबसे व्यस्त काम के दिनों में भी उपयुक्त",
+        "भूख और खाने की इच्छा को कम करने में मदद करता है — निरंतर कैलोरी घाटे की पालना का समर्थन करता है",
+        "डॉक्टर-फॉर्मूलेटेड सिस्टम 70,000+ उपयोगकर्ताओं के साथ — व्यावहारिक वजन घटाने के लिए 15 दिन की स्पष्ट प्रगति"
+      ],
+      "background_slot": "BG-361",
+      "background_name": "Pale granite kitchen",
+      "background_source": "catalog",
+      "fresh_background_signature": null,
+      "language": "BOTH",
+      "output_quality": "pending",
+      "notes": "assembled_from=copy_batch.json; batch=v57; aspect_ratio=4:5; seed=1146154747; visual_archetype=feat_callout_annotations",
+      "opening_pattern_4tok_en": "no_time_for_complicated",
+      "opening_pattern_4tok_hi": "जटिल_वजन_घटाने_की",
+      "copy_skeleton": "question_mechanism_cta",
+      "hook_structure_class": "proof_lead",
+      "proof_style_class": "mechanism_explainer",
+      "cta_voice_class": "urgent_start",
+      "headline_word_count": 6,
+      "support_line_word_count": 0,
+      "has_protocol_mechanics": true,
+      "has_social_proof_number": false,
+      "background_scene_category": "kitchen",
+      "hypothesis_id": "concept_angle-offer",
+      "test_group": "",
+      "variant_variable": "concept_angle",
+      "variant_value": "offer"
     }
   ]
 }

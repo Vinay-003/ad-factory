@@ -28,6 +28,3 @@ stop_pid_file() {
 
 stop_pid_file "$PID_DIR/dashboard.pid" "dashboard"
 stop_pid_file "$PID_DIR/opencode.pid" "opencode"
-stop_pid_file "$PID_DIR/blackbox.pid" "blackbox"
-
-pkill -f "blackbox_server.py" 2>/dev/null || true

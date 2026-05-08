@@ -14,9 +14,7 @@ const providerSelectEl = document.getElementById("opencodeProvider");
 const modelSelectEl = document.getElementById("opencodeModel");
 const hypothesisTypeEl = document.getElementById("hypothesisType");
 const hypothesisVariantEl = document.getElementById("hypothesisVariant");
-const hypothesisTestGroupEl = document.getElementById("hypothesisTestGroup");
 const hypothesisVariantRowEl = document.getElementById("hypothesisVariantRow");
-const hypothesisGroupRowEl = document.getElementById("hypothesisGroupRow");
 const hypothesisSummaryEl = document.getElementById("hypothesisSummary");
 
 const formats = ["HERO", "BA", "TEST", "FEAT", "UGC"];
@@ -27,7 +25,7 @@ let selectedLanguageMode = "ALL";
 let modelsByProvider = {};
 let runsData = [];
 let currentRunIndex = 0;
-let hypothesisConfig = { type: "none", variant: "", test_group: "all" };
+let hypothesisConfig = { type: "none", variant: "" };
 let currentServerType = "opencode";
 
 function setSelectOptions(selectEl, values, selectedValue) {
@@ -145,9 +143,7 @@ function renderLanguageModes() {
 function renderHypothesisUI() {
   if (!hypothesisTypeEl || !defaultData) return;
   const vars = defaultData.hypothesis?.variables || {};
-  const groups = defaultData.hypothesis?.test_groups || [];
 
-  // Populate hypothesis type dropdown
   hypothesisTypeEl.innerHTML = "";
   Object.entries(vars).forEach(([key, defn]) => {
     const opt = document.createElement("option");
@@ -156,18 +152,6 @@ function renderHypothesisUI() {
     if (hypothesisConfig.type === key) opt.selected = true;
     hypothesisTypeEl.appendChild(opt);
   });
-
-  // Populate test groups
-  if (hypothesisTestGroupEl) {
-    hypothesisTestGroupEl.innerHTML = "";
-    groups.forEach((g) => {
-      const opt = document.createElement("option");
-      opt.value = g.id;
-      opt.textContent = g.label;
-      if (hypothesisConfig.test_group === g.id) opt.selected = true;
-      hypothesisTestGroupEl.appendChild(opt);
-    });
-  }
 
   updateHypothesisVariantOptions();
   updateHypothesisSummary();
@@ -181,12 +165,10 @@ function updateHypothesisVariantOptions() {
 
   if (!defn || !defn.options || defn.options.length === 0) {
     hypothesisVariantRowEl?.classList.add("hidden");
-    hypothesisGroupRowEl?.classList.add("hidden");
     return;
   }
 
   hypothesisVariantRowEl?.classList.remove("hidden");
-  hypothesisGroupRowEl?.classList.remove("hidden");
 
   hypothesisVariantEl.innerHTML = "";
   defn.options.forEach((opt) => {
@@ -205,25 +187,22 @@ function updateHypothesisSummary() {
   const defn = vars[type];
 
   if (!defn || type === "none") {
-    hypothesisSummaryEl.textContent = "No hypothesis test active. Ads will generate normally.";
+    hypothesisSummaryEl.textContent = "No hypothesis style selected. Ads will generate normally.";
     return;
   }
 
   const variant = hypothesisVariantEl.value;
-  const group = hypothesisTestGroupEl.value;
   const variantLabel = defn.options?.find((o) => o.id === variant)?.label || variant;
-  const groupLabel = defaultData.hypothesis?.test_groups?.find((g) => g.id === group)?.label || group;
 
-  hypothesisSummaryEl.textContent = `Testing: ${defn.label}. Variant: ${variantLabel}. Group: ${groupLabel}.`;
+  hypothesisSummaryEl.textContent = `Style: ${defn.label} - ${variantLabel}`;
 }
 
 function getHypothesisConfig() {
   const type = hypothesisTypeEl?.value || "none";
-  if (type === "none") return { type: "none", variant: "", test_group: "all" };
+  if (type === "none") return { type: "none", variant: "" };
   return {
     type,
     variant: hypothesisVariantEl?.value || "",
-    test_group: hypothesisTestGroupEl?.value || "all",
   };
 }
 
@@ -443,25 +422,177 @@ function renderRun(run) {
 
       const controls = document.createElement("div");
       controls.className = "prompt-controls";
+
       const selectAllBtn = document.createElement("button");
       selectAllBtn.type = "button";
       selectAllBtn.textContent = "Select all";
+
       const clearBtn = document.createElement("button");
       clearBtn.type = "button";
       clearBtn.textContent = "Clear selection";
+
       const saveBtn = document.createElement("button");
       saveBtn.type = "button";
       saveBtn.textContent = "Save edited copy";
+
+      const exportCopyBtn = document.createElement("button");
+      exportCopyBtn.type = "button";
+      exportCopyBtn.textContent = "EXPORT ON-IMAGE COPY";
+
+      const importCopyBtn = document.createElement("button");
+      importCopyBtn.type = "button";
+      importCopyBtn.textContent = "IMPORT EXCEL & UPDATE PROMPTS";
+
+      const importFileEl = document.createElement("input");
+      importFileEl.type = "file";
+      importFileEl.accept = ".xlsx";
+      importFileEl.style.display = "none";
+
+      exportCopyBtn.onclick = async () => {
+        exportCopyBtn.disabled = true;
+        try {
+          setStatus(`Exporting EXACT ON-IMAGE COPY to XLSX for ${run.run_id}...`);
+          const res = await fetch(`/api/runs/${run.run_id}/export-on-image-copy`);
+          if (!res.ok) {
+            const txt = await res.text();
+            setStatus(`Export failed: ${txt || res.statusText}`);
+            return;
+          }
+          const blob = await res.blob();
+          const url = URL.createObjectURL(blob);
+          const a = document.createElement("a");
+          a.href = url;
+          const contentDisposition = res.headers.get("Content-Disposition");
+          const fnMatch = contentDisposition && contentDisposition.match(/filename="([^"]+)"/);
+          const suggestedName = fnMatch ? fnMatch[1] : `on-image-copy-${run.run_id}.xlsx`;
+          a.download = suggestedName;
+          document.body.appendChild(a);
+          a.click();
+          a.remove();
+          URL.revokeObjectURL(url);
+          setStatus(`Export ready: ${run.run_id}`);
+        } catch (err) {
+          setStatus(String(err));
+        } finally {
+          exportCopyBtn.disabled = false;
+        }
+      };
+
+      importCopyBtn.onclick = () => {
+        importFileEl.click();
+      };
+
+      importFileEl.onchange = async () => {
+        const file = importFileEl.files && importFileEl.files[0];
+        if (!file) return;
+
+        const previewEl = document.createElement("pre");
+        previewEl.className = "status";
+        previewEl.style.marginTop = "10px";
+
+        importCopyBtn.disabled = true;
+        try {
+          setStatus("Importing XLSX and generating preview...");
+          const fd = new FormData();
+          fd.append("file", file);
+          fd.append("confirm", "false");
+
+          const res = await fetch(`/api/runs/${run.run_id}/import-on-image-copy`, {
+            method: "POST",
+            body: fd,
+          });
+
+          const raw = await res.text();
+          let data = null;
+          try {
+            data = raw ? JSON.parse(raw) : {};
+          } catch {
+            data = { detail: raw };
+          }
+
+          if (!res.ok) {
+            setStatus(`Import validation failed`);
+            previewEl.textContent = JSON.stringify(data.detail || data, null, 2);
+            promptActions.appendChild(previewEl);
+            return;
+          }
+
+          previewEl.textContent =
+            `Preview ready for ${data.changed_rows_count} rows (skipped ${data.skipped_rows}):\n` +
+            (data.items || [])
+              .slice(0, 30)
+              .map((x) => `- ${x.prompt_id}: ${x.old_copy} => ${x.new_copy}`)
+              .join("\n") +
+            ((data.items || []).length > 30 ? `\n... (${(data.items || []).length - 30} more)` : "");
+
+          promptActions.appendChild(previewEl);
+
+          const ok = window.confirm(
+            `Preview generated.\nApply changes for ${data.changed_rows_count} rows?\n(Any row skipped/missing exact block will not be modified.)`
+          );
+
+          if (!ok) {
+            setStatus("Import canceled (no overwrite applied).");
+            return;
+          }
+
+          setStatus("Applying XLSX changes (exact-block overwrite only)...");
+          const fd2 = new FormData();
+          fd2.append("file", file);
+          fd2.append("confirm", "true");
+
+          const res2 = await fetch(`/api/runs/${run.run_id}/import-on-image-copy`, {
+            method: "POST",
+            body: fd2,
+          });
+
+          const raw2 = await res2.text();
+          let data2 = null;
+          try {
+            data2 = raw2 ? JSON.parse(raw2) : {};
+          } catch {
+            data2 = { detail: raw2 };
+          }
+
+          if (!res2.ok) {
+            setStatus("Import apply failed.");
+            previewEl.textContent = JSON.stringify(data2.detail || data2, null, 2);
+            return;
+          }
+
+          setStatus(`Import applied. Updated ${data2.changed_rows_count} rows. Skipped ${data2.skipped_rows}.`);
+          await loadRuns();
+        } catch (err) {
+          setStatus(String(err));
+        } finally {
+          importCopyBtn.disabled = false;
+          importFileEl.value = "";
+        }
+      };
+
       const generate916PromptBtn = document.createElement("button");
       generate916PromptBtn.type = "button";
       generate916PromptBtn.textContent = "Generate 9:16 prompts for selected";
+
       const generate45Btn = document.createElement("button");
       generate45Btn.type = "button";
       generate45Btn.textContent = "Generate 4:5 in Gemini";
+
       const generate916Btn = document.createElement("button");
       generate916Btn.type = "button";
       generate916Btn.textContent = "Generate 9:16 in Gemini from 4:5 images";
-      controls.append(selectAllBtn, clearBtn, saveBtn, generate916PromptBtn, generate45Btn, generate916Btn);
+
+      controls.append(
+        selectAllBtn,
+        clearBtn,
+        saveBtn,
+        exportCopyBtn,
+        importCopyBtn,
+        generate916PromptBtn,
+        generate45Btn,
+        generate916Btn
+      );
+
       promptActions.appendChild(controls);
 
       const editorList = document.createElement("div");
@@ -765,10 +896,6 @@ if (hypothesisTypeEl) {
 
 if (hypothesisVariantEl) {
   hypothesisVariantEl.addEventListener("change", updateHypothesisSummary);
-}
-
-if (hypothesisTestGroupEl) {
-  hypothesisTestGroupEl.addEventListener("change", updateHypothesisSummary);
 }
 
 initTheme();

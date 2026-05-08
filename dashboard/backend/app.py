@@ -20,6 +20,7 @@ from pathlib import Path
 from typing import Any
 
 from fastapi import Body, FastAPI, File, Form, HTTPException, UploadFile
+from fastapi.responses import StreamingResponse
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.staticfiles import StaticFiles
 
@@ -333,12 +334,7 @@ HYPOTHESIS_VARIABLES: dict[str, dict[str, Any]] = {
     },
 }
 
-TEST_GROUPS = [
-    {"id": "control", "label": "Control"},
-    {"id": "variant_a", "label": "Variant A"},
-    {"id": "variant_b", "label": "Variant B"},
-    {"id": "all", "label": "Generate All"},
-]
+
 
 
 def resolve_language_mode(config: dict[str, Any]) -> str:
@@ -2498,6 +2494,12 @@ def parse_persona_number_from_prompt(prompt_text: str) -> int | None:
 
 
 def extract_on_image_copy_lines(prompt_text: str) -> list[dict[str, str]]:
+    """
+    Legacy-ish extractor used by the dashboard editor.
+
+    It DOES NOT preserve exact spacing/linebreaks; it trims lines into {label,value}.
+    Keep this for backward compatibility.
+    """
     block = re.search(
         r"EXACT ON-IMAGE COPY - DO NOT ALTER ANYTHING\s*\n(.+?)\n\s*Render every character exactly as written",
         prompt_text,
@@ -2516,6 +2518,36 @@ def extract_on_image_copy_lines(prompt_text: str) -> list[dict[str, str]]:
             continue
         out.append({"label": parsed.group(1).strip(), "value": parsed.group(2).strip()})
     return out
+
+
+def extract_exact_on_image_copy_block(prompt_text: str, *, warn_log_path: Path | None = None) -> str | None:
+    """
+    Task 5: Extract ONLY the content inside:
+      EXACT ON-IMAGE COPY - DO NOT ALTER ANYTHING
+      ...
+      Render every character exactly as written
+
+    Rules:
+    - preserve exact text including punctuation/case/spacing/line breaks
+    - no normalization (no strip, no join)
+    - if block missing: optionally log warning; return None
+    """
+    pattern = (
+        r"EXACT ON-IMAGE COPY - DO NOT ALTER ANYTHING\s*\n"
+        r"(?P<block>.+?)\n\s*Render every character exactly as written"
+    )
+    m = re.search(pattern, prompt_text, flags=re.DOTALL)
+    if not m:
+        if warn_log_path is not None:
+            warn_log_path.parent.mkdir(parents=True, exist_ok=True)
+            warn_log_path.write_text(
+                "WARNING: EXACT ON-IMAGE COPY block missing; skipping this prompt.\n",
+                encoding="utf-8",
+            )
+        return None
+
+    # Return exactly what was captured: no strip().
+    return m.group("block")
 
 
 def load_run_language_mode(run_dir: Path) -> str:
@@ -2702,10 +2734,9 @@ def resolve_format_plan(config: dict[str, Any]) -> list[dict[str, Any]]:
 
 
 def expand_plan_with_hypothesis(plan: list[dict[str, Any]], hypothesis_cfg: dict[str, Any]) -> list[dict[str, Any]]:
-    """Expand ad plan to include hypothesis test variants.
+    """Expand ad plan to include hypothesis style.
 
-    When a hypothesis is active, generates controlled variants where only the
-    hypothesis variable changes. Each variant is tagged with hypothesis metadata.
+    When a hypothesis is active, generates ads using that specific style/variant.
     """
     hyp_type = str(hypothesis_cfg.get("type") or "none").strip().lower()
     if hyp_type == "none" or hyp_type not in HYPOTHESIS_VARIABLES:
@@ -2713,41 +2744,24 @@ def expand_plan_with_hypothesis(plan: list[dict[str, Any]], hypothesis_cfg: dict
 
     variable_def = HYPOTHESIS_VARIABLES[hyp_type]
     selected_variant = str(hypothesis_cfg.get("variant") or "").strip()
-    test_group = str(hypothesis_cfg.get("test_group") or "all").strip()
     available_options = [opt["id"] for opt in variable_def.get("options", [])]
 
     if not available_options:
         return plan
 
-    # Determine which variants to generate
-    variants_to_generate: list[str] = []
-    if selected_variant and selected_variant in available_options:
-        # Single variant test: control (first option) vs selected variant
-        if test_group in ("control", "all"):
-            variants_to_generate.append(available_options[0])
-        if test_group in ("variant_a", "variant_b", "all"):
-            variants_to_generate.append(selected_variant)
-    else:
-        # No specific variant selected — test all options
-        if test_group == "control":
-            variants_to_generate = [available_options[0]]
-        elif test_group == "all":
-            variants_to_generate = available_options[:3]  # cap at 3 to avoid explosion
-        else:
-            variants_to_generate = available_options[:2]  # default: first two
+    # Use the selected variant if valid, otherwise use first available
+    variant_to_use = selected_variant if selected_variant in available_options else available_options[0]
 
     out: list[dict[str, Any]] = []
     for item in plan:
-        for variant in variants_to_generate:
-            entry = dict(item)
-            entry["hypothesis"] = {
-                "type": hyp_type,
-                "variable_label": variable_def["label"],
-                "variant": variant,
-                "test_group": "control" if variant == available_options[0] else (test_group if test_group in {"variant_a", "variant_b"} else "variant"),
-                "hypothesis_id": f"{hyp_type}-{variant}",
-            }
-            out.append(entry)
+        entry = dict(item)
+        entry["hypothesis"] = {
+            "type": hyp_type,
+            "variable_label": variable_def["label"],
+            "variant": variant_to_use,
+            "hypothesis_id": f"{hyp_type}-{variant_to_use}",
+        }
+        out.append(entry)
     return out
 
 
@@ -2786,8 +2800,7 @@ def api_defaults() -> dict[str, Any]:
         "opencode": opencode,
         "hypothesis": {
             "variables": HYPOTHESIS_VARIABLES,
-            "test_groups": TEST_GROUPS,
-            "default": {"type": "none", "variant": "", "test_group": "all"},
+            "default": {"type": "none", "variant": ""},
         },
     }
 
@@ -3001,6 +3014,16 @@ def api_run_update_prompt_copies(run_id: str, payload: dict[str, Any] = Body(...
     copy_path.write_text(json.dumps(copy_json, ensure_ascii=False, indent=2) + "\n", encoding="utf-8")
     rerender_prompts_for_run(run_dir, batch, copy_path, load_run_language_mode(run_dir))
 
+    _append_audit_log(
+        run_dir,
+        "prompt_updates",
+        {
+            "run_id": run_id,
+            "batch": batch,
+            "updated_count": updated_count,
+        },
+    )
+
     has_916 = any("/96/" in str(path) for path in (manifest.get("prompt_files") or []))
     if has_916:
         manifest = generate_916_for_run(run_dir, manifest)
@@ -3009,6 +3032,394 @@ def api_run_update_prompt_copies(run_id: str, payload: dict[str, Any] = Body(...
     refreshed["copy_edits_applied"] = updated_count
     merged = merge_manifest(run_dir, manifest, refreshed)
     return merged
+
+
+# ──────────────────────────────────────────────────────────────────────────────
+# Task 6/7/8: Export/Import on-image copy (EXACT ON-IMAGE COPY block)
+# ──────────────────────────────────────────────────────────────────────────────
+
+EXACT_COPY_SHEET_COLUMNS = [
+    "prompt_id",
+    "vn",
+    "hypothesis_id",
+    "hypothesis_name",
+    "persona",
+    "angle",
+    "headline_copy",
+    "exact_on_image_copy_block",
+    "created_at",
+]
+
+EXACT_COPY_BLOCK_FULL_RE = re.compile(
+    r"EXACT ON-IMAGE COPY - DO NOT ALTER ANYTHING\s*\n(?P<block>.+?)\n\s*Render every character exactly as written",
+    flags=re.DOTALL,
+)
+
+
+def _extract_vn_from_prompt_rel_path(prompt_rel_path: str) -> str:
+    # Expected pattern: output/v{N}/...
+    # Keep backward compatible: if not found, return empty string.
+    m = re.search(r"/output/(v\d+)(/|$)", prompt_rel_path.replace("\\", "/"))
+    return m.group(1) if m else ""
+
+
+def _extract_created_at_iso_from_file(file_path: Path) -> str:
+    try:
+        ts = file_path.stat().st_mtime
+        return datetime.fromtimestamp(ts, tz=timezone.utc).replace(microsecond=0).isoformat().replace("+00:00", "Z")
+    except Exception:
+        return ""
+
+
+def _parse_exact_block_headline_value(block_text: str) -> str | None:
+    """
+    Preserve EXACT headline value text as written in the exact block.
+
+    We intentionally do NOT trim/normalize:
+    - keep any spaces immediately after the colon
+    - keep punctuation/case/capitalization
+    """
+    for raw_line in (block_text or "").splitlines():
+        # Allow optional whitespace before "-" and around "-", but preserve everything after "Headline:"
+        m = re.match(r"^\s*-\s*Headline:(.*)$", raw_line)
+        if not m:
+            continue
+        return m.group(1)
+    return None
+
+
+def _replace_exact_copy_block(prompt_text: str, new_block_text: str) -> str | None:
+    m = EXACT_COPY_BLOCK_FULL_RE.search(prompt_text or "")
+    if not m:
+        return None
+    start_idx = m.start("block")
+    end_idx = m.end("block")
+    return (prompt_text[:start_idx] + new_block_text + prompt_text[end_idx:])
+
+
+def _load_run_prompt_files(run_id: str) -> list[str]:
+    run_dir = RUNS_ROOT / run_id
+    manifest_path = run_dir / "manifest.json"
+    if not manifest_path.exists():
+        raise HTTPException(status_code=404, detail="Run not found")
+    manifest = json.loads(manifest_path.read_text(encoding="utf-8"))
+    prompt_files_all = manifest.get("prompt_files") or []
+    # Export only 4:5 prompt copies (align with existing editor/generation selection)
+    prompt_files = [path for path in prompt_files_all if "/45/" in str(path)] or prompt_files_all
+    return prompt_files
+
+
+def _extract_prompt_row_metadata(run_id: str, copy_batch: dict[str, Any], prompt_rel_path: str, batch_vn: str = "") -> dict[str, Any]:
+    prompt_path = ROOT / prompt_rel_path
+    text = prompt_path.read_text(encoding="utf-8", errors="ignore")
+
+    block = extract_exact_on_image_copy_block(text)
+    headline_copy = None
+    exact_block = ""
+    if block is not None:
+        headline_copy = _parse_exact_block_headline_value(block)
+        exact_block = block.strip()
+    if headline_copy is None:
+        headline_copy = ""
+
+    vn = _extract_vn_from_prompt_rel_path(prompt_rel_path)
+    if not vn and batch_vn:
+        vn = batch_vn
+    created_at = _extract_created_at_iso_from_file(prompt_path)
+
+    parsed = parse_prompt_filename(prompt_rel_path)
+    fmt = parsed[0] if parsed else ""
+    persona_number = parsed[2] if parsed else None
+    if persona_number is None:
+        persona_number = parse_persona_number_from_prompt(text)
+
+    persona = ""
+    angle = ""
+    hypothesis_id = ""
+    hypothesis_name = ""
+
+    if isinstance(persona_number, int):
+        for ad in copy_batch.get("ads") or []:
+            if not isinstance(ad, dict):
+                continue
+            if str(ad.get("format") or "").strip().upper() != fmt:
+                continue
+            persona = ""
+            persona_obj = ad.get("persona")
+            if isinstance(persona_obj, dict):
+                if isinstance(persona_obj.get("number"), int) and int(persona_obj.get("number")) == persona_number:
+                    persona = str(persona_obj.get("persona_name") or persona_obj.get("name") or f"Persona {persona_number}")
+            if persona:
+                angle = str(ad.get("headline_angle") or ad.get("concept_angle") or "")
+                hyp = ad.get("hypothesis") if isinstance(ad.get("hypothesis"), dict) else {}
+                if hyp:
+                    hypothesis_id = str(hyp.get("hypothesis_id") or "")
+                    hypothesis_name = str(hyp.get("variant") or hyp.get("variable_label") or "")
+                break
+
+    return {
+        "prompt_id": prompt_rel_path,
+        "vn": vn,
+        "hypothesis_id": hypothesis_id,
+        "hypothesis_name": hypothesis_name,
+        "persona": persona,
+        "angle": angle,
+        "headline_copy": headline_copy,
+        "exact_on_image_copy_block": exact_block,
+        "created_at": created_at,
+    }
+
+
+def _append_audit_log(run_dir: Path, event_type: str, payload: dict[str, Any]) -> None:
+    audit_dir = run_dir / "audit"
+    audit_dir.mkdir(parents=True, exist_ok=True)
+    path = audit_dir / "audit_log.jsonl"
+    entry = {"ts": now_iso(), "event_type": event_type, "payload": payload}
+    with path.open("a", encoding="utf-8") as f:
+        f.write(json.dumps(entry, ensure_ascii=False) + "\n")
+
+
+@app.get("/api/runs/{run_id}/export-on-image-copy")
+def api_export_on_image_copy(run_id: str) -> StreamingResponse:
+    from openpyxl import Workbook
+    import io
+
+    run_dir = RUNS_ROOT / run_id
+    manifest_path = run_dir / "manifest.json"
+    if not manifest_path.exists():
+        raise HTTPException(status_code=404, detail="Run not found")
+
+    manifest = json.loads(manifest_path.read_text(encoding="utf-8"))
+
+    copy_path = run_dir / "context" / "copy_batch.json"
+    if not copy_path.exists():
+        raise HTTPException(status_code=404, detail="copy_batch.json not found for run")
+
+    copy_batch = json.loads(copy_path.read_text(encoding="utf-8"))
+
+    prompt_files = _load_run_prompt_files(run_id)
+
+    unique_vns = set()
+    for rel in prompt_files:
+        prompt_rel_path = str(rel).replace("\\", "/")
+        vn = _extract_vn_from_prompt_rel_path(prompt_rel_path)
+        if vn:
+            unique_vns.add(vn)
+
+    batch = manifest.get("batch", "")
+
+    if not unique_vns:
+        if batch and batch.startswith("v"):
+            unique_vns.add(batch)
+
+    if unique_vns:
+        vn_suffix = "-".join(sorted(unique_vns))
+    else:
+        vn_suffix = None
+
+    wb = Workbook()
+    ws = wb.active
+    ws.title = "on-image-copy"
+
+    ws.append(EXACT_COPY_SHEET_COLUMNS)
+    for rel in prompt_files:
+        prompt_rel_path = str(rel).replace("\\", "/")
+        if not (ROOT / prompt_rel_path).exists():
+            continue
+        row = _extract_prompt_row_metadata(run_id, copy_batch, prompt_rel_path, batch)
+        ws.append([row.get(col, "") for col in EXACT_COPY_SHEET_COLUMNS])
+
+    buf = io.BytesIO()
+    wb.save(buf)
+    buf.seek(0)
+
+    _append_audit_log(run_dir, "export_on_image_copy", {"run_id": run_id, "prompt_rows": len(prompt_files)})
+
+    if vn_suffix:
+        filename = f"on-image-copy-{vn_suffix}.xlsx"
+    else:
+        filename = f"on-image-copy-{run_id}.xlsx"
+
+    return StreamingResponse(
+        buf,
+        media_type="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+        headers={"Content-Disposition": f'attachment; filename="{filename}"'},
+    )
+
+
+@app.post("/api/runs/{run_id}/import-on-image-copy")
+async def api_import_on_image_copy(
+    run_id: str,
+    file: UploadFile = File(...),
+    confirm: bool = Form(False),
+) -> dict[str, Any]:
+    from openpyxl import load_workbook
+
+    run_dir = RUNS_ROOT / run_id
+    manifest_path = run_dir / "manifest.json"
+    if not manifest_path.exists():
+        raise HTTPException(status_code=404, detail="Run not found")
+
+    copy_path = run_dir / "context" / "copy_batch.json"
+    if not copy_path.exists():
+        raise HTTPException(status_code=404, detail="copy_batch.json not found for run")
+
+    # Parse xlsx (no prompt regeneration; only exact-block replacement)
+    if not file.filename:
+        raise HTTPException(status_code=400, detail="Missing upload filename")
+
+    content = await file.read()
+    if not content:
+        raise HTTPException(status_code=400, detail="Empty upload")
+
+    tmp_path = run_dir / "imports" / f"upload-{int(time.time())}-{file.filename}"
+    tmp_path.parent.mkdir(parents=True, exist_ok=True)
+    tmp_path.write_bytes(content)
+
+    wb = load_workbook(tmp_path)
+    ws = wb.active
+
+    # Build column index
+    header = [str(cell.value or "").strip() for cell in next(ws.iter_rows(min_row=1, max_row=1))]
+    col_idx = {name: i for i, name in enumerate(header) if name}
+    missing_cols = [c for c in EXACT_COPY_SHEET_COLUMNS if c not in col_idx]
+    if missing_cols:
+        raise HTTPException(status_code=400, detail=f"Missing required columns: {missing_cols}")
+
+    seen_prompt_ids: set[str] = set()
+    rows: list[dict[str, Any]] = []
+    errors: list[dict[str, Any]] = []
+
+    for excel_row in ws.iter_rows(min_row=2):
+        values = [cell.value for cell in excel_row]
+        prompt_id = str(values[col_idx["prompt_id"]] or "").replace("\\", "/").strip()
+        if not prompt_id:
+            continue
+        if prompt_id in seen_prompt_ids:
+            errors.append({"prompt_id": prompt_id, "error": "duplicate_prompt_id"})
+            continue
+        seen_prompt_ids.add(prompt_id)
+
+        headline_copy = str(values[col_idx["headline_copy"]] or "").strip()
+        full_block = str(values[col_idx.get("exact_on_image_copy_block", -1)] or "").strip() if "exact_on_image_copy_block" in col_idx else ""
+
+        if not headline_copy.strip() and not full_block:
+            errors.append({"prompt_id": prompt_id, "error": "empty_headline_copy_and_block"})
+            continue
+
+        rows.append(
+            {
+                "prompt_id": prompt_id,
+                "headline_copy": headline_copy,
+                "full_block": full_block,
+            }
+        )
+
+    # Validate prompt_id exists
+    for r in rows:
+        p = ROOT / r["prompt_id"]
+        if not p.exists() or not p.is_file():
+            errors.append({"prompt_id": r["prompt_id"], "error": "prompt_id_not_found"})
+    if errors:
+        _append_audit_log(run_dir, "import_on_image_copy_validation_failed", {"run_id": run_id, "errors": errors, "confirm": confirm})
+        raise HTTPException(status_code=400, detail={"validation_errors": errors})
+
+    # Preview diffs
+    preview_items: list[dict[str, Any]] = []
+    applied_count = 0
+    skipped_count = 0
+
+    for r in rows:
+        prompt_rel_path = r["prompt_id"]
+        prompt_path = ROOT / prompt_rel_path
+        old_text = prompt_path.read_text(encoding="utf-8", errors="ignore")
+
+        old_block = extract_exact_on_image_copy_block(old_text, warn_log_path=None)
+        if old_block is None:
+            skipped_count += 1
+            preview_items.append({"prompt_id": prompt_rel_path, "status": "skipped_missing_exact_block"})
+            continue
+
+        full_block = r.get("full_block", "")
+        new_block = None
+
+        if full_block:
+            new_block = full_block
+            old_copy = old_block.strip()
+            new_copy = new_block.strip()
+        else:
+            headline_copy = r.get("headline_copy", "")
+            new_lines: list[str] = []
+            headline_replaced = False
+            for line in old_block.splitlines():
+                m = re.match(r"^(\s*-\s*Headline:)(.*)$", line)
+                if m:
+                    new_lines.append(m.group(1) + headline_copy)
+                    headline_replaced = True
+                else:
+                    new_lines.append(line)
+
+            if not headline_replaced:
+                skipped_count += 1
+                preview_items.append({"prompt_id": prompt_rel_path, "status": "skipped_headline_line_not_found"})
+                continue
+
+            new_block = "\n".join(new_lines)
+            old_copy = _parse_exact_block_headline_value(old_block) or ""
+            new_copy = _parse_exact_block_headline_value(new_block) or ""
+
+        preview_items.append(
+            {
+                "prompt_id": prompt_rel_path,
+                "status": "ready_to_apply" if confirm else "preview",
+                "old_copy": old_copy[:100] + "..." if len(old_copy) > 100 else old_copy,
+                "new_copy": new_copy[:100] + "..." if len(new_copy) > 100 else new_copy,
+            }
+        )
+
+        if confirm:
+            updated_text = _replace_exact_copy_block(old_text, new_block)
+            if updated_text is None:
+                skipped_count += 1
+                preview_items[-1]["status"] = "skipped_replace_failed"
+                continue
+            prompt_path.write_text(updated_text, encoding="utf-8")
+            applied_count += 1
+
+    _append_audit_log(
+        run_dir,
+        "import_on_image_copy",
+        {"run_id": run_id, "confirm": confirm, "rows": len(rows), "applied": applied_count, "skipped": skipped_count},
+    )
+
+    if not confirm:
+        return {
+            "run_id": run_id,
+            "preview": True,
+            "changed_rows_count": applied_count,
+            "skipped_rows": skipped_count,
+            "failed_rows": len(errors),
+            "items": preview_items,
+        }
+
+    # Re-assemble prompts side-effects: since we directly edited prompt text,
+    # we do not mutate copy_batch.json metadata (per requirements).
+    # However, manifest/prompt_files state should be refreshed.
+    manifest = json.loads((run_dir / "manifest.json").read_text(encoding="utf-8"))
+    batch = (manifest.get("batch") or "").strip()
+    refreshed = collect_run_result(run_dir, batch, bool(manifest.get("image_generated", False)))
+    refreshed["on_image_copy_import_applied"] = applied_count
+    merged = merge_manifest(run_dir, manifest, refreshed)
+
+    return {
+        "run_id": run_id,
+        "preview": False,
+        "changed_rows_count": applied_count,
+        "skipped_rows": skipped_count,
+        "failed_rows": len(errors),
+        "items": preview_items,
+        "manifest": merged,
+    }
 
 
 @app.post("/api/runs/{run_id}/generate-916")
