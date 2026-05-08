@@ -3628,6 +3628,167 @@ def api_run_generate_images_916_from_45(run_id: str, payload: dict[str, Any] = B
     return merged
 
 
+@app.post("/api/batch/generate-images-45")
+def api_batch_generate_images_45(payload: dict[str, Any] = Body(...)) -> dict[str, Any]:
+    run_ids = payload.get("run_ids")
+    if not isinstance(run_ids, list) or not run_ids:
+        raise HTTPException(status_code=400, detail="run_ids must be a non-empty array")
+
+    all_prompt_files: list[str] = []
+    run_info: list[dict[str, Any]] = []
+
+    for run_id in run_ids:
+        run_dir = RUNS_ROOT / run_id
+        manifest_path = run_dir / "manifest.json"
+        if not manifest_path.exists():
+            continue
+        manifest = json.loads(manifest_path.read_text(encoding="utf-8"))
+        batch = str(manifest.get("batch") or "").strip()
+        if not batch:
+            continue
+        prompt_files_all = manifest.get("prompt_files") or []
+        prompt_files_45 = [path for path in prompt_files_all if "/45/" in str(path)]
+        if not prompt_files_45:
+            continue
+        all_prompt_files.extend(prompt_files_45)
+        run_info.append({
+            "run_id": run_id,
+            "batch": batch,
+            "prompt_count": len(prompt_files_45),
+        })
+
+    if not all_prompt_files:
+        raise HTTPException(status_code=400, detail="No 4:5 prompt files found for any run")
+
+    batch_str = f"batch_{int(time.time())}_{uuid.uuid4().hex[:8]}"
+    try:
+        result = run_gemini_generation(
+            batch=batch_str,
+            prompt_files=all_prompt_files,
+            aspect_ratio="4:5",
+            image_sources_file=None,
+        )
+    except RuntimeError as exc:
+        raise HTTPException(status_code=400, detail=str(exc)) from exc
+
+    if result.returncode != 0:
+        error_text = result.stderr or result.stdout
+        raise HTTPException(status_code=500, detail=f"Batch 4:5 generation failed: {error_text[:500]}")
+
+    return {
+        "status": "completed",
+        "batch_key": batch_str,
+        "total_prompts": len(all_prompt_files),
+        "runs": run_info,
+    }
+
+
+@app.post("/api/batch/generate-images-916")
+def api_batch_generate_images_916(payload: dict[str, Any] = Body(...)) -> dict[str, Any]:
+    run_ids = payload.get("run_ids")
+    if not isinstance(run_ids, list) or not run_ids:
+        raise HTTPException(status_code=400, detail="run_ids must be a non-empty array")
+
+    persona_prompt_blocks: list[dict[str, Any]] = []
+
+    for run_id in run_ids:
+        run_dir = RUNS_ROOT / run_id
+        manifest_path = run_dir / "manifest.json"
+        if not manifest_path.exists():
+            continue
+        manifest = json.loads(manifest_path.read_text(encoding="utf-8"))
+        batch = str(manifest.get("batch") or "").strip()
+        if not batch:
+            continue
+        prompt_files_all = manifest.get("prompt_files") or []
+        prompt_files_45 = [path for path in prompt_files_all if "/45/" in str(path)]
+
+        for pf in prompt_files_45:
+            prompt_path = ROOT / pf
+            if not prompt_path.exists():
+                continue
+            prompt_text = prompt_path.read_text(encoding="utf-8", errors="ignore")
+            parsed = parse_prompt_filename(pf)
+            fmt = parsed[0] if parsed else ""
+            persona_num = parsed[2] if parsed else None
+
+            persona_input_block = extract_persona_input_block(prompt_text)
+            if persona_input_block:
+                persona_prompt_blocks.append({
+                    "run_id": run_id,
+                    "batch": batch,
+                    "prompt_file": pf,
+                    "format": fmt,
+                    "persona_number": persona_num,
+                    "persona_input_block": persona_input_block,
+                })
+
+    if not persona_prompt_blocks:
+        raise HTTPException(status_code=400, detail="No persona input blocks found for any run")
+
+    batch_str = f"batch_916_{int(time.time())}_{uuid.uuid4().hex[:8]}"
+    prompt_work_dir = RUNTIME_ROOT / "gemini_selected_prompts" / f"{batch_str}_9_16"
+    prompt_work_dir.mkdir(parents=True, exist_ok=True)
+
+    starting_prompt_path = ROOT / "input" / "startingprompt.txt"
+    starting_prompt = starting_prompt_path.read_text(encoding="utf-8").strip() if starting_prompt_path.exists() else ""
+
+    prompt_files_created: list[str] = []
+    for idx, block in enumerate(persona_prompt_blocks):
+        persona_block = block.get("persona_input_block", "")
+        combined = f"{starting_prompt}\n\n{persona_block.strip()}\n" if starting_prompt else persona_block
+        output_name = f"FINAL_OUTPUT_{block.get('format', 'AD')}_P{block.get('persona_number', 1):02d}_EN.txt"
+        output_path = prompt_work_dir / output_name
+        output_path.write_text(combined, encoding="utf-8")
+        prompt_files_created.append(str(output_path))
+
+    out_dir = LEGACY_GENERATED_IMAGE_ROOT / batch_str / "GEMINI_9_16"
+    debugger_args = gemini_debugger_args()
+    cmd = [
+        sys.executable,
+        "scripts/gemini_web_automation.py",
+        "--prompt-dir",
+        str(prompt_work_dir),
+        "--prompt-glob",
+        "*.txt",
+        "--out-dir",
+        str(out_dir),
+        "--timeout",
+        str(int(os.getenv("GEMINI_GENERATION_TIMEOUT_SECONDS") or "420")),
+        "--manual-login-timeout",
+        str(int(os.getenv("GEMINI_MANUAL_LOGIN_TIMEOUT_SECONDS") or "180")),
+        "--browser",
+        "chrome",
+        "--upload-dir",
+        str(INPUT_IMAGES_DIR),
+        *debugger_args,
+    ]
+
+    result = run_cmd(cmd, cwd=ROOT)
+    if result.returncode != 0:
+        error_text = result.stderr or result.stdout
+        raise HTTPException(status_code=500, detail=f"Batch 9:16 generation failed: {error_text[:500]}")
+
+    return {
+        "status": "completed",
+        "batch_key": batch_str,
+        "total_prompts": len(prompt_files_created),
+        "run_count": len(run_ids),
+    }
+
+
+def extract_persona_input_block(prompt_text: str) -> str:
+    markers = ["EXACT ON-IMAGE COPY", "PERSONA INPUT", "PERSONA:", "INPUT:"]
+    for marker in markers:
+        if marker in prompt_text.upper():
+            start = prompt_text.upper().find(marker)
+            if start != -1:
+                return prompt_text[start:].strip()
+    if len(prompt_text) > 50:
+        return prompt_text.strip()
+    return ""
+
+
 @app.get("/api/file-content")
 def api_file_content(path: str, max_lines: int = 400) -> dict[str, Any]:
     file_path = resolve_safe_path(path)

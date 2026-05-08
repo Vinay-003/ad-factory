@@ -92,11 +92,15 @@
       <h2>6) Latest Runs</h2>
       <div class="runs-toolbar">
         <button id="refreshRuns" class="ghost-btn" type="button">Refresh</button>
-        <div class="carousel-controls">
-          <button id="runPrev" class="carousel-btn" type="button" aria-label="Previous run">◀</button>
-          <span id="runIndex" class="run-index">0 / 0</span>
-          <button id="runNext" class="carousel-btn" type="button" aria-label="Next run">▶</button>
+        <div class="batch-dropdown" style="position: relative;">
+          <button id="batchDropdownBtn" class="ghost-btn" type="button">Select batch(es)</button>
+          <div id="batchDropdownMenu" class="dropdown-menu hidden"></div>
         </div>
+        <button id="batchGen45" class="ghost-btn" type="button">Generate 4:5</button>
+        <button id="batchGen916" class="ghost-btn" type="button">Generate 9:16</button>
+        <button id="runPrev" class="carousel-btn" type="button">◀</button>
+        <span id="runIndex" class="run-index">0 / 0</span>
+        <button id="runNext" class="carousel-btn" type="button">▶</button>
       </div>
       <div id="runs" class="runs-carousel"></div>
     </section>

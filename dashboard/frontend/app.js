@@ -841,12 +841,110 @@ function renderRunCarousel() {
   updateRunNav();
 }
 
+function getSelectedBatchValues() {
+  return Array.from(document.querySelectorAll(".batch-check:checked")).map((c) => c.value);
+}
+
+function updateBatchDropdownButtonLabel() {
+  const btn = document.getElementById("batchDropdownBtn");
+  if (!btn) return;
+
+  const selectedCount = getSelectedBatchValues().length;
+  btn.textContent = selectedCount ? `${selectedCount} batch(es) selected` : "Select batch(es)";
+}
+
+function closeBatchDropdown() {
+  const menu = document.getElementById("batchDropdownMenu");
+  const btn = document.getElementById("batchDropdownBtn");
+  if (menu && !menu.classList.contains("hidden")) menu.classList.add("hidden");
+  if (btn) btn.setAttribute("aria-expanded", "false");
+}
+
+function openBatchDropdown() {
+  const menu = document.getElementById("batchDropdownMenu");
+  const btn = document.getElementById("batchDropdownBtn");
+  if (menu) menu.classList.remove("hidden");
+  if (btn) btn.setAttribute("aria-expanded", "true");
+}
+
+let batchDropdownInitialized = false;
+
 async function loadRuns() {
   const res = await fetch("/api/runs");
   if (!res.ok) return;
   const data = await res.json();
   runsData = data.runs || [];
   currentRunIndex = 0;
+
+  const batchMenu = document.getElementById("batchDropdownMenu");
+  batchMenu.innerHTML = "";
+
+  const batches = new Set();
+  runsData.forEach((r) => {
+    if (r.batch) batches.add(r.batch);
+  });
+
+  const grid = document.createElement("div");
+  grid.className = "batch-grid";
+
+  Array.from(batches)
+    .sort()
+    .reverse()
+    .forEach((batch) => {
+      const item = document.createElement("div");
+      item.className = "batch-grid-item";
+
+      const cb = document.createElement("input");
+      cb.type = "checkbox";
+      cb.value = batch;
+      cb.className = "batch-check";
+
+      const labelSpan = document.createElement("span");
+      labelSpan.className = "batch-label";
+      labelSpan.textContent = batch;
+
+      cb.addEventListener("change", () => updateBatchDropdownButtonLabel());
+
+      item.append(cb, labelSpan);
+      grid.appendChild(item);
+    });
+
+  batchMenu.appendChild(grid);
+
+  // Initialize dropdown behaviors once
+  if (!batchDropdownInitialized) {
+    batchDropdownInitialized = true;
+
+    const dropdownRoot = document.querySelector(".batch-dropdown");
+    const btn = document.getElementById("batchDropdownBtn");
+
+    btn?.addEventListener("click", (e) => {
+      e.stopPropagation();
+      const menu = document.getElementById("batchDropdownMenu");
+      if (!menu) return;
+      if (menu.classList.contains("hidden")) openBatchDropdown();
+      else closeBatchDropdown();
+    });
+
+    document.addEventListener("click", (e) => {
+      const menu = document.getElementById("batchDropdownMenu");
+      if (!menu || menu.classList.contains("hidden")) return;
+
+      const target = e.target;
+      if (!(target instanceof Node)) return;
+
+      // Close if click is outside the batch dropdown widget
+      if (dropdownRoot && !dropdownRoot.contains(target)) closeBatchDropdown();
+    });
+
+    document.addEventListener("keydown", (e) => {
+      if (e.key === "Escape") closeBatchDropdown();
+    });
+  }
+
+  // Default label state: based on whatever is checked (probably none after refresh)
+  updateBatchDropdownButtonLabel();
+
   renderRunCarousel();
 }
 
@@ -856,6 +954,71 @@ document.getElementById("runBtn").addEventListener("click", () => {
 
 document.getElementById("refreshRuns").addEventListener("click", () => {
   loadRuns().catch(() => {});
+});
+
+
+document.getElementById("batchGen45").addEventListener("click", async () => {
+  const checks = document.querySelectorAll(".batch-check:checked");
+  const selectedBatches = Array.from(checks).map((c) => c.value);
+  if (!selectedBatches.length) {
+    setStatus("Select at least one batch.");
+    return;
+  }
+  const runsForBatches = runsData.filter((r) => selectedBatches.includes(r.batch));
+  if (!runsForBatches.length) {
+    setStatus("No runs found for selected batch(es).");
+    return;
+  }
+  const runIds = runsForBatches.map((r) => r.run_id);
+  setStatus(`Batch generating 4:5 for ${runIds.length} run(s)...`);
+  try {
+    const res = await fetch("/api/batch/generate-images-45", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ run_ids: runIds }),
+    });
+    const data = await res.json();
+    if (!res.ok) {
+      setStatus(`Failed: ${data.detail || "batch 4:5 error"}`);
+      return;
+    }
+    setStatus(`Done. Batch: ${data.batch_key}, Prompts: ${data.total_prompts}`);
+    await loadRuns();
+  } catch (err) {
+    setStatus(String(err));
+  }
+});
+
+document.getElementById("batchGen916").addEventListener("click", async () => {
+  const checks = document.querySelectorAll(".batch-check:checked");
+  const selectedBatches = Array.from(checks).map((c) => c.value);
+  if (!selectedBatches.length) {
+    setStatus("Select at least one batch.");
+    return;
+  }
+  const runsForBatches = runsData.filter((r) => selectedBatches.includes(r.batch));
+  if (!runsForBatches.length) {
+    setStatus("No runs found for selected batch(es).");
+    return;
+  }
+  const runIds = runsForBatches.map((r) => r.run_id);
+  setStatus(`Batch generating 9:16 for ${runIds.length} run(s) (no input images)...`);
+  try {
+    const res = await fetch("/api/batch/generate-images-916", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ run_ids: runIds }),
+    });
+    const data = await res.json();
+    if (!res.ok) {
+      setStatus(`Failed: ${data.detail || "batch 9:16 error"}`);
+      return;
+    }
+    setStatus(`Done. Batch: ${data.batch_key}, Prompts: ${data.total_prompts}`);
+    await loadRuns();
+  } catch (err) {
+    setStatus(String(err));
+  }
 });
 
 if (runPrevEl) {

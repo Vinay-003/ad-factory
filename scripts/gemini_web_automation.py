@@ -581,6 +581,115 @@ def _url_looks_like_old_conversation(url: str) -> bool:
     return path.startswith("/app/") and path != "/app"
 
 
+def trigger_new_chat_shortcut(driver: webdriver.Chrome, pause: float = 2.5) -> None:
+    """Trigger Gemini's Ctrl+Shift+O new-chat shortcut in the active tab."""
+    dismiss_open_overlays(driver)
+    body = driver.find_element(By.TAG_NAME, "body")
+    try:
+        body.click()
+    except Exception:
+        driver.execute_script("arguments[0].focus();", body)
+    time.sleep(0.25)
+    try:
+        ActionChains(driver).key_down(Keys.CONTROL).key_down(Keys.SHIFT).send_keys("o").key_up(Keys.SHIFT).key_up(Keys.CONTROL).perform()
+    except Exception:
+        # Fallback if ActionChains is flaky in the attached browser.
+        body.send_keys(Keys.CONTROL, Keys.SHIFT, "o")
+    time.sleep(pause)
+
+
+def composer_is_empty(driver: webdriver.Chrome) -> bool:
+    script = r"""
+        const nodes = Array.from(document.querySelectorAll(
+            'rich-textarea div[contenteditable="true"], div[contenteditable="true"], textarea'
+        ));
+        const visible = el => {
+            const r = el.getBoundingClientRect();
+            const s = getComputedStyle(el);
+            return r.width > 0 && r.height > 0 && s.display !== 'none' && s.visibility !== 'hidden';
+        };
+        for (const el of nodes) {
+            if (!visible(el)) continue;
+            const txt = (el.value || el.innerText || el.textContent || '').trim();
+            if (txt.length > 0) return false;
+        }
+        return true;
+    """
+    try:
+        return bool(driver.execute_script(script))
+    except Exception:
+        return False
+
+
+def page_has_existing_chat_content(driver: webdriver.Chrome) -> bool:
+    """True when the page already contains visible prior-turn content."""
+    script = r"""
+        function visible(el) {
+            const r = el.getBoundingClientRect();
+            const s = getComputedStyle(el);
+            return r.width > 0 && r.height > 0 && s.display !== 'none' && s.visibility !== 'hidden';
+        }
+        const main = document.querySelector('main') || document.body;
+        const responseSelectors = [
+            'model-response', '.model-response', '.response-container',
+            '[data-response-index]', '[data-chunk-index]', '[data-testid*="response"]',
+            '[class*="response"]', 'user-query', '.user-query', '[data-author="user"]'
+        ];
+        for (const sel of responseSelectors) {
+            for (const el of main.querySelectorAll(sel)) {
+                if (visible(el)) return true;
+            }
+        }
+        for (const img of main.querySelectorAll('img')) {
+            if (img.closest('rich-textarea, textarea, form, nav, [role="navigation"], header')) continue;
+            const r = img.getBoundingClientRect();
+            if (r.width > 120 && r.height > 120) return true;
+        }
+        return false;
+    """
+    try:
+        return bool(driver.execute_script(script))
+    except Exception:
+        return False
+
+
+def _chat_state_is_clean(driver: webdriver.Chrome) -> bool:
+    url = ""
+    try:
+        url = driver.current_url or ""
+    except Exception:
+        pass
+    if not _url_is_base_app(url):
+        return False
+    if _url_looks_temporary(url) or page_heading_looks_temporary(driver):
+        return False
+    try:
+        find_composer(driver, timeout=10)
+    except Exception:
+        return False
+    if not composer_is_empty(driver):
+        return False
+    if page_has_existing_chat_content(driver):
+        return False
+    return True
+
+
+def assert_fresh_url_immediately_before_send(driver: webdriver.Chrome) -> None:
+    """Final guard before Send: never submit unless the active tab URL is exactly /app."""
+    try:
+        url = driver.current_url or ""
+    except Exception:
+        url = ""
+    print(f"  [pre-send-url] Active URL immediately before Send: {url}")
+    assert_not_temporary_chat(driver)
+    if not _url_is_base_app(url):
+        raise RuntimeError(
+            "Pre-send fresh-chat URL guard failed. The active Gemini tab is not exactly /app, "
+            "so the script will NOT click Send into a possible old conversation. "
+            f"URL was: {url}"
+        )
+
+
 def _url_looks_temporary(url: str) -> bool:
     lower = (url or "").lower()
     return "temporary" in lower or "temp_chat" in lower or "tempchat" in lower
@@ -702,54 +811,76 @@ def open_prompt_tab(driver: webdriver.Chrome, job_index: int, first_tab_mode: st
 
 
 def navigate_to_fresh_chat(driver: webdriver.Chrome, manual_login_timeout: int, strict_login: bool) -> None:
-    """Navigate to a fresh Gemini chat without touching old chat rows."""
+    """Navigate to a guaranteed fresh Gemini chat.
+
+    Logic requested by the user:
+      1. Navigate to /app in the new tab.
+      2. If the URL contains anything after /app, trigger Ctrl+Shift+O.
+      3. Re-check the URL and page state.
+      4. Continue only if the tab is truly a clean new chat.
+      5. Otherwise retry; never upload into an old chat.
+    """
     last_url = ""
-    for attempt in range(1, 4):
-        print(f"  [fresh] Navigation attempt {attempt}: {GEMINI_URL}")
+    rounds = 4
+    for round_no in range(1, rounds + 1):
+        print(f"  [fresh] Round {round_no}/{rounds}: navigating to {GEMINI_URL}")
         try:
             driver.get(GEMINI_URL)
         except Exception as exc:
             print(f"  [fresh] driver.get raised: {exc}")
         wait_for_manual_login(driver, timeout=manual_login_timeout, strict=strict_login)
         dismiss_open_overlays(driver)
-        time.sleep(1.0)
+        time.sleep(1.5)
         try:
             last_url = driver.current_url or ""
         except Exception:
             last_url = ""
-        print(f"  [fresh] Current URL: {last_url}")
+        print(f"  [fresh] URL after get(): {last_url}")
         assert_not_temporary_chat(driver)
 
-        if _url_is_base_app(last_url):
-            find_composer(driver, timeout=30)
-            print("  [fresh] Fresh base /app chat confirmed.")
-            return
-
         if _url_looks_like_old_conversation(last_url):
-            print("  [fresh] Gemini redirected to an old conversation. Clicking only dedicated New chat.")
-            if click_dedicated_new_chat(driver):
-                time.sleep(2.0)
-                dismiss_open_overlays(driver)
-                try:
-                    last_url = driver.current_url or ""
-                except Exception:
-                    last_url = ""
-                assert_not_temporary_chat(driver)
-                if _url_is_base_app(last_url) or not _url_looks_like_old_conversation(last_url):
-                    find_composer(driver, timeout=30)
-                    print("  [fresh] New chat opened using dedicated New chat control.")
-                    return
-            print("  [fresh] Dedicated New chat did not produce a fresh page; retrying base URL.")
-            continue
+            print("  [fresh] Old conversation detected. Triggering Ctrl+Shift+O...")
+            try:
+                trigger_new_chat_shortcut(driver, pause=2.5)
+            except Exception as exc:
+                print(f"  [fresh] Shortcut error: {exc}")
+            dismiss_open_overlays(driver)
+            time.sleep(1.0)
+            try:
+                last_url = driver.current_url or ""
+            except Exception:
+                last_url = ""
+            print(f"  [fresh] URL after Ctrl+Shift+O: {last_url}")
+            assert_not_temporary_chat(driver)
 
-        try:
-            find_composer(driver, timeout=10)
-            print("  [fresh] Composer present on Gemini page; continuing.")
+        if _chat_state_is_clean(driver):
+            print("  [fresh] Clean fresh chat confirmed (URL=/app, empty composer, no old content).")
             return
-        except Exception:
-            pass
 
-    raise RuntimeError(f"Could not guarantee a fresh Gemini chat. Last URL: {last_url}")
+        if _url_is_base_app(last_url):
+            print("  [fresh] URL is /app but page still looks dirty. Triggering Ctrl+Shift+O and re-checking...")
+            try:
+                trigger_new_chat_shortcut(driver, pause=2.5)
+            except Exception as exc:
+                print(f"  [fresh] Shortcut error: {exc}")
+            dismiss_open_overlays(driver)
+            time.sleep(1.0)
+            try:
+                last_url = driver.current_url or ""
+            except Exception:
+                last_url = ""
+            print(f"  [fresh] URL after cleanup shortcut: {last_url}")
+            assert_not_temporary_chat(driver)
+            if _chat_state_is_clean(driver):
+                print("  [fresh] Clean fresh chat confirmed after Ctrl+Shift+O cleanup.")
+                return
+
+        print("  [fresh] Chat is still not clean. Retrying with a fresh /app navigation...")
+
+    raise RuntimeError(
+        "Could not guarantee a fresh Gemini chat after repeated /app + Ctrl+Shift+O checks. "
+        f"Final URL: {last_url}"
+    )
 
 
 # ---------------------------------------------------------------------------
@@ -2420,6 +2551,8 @@ def run() -> None:
 
                         baseline_srcs = get_all_image_srcs(driver)
                         print(f"  Baseline image src count before Send: {len(baseline_srcs)}")
+
+                        assert_fresh_url_immediately_before_send(driver)
 
                         print("  Sending prompt...")
                         click_send_and_confirm(
