@@ -887,27 +887,47 @@ async function loadRuns() {
   const grid = document.createElement("div");
   grid.className = "batch-grid";
 
-  Array.from(batches)
-    .sort()
-    .reverse()
-    .forEach((batch) => {
-      const item = document.createElement("div");
-      item.className = "batch-grid-item";
+  const batchList = Array.from(batches).sort().reverse();
+  // UX requirement: split the grid into halves (top/bottom).
+  // If odd count, add one more column (i.e., ceil(N/2) columns over 2 rows).
+  const num = batchList.length;
+  const rows = num <= 1 ? 1 : 2;
+  const cols = rows === 1 ? 1 : Math.ceil(num / 2);
 
-      const cb = document.createElement("input");
-      cb.type = "checkbox";
-      cb.value = batch;
-      cb.className = "batch-check";
+  grid.style.gridTemplateColumns = `repeat(${cols}, minmax(170px, 1fr))`;
+  grid.style.gridAutoRows = "auto";
+  grid.style.gridTemplateRows = `repeat(${rows}, auto)`;
 
-      const labelSpan = document.createElement("span");
-      labelSpan.className = "batch-label";
-      labelSpan.textContent = batch;
+  batchList.forEach((batch) => {
+    const item = document.createElement("div");
+    item.className = "batch-grid-item";
 
-      cb.addEventListener("change", () => updateBatchDropdownButtonLabel());
+    const cb = document.createElement("input");
+    cb.type = "checkbox";
+    cb.value = batch;
+    cb.className = "batch-check";
 
-      item.append(cb, labelSpan);
-      grid.appendChild(item);
+    const labelSpan = document.createElement("span");
+    labelSpan.className = "batch-label";
+    labelSpan.textContent = batch;
+
+    cb.addEventListener("change", () => updateBatchDropdownButtonLabel());
+
+    // UX: clicking the tile toggles checkbox (check/uncheck).
+    item.addEventListener("click", (event) => {
+      const target = event.target;
+      if (!(target instanceof Element)) return;
+
+      // If user directly clicks the checkbox, let default behavior + change event run.
+      if (target.closest("input[type='checkbox']")) return;
+
+      cb.checked = !cb.checked;
+      cb.dispatchEvent(new Event("change", { bubbles: true }));
     });
+
+    item.append(cb, labelSpan);
+    grid.appendChild(item);
+  });
 
   batchMenu.appendChild(grid);
 

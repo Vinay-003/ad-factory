@@ -1,6 +1,0 @@
-- [x] Switch extraction/build to use ONLY `product master doc.txt` (single source of truth)
-- [x] Update `scripts/extract_product_context.py` to parse the new doc format (no legacy SNAPSHOT markers)
-- [x] Update `scripts/build_canonical_context.py` to use ONLY `product master doc.txt` (no mechanism/faq)
-- [x] Update `dashboard/backend/app.py` to remove FEATURE_LANES/feature-driven headline/support templates and stop using legacy product docs
-- [ ] Search codebase for remaining hardcoded headline/feature-lane constraints and remove/loosen them
-- [ ] Run a smoke test: build canonical context + generate one run to confirm pipeline works end-to-end

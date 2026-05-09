@@ -52,7 +52,7 @@ from selenium.webdriver.support import expected_conditions as EC
 from selenium.webdriver.support.ui import WebDriverWait
 
 
-GEMINI_URL = "https://gemini.google.com/app"
+GEMINI_URL = "https://gemini.google.com/app?pli=1"
 FORMAT_ORDER = ["BA", "FEAT", "HERO", "TEST", "UGC"]
 UNSAFE_CLICK_WORDS = (
     "share conversation",
@@ -674,6 +674,85 @@ def _chat_state_is_clean(driver: webdriver.Chrome) -> bool:
     return True
 
 
+def _fresh_state_report(driver: webdriver.Chrome) -> dict[str, Any]:
+    """Small diagnostic report used before upload/send."""
+    try:
+        url = driver.current_url or ""
+    except Exception:
+        url = ""
+    return {
+        "url": url,
+        "is_base_app": _url_is_base_app(url),
+        "looks_old_url": _url_looks_like_old_conversation(url),
+        "composer_empty": composer_is_empty(driver),
+        "has_existing_content": page_has_existing_chat_content(driver),
+        "temporary": _url_looks_temporary(url) or page_heading_looks_temporary(driver),
+    }
+
+
+def _print_fresh_state(driver: webdriver.Chrome, label: str) -> dict[str, Any]:
+    report = _fresh_state_report(driver)
+    print(
+        f"  [{label}] url={report['url']} | base={report['is_base_app']} | "
+        f"old_url={report['looks_old_url']} | empty={report['composer_empty']} | "
+        f"old_content={report['has_existing_content']} | temporary={report['temporary']}"
+    )
+    return report
+
+
+def assert_clean_fresh_chat_before_upload(driver: webdriver.Chrome) -> None:
+    """Hard guard: no upload is allowed unless the current tab is a clean /app chat."""
+    report = _print_fresh_state(driver, "pre-upload-fresh")
+    assert_not_temporary_chat(driver)
+    if not _chat_state_is_clean(driver):
+        raise RuntimeError(
+            "Pre-upload fresh-chat guard failed. Refusing to upload into a tab that may be an old Gemini chat. "
+            f"State: {report}"
+        )
+
+
+def _open_new_tab_at_base_app(driver: webdriver.Chrome) -> None:
+    """Open a new tab directly at /app and switch to it. Previous tabs stay open."""
+    handles_before = set(driver.window_handles)
+    url = f"{GEMINI_URL}?fresh={int(time.time() * 1000)}"
+    print(f"  [fresh] Opening replacement tab at {url}")
+    try:
+        driver.switch_to.new_window("tab")
+        driver.get(url)
+        return
+    except Exception:
+        pass
+    driver.execute_script("window.open(arguments[0], '_blank');", url)
+    time.sleep(0.7)
+    new_handles = set(driver.window_handles) - handles_before
+    driver.switch_to.window(list(new_handles)[0] if new_handles else driver.window_handles[-1])
+
+
+def _hard_navigate_current_tab_to_base(driver: webdriver.Chrome, manual_login_timeout: int, strict_login: bool, label: str) -> bool:
+    """Force the active tab to /app using browser navigation, not keyboard shortcuts."""
+    targets = [
+        GEMINI_URL,
+        f"{GEMINI_URL}?fresh={int(time.time() * 1000)}",
+    ]
+    for i, target in enumerate(targets, start=1):
+        print(f"  [fresh] {label}: hard navigation {i}/{len(targets)} -> {target}")
+        try:
+            if i == 1:
+                driver.get(target)
+            else:
+                driver.execute_script("window.location.replace(arguments[0]);", target)
+        except Exception as exc:
+            print(f"  [fresh] {label}: navigation raised: {exc}")
+        wait_for_manual_login(driver, timeout=manual_login_timeout, strict=strict_login)
+        dismiss_open_overlays(driver)
+        time.sleep(1.5)
+        assert_not_temporary_chat(driver)
+        _print_fresh_state(driver, f"fresh-check-{label}-{i}")
+        if _chat_state_is_clean(driver):
+            return True
+    return False
+
+
 def assert_fresh_url_immediately_before_send(driver: webdriver.Chrome) -> None:
     """Final guard before Send: never submit unless the active tab URL is exactly /app."""
     try:
@@ -811,75 +890,62 @@ def open_prompt_tab(driver: webdriver.Chrome, job_index: int, first_tab_mode: st
 
 
 def navigate_to_fresh_chat(driver: webdriver.Chrome, manual_login_timeout: int, strict_login: bool) -> None:
-    """Navigate to a guaranteed fresh Gemini chat.
+    """Guarantee a clean fresh Gemini chat before upload.
 
-    Logic requested by the user:
-      1. Navigate to /app in the new tab.
-      2. If the URL contains anything after /app, trigger Ctrl+Shift+O.
-      3. Re-check the URL and page state.
-      4. Continue only if the tab is truly a clean new chat.
-      5. Otherwise retry; never upload into an old chat.
+    This intentionally does NOT rely on Ctrl+Shift+O. In Chrome that shortcut can
+    be intercepted by the browser/bookmarks UI. Instead we force the active tab
+    to /app, verify the page is clean, and if Gemini still lands on an old
+    /app/... conversation, we abandon that tab and open a replacement tab.
     """
-    last_url = ""
-    rounds = 4
-    for round_no in range(1, rounds + 1):
-        print(f"  [fresh] Round {round_no}/{rounds}: navigating to {GEMINI_URL}")
-        try:
-            driver.get(GEMINI_URL)
-        except Exception as exc:
-            print(f"  [fresh] driver.get raised: {exc}")
-        wait_for_manual_login(driver, timeout=manual_login_timeout, strict=strict_login)
-        dismiss_open_overlays(driver)
-        time.sleep(1.5)
-        try:
-            last_url = driver.current_url or ""
-        except Exception:
-            last_url = ""
-        print(f"  [fresh] URL after get(): {last_url}")
-        assert_not_temporary_chat(driver)
+    max_rounds = 5
+    last_report: dict[str, Any] = {}
+    for round_no in range(1, max_rounds + 1):
+        print(f"  [fresh] Clean-chat round {round_no}/{max_rounds}")
 
-        if _url_looks_like_old_conversation(last_url):
-            print("  [fresh] Old conversation detected. Triggering Ctrl+Shift+O...")
-            try:
-                trigger_new_chat_shortcut(driver, pause=2.5)
-            except Exception as exc:
-                print(f"  [fresh] Shortcut error: {exc}")
-            dismiss_open_overlays(driver)
-            time.sleep(1.0)
-            try:
-                last_url = driver.current_url or ""
-            except Exception:
-                last_url = ""
-            print(f"  [fresh] URL after Ctrl+Shift+O: {last_url}")
-            assert_not_temporary_chat(driver)
+        if round_no == 1:
+            ok = _hard_navigate_current_tab_to_base(
+                driver,
+                manual_login_timeout=manual_login_timeout,
+                strict_login=strict_login,
+                label=f"round-{round_no}",
+            )
+        else:
+            # If the previous tab kept resolving to an old chat, do not keep
+            # uploading/retrying inside it. Leave it open for inspection and
+            # continue in a brand-new tab.
+            _open_new_tab_at_base_app(driver)
+            ok = _hard_navigate_current_tab_to_base(
+                driver,
+                manual_login_timeout=manual_login_timeout,
+                strict_login=strict_login,
+                label=f"replacement-{round_no}",
+            )
 
-        if _chat_state_is_clean(driver):
-            print("  [fresh] Clean fresh chat confirmed (URL=/app, empty composer, no old content).")
+        last_report = _print_fresh_state(driver, "fresh-final-check")
+        if ok and _chat_state_is_clean(driver):
+            print("  [fresh] Clean fresh chat confirmed before upload.")
             return
 
-        if _url_is_base_app(last_url):
-            print("  [fresh] URL is /app but page still looks dirty. Triggering Ctrl+Shift+O and re-checking...")
-            try:
-                trigger_new_chat_shortcut(driver, pause=2.5)
-            except Exception as exc:
-                print(f"  [fresh] Shortcut error: {exc}")
-            dismiss_open_overlays(driver)
-            time.sleep(1.0)
-            try:
-                last_url = driver.current_url or ""
-            except Exception:
-                last_url = ""
-            print(f"  [fresh] URL after cleanup shortcut: {last_url}")
-            assert_not_temporary_chat(driver)
-            if _chat_state_is_clean(driver):
-                print("  [fresh] Clean fresh chat confirmed after Ctrl+Shift+O cleanup.")
-                return
+        # Last non-keyboard fallback: click only a real New chat button/link.
+        # This is safer than broad text clicks and safer than Ctrl+Shift+O.
+        print("  [fresh] Hard URL repair did not produce a clean chat. Trying dedicated New chat button once...")
+        try:
+            if click_dedicated_new_chat(driver):
+                time.sleep(2.0)
+                dismiss_open_overlays(driver)
+                wait_for_manual_login(driver, timeout=manual_login_timeout, strict=strict_login)
+                last_report = _print_fresh_state(driver, "fresh-after-new-chat-button")
+                if _chat_state_is_clean(driver):
+                    print("  [fresh] Clean fresh chat confirmed after dedicated New chat button.")
+                    return
+        except Exception as exc:
+            print(f"  [fresh] Dedicated New chat fallback raised: {exc}")
 
-        print("  [fresh] Chat is still not clean. Retrying with a fresh /app navigation...")
+        print("  [fresh] Still not clean; abandoning this tab and trying a replacement tab.")
 
     raise RuntimeError(
-        "Could not guarantee a fresh Gemini chat after repeated /app + Ctrl+Shift+O checks. "
-        f"Final URL: {last_url}"
+        "Could not guarantee a clean fresh Gemini chat before upload after URL repair/new-tab retries. "
+        f"Last state: {last_report}"
     )
 
 
@@ -2530,8 +2596,13 @@ def run() -> None:
                         )
                         configure_download_dir(driver, browser_download_dir)
 
+                        assert_clean_fresh_chat_before_upload(driver)
+
                         print("  Selecting model/tool before typing prompt...")
                         select_model_and_tool_if_requested(driver, args)
+
+                        # Model/tool clicks must not switch us into an old conversation.
+                        assert_clean_fresh_chat_before_upload(driver)
 
                         print("  Uploading reference images...")
                         upload_images(driver, upload_paths)

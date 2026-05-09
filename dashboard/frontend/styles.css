@@ -47,6 +47,12 @@ body[data-theme="dark"] {
   --accent-coral: #d07b66;
   --accent-violet: #9985e0;
   --accent-teal: #5fc5b0;
+
+  --fmt-hero: #4a9eff;
+  --fmt-ba: #e8774d;
+  --fmt-test: #9b7ee0;
+  --fmt-feat: #4dc4a8;
+  --fmt-ugc: #e077b0;
 }
 
 * {
@@ -431,6 +437,12 @@ label {
   color: #fff;
 }
 
+body[data-theme="dark"] .chip.active {
+  background: linear-gradient(130deg, var(--primary), var(--primary-2));
+  border-color: transparent;
+  color: #121821;
+}
+
 .format-chip-group {
   gap: 6px;
 }
@@ -519,6 +531,26 @@ label {
 
 .chip-format.fmt-ugc:hover {
   background: color-mix(in srgb, var(--fmt-ugc) 12%, var(--surface));
+}
+
+body[data-theme="dark"] .chip-format.checked.fmt-hero {
+  background: color-mix(in srgb, var(--fmt-hero) 35%, var(--surface));
+}
+
+body[data-theme="dark"] .chip-format.checked.fmt-ba {
+  background: color-mix(in srgb, var(--fmt-ba) 35%, var(--surface));
+}
+
+body[data-theme="dark"] .chip-format.checked.fmt-test {
+  background: color-mix(in srgb, var(--fmt-test) 35%, var(--surface));
+}
+
+body[data-theme="dark"] .chip-format.checked.fmt-feat {
+  background: color-mix(in srgb, var(--fmt-feat) 35%, var(--surface));
+}
+
+body[data-theme="dark"] .chip-format.checked.fmt-ugc {
+  background: color-mix(in srgb, var(--fmt-ugc) 35%, var(--surface));
 }
 
 textarea,
