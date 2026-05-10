@@ -27,6 +27,7 @@ let runsData = [];
 let currentRunIndex = 0;
 let hypothesisConfig = { type: "none", variant: "" };
 let currentServerType = "opencode";
+let headlessModeEnabled = false;
 
 function setSelectOptions(selectEl, values, selectedValue) {
   selectEl.innerHTML = "";
@@ -727,23 +728,31 @@ function renderRun(run) {
           const res = await fetch(`/api/runs/${run.run_id}/generate-images-45`, {
             method: "POST",
             headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({ prompt_files: selected }),
+            body: JSON.stringify({ prompt_files: selected, headless: headlessModeEnabled }),
           });
           const raw = await res.text();
           let data = null;
           try {
             data = raw ? JSON.parse(raw) : {};
           } catch {
+            stopProgressPolling();
             setStatus(`Failed: ${raw || "image generation error"}`);
             return;
           }
           if (!res.ok) {
+            stopProgressPolling();
             setStatus(`Failed: ${data.detail || "image generation error"}`);
             return;
           }
+          const batchKey = data.batch_key || data.run_id || "";
+          if (batchKey && headlessModeEnabled) {
+            startProgressPolling(batchKey);
+          }
           setStatus(`Done\nRun: ${data.run_id}\nBatch: ${data.batch}\nGenerated 4:5 in Gemini for selected prompts: ${selected.length}`);
+          stopProgressPolling();
           await loadRuns();
         } catch (err) {
+          stopProgressPolling();
           setStatus(String(err));
         } finally {
           generate45Btn.disabled = false;
@@ -762,23 +771,31 @@ function renderRun(run) {
           const res = await fetch(`/api/runs/${run.run_id}/generate-images-916-from-45`, {
             method: "POST",
             headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({ prompt_files: selected }),
+            body: JSON.stringify({ prompt_files: selected, headless: headlessModeEnabled }),
           });
           const raw = await res.text();
           let data = null;
           try {
             data = raw ? JSON.parse(raw) : {};
           } catch {
+            stopProgressPolling();
             setStatus(`Failed: ${raw || "9:16 generation error"}`);
             return;
           }
           if (!res.ok) {
+            stopProgressPolling();
             setStatus(`Failed: ${data.detail || "9:16 generation error"}`);
             return;
           }
+          const batchKey = data.batch || "";
+          if (batchKey && headlessModeEnabled) {
+            startProgressPolling(batchKey);
+          }
           setStatus(`Done\nRun: ${data.run_id}\nBatch: ${data.batch}\nGenerated 9:16 in Gemini from selected 4:5 refs`);
+          stopProgressPolling();
           await loadRuns();
         } catch (err) {
+          stopProgressPolling();
           setStatus(String(err));
         } finally {
           generate916Btn.disabled = false;
@@ -995,16 +1012,23 @@ document.getElementById("batchGen45").addEventListener("click", async () => {
     const res = await fetch("/api/batch/generate-images-45", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ run_ids: runIds }),
+      body: JSON.stringify({ run_ids: runIds, headless: headlessModeEnabled }),
     });
     const data = await res.json();
     if (!res.ok) {
+      stopProgressPolling();
       setStatus(`Failed: ${data.detail || "batch 4:5 error"}`);
       return;
     }
+    const batchKey = data.batch_key || "";
+    if (batchKey && headlessModeEnabled) {
+      startProgressPolling(batchKey);
+    }
     setStatus(`Done. Batch: ${data.batch_key}, Prompts: ${data.total_prompts}`);
+    stopProgressPolling();
     await loadRuns();
   } catch (err) {
+    stopProgressPolling();
     setStatus(String(err));
   }
 });
@@ -1027,16 +1051,23 @@ document.getElementById("batchGen916").addEventListener("click", async () => {
     const res = await fetch("/api/batch/generate-images-916", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ run_ids: runIds }),
+      body: JSON.stringify({ run_ids: runIds, headless: headlessModeEnabled }),
     });
     const data = await res.json();
     if (!res.ok) {
+      stopProgressPolling();
       setStatus(`Failed: ${data.detail || "batch 9:16 error"}`);
       return;
     }
+    const batchKey = data.batch_key || "";
+    if (batchKey && headlessModeEnabled) {
+      startProgressPolling(batchKey);
+    }
     setStatus(`Done. Batch: ${data.batch_key}, Prompts: ${data.total_prompts}`);
+    stopProgressPolling();
     await loadRuns();
   } catch (err) {
+    stopProgressPolling();
     setStatus(String(err));
   }
 });
@@ -1081,5 +1112,43 @@ if (hypothesisVariantEl) {
   hypothesisVariantEl.addEventListener("change", updateHypothesisSummary);
 }
 
+let currentPollingInterval = null;
+
+function startProgressPolling(batchKey) {
+  if (currentPollingInterval) clearInterval(currentPollingInterval);
+  currentPollingInterval = setInterval(async () => {
+    try {
+      const res = await fetch(`/api/progress/${encodeURIComponent(batchKey)}`);
+      if (!res.ok) {
+        if (res.status === 404) {
+          clearInterval(currentPollingInterval);
+          return;
+        }
+        return;
+      }
+      const data = await res.json();
+      const step = data.step || "";
+      const msg = data.message || "";
+      const time = data.time ? new Date(data.time * 1000).toLocaleTimeString() : "";
+      setStatus(`[${time}] [${step}] ${msg}\n`);
+    } catch (_) {}
+  }, 3000);
+}
+
+function stopProgressPolling() {
+  if (currentPollingInterval) {
+    clearInterval(currentPollingInterval);
+    currentPollingInterval = null;
+  }
+}
+
 initTheme();
 fetchDefaults().then(loadRuns).catch((err) => setStatus(String(err)));
+
+const headlessToggle = document.getElementById("headlessMode");
+if (headlessToggle) {
+  headlessToggle.addEventListener("change", () => {
+    headlessModeEnabled = headlessToggle.checked;
+    setStatus(`Headless mode ${headlessModeEnabled ? "ON" : "OFF"}`);
+  });
+}

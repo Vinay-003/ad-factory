@@ -1,22 +1,18 @@
 #!/usr/bin/env python3
-"""Strict Gemini web image-generation automation for Selenium 4.32.
+"""Strict Gemini web image-generation automation for Playwright.
 
 Per prompt:
-  1. Use one real tab for that prompt. The first prompt reuses Selenium's blank
-     tab when safe, so there is no extra empty Gemini tab at startup.
+  1. Use one real tab for that prompt. The first prompt reuses the initial
+     blank tab when safe, so there is no extra empty Gemini tab at startup.
   2. Navigate to a fresh Gemini chat only. Never click old chat rows or their
      three-dot menus.
   3. Optionally select Pro/Create image using guarded selectors only.
   4. Upload references, wait for attachments to settle, paste the prompt with
-     CDP/clipboard input events, verify full prompt integrity, and confirm Send
+     keyboard/clipboard input events, verify full prompt integrity, and confirm Send
      actually submitted.
   5. Wait for a large image in the latest assistant/model response.
   6. Download the exact generated image and wait until the file is complete.
   7. Move to the next prompt tab without closing previous prompt tabs.
-
-This file intentionally avoids broad "click any button/div containing text"
-helpers because those were the source of Temporary chat / Share conversation /
-old-chat menu misclicks.
 """
 
 from __future__ import annotations
@@ -38,21 +34,19 @@ from dataclasses import dataclass
 from pathlib import Path
 from typing import Any, Iterable
 
-from selenium import webdriver
-from selenium.common.exceptions import (
-    ElementClickInterceptedException,
-    InvalidSessionIdException,
-    TimeoutException,
-    WebDriverException,
-)
-from selenium.webdriver.common.by import By
-from selenium.webdriver.common.keys import Keys
-from selenium.webdriver.common.action_chains import ActionChains
-from selenium.webdriver.support import expected_conditions as EC
-from selenium.webdriver.support.ui import WebDriverWait
+from playwright.sync_api import sync_playwright, Page, Locator, TimeoutError as PWTimeoutError
+from concurrent.futures import ThreadPoolExecutor, as_completed
+import threading
+import tempfile
+import time
+import urllib.parse
+import urllib.request
+from dataclasses import dataclass
+from pathlib import Path
+from typing import Any, Iterable
 
 
-GEMINI_URL = "https://gemini.google.com/app?pli=1"
+GEMINI_URL = "https://gemini.google.com/app"
 FORMAT_ORDER = ["BA", "FEAT", "HERO", "TEST", "UGC"]
 UNSAFE_CLICK_WORDS = (
     "share conversation",
@@ -122,11 +116,7 @@ def parse_args() -> argparse.Namespace:
     )
 
     parser.add_argument("--user-data-dir", default="")
-    parser.add_argument("--profile-directory", default="")
     parser.add_argument("--headless", action="store_true")
-    parser.add_argument("--browser", choices=["brave", "chrome"], default="brave")
-    parser.add_argument("--attach-debugger-address", default="")
-    parser.add_argument("--debug-user-data-dir", default="/home/mylappy/.chrome-selenium-profile")
     parser.add_argument("--manual-login-timeout", type=int, default=180)
     parser.add_argument("--login-wait-mode", choices=["auto", "strict"], default="auto")
     parser.add_argument("--browser-download-dir", default="")
@@ -145,7 +135,7 @@ def parse_args() -> argparse.Namespace:
     parser.add_argument(
         "--require-pro-model",
         action=argparse.BooleanOptionalAction,
-        default=True,
+        default=False,
         help="Use --no-require-pro-model if Gemini UI changed and selection cannot be confirmed",
     )
     parser.add_argument(
@@ -156,9 +146,9 @@ def parse_args() -> argparse.Namespace:
     )
     parser.add_argument(
         "--prompt-paste-method",
-        choices=["auto", "cdp", "clipboard", "js"],
+        choices=["auto", "keyboard", "clipboard", "js"],
         default="auto",
-        help="How to insert long prompts. auto tries CDP insertText, then clipboard paste. JS must be requested explicitly.",
+        help="How to insert long prompts. auto tries clipboard paste, JS insertion, then safe keyboard insert_text.",
     )
     parser.add_argument(
         "--prompt-paste-timeout",
@@ -181,14 +171,19 @@ def parse_args() -> argparse.Namespace:
     parser.add_argument(
         "--send-submit-method",
         choices=["enter", "click", "auto"],
-        default="auto",
-        help="How to submit after the prompt is complete. auto uses the real composer Send/Submit button first, then Enter fallbacks.",
+        default="enter",
+        help="How to submit after the prompt is complete. Default enter presses Enter first, then falls back to button clicks.",
     )
     parser.add_argument(
         "--send-confirm-timeout",
         type=float,
         default=35.0,
         help="Seconds to wait for proof that Gemini accepted the prompt after a submit attempt",
+    )
+    parser.add_argument(
+        "--continue-on-error",
+        action="store_true",
+        help="Continue to the next prompt after a job failure. Default is fail-fast so problems do not silently skip prompts.",
     )
     return parser.parse_args()
 
@@ -383,11 +378,6 @@ def collect_upload_images_from_dir(upload_dir: Path) -> list[Path]:
 
 
 def resolve_browser_binary(args: argparse.Namespace) -> str:
-    if args.browser == "brave":
-        for candidate in ["/usr/bin/brave-browser", "/usr/bin/brave", "/snap/bin/brave"]:
-            if Path(candidate).exists():
-                return candidate
-        return ""
     for candidate in [
         "/usr/bin/google-chrome",
         "/usr/bin/google-chrome-stable",
@@ -400,107 +390,103 @@ def resolve_browser_binary(args: argparse.Namespace) -> str:
     return ""
 
 
-def debugger_endpoint_reachable(address: str) -> bool:
-    if not address:
-        return False
+def grant_gemini_permissions(context) -> None:
+    """Best-effort permissions needed for clipboard paste in CDP/visible Chrome."""
     try:
-        with urllib.request.urlopen(f"http://{address}/json/version", timeout=2) as resp:
-            return resp.status == 200
-    except Exception:
-        return False
+        context.grant_permissions(["clipboard-read", "clipboard-write"], origin="https://gemini.google.com")
+    except Exception as exc:
+        print(f"  [browser] Could not grant clipboard permissions; will use fallbacks: {exc}")
 
 
-def auto_launch_debug_browser(args: argparse.Namespace) -> None:
-    if not args.attach_debugger_address:
-        return
-    if debugger_endpoint_reachable(args.attach_debugger_address):
-        return
+def build_browser_context(args: argparse.Namespace, download_dir: Path):
+    p = sync_playwright().start()
 
-    binary = resolve_browser_binary(args)
-    if not binary:
-        raise RuntimeError(f"Could not resolve {args.browser} binary for debugger attach")
-    host, _, port = args.attach_debugger_address.partition(":")
-    if not host or not port:
-        raise ValueError("--attach-debugger-address must look like host:port")
-
-    user_data_dir = Path(args.debug_user_data_dir).expanduser()
-    user_data_dir.mkdir(parents=True, exist_ok=True)
-    cmd = [
-        binary,
-        f"--remote-debugging-address={host}",
-        f"--remote-debugging-port={port}",
-        f"--user-data-dir={str(user_data_dir)}",
-        "--no-first-run",
-        "--no-default-browser-check",
-    ]
-    print("Debugger endpoint not reachable. Auto-launching browser for attach...")
-    subprocess.Popen(cmd, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
-
-    deadline = time.time() + 20
-    while time.time() < deadline:
-        if debugger_endpoint_reachable(args.attach_debugger_address):
-            print(f"Debugger endpoint is live at {args.attach_debugger_address}")
-            return
-        time.sleep(0.5)
-    raise RuntimeError(f"Browser launched, but debugger endpoint is not reachable at {args.attach_debugger_address}")
-
-
-def build_driver(args: argparse.Namespace, download_dir: Path) -> webdriver.Chrome:
-    options = webdriver.ChromeOptions()
-    if args.attach_debugger_address:
-        options.add_experimental_option("debuggerAddress", args.attach_debugger_address)
-    selected_binary = ""
-    if not args.attach_debugger_address:
-        selected_binary = resolve_browser_binary(args)
-        if selected_binary:
-            options.binary_location = selected_binary
-
-    prefs = {
-        "credentials_enable_service": False,
-        "profile.password_manager_enabled": False,
-        "download.default_directory": str(download_dir),
-        "download.prompt_for_download": False,
-        "download.directory_upgrade": True,
-        "safebrowsing.enabled": True,
-        "profile.default_content_setting_values.automatic_downloads": 1,
-    }
-    options.add_experimental_option("prefs", prefs)
-    options.add_argument("--start-maximized")
-    options.add_argument("--disable-notifications")
-    options.add_argument("--disable-blink-features=AutomationControlled")
-    options.add_argument("--disable-popup-blocking")
-    options.add_argument("--no-first-run")
-    options.add_argument("--no-default-browser-check")
-    options.add_argument("--disable-dev-shm-usage")
-    if args.user_data_dir:
-        options.add_argument(f"--user-data-dir={args.user_data_dir}")
-    if args.profile_directory:
-        options.add_argument(f"--profile-directory={args.profile_directory}")
-    if args.headless:
-        options.add_argument("--headless=new")
-
-    driver = webdriver.Chrome(options=options)
-    if selected_binary:
-        print(f"Using browser binary: {selected_binary}")
     try:
-        driver.set_page_load_timeout(120)
-        driver.set_script_timeout(180)
+        import socket
+        sock = socket.socket()
+        sock.settimeout(1)
+        sock.connect(("127.0.0.1", 9222))
+        sock.close()
+        print("  [connect] Connecting to existing Chrome via CDP on port 9222...")
+        browser = p.chromium.connect_over_cdp("http://127.0.0.1:9222")
+        ctx = browser.contexts[0] if browser.contexts else browser.new_context()
+        ctx.set_default_timeout(30000)
+        grant_gemini_permissions(ctx)
+        ctx.pages[0].goto("about:blank") if ctx.pages else ctx.new_page().goto("about:blank")
+        return p, ctx
     except Exception:
         pass
-    return driver
+
+    print("  [launch] No Chrome debug port found, launching fresh browser...")
+    selected_binary = resolve_browser_binary(args)
+
+    launch_opts: dict[str, Any] = {
+        "headless": args.headless,
+        "downloads_path": str(download_dir),
+        "accept_downloads": True,
+        "bypass_csp": True,
+        "args": [
+            "--disable-notifications",
+            "--disable-popup-blocking",
+            "--no-first-run",
+            "--no-default-browser-check",
+            "--disable-dev-shm-usage",
+            "--safebrowsing-enabled",
+            "--disable-web-security",
+            "--test-type",
+            "--start-maximized",
+        ],
+    }
+    if selected_binary:
+        launch_opts["executable_path"] = selected_binary
+
+    context = p.chromium.launch_persistent_context(
+        str(download_dir / ".pw_profile"),
+        **launch_opts,
+    )
+    context.set_default_timeout(30000)
+    grant_gemini_permissions(context)
+    context.pages[0].goto("about:blank")
+    return p, context
 
 
-def configure_download_dir(driver: webdriver.Chrome, download_dir: Path) -> None:
-    download_dir.mkdir(parents=True, exist_ok=True)
-    for command in ["Page.setDownloadBehavior", "Browser.setDownloadBehavior"]:
+def _configure_download_dir(context, download_dir: Path) -> None:
+    """Best-effort configure Chrome's download directory.
+
+    This matters when attached to an existing Chrome via CDP. Playwright's
+    downloads_path is only guaranteed for browsers it launches itself; CDP
+    sessions may otherwise save to the user's default Downloads folder.
+    """
+    try:
+        download_dir.mkdir(parents=True, exist_ok=True)
+    except Exception:
+        return
+
+    # Normal Playwright downloads are still handled by page.expect_download().
+    # This CDP configuration is a fallback so directory polling also works.
+    try:
+        pages = list(getattr(context, "pages", []) or [])
+        if not pages:
+            return
+        session = context.new_cdp_session(pages[0])
         try:
-            params = {"behavior": "allow", "downloadPath": str(download_dir)}
-            if command.startswith("Browser"):
-                params = {"behavior": "allow", "downloadPath": str(download_dir), "eventsEnabled": True}
-            driver.execute_cdp_cmd(command, params)
+            session.send("Browser.setDownloadBehavior", {
+                "behavior": "allow",
+                "downloadPath": str(download_dir),
+                "eventsEnabled": True,
+            })
             return
         except Exception:
-            continue
+            pass
+        try:
+            session.send("Page.setDownloadBehavior", {
+                "behavior": "allow",
+                "downloadPath": str(download_dir),
+            })
+        except Exception:
+            pass
+    except Exception:
+        pass
 
 
 # ---------------------------------------------------------------------------
@@ -513,9 +499,9 @@ def is_blankish_url(url: str) -> bool:
     return lower in ("", "about:blank") or lower.startswith("chrome://newtab") or lower.startswith("data:")
 
 
-def gemini_app_ready(driver: webdriver.Chrome) -> bool:
+def gemini_app_ready(page: Page) -> bool:
     try:
-        current = (driver.current_url or "").lower()
+        current = (page.url or "").lower()
     except Exception:
         return False
     if "gemini.google.com" not in current:
@@ -530,24 +516,24 @@ def gemini_app_ready(driver: webdriver.Chrome) -> bool:
     ]
     for selector in selectors:
         try:
-            if any(el.is_displayed() for el in driver.find_elements(By.CSS_SELECTOR, selector)):
+            if page.locator(selector).first.is_visible():
                 return True
         except Exception:
             continue
     return False
 
 
-def wait_for_manual_login(driver: webdriver.Chrome, timeout: int, strict: bool) -> None:
+def wait_for_manual_login(page: Page, timeout: int, strict: bool) -> None:
     print("Waiting for Gemini login/readiness...")
     deadline = time.time() + timeout
     next_log = time.time() + 5
     while time.time() < deadline:
-        if gemini_app_ready(driver):
-            print(f"Gemini UI looks ready at {driver.current_url}. Continuing.")
+        if gemini_app_ready(page):
+            print(f"Gemini UI looks ready at {page.url}. Continuing.")
             return
         if time.time() >= next_log:
             try:
-                current = driver.current_url
+                current = page.url
             except Exception:
                 current = "<unavailable>"
             print(f"Still waiting for Gemini UI readiness... current URL: {current}")
@@ -555,7 +541,7 @@ def wait_for_manual_login(driver: webdriver.Chrome, timeout: int, strict: bool) 
         time.sleep(1.0)
     msg = f"Timed out after {timeout}s waiting for Gemini readiness"
     if strict:
-        raise TimeoutException(msg)
+        raise PWTimeoutError(msg)
     print(f"{msg}; continuing in auto mode.")
 
 
@@ -581,202 +567,14 @@ def _url_looks_like_old_conversation(url: str) -> bool:
     return path.startswith("/app/") and path != "/app"
 
 
-def trigger_new_chat_shortcut(driver: webdriver.Chrome, pause: float = 2.5) -> None:
-    """Trigger Gemini's Ctrl+Shift+O new-chat shortcut in the active tab."""
-    dismiss_open_overlays(driver)
-    body = driver.find_element(By.TAG_NAME, "body")
-    try:
-        body.click()
-    except Exception:
-        driver.execute_script("arguments[0].focus();", body)
-    time.sleep(0.25)
-    try:
-        ActionChains(driver).key_down(Keys.CONTROL).key_down(Keys.SHIFT).send_keys("o").key_up(Keys.SHIFT).key_up(Keys.CONTROL).perform()
-    except Exception:
-        # Fallback if ActionChains is flaky in the attached browser.
-        body.send_keys(Keys.CONTROL, Keys.SHIFT, "o")
-    time.sleep(pause)
-
-
-def composer_is_empty(driver: webdriver.Chrome) -> bool:
-    script = r"""
-        const nodes = Array.from(document.querySelectorAll(
-            'rich-textarea div[contenteditable="true"], div[contenteditable="true"], textarea'
-        ));
-        const visible = el => {
-            const r = el.getBoundingClientRect();
-            const s = getComputedStyle(el);
-            return r.width > 0 && r.height > 0 && s.display !== 'none' && s.visibility !== 'hidden';
-        };
-        for (const el of nodes) {
-            if (!visible(el)) continue;
-            const txt = (el.value || el.innerText || el.textContent || '').trim();
-            if (txt.length > 0) return false;
-        }
-        return true;
-    """
-    try:
-        return bool(driver.execute_script(script))
-    except Exception:
-        return False
-
-
-def page_has_existing_chat_content(driver: webdriver.Chrome) -> bool:
-    """True when the page already contains visible prior-turn content."""
-    script = r"""
-        function visible(el) {
-            const r = el.getBoundingClientRect();
-            const s = getComputedStyle(el);
-            return r.width > 0 && r.height > 0 && s.display !== 'none' && s.visibility !== 'hidden';
-        }
-        const main = document.querySelector('main') || document.body;
-        const responseSelectors = [
-            'model-response', '.model-response', '.response-container',
-            '[data-response-index]', '[data-chunk-index]', '[data-testid*="response"]',
-            '[class*="response"]', 'user-query', '.user-query', '[data-author="user"]'
-        ];
-        for (const sel of responseSelectors) {
-            for (const el of main.querySelectorAll(sel)) {
-                if (visible(el)) return true;
-            }
-        }
-        for (const img of main.querySelectorAll('img')) {
-            if (img.closest('rich-textarea, textarea, form, nav, [role="navigation"], header')) continue;
-            const r = img.getBoundingClientRect();
-            if (r.width > 120 && r.height > 120) return true;
-        }
-        return false;
-    """
-    try:
-        return bool(driver.execute_script(script))
-    except Exception:
-        return False
-
-
-def _chat_state_is_clean(driver: webdriver.Chrome) -> bool:
-    url = ""
-    try:
-        url = driver.current_url or ""
-    except Exception:
-        pass
-    if not _url_is_base_app(url):
-        return False
-    if _url_looks_temporary(url) or page_heading_looks_temporary(driver):
-        return False
-    try:
-        find_composer(driver, timeout=10)
-    except Exception:
-        return False
-    if not composer_is_empty(driver):
-        return False
-    if page_has_existing_chat_content(driver):
-        return False
-    return True
-
-
-def _fresh_state_report(driver: webdriver.Chrome) -> dict[str, Any]:
-    """Small diagnostic report used before upload/send."""
-    try:
-        url = driver.current_url or ""
-    except Exception:
-        url = ""
-    return {
-        "url": url,
-        "is_base_app": _url_is_base_app(url),
-        "looks_old_url": _url_looks_like_old_conversation(url),
-        "composer_empty": composer_is_empty(driver),
-        "has_existing_content": page_has_existing_chat_content(driver),
-        "temporary": _url_looks_temporary(url) or page_heading_looks_temporary(driver),
-    }
-
-
-def _print_fresh_state(driver: webdriver.Chrome, label: str) -> dict[str, Any]:
-    report = _fresh_state_report(driver)
-    print(
-        f"  [{label}] url={report['url']} | base={report['is_base_app']} | "
-        f"old_url={report['looks_old_url']} | empty={report['composer_empty']} | "
-        f"old_content={report['has_existing_content']} | temporary={report['temporary']}"
-    )
-    return report
-
-
-def assert_clean_fresh_chat_before_upload(driver: webdriver.Chrome) -> None:
-    """Hard guard: no upload is allowed unless the current tab is a clean /app chat."""
-    report = _print_fresh_state(driver, "pre-upload-fresh")
-    assert_not_temporary_chat(driver)
-    if not _chat_state_is_clean(driver):
-        raise RuntimeError(
-            "Pre-upload fresh-chat guard failed. Refusing to upload into a tab that may be an old Gemini chat. "
-            f"State: {report}"
-        )
-
-
-def _open_new_tab_at_base_app(driver: webdriver.Chrome) -> None:
-    """Open a new tab directly at /app and switch to it. Previous tabs stay open."""
-    handles_before = set(driver.window_handles)
-    url = f"{GEMINI_URL}?fresh={int(time.time() * 1000)}"
-    print(f"  [fresh] Opening replacement tab at {url}")
-    try:
-        driver.switch_to.new_window("tab")
-        driver.get(url)
-        return
-    except Exception:
-        pass
-    driver.execute_script("window.open(arguments[0], '_blank');", url)
-    time.sleep(0.7)
-    new_handles = set(driver.window_handles) - handles_before
-    driver.switch_to.window(list(new_handles)[0] if new_handles else driver.window_handles[-1])
-
-
-def _hard_navigate_current_tab_to_base(driver: webdriver.Chrome, manual_login_timeout: int, strict_login: bool, label: str) -> bool:
-    """Force the active tab to /app using browser navigation, not keyboard shortcuts."""
-    targets = [
-        GEMINI_URL,
-        f"{GEMINI_URL}?fresh={int(time.time() * 1000)}",
-    ]
-    for i, target in enumerate(targets, start=1):
-        print(f"  [fresh] {label}: hard navigation {i}/{len(targets)} -> {target}")
-        try:
-            if i == 1:
-                driver.get(target)
-            else:
-                driver.execute_script("window.location.replace(arguments[0]);", target)
-        except Exception as exc:
-            print(f"  [fresh] {label}: navigation raised: {exc}")
-        wait_for_manual_login(driver, timeout=manual_login_timeout, strict=strict_login)
-        dismiss_open_overlays(driver)
-        time.sleep(1.5)
-        assert_not_temporary_chat(driver)
-        _print_fresh_state(driver, f"fresh-check-{label}-{i}")
-        if _chat_state_is_clean(driver):
-            return True
-    return False
-
-
-def assert_fresh_url_immediately_before_send(driver: webdriver.Chrome) -> None:
-    """Final guard before Send: never submit unless the active tab URL is exactly /app."""
-    try:
-        url = driver.current_url or ""
-    except Exception:
-        url = ""
-    print(f"  [pre-send-url] Active URL immediately before Send: {url}")
-    assert_not_temporary_chat(driver)
-    if not _url_is_base_app(url):
-        raise RuntimeError(
-            "Pre-send fresh-chat URL guard failed. The active Gemini tab is not exactly /app, "
-            "so the script will NOT click Send into a possible old conversation. "
-            f"URL was: {url}"
-        )
-
-
 def _url_looks_temporary(url: str) -> bool:
     lower = (url or "").lower()
     return "temporary" in lower or "temp_chat" in lower or "tempchat" in lower
 
 
-def dismiss_open_overlays(driver: webdriver.Chrome) -> None:
+def dismiss_open_overlays(page: Page) -> None:
     try:
-        driver.find_element(By.TAG_NAME, "body").send_keys(Keys.ESCAPE)
+        page.keyboard.press("Escape")
     except Exception:
         pass
     selectors = [
@@ -786,18 +584,18 @@ def dismiss_open_overlays(driver: webdriver.Chrome) -> None:
         "button[aria-label*='Close']",
     ]
     for selector in selectors:
-        for el in driver.find_elements(By.CSS_SELECTOR, selector):
+        for el in page.locator(selector).all():
             try:
-                if el.is_displayed():
+                if el.is_visible():
                     el.click()
             except Exception:
                 try:
-                    driver.execute_script("arguments[0].click();", el)
+                    el.evaluate("el => el.click()")
                 except Exception:
                     pass
 
 
-def page_heading_looks_temporary(driver: webdriver.Chrome) -> bool:
+def page_heading_looks_temporary(page: Page) -> bool:
     script = r"""
         const headings = Array.from(document.querySelectorAll('main h1, main h2, header h1, header h2, [role="heading"]'));
         for (const h of headings) {
@@ -809,18 +607,18 @@ def page_heading_looks_temporary(driver: webdriver.Chrome) -> bool:
         return title.includes('temporary chat');
     """
     try:
-        return bool(driver.execute_script(script))
+        return bool(page.evaluate(script))
     except Exception:
         return False
 
 
-def assert_not_temporary_chat(driver: webdriver.Chrome) -> None:
+def assert_not_temporary_chat(page: Page) -> None:
     url = ""
     try:
-        url = driver.current_url or ""
+        url = page.url or ""
     except Exception:
         pass
-    if _url_looks_temporary(url) or page_heading_looks_temporary(driver):
+    if _url_looks_temporary(url) or page_heading_looks_temporary(page):
         raise RuntimeError(
             "Gemini appears to be in Temporary chat mode. The script will not continue "
             "because you asked not to use temporary chats. Turn Temporary chat off manually "
@@ -828,125 +626,132 @@ def assert_not_temporary_chat(driver: webdriver.Chrome) -> None:
         )
 
 
-def click_dedicated_new_chat(driver: webdriver.Chrome) -> bool:
-    """Click only a real New chat button/link. Never click history rows or 3-dot menus."""
-    script = r"""
-        function visible(el) {
-            const r = el.getBoundingClientRect();
-            const s = getComputedStyle(el);
-            return r.width > 0 && r.height > 0 && s.display !== 'none' && s.visibility !== 'hidden';
-        }
-        function unsafe(el) {
-            const txt = ((el.getAttribute('aria-label') || '') + ' ' + (el.innerText || '')).toLowerCase();
-            const bad = ['share', 'rename', 'delete', 'archive', 'more options'];
-            return bad.some(x => txt.includes(x));
-        }
-        const nodes = Array.from(document.querySelectorAll('a,button,[role="button"]'));
-        const candidates = nodes.filter(el => {
-            if (!visible(el) || unsafe(el)) return false;
-            const txt = ((el.getAttribute('aria-label') || '') + ' ' + (el.innerText || '')).trim().toLowerCase();
-            if (!(txt.includes('new chat') || txt.includes('new conversation'))) return false;
-            const r = el.getBoundingClientRect();
-            // Sidebar/top-left New chat is acceptable. Old-chat rows are usually not named New chat.
-            return r.left < 520 || txt.includes('new chat') || txt.includes('new conversation');
-        });
-        if (!candidates.length) return false;
-        candidates.sort((a, b) => {
-            const ar = a.getBoundingClientRect();
-            const br = b.getBoundingClientRect();
-            return (ar.left - br.left) || (ar.top - br.top);
-        });
-        candidates[0].click();
-        return true;
-    """
-    try:
-        return bool(driver.execute_script(script))
-    except Exception:
-        return False
-
-
-def open_prompt_tab(driver: webdriver.Chrome, job_index: int, first_tab_mode: str, download_dir: Path) -> None:
+def open_prompt_tab(context, page: Page, job_index: int, first_tab_mode: str, download_dir: Path) -> Page:
     """Open/switch to the tab that will own this prompt."""
     use_current = False
     if job_index == 1 and first_tab_mode == "reuse-blank":
         try:
-            use_current = is_blankish_url(driver.current_url or "")
+            use_current = is_blankish_url(page.url or "")
         except Exception:
             use_current = False
 
     if use_current:
-        print("  [tab] Reusing Selenium's initial blank tab for the first prompt.")
+        print("  [tab] Reusing initial blank tab for the first prompt.")
+        return page
     else:
         print("  [tab] Opening a new tab for this prompt.")
+        new_page = context.new_page()
+        new_page.bring_to_front()
+        return new_page
+
+
+
+
+def goto_gemini_app(page: Page, timeout_ms: int = 60000) -> None:
+    """Navigate to Gemini without failing only because the SPA never fires full load."""
+    try:
+        page.goto(GEMINI_URL, wait_until="domcontentloaded", timeout=timeout_ms)
+    except PWTimeoutError:
+        current = ""
         try:
-            driver.switch_to.new_window("tab")
+            current = page.url or ""
         except Exception:
-            handles_before = set(driver.window_handles)
-            driver.execute_script("window.open('about:blank', '_blank');")
-            time.sleep(0.5)
-            new_handles = set(driver.window_handles) - handles_before
-            driver.switch_to.window(list(new_handles)[0] if new_handles else driver.window_handles[-1])
-    configure_download_dir(driver, download_dir)
-
-
-def navigate_to_fresh_chat(driver: webdriver.Chrome, manual_login_timeout: int, strict_login: bool) -> None:
-    """Guarantee a clean fresh Gemini chat before upload.
-
-    This intentionally does NOT rely on Ctrl+Shift+O. In Chrome that shortcut can
-    be intercepted by the browser/bookmarks UI. Instead we force the active tab
-    to /app, verify the page is clean, and if Gemini still lands on an old
-    /app/... conversation, we abandon that tab and open a replacement tab.
-    """
-    max_rounds = 5
-    last_report: dict[str, Any] = {}
-    for round_no in range(1, max_rounds + 1):
-        print(f"  [fresh] Clean-chat round {round_no}/{max_rounds}")
-
-        if round_no == 1:
-            ok = _hard_navigate_current_tab_to_base(
-                driver,
-                manual_login_timeout=manual_login_timeout,
-                strict_login=strict_login,
-                label=f"round-{round_no}",
-            )
-        else:
-            # If the previous tab kept resolving to an old chat, do not keep
-            # uploading/retrying inside it. Leave it open for inspection and
-            # continue in a brand-new tab.
-            _open_new_tab_at_base_app(driver)
-            ok = _hard_navigate_current_tab_to_base(
-                driver,
-                manual_login_timeout=manual_login_timeout,
-                strict_login=strict_login,
-                label=f"replacement-{round_no}",
-            )
-
-        last_report = _print_fresh_state(driver, "fresh-final-check")
-        if ok and _chat_state_is_clean(driver):
-            print("  [fresh] Clean fresh chat confirmed before upload.")
+            pass
+        if "gemini.google.com" in current or gemini_app_ready(page):
+            print("  [fresh] Gemini navigation timed out waiting for DOM load, but the app is present; continuing.")
             return
+        raise
 
-        # Last non-keyboard fallback: click only a real New chat button/link.
-        # This is safer than broad text clicks and safer than Ctrl+Shift+O.
-        print("  [fresh] Hard URL repair did not produce a clean chat. Trying dedicated New chat button once...")
+
+def navigate_to_fresh_chat(page: Page, manual_login_timeout: int, strict_login: bool) -> None:
+    """Navigate to a fresh Gemini chat using URL Stability Locks to defeat SPA race conditions."""
+    print("  [fresh] Navigating to Gemini...")
+
+    page.goto("about:blank", wait_until="domcontentloaded", timeout=15000)
+    time.sleep(0.5)
+    goto_gemini_app(page)
+
+    wait_for_manual_login(page, timeout=manual_login_timeout, strict=strict_login)
+    dismiss_open_overlays(page)
+
+    deadline = time.time() + 60
+
+    while time.time() < deadline:
+        time.sleep(2.0)
+
+        current_url = page.url or ""
+        assert_not_temporary_chat(page)
+
+        if not _url_is_base_app(current_url):
+            print(f"  [fresh] Dirty URL detected ({current_url}). Hunting for 'New Chat' button...")
+
+            clicked = page.evaluate(r"""
+                const clickables = Array.from(document.querySelectorAll('a, button, [role="button"], div[role="link"]'));
+                for (const el of clickables) {
+                    const r = el.getBoundingClientRect();
+                    if (r.width === 0 || r.height === 0) continue;
+
+                    if (el.closest('history-list, .conversation-list, [aria-label*="Recent"], [data-test-id*="conversation"], .recent')) {
+                        continue;
+                    }
+
+                    const href = el.getAttribute('href') || '';
+                    if (href.match(/\/app\/[a-zA-Z0-9_-]{5,}/)) {
+                        continue;
+                    }
+
+                    const txt = (el.innerText || '').toLowerCase().trim();
+                    const aria = (el.getAttribute('aria-label') || '').toLowerCase().trim();
+                    const title = (el.getAttribute('title') || '').toLowerCase().trim();
+
+                    if (txt === 'new chat' || aria === 'new chat' || title === 'new chat' || (href === '/app' && r.top < 150)) {
+                        el.click();
+                        return true;
+                    }
+                }
+                return false;
+            """.lstrip())
+
+            if clicked:
+                print("  [fresh] Clicked 'New Chat'. Waiting for UI to react...")
+                time.sleep(2.5)
+            else:
+                print("  [fresh] Could not find the UI button. Doing a hard refresh instead...")
+                goto_gemini_app(page)
+            continue
+
+        print("  [fresh] URL is currently base /app. Locking down for 3 seconds to test stability...")
+        time.sleep(3.0)
+
+        post_wait_url = page.url or ""
+        if not _url_is_base_app(post_wait_url):
+            print(f"  [fresh] HIJACKED! Gemini auto-redirected to {post_wait_url} at the last second. Retrying...")
+            continue
+
         try:
-            if click_dedicated_new_chat(driver):
-                time.sleep(2.0)
-                dismiss_open_overlays(driver)
-                wait_for_manual_login(driver, timeout=manual_login_timeout, strict=strict_login)
-                last_report = _print_fresh_state(driver, "fresh-after-new-chat-button")
-                if _chat_state_is_clean(driver):
-                    print("  [fresh] Clean fresh chat confirmed after dedicated New chat button.")
-                    return
-        except Exception as exc:
-            print(f"  [fresh] Dedicated New chat fallback raised: {exc}")
+            bubbles_count = int(page.evaluate(
+                "return document.querySelectorAll('user-query, model-response, [data-author=\"user\"], .user-query, .model-response').length;"
+            ))
+        except Exception:
+            bubbles_count = 0
 
-        print("  [fresh] Still not clean; abandoning this tab and trying a replacement tab.")
+        if bubbles_count > 0:
+            print(f"  [fresh] Fakeout! URL is /app but found {bubbles_count} old chat bubbles. Forcing a refresh...")
+            page.goto("about:blank", wait_until="domcontentloaded", timeout=15000)
+            time.sleep(0.5)
+            goto_gemini_app(page)
+            continue
 
-    raise RuntimeError(
-        "Could not guarantee a clean fresh Gemini chat before upload after URL repair/new-tab retries. "
-        f"Last state: {last_report}"
-    )
+        try:
+            find_composer(page, timeout=3)
+            print("  [fresh] SUCCESS! Verified stable, truly fresh chat.")
+            return
+        except Exception:
+            print("  [fresh] Clean chat, but composer isn't fully loaded yet. Waiting...")
+            pass
+
+    raise RuntimeError("Failed to establish a fresh Gemini chat. SPA state kept hijacking the session.")
+
 
 
 # ---------------------------------------------------------------------------
@@ -954,73 +759,74 @@ def navigate_to_fresh_chat(driver: webdriver.Chrome, manual_login_timeout: int, 
 # ---------------------------------------------------------------------------
 
 
-def _safe_click_js(driver: webdriver.Chrome, labels: Iterable[str], exact: bool = False, timeout: float = 8.0) -> bool:
-    labels_list = [x.lower().strip() for x in labels if x.strip()]
+def _safe_click_js(page: Page, labels: Iterable[str], exact: bool = False, timeout: float = 8.0) -> bool:
+    labels_list = [str(x).lower().strip().replace("'", "\\'") for x in labels if str(x).strip()]
+    bad_words_list = [x.lower().strip().replace("'", "\\'") for x in UNSAFE_CLICK_WORDS]
     deadline = time.time() + timeout
     while time.time() < deadline:
-        clicked = driver.execute_script(
-            r"""
-            const labels = arguments[0];
-            const exact = arguments[1];
-            const badWords = arguments[2];
-            function visible(el) {
+        labels_copy = list(labels_list)
+        js = f"""
+        (function() {{
+            const labels = {labels_copy};
+            const exact = {str(exact).lower()};
+            const badWords = {bad_words_list};
+            function visible(el) {{
                 const r = el.getBoundingClientRect();
                 const s = getComputedStyle(el);
                 return r.width > 0 && r.height > 0 && s.display !== 'none' && s.visibility !== 'hidden';
-            }
-            function inForbiddenArea(el) {
+            }}
+            function inForbiddenArea(el) {{
                 return !!el.closest('nav, [role="navigation"], [aria-label*="Recent"], [aria-label*="Conversation history"], .conversation-list, .history');
-            }
-            function bad(el) {
+            }}
+            function bad(el) {{
                 const txt = ((el.getAttribute('aria-label') || '') + ' ' + (el.getAttribute('title') || '') + ' ' + (el.innerText || '')).toLowerCase();
-                if (badWords.some(w => txt.includes(w))) return true;
+                if (badWords.some(function(w) {{ return txt.includes(w); }})) return true;
                 return false;
-            }
+            }}
             const roots = Array.from(document.querySelectorAll('main, header, [role="dialog"], .cdk-overlay-container, body'));
             const nodes = [];
-            for (const root of roots) {
-                for (const el of root.querySelectorAll('button,a,[role="button"],[role="menuitem"],[role="option"],[role="menuitemradio"],mat-option')) {
+            for (const root of roots) {{
+                for (const el of root.querySelectorAll('button,a,[role="button"],[role="menuitem"],[role="option"],[role="menuitemradio"],mat-option')) {{
                     if (!nodes.includes(el)) nodes.push(el);
-                }
-            }
+                }}
+            }}
             const candidates = [];
-            for (const el of nodes) {
+            for (const el of nodes) {{
                 if (!visible(el) || bad(el)) continue;
-                // Do not click sidebar/history unless it is explicitly New chat (handled elsewhere).
                 if (inForbiddenArea(el)) continue;
                 const txt = ((el.getAttribute('aria-label') || '') + ' ' + (el.getAttribute('title') || '') + ' ' + (el.innerText || '')).trim().toLowerCase();
                 if (!txt) continue;
-                for (const label of labels) {
-                    if ((exact && txt === label) || (!exact && txt.includes(label))) {
+                for (const label of labels) {{
+                    if ((exact && txt === label) || (!exact && txt.includes(label))) {{
                         candidates.push(el);
                         break;
-                    }
-                }
-            }
+                    }}
+                }}
+            }}
             if (!candidates.length) return false;
-            candidates.sort((a,b) => {
+            candidates.sort(function(a, b) {{
                 const ar = a.getBoundingClientRect();
                 const br = b.getBoundingClientRect();
-                // Prefer lower/right side controls for composer/tool buttons, then visible menu items.
                 return (br.top - ar.top) || (br.left - ar.left);
-            });
-            candidates[0].scrollIntoView({block:'center', inline:'center'});
+            }});
+            candidates[0].scrollIntoView({{block:'center', inline:'center'}});
             candidates[0].click();
             return true;
-            """,
-            labels_list,
-            exact,
-            list(UNSAFE_CLICK_WORDS),
-        )
-        if clicked:
-            return True
+        }})();
+        """
+        try:
+            clicked = page.evaluate(js)
+            if clicked:
+                return True
+        except Exception:
+            pass
         time.sleep(0.3)
     return False
 
 
-def safe_click_labels(driver: webdriver.Chrome, labels: Iterable[str], timeout: float = 8.0, exact: bool = False) -> bool:
+def safe_click_labels(page: Page, labels: Iterable[str], timeout: float = 8.0, exact: bool = False) -> bool:
     try:
-        return _safe_click_js(driver, labels, exact=exact, timeout=timeout)
+        return _safe_click_js(page, labels, exact=exact, timeout=timeout)
     except Exception:
         return False
 
@@ -1030,8 +836,7 @@ def safe_click_labels(driver: webdriver.Chrome, labels: Iterable[str], timeout: 
 # ---------------------------------------------------------------------------
 
 
-def find_composer(driver: webdriver.Chrome, timeout: int = 30):
-    wait = WebDriverWait(driver, timeout)
+def find_composer(page: Page, timeout: int = 30) -> Locator:
     selectors = [
         "rich-textarea div[contenteditable='true']",
         "div[contenteditable='true'][role='textbox']",
@@ -1042,35 +847,35 @@ def find_composer(driver: webdriver.Chrome, timeout: int = 30):
     last_error: Exception | None = None
     for selector in selectors:
         try:
-            elem = wait.until(EC.presence_of_element_located((By.CSS_SELECTOR, selector)))
-            if elem.is_displayed():
-                return elem
+            loc = page.locator(selector).first
+            loc.wait_for(state="visible", timeout=timeout * 1000)
+            return loc
         except Exception as exc:
             last_error = exc
-    raise TimeoutException(f"Could not find Gemini composer. Last error: {last_error}")
+    raise PWTimeoutError(f"Could not find Gemini composer. Last error: {last_error}")
 
 
-def get_composer_text(driver: webdriver.Chrome, composer: Any) -> str:
-    """Read text from Gemini's real composer, not old messages or upload chips."""
+def get_composer_text(page: Page, composer: Locator) -> str:
     script = r"""
-        const root = arguments[0];
-        function readText(el) {
-            if (!el) return '';
-            const tag = (el.tagName || '').toLowerCase();
-            if (tag === 'textarea' || tag === 'input') return el.value || '';
-            if (el.isContentEditable || el.getAttribute('contenteditable') === 'true') {
+        (root) => {
+            function readText(el) {
+                if (!el) return '';
+                const tag = (el.tagName || '').toLowerCase();
+                if (tag === 'textarea' || tag === 'input') return el.value || '';
+                if (el.isContentEditable || el.getAttribute('contenteditable') === 'true') {
+                    return el.innerText || el.textContent || '';
+                }
+                if (el.querySelector) {
+                    const child = el.querySelector('textarea, input, [contenteditable="true"], [role="textbox"]');
+                    if (child) return readText(child);
+                }
                 return el.innerText || el.textContent || '';
             }
-            if (el.querySelector) {
-                const child = el.querySelector('textarea, input, [contenteditable="true"], [role="textbox"]');
-                if (child) return readText(child);
-            }
-            return el.innerText || el.textContent || '';
+            return readText(root);
         }
-        return readText(root);
-    """
+    """.strip()
     try:
-        return driver.execute_script(script, composer) or ""
+        return composer.evaluate(script) or ""
     except Exception:
         return ""
 
@@ -1173,169 +978,134 @@ def write_prompt_debug_file(path: Path | None, expected: str, actual: str, repor
         print(f"  [prompt] Could not write debug file {path}: {exc}")
 
 
-def focus_composer(driver: webdriver.Chrome, composer: Any) -> None:
+def focus_composer(page: Page, composer: Locator) -> None:
     try:
-        driver.execute_script("arguments[0].scrollIntoView({block:'center', inline:'center'});", composer)
+        composer.scroll_into_view_if_needed()
     except Exception:
         pass
     for _ in range(3):
         try:
             composer.click()
             break
-        except ElementClickInterceptedException:
-            dismiss_open_overlays(driver)
-            time.sleep(0.3)
         except Exception:
-            try:
-                driver.execute_script("arguments[0].focus();", composer)
-                break
-            except Exception:
-                pass
-    try:
-        driver.execute_script("arguments[0].focus();", composer)
-    except Exception:
-        pass
+            dismiss_open_overlays(page)
+            time.sleep(0.3)
     time.sleep(0.15)
 
 
-def clear_composer_keyboard(driver: webdriver.Chrome, composer: Any) -> None:
-    focus_composer(driver, composer)
+def clear_composer_keyboard(page: Page, composer: Locator) -> None:
+    focus_composer(page, composer)
     try:
-        ActionChains(driver).key_down(Keys.CONTROL).send_keys("a").key_up(Keys.CONTROL).send_keys(Keys.BACKSPACE).perform()
+        composer.click()
+        page.keyboard.press("Control+a")
+        page.keyboard.press("Backspace")
     except Exception:
-        try:
-            composer.send_keys(Keys.CONTROL, "a")
-            composer.send_keys(Keys.BACKSPACE)
-        except Exception:
-            pass
+        pass
     time.sleep(0.25)
 
 
-def paste_prompt_via_cdp(driver: webdriver.Chrome, text: str) -> bool:
-    """Use Chrome DevTools Input.insertText so newlines are inserted as text, not Enter keypresses."""
+def paste_prompt_via_keyboard(page: Page, text: str) -> bool:
+    """Insert text without synthesizing Enter key presses.
+
+    keyboard.type() is unsafe for long multiline Gemini prompts because every
+    newline is delivered as an Enter key press and Gemini can submit early.
+    insert_text() sends a text insertion command instead, so newlines stay in
+    the composer.
+    """
     try:
-        composer = find_composer(driver, timeout=10)
-        clear_composer_keyboard(driver, composer)
-        composer = find_composer(driver, timeout=5)
-        focus_composer(driver, composer)
-        driver.execute_cdp_cmd("Input.insertText", {"text": text})
+        composer = find_composer(page, timeout=10)
+        clear_composer_keyboard(page, composer)
+        composer = find_composer(page, timeout=5)
+        focus_composer(page, composer)
+        composer.click()
+        page.keyboard.insert_text(text)
         return True
     except Exception as exc:
-        print(f"  [prompt] CDP insertText failed: {exc}")
+        print(f"  [prompt] keyboard insert_text failed: {exc}")
         return False
 
 
-def grant_clipboard_permissions(driver: webdriver.Chrome) -> None:
-    for permissions in (["clipboardReadWrite", "clipboardSanitizedWrite"], ["clipboardReadWrite"]):
-        try:
-            driver.execute_cdp_cmd(
-                "Browser.grantPermissions",
-                {"origin": "https://gemini.google.com", "permissions": list(permissions)},
-            )
-            return
-        except Exception:
-            continue
-
-
-def write_browser_clipboard(driver: webdriver.Chrome, text: str) -> bool:
+def paste_prompt_via_clipboard(page: Page, text: str) -> bool:
     try:
-        grant_clipboard_permissions(driver)
-        try:
-            driver.set_script_timeout(60)
-        except Exception:
-            pass
-        result = driver.execute_async_script(
-            r"""
-            const text = arguments[0];
-            const done = arguments[arguments.length - 1];
-            if (!navigator.clipboard || !navigator.clipboard.writeText) {
-                done({ok:false, error:'navigator.clipboard.writeText unavailable'});
-                return;
-            }
-            navigator.clipboard.writeText(text)
-                .then(() => done({ok:true}))
-                .catch(err => done({ok:false, error:String(err)}));
-            """,
+        # Only use clipboard when explicitly requested. Verify the browser
+        # clipboard actually contains our prompt before pressing Control+V;
+        # otherwise old user clipboard contents can be pasted into Gemini.
+        probe = page.evaluate(
+            """async (text) => {
+                if (!navigator.clipboard || !navigator.clipboard.writeText || !navigator.clipboard.readText) {
+                    throw new Error('clipboard read/write unavailable');
+                }
+                await navigator.clipboard.writeText(text);
+                const current = await navigator.clipboard.readText();
+                return current === text;
+            }""",
             text,
         )
-        if isinstance(result, dict) and result.get("ok"):
-            return True
-        print(f"  [prompt] Browser clipboard write failed: {result}")
-        return False
-    except Exception as exc:
-        print(f"  [prompt] Browser clipboard write error: {exc}")
-        return False
-
-
-def paste_prompt_via_clipboard(driver: webdriver.Chrome, text: str) -> bool:
-    """Paste through the browser clipboard; this updates Gemini like a real user paste."""
-    if not write_browser_clipboard(driver, text):
-        return False
-    try:
-        composer = find_composer(driver, timeout=10)
-        clear_composer_keyboard(driver, composer)
-        composer = find_composer(driver, timeout=5)
-        focus_composer(driver, composer)
-        ActionChains(driver).key_down(Keys.CONTROL).send_keys("v").key_up(Keys.CONTROL).perform()
+        if not probe:
+            raise RuntimeError("clipboard verification failed; refusing to paste stale clipboard")
+        composer = find_composer(page, timeout=10)
+        clear_composer_keyboard(page, composer)
+        composer = find_composer(page, timeout=5)
+        focus_composer(page, composer)
+        page.keyboard.press("Control+v")
         return True
     except Exception as exc:
-        print(f"  [prompt] Clipboard paste failed: {exc}")
+        print(f"  [prompt] clipboard paste failed: {exc}")
         return False
 
 
-def paste_prompt_via_js_last_resort(driver: webdriver.Chrome, text: str) -> bool:
-    """Last-resort DOM insertion. It is verified strictly before Send is allowed."""
+def paste_prompt_via_js_last_resort(page: Page, text: str) -> bool:
     script = r"""
-        const el = arguments[0];
-        const text = arguments[1];
-        el.scrollIntoView({block:'center', inline:'center'});
-        el.focus();
-        const tag = (el.tagName || '').toLowerCase();
-        if (tag === 'textarea' || tag === 'input') {
-            el.value = '';
-            el.dispatchEvent(new Event('input', {bubbles:true}));
-            el.value = text;
+        (el, text) => {
+            el.scrollIntoView({block:'center', inline:'center'});
+            el.focus();
+            const tag = (el.tagName || '').toLowerCase();
+            if (tag === 'textarea' || tag === 'input') {
+                el.value = '';
+                el.dispatchEvent(new Event('input', {bubbles:true}));
+                el.value = text;
+                el.dispatchEvent(new InputEvent('input', {bubbles:true, inputType:'insertFromPaste', data:text}));
+                el.dispatchEvent(new Event('change', {bubbles:true}));
+                return true;
+            }
+            const dt = new DataTransfer();
+            dt.setData('text/plain', text);
+            const pasteEvent = new ClipboardEvent('paste', {bubbles:true, cancelable:true, clipboardData:dt});
+            el.dispatchEvent(pasteEvent);
+            if ((el.innerText || '').trim().length < 10) {
+                el.textContent = '';
+                document.execCommand('insertText', false, text);
+            }
             el.dispatchEvent(new InputEvent('input', {bubbles:true, inputType:'insertFromPaste', data:text}));
             el.dispatchEvent(new Event('change', {bubbles:true}));
             return true;
         }
-        const dt = new DataTransfer();
-        dt.setData('text/plain', text);
-        const pasteEvent = new ClipboardEvent('paste', {bubbles:true, cancelable:true, clipboardData:dt});
-        el.dispatchEvent(pasteEvent);
-        if ((el.innerText || '').trim().length < 10) {
-            el.textContent = '';
-            document.execCommand('insertText', false, text);
-        }
-        el.dispatchEvent(new InputEvent('input', {bubbles:true, inputType:'insertFromPaste', data:text}));
-        el.dispatchEvent(new Event('change', {bubbles:true}));
-        return true;
-    """
+    """.strip()
     try:
-        composer = find_composer(driver, timeout=10)
-        clear_composer_keyboard(driver, composer)
-        composer = find_composer(driver, timeout=5)
-        focus_composer(driver, composer)
-        return bool(driver.execute_script(script, composer, text))
+        composer = find_composer(page, timeout=10)
+        clear_composer_keyboard(page, composer)
+        composer = find_composer(page, timeout=5)
+        focus_composer(page, composer)
+        return bool(composer.evaluate(script, text))
     except Exception as exc:
         print(f"  [prompt] JS last-resort insert failed: {exc}")
         return False
 
 
 def wait_for_prompt_integrity(
-    driver: webdriver.Chrome,
+    page: Page,
     expected: str,
     timeout: float,
     min_ratio: float,
-) -> tuple[Any, str, dict[str, Any]]:
+) -> tuple[Locator, str, dict[str, Any]]:
     deadline = time.time() + timeout
-    last_composer: Any = None
+    last_composer: Locator | None = None
     last_actual = ""
     last_report = prompt_integrity_report(expected, "", min_ratio)
     while time.time() < deadline:
         try:
-            last_composer = find_composer(driver, timeout=3)
-            last_actual = get_composer_text(driver, last_composer)
+            last_composer = find_composer(page, timeout=3)
+            last_actual = get_composer_text(page, last_composer)
             last_report = prompt_integrity_report(expected, last_actual, min_ratio)
             if last_report["ok"]:
                 return last_composer, last_actual, last_report
@@ -1343,27 +1113,31 @@ def wait_for_prompt_integrity(
             pass
         time.sleep(0.5)
     if last_composer is None:
-        last_composer = find_composer(driver, timeout=5)
+        last_composer = find_composer(page, timeout=5)
     return last_composer, last_actual, last_report
 
 
 def _prompt_methods_for(method: str) -> list[str]:
-    if method == "auto":
-        # Do not silently fall back to DOM/JS insertion in auto mode. JS can make
-        # the composer look full while Gemini's internal editor state is stale.
-        # Failing is safer than sending a partial prompt.
-        return ["cdp", "clipboard"]
+    # Avoid using the OS/browser clipboard in auto mode. On a CDP-attached
+    # desktop Chrome, navigator.clipboard.writeText can silently fail or be
+    # denied; Control+V then pastes whatever the user last copied (for example
+    # the shell command), which is exactly what we want to avoid.
+    #
+    # keyboard here uses Playwright keyboard.insert_text(), NOT keyboard.type(),
+    # so multiline prompts are inserted as text and newlines do not submit.
+    if method in {"auto", "cdp"}:
+        return ["keyboard", "js"]
     return [method]
 
 
 def set_prompt_text(
-    driver: webdriver.Chrome,
+    page: Page,
     text: str,
     method: str = "auto",
     verify_timeout: float = 35,
     min_integrity_ratio: float = 0.98,
     debug_path: Path | None = None,
-) -> Any:
+) -> Locator:
     print(f"  [prompt] Expected prompt: {len(text)} chars, {text.count(chr(10)) + 1} lines")
     last_actual = ""
     last_report = prompt_integrity_report(text, "", min_integrity_ratio)
@@ -1372,12 +1146,12 @@ def set_prompt_text(
     for selected_method in _prompt_methods_for(method):
         last_method = selected_method
         print(f"  [prompt] Inserting with method: {selected_method}")
-        if selected_method == "cdp":
-            inserted = paste_prompt_via_cdp(driver, text)
+        if selected_method == "keyboard":
+            inserted = paste_prompt_via_keyboard(page, text)
         elif selected_method == "clipboard":
-            inserted = paste_prompt_via_clipboard(driver, text)
+            inserted = paste_prompt_via_clipboard(page, text)
         elif selected_method == "js":
-            inserted = paste_prompt_via_js_last_resort(driver, text)
+            inserted = paste_prompt_via_js_last_resort(page, text)
         else:
             inserted = False
 
@@ -1385,7 +1159,7 @@ def set_prompt_text(
             continue
 
         composer, actual, report = wait_for_prompt_integrity(
-            driver,
+            page,
             expected=text,
             timeout=verify_timeout,
             min_ratio=min_integrity_ratio,
@@ -1398,7 +1172,7 @@ def set_prompt_text(
             return composer
 
     write_prompt_debug_file(debug_path, text, last_actual, last_report, last_method)
-    raise TimeoutException(
+    raise PWTimeoutError(
         "Prompt was not inserted completely; refusing to send partial prompt. "
         + format_prompt_integrity(last_report)
         + " | actual_start="
@@ -1408,199 +1182,232 @@ def set_prompt_text(
     )
 
 
-def _send_button_diagnostics(driver: webdriver.Chrome, composer: Any | None = None) -> list[str]:
-    """Return a short list of visible composer-area buttons for debugging."""
-    script = r"""
-        const composer = arguments[0] || null;
-        function visible(el) {
-            const r = el.getBoundingClientRect();
-            const s = getComputedStyle(el);
-            return r.width > 0 && r.height > 0 && s.display !== 'none' && s.visibility !== 'hidden';
-        }
-        const cr = composer && composer.getBoundingClientRect ? composer.getBoundingClientRect() : null;
-        const out = [];
-        const nodes = Array.from(document.querySelectorAll('main button, main [role="button"]'));
-        for (const b of nodes) {
-            if (!visible(b)) continue;
-            const r = b.getBoundingClientRect();
-            if (cr) {
-                const nearY = r.top < cr.bottom + 220 && r.bottom > cr.top - 120;
-                if (!nearY) continue;
-            } else if (r.top < window.innerHeight * 0.45) {
-                continue;
-            }
-            const txt = ((b.getAttribute('aria-label') || '') + ' | ' + (b.getAttribute('title') || '') + ' | ' + (b.innerText || '')).replace(/\s+/g, ' ').trim();
-            out.push(`${Math.round(r.left)},${Math.round(r.top)} ${Math.round(r.width)}x${Math.round(r.height)} disabled=${!!b.disabled || b.getAttribute('aria-disabled') === 'true'} :: ${txt.slice(0, 140)}`);
-            if (out.length >= 12) break;
-        }
-        return out;
-    """
+
+def _locator_rect(locator: Locator | None) -> dict[str, float] | None:
+    if locator is None:
+        return None
     try:
-        return list(driver.execute_script(script, composer) or [])
-    except Exception:
-        return []
-
-
-def find_enabled_send_button(driver: webdriver.Chrome, composer: Any | None = None, loose: bool = False):
-    """
-    Find Gemini's actual composer Send/Submit control.
-
-    The earlier versions looked only for aria-label text containing "Send".
-    Gemini often exposes the submit control as an icon-only button, or changes
-    the label to "Submit prompt". This finder scores visible enabled buttons by
-    text/icon AND position relative to the composer, while avoiding sidebar,
-    upload, tools, mic, model, share, and old-chat controls.
-    """
-    script = r"""
-        const composer = arguments[0] || null;
-        const loose = !!arguments[1];
-
-        function visible(el) {
-            const r = el.getBoundingClientRect();
-            const s = getComputedStyle(el);
-            return r.width > 0 && r.height > 0 && s.display !== 'none' && s.visibility !== 'hidden' && s.opacity !== '0';
-        }
-        function disabled(el) {
-            return !!el.disabled || el.getAttribute('aria-disabled') === 'true' || el.classList.contains('disabled');
-        }
-        function textOf(el) {
-            const iconText = Array.from(el.querySelectorAll('mat-icon, .material-icons, .material-symbols-outlined, svg title'))
-                .map(x => x.textContent || '').join(' ');
-            return ((el.getAttribute('aria-label') || '') + ' ' +
-                    (el.getAttribute('title') || '') + ' ' +
-                    (el.getAttribute('data-testid') || '') + ' ' +
-                    (el.getAttribute('data-test-id') || '') + ' ' +
-                    (el.innerText || '') + ' ' + iconText).replace(/\s+/g, ' ').trim().toLowerCase();
-        }
-        function inForbiddenArea(el) {
-            return !!el.closest('nav, [role="navigation"], [aria-label*="Recent"], [aria-label*="Conversation history"], .conversation-list, .history');
-        }
-
-        const badWords = [
-            'add files', 'attach', 'attachment', 'upload', 'insert', 'image', 'photo',
-            'microphone', 'mic', 'voice', 'tools', 'tool', 'model', 'flash', 'fast', 'pro',
-            'close', 'cancel', 'menu', 'more options', 'share', 'new chat', 'temporary chat',
-            'settings', 'apps', 'account', 'help', 'delete', 'rename', 'archive'
-        ];
-        const sendWords = ['send', 'submit', 'arrow_upward', 'arrow_forward', 'paper_plane', 'send_message'];
-
-        const cr = composer && composer.getBoundingClientRect ? composer.getBoundingClientRect() : null;
-        const nodes = Array.from(document.querySelectorAll('main button, main [role="button"], button[aria-label*="Send"], button[aria-label*="Submit"]'));
-        const seen = new Set();
-        const candidates = [];
-
-        for (const el of nodes) {
-            if (!el || seen.has(el)) continue;
-            seen.add(el);
-            if (!visible(el) || disabled(el) || inForbiddenArea(el)) continue;
-            const t = textOf(el);
-            const r = el.getBoundingClientRect();
-            const named = sendWords.some(w => t.includes(w)) || ((el.getAttribute('type') || '').toLowerCase() === 'submit');
-            if (badWords.some(w => t.includes(w)) && !named) continue;
-
-            let score = 0;
-            if (t.includes('send message')) score += 260;
-            if (t.includes('send')) score += 230;
-            if (t.includes('submit')) score += 220;
-            if (t.includes('arrow_upward') || t.includes('send_message') || t.includes('paper_plane')) score += 180;
-            if ((el.getAttribute('type') || '').toLowerCase() === 'submit') score += 150;
-
-            let nearComposer = false;
-            if (cr) {
-                const midY = (r.top + r.bottom) / 2;
-                const compMidY = (cr.top + cr.bottom) / 2;
-                const vertical = r.top < cr.bottom + 220 && r.bottom > cr.top - 140;
-                const rightSide = r.left > cr.left + cr.width * 0.52 || r.right > window.innerWidth * 0.66;
-                nearComposer = vertical && rightSide;
-                if (nearComposer) score += 140;
-                score += Math.max(0, 45 - Math.abs(midY - compMidY) / 6);
-                score += Math.max(0, (r.left - cr.left) / 25);
-            } else {
-                if (r.top > window.innerHeight * 0.55 && r.left > window.innerWidth * 0.55) score += 80;
-            }
-
-            // Strict mode requires a name/icon/type. Loose mode permits a highly
-            // positioned bottom-right enabled button near the composer.
-            if (!named && !(loose && nearComposer && score >= 120)) continue;
-
-            // Avoid very large container buttons.
-            if (r.width > 360 || r.height > 120) score -= 120;
-            candidates.push({el, score, top: r.top, left: r.left, text: t});
-        }
-
-        if (!candidates.length) return null;
-        candidates.sort((a, b) => (b.score - a.score) || (b.top - a.top) || (b.left - a.left));
-        return candidates[0].el;
-    """
-    try:
-        return driver.execute_script(script, composer, loose)
+        return locator.evaluate(
+            """el => {
+                const r = el.getBoundingClientRect();
+                return {top:r.top, bottom:r.bottom, left:r.left, right:r.right, width:r.width, height:r.height};
+            }"""
+        )
     except Exception:
         return None
 
-
-def wait_until_send_enabled(driver: webdriver.Chrome, composer: Any | None = None, timeout: float = 20.0, loose: bool = False):
-    deadline = time.time() + timeout
-    while time.time() < deadline:
-        btn = find_enabled_send_button(driver, composer=composer, loose=loose)
-        if btn is not None:
-            return btn
-        time.sleep(0.35)
-    return None
-
-
-def generation_in_progress(driver: webdriver.Chrome) -> bool:
+def _send_button_diagnostics(page: Page, composer: Locator | None = None) -> list[str]:
+    cr = _locator_rect(composer)
     script = r"""
-        const main = document.querySelector('main') || document.body;
-        const txt = (main.innerText || '').toLowerCase();
-        if (txt.includes('generating') || txt.includes('creating image') || txt.includes('creating your image') || txt.includes('working on it')) return true;
-        for (const el of main.querySelectorAll('[role="progressbar"], mat-progress-spinner, .spinner, .loading, .progress')) {
-            const r = el.getBoundingClientRect();
-            const s = getComputedStyle(el);
-            if (r.width > 0 && r.height > 0 && s.display !== 'none' && s.visibility !== 'hidden') return true;
+        (cr) => {
+            function visible(el) {
+                const r = el.getBoundingClientRect();
+                const s = getComputedStyle(el);
+                return r.width > 0 && r.height > 0 && s.display !== 'none' && s.visibility !== 'hidden';
+            }
+            const out = [];
+            const nodes = Array.from(document.querySelectorAll('main button, main [role="button"]'));
+            for (const b of nodes) {
+                if (!visible(b)) continue;
+                const r = b.getBoundingClientRect();
+                if (cr) {
+                    const nearY = r.top < cr.bottom + 220 && r.bottom > cr.top - 120;
+                    if (!nearY) continue;
+                } else if (r.top < window.innerHeight * 0.45) {
+                    continue;
+                }
+                const txt = ((b.getAttribute('aria-label') || '') + ' | ' + (b.getAttribute('title') || '') + ' | ' + (b.innerText || '')).replace(/\s+/g, ' ').trim();
+                out.push(`${Math.round(r.left)},${Math.round(r.top)} ${Math.round(r.width)}x${Math.round(r.height)} disabled=${!!b.disabled || b.getAttribute('aria-disabled') === 'true'} :: ${txt.slice(0, 140)}`);
+                if (out.length >= 12) break;
+            }
+            return out;
         }
-        for (const b of main.querySelectorAll('button, [role="button"]')) {
-            const t = ((b.getAttribute('aria-label') || '') + ' ' + (b.getAttribute('title') || '') + ' ' + (b.innerText || '')).toLowerCase();
-            if (t.includes('stop') || t.includes('cancel generation') || t.includes('stop response')) return true;
-        }
-        return false;
-    """
+    """.strip()
     try:
-        return bool(driver.execute_script(script))
+        return list(page.evaluate(script, cr) or [])
     except Exception:
+        return []
+
+
+def _send_button_action(page: Page, composer: Locator | None = None, loose: bool = False, click: bool = False) -> bool:
+    cr = _locator_rect(composer)
+    script = r"""
+        ({cr, loose, click}) => {
+            function visible(el) {
+                const r = el.getBoundingClientRect();
+                const s = getComputedStyle(el);
+                return r.width > 0 && r.height > 0 && s.display !== 'none' && s.visibility !== 'hidden' && s.opacity !== '0';
+            }
+            function disabled(el) {
+                return !!el.disabled || el.getAttribute('aria-disabled') === 'true' || el.classList.contains('disabled');
+            }
+            function textOf(el) {
+                const iconText = Array.from(el.querySelectorAll('mat-icon, .material-icons, .material-symbols-outlined, svg title'))
+                    .map(x => x.textContent || '').join(' ');
+                return ((el.getAttribute('aria-label') || '') + ' ' +
+                        (el.getAttribute('title') || '') + ' ' +
+                        (el.getAttribute('data-testid') || '') + ' ' +
+                        (el.getAttribute('data-test-id') || '') + ' ' +
+                        (el.innerText || '') + ' ' + iconText).replace(/\s+/g, ' ').trim().toLowerCase();
+            }
+            function inForbiddenArea(el) {
+                return !!el.closest('nav, [role="navigation"], [aria-label*="Recent"], [aria-label*="Conversation history"], .conversation-list, .history');
+            }
+
+            const badWords = [
+                'add files', 'attach', 'attachment', 'upload', 'insert', 'image', 'photo',
+                'microphone', 'mic', 'voice', 'tools', 'tool', 'model', 'flash', 'fast', 'pro',
+                'close', 'cancel', 'menu', 'more options', 'share', 'new chat', 'temporary chat',
+                'settings', 'apps', 'account', 'help', 'delete', 'rename', 'archive'
+            ];
+            const sendWords = ['send', 'submit', 'arrow_upward', 'arrow_forward', 'paper_plane', 'send_message'];
+            const nodes = Array.from(document.querySelectorAll('main button, main [role="button"], button[aria-label*="Send"], button[aria-label*="Submit"]'));
+            const candidates = [];
+            const seen = new Set();
+
+            for (const el of nodes) {
+                if (!el || seen.has(el)) continue;
+                seen.add(el);
+                if (!visible(el) || disabled(el) || inForbiddenArea(el)) continue;
+                const t = textOf(el);
+                const r = el.getBoundingClientRect();
+                const named = sendWords.some(w => t.includes(w)) || ((el.getAttribute('type') || '').toLowerCase() === 'submit');
+                if (badWords.some(w => t.includes(w)) && !named) continue;
+
+                let score = 0;
+                if (t.includes('send message')) score += 260;
+                if (t.includes('send')) score += 230;
+                if (t.includes('submit')) score += 220;
+                if (t.includes('arrow_upward') || t.includes('send_message') || t.includes('paper_plane')) score += 180;
+                if ((el.getAttribute('type') || '').toLowerCase() === 'submit') score += 150;
+
+                let nearComposer = false;
+                if (cr) {
+                    const midY = (r.top + r.bottom) / 2;
+                    const compMidY = (cr.top + cr.bottom) / 2;
+                    const vertical = r.top < cr.bottom + 220 && r.bottom > cr.top - 140;
+                    const rightSide = r.left > cr.left + cr.width * 0.52 || r.right > window.innerWidth * 0.66;
+                    nearComposer = vertical && rightSide;
+                    if (nearComposer) score += 140;
+                    score += Math.max(0, 45 - Math.abs(midY - compMidY) / 6);
+                    score += Math.max(0, (r.left - cr.left) / 25);
+                } else if (r.top > window.innerHeight * 0.55 && r.left > window.innerWidth * 0.55) {
+                    score += 80;
+                }
+
+                if (!named && !(loose && nearComposer && score >= 120)) continue;
+                if (r.width > 360 || r.height > 120) score -= 120;
+                candidates.push({el, score, top: r.top, left: r.left});
+            }
+
+            if (!candidates.length) return false;
+            candidates.sort((a, b) => (b.score - a.score) || (b.top - a.top) || (b.left - a.left));
+            if (click) {
+                candidates[0].el.scrollIntoView({block:'center', inline:'center'});
+                candidates[0].el.click();
+            }
+            return true;
+        }
+    """.strip()
+    try:
+        return bool(page.evaluate(script, {"cr": cr, "loose": bool(loose), "click": bool(click)}))
+    except Exception as exc:
+        print(f"  [send] Send button query failed: {exc}")
         return False
 
 
+def find_enabled_send_button(page: Page, composer: Locator | None = None, loose: bool = False) -> bool:
+    return _send_button_action(page, composer=composer, loose=loose, click=False)
+
+
+def wait_until_send_enabled(page: Page, composer: Locator | None = None, timeout: float = 20.0, loose: bool = False) -> bool:
+    deadline = time.time() + timeout
+    while time.time() < deadline:
+        if find_enabled_send_button(page, composer=composer, loose=loose):
+            return True
+        time.sleep(0.35)
+    return False
+
+
+def click_send_button(page: Page, composer: Locator | None = None, loose: bool = False) -> bool:
+    try:
+        composer = composer or find_composer(page, timeout=3)
+    except Exception:
+        composer = None
+    if not wait_until_send_enabled(page, composer=composer, timeout=12, loose=loose):
+        diag = _send_button_diagnostics(page, composer)
+        if diag:
+            print("  [send] Visible composer-area buttons when Send was not found:")
+            for row in diag:
+                print(f"  [send]   {row}")
+        return False
+    return _send_button_action(page, composer=composer, loose=loose, click=True)
+
+def _submission_activity_report(page: Page) -> dict[str, Any]:
+    """Return visible signs that Gemini accepted the prompt.
+
+    Gemini often clears the composer and shows a Stop response button / Show
+    thinking panel before the generated image appears. The previous script only
+    trusted a narrow progress detector, so it sometimes kept clicking Send even
+    after the first Enter had already submitted the prompt.
+    """
+    script = r"""
+        () => {
+            const root = document.querySelector('main') || document.body;
+            function visible(el) {
+                if (!el) return false;
+                const r = el.getBoundingClientRect();
+                const s = getComputedStyle(el);
+                return r.width > 0 && r.height > 0 && s.display !== 'none' && s.visibility !== 'hidden' && s.opacity !== '0';
+            }
+            function textOf(el) {
+                return ((el.getAttribute('aria-label') || '') + ' ' +
+                        (el.getAttribute('title') || '') + ' ' +
+                        (el.innerText || '') + ' ' +
+                        (el.textContent || '')).replace(/\s+/g, ' ').trim().toLowerCase();
+            }
+            const bodyText = (root.innerText || document.body.innerText || '').replace(/\s+/g, ' ').toLowerCase();
+            const buttons = Array.from(document.querySelectorAll('button, [role="button"]')).filter(visible);
+            const buttonText = buttons.map(textOf).join(' | ');
+            const stopVisible = buttonText.includes('stop response') || buttonText.includes('cancel generation') || buttonText.includes('stop generating');
+            const thinkingVisible = bodyText.includes('show thinking') || bodyText.includes('thinking') || bodyText.includes('creating image') || bodyText.includes('generating');
+            let progressVisible = false;
+            for (const el of document.querySelectorAll('[role="progressbar"], mat-progress-spinner, mat-progress-bar, .spinner, .loading, .progress')) {
+                if (visible(el)) { progressVisible = true; break; }
+            }
+            const assistantCount = Array.from(document.querySelectorAll('model-response, .model-response, .response-container, [data-response-index], [data-chunk-index], [data-testid*="response"], [class*="response"]')).filter(visible).length;
+            const path = window.location.pathname || '';
+            const conversationUrl = /^\/app\//.test(path);
+            return {stopVisible, thinkingVisible, progressVisible, assistantCount, conversationUrl, path};
+        }
+    """.strip()
+    try:
+        report = page.evaluate(script) or {}
+        if not isinstance(report, dict):
+            return {}
+        return report
+    except Exception:
+        return {}
+
+
+def generation_in_progress(page: Page) -> bool:
+    report = _submission_activity_report(page)
+    return bool(
+        report.get("stopVisible")
+        or report.get("thinkingVisible")
+        or report.get("progressVisible")
+    )
+
 def _submission_needles(expected_prompt: str | None) -> list[str]:
-    if not expected_prompt:
+    """Return stable prompt snippets used to confirm the prompt left composer."""
+    compact = _compact_prompt_compare(expected_prompt or "")
+    if not compact:
         return []
-    lines = []
-    for raw in expected_prompt.splitlines():
-        line = re.sub(r"\s+", " ", raw).strip()
-        if len(line) < 14:
-            continue
-        # Prefer distinctive headings and exact-copy lines; avoid generic bullets first.
-        lines.append(line)
-    needles: list[str] = []
-    for line in lines[:12]:
-        if line not in needles:
-            needles.append(line[:110])
-        if len(line) > 34:
-            short = line[:34].strip()
-            if short not in needles:
-                needles.append(short)
-        if len(needles) >= 8:
-            break
-    compact = _compact_prompt_compare(expected_prompt)
-    if compact:
-        for size in (80, 48, 32):
-            chunk = compact[:size].strip()
-            if len(chunk) >= 14 and chunk not in needles:
-                needles.append(chunk)
-    return needles[:10]
+    chunks = _sample_chunks(compact, chunk_size=80)
+    # Avoid excessive DOM walking while still checking start/middle/end text.
+    return [c.lower() for c in chunks[:5] if len(c.strip()) >= 20]
 
-
-def prompt_visible_outside_composer_count(driver: webdriver.Chrome, expected_prompt: str | None) -> int:
-    """Count text-node matches for the prompt outside the editable composer."""
+def prompt_visible_outside_composer_count(page: Page, expected_prompt: str | None) -> int:
     needles = _submission_needles(expected_prompt)
     if not needles:
         return 0
@@ -1630,128 +1437,90 @@ def prompt_visible_outside_composer_count(driver: webdriver.Chrome, expected_pro
             if (needles.some(n => txt.includes(n) || n.includes(txt))) count++;
         }
         return count;
-    """
+    """.lstrip()
     try:
-        return int(driver.execute_script(script, needles) or 0)
+        return int(page.evaluate(script, needles) or 0)
     except Exception:
         return 0
 
 
 def wait_for_send_confirmation(
-    driver: webdriver.Chrome,
+    page: Page,
     expected_prompt: str | None = None,
     before_marker_count: int = 0,
     timeout: float = 35.0,
     allow_progress_marker: bool = True,
+    before_url: str | None = None,
 ) -> bool:
-    """
-    Confirm Gemini accepted the prompt.
-
-    Important: an empty composer alone is NOT accepted as success anymore,
-    because Gemini can clear/mutate the rich editor without actually starting
-    the request. We require either a generation/progress signal or the prompt
-    appearing as a submitted user message outside the composer.
-    """
     deadline = time.time() + timeout
     saw_empty_composer = False
+    before_path = ""
+    try:
+        before_path = urllib.parse.urlparse(before_url or "").path.rstrip("/")
+    except Exception:
+        before_path = ""
+
     while time.time() < deadline:
-        if allow_progress_marker and generation_in_progress(driver):
-            print("  [send] Prompt accepted; generation/progress indicator is active.")
+        try:
+            current_composer = find_composer(page, timeout=1)
+            current_text = get_composer_text(page, current_composer).strip()
+        except Exception:
+            current_text = ""
+
+        report = _submission_activity_report(page)
+        try:
+            current_path = urllib.parse.urlparse(page.url or "").path.rstrip("/")
+        except Exception:
+            current_path = ""
+        url_changed_to_conversation = bool(current_path.startswith("/app/") and current_path != before_path)
+
+        if allow_progress_marker and generation_in_progress(page):
+            print("  [send] Prompt accepted; Gemini shows thinking/progress/Stop response.")
+            return True
+
+        # In Gemini, a successful Enter often clears the composer immediately and
+        # then shows Show thinking / Stop response. Treat that as success; do not
+        # try to click Send again while Gemini is already working.
+        if not current_text and (
+            report.get("stopVisible")
+            or report.get("thinkingVisible")
+            or report.get("progressVisible")
+            or report.get("assistantCount", 0) > 0
+            or url_changed_to_conversation
+        ):
+            print(
+                "  [send] Prompt accepted; composer cleared and Gemini activity is visible "
+                f"(stop={report.get('stopVisible')}, thinking={report.get('thinkingVisible')}, "
+                f"assistant={report.get('assistantCount')}, path={current_path})."
+            )
             return True
 
         if expected_prompt:
-            marker_count = prompt_visible_outside_composer_count(driver, expected_prompt)
+            marker_count = prompt_visible_outside_composer_count(page, expected_prompt)
             if marker_count > before_marker_count:
                 print("  [send] Prompt accepted; user prompt is visible in the conversation.")
                 return True
 
-        try:
-            current_composer = find_composer(driver, timeout=1)
-            current_text = get_composer_text(driver, current_composer).strip()
-        except Exception:
-            current_text = ""
         if not current_text and not saw_empty_composer:
-            print("  [send] Composer is empty, but waiting for a real submit/progress marker...")
+            print("  [send] Composer is empty, but waiting for Gemini activity/URL/prompt marker...")
             saw_empty_composer = True
         time.sleep(0.55)
     return False
 
-
-def press_enter_to_send(driver: webdriver.Chrome, composer: Any) -> None:
-    """Focus Gemini composer and perform a real Selenium Enter keypress."""
-    composer = find_composer(driver, timeout=5)
-    focus_composer(driver, composer)
+def press_enter_to_send(page: Page, composer: Locator) -> None:
+    composer = find_composer(page, timeout=5)
+    focus_composer(page, composer)
     try:
-        ActionChains(driver).move_to_element(composer).click(composer).pause(0.15).send_keys(Keys.ENTER).perform()
+        composer.click()
+        page.keyboard.press("Enter")
         return
     except Exception:
         pass
-    try:
-        composer.send_keys(Keys.ENTER)
-        return
-    except Exception:
-        pass
-    # Final keyboard fallback for Chrome. rawKeyDown is more reliable than keyDown here.
-    driver.execute_cdp_cmd("Input.dispatchKeyEvent", {"type": "rawKeyDown", "key": "Enter", "code": "Enter", "windowsVirtualKeyCode": 13, "nativeVirtualKeyCode": 13})
-    driver.execute_cdp_cmd("Input.dispatchKeyEvent", {"type": "keyUp", "key": "Enter", "code": "Enter", "windowsVirtualKeyCode": 13, "nativeVirtualKeyCode": 13})
-
-
-def press_cdp_enter_to_send(driver: webdriver.Chrome, composer: Any) -> None:
-    composer = find_composer(driver, timeout=5)
-    focus_composer(driver, composer)
-    driver.execute_cdp_cmd("Input.dispatchKeyEvent", {"type": "rawKeyDown", "key": "Enter", "code": "Enter", "windowsVirtualKeyCode": 13, "nativeVirtualKeyCode": 13})
-    driver.execute_cdp_cmd("Input.dispatchKeyEvent", {"type": "keyUp", "key": "Enter", "code": "Enter", "windowsVirtualKeyCode": 13, "nativeVirtualKeyCode": 13})
-
-
-def press_ctrl_enter_to_send(driver: webdriver.Chrome, composer: Any) -> None:
-    composer = find_composer(driver, timeout=5)
-    focus_composer(driver, composer)
-    try:
-        ActionChains(driver).move_to_element(composer).click(composer).pause(0.1).key_down(Keys.CONTROL).send_keys(Keys.ENTER).key_up(Keys.CONTROL).perform()
-        return
-    except Exception:
-        pass
-    composer.send_keys(Keys.CONTROL, Keys.ENTER)
-
-
-def click_send_button(driver: webdriver.Chrome, composer: Any | None = None, loose: bool = False) -> bool:
-    try:
-        composer = composer or find_composer(driver, timeout=3)
-    except Exception:
-        pass
-    btn = wait_until_send_enabled(driver, composer=composer, timeout=12, loose=loose)
-    if btn is None:
-        diag = _send_button_diagnostics(driver, composer)
-        if diag:
-            print("  [send] Visible composer-area buttons when Send was not found:")
-            for row in diag:
-                print(f"  [send]   {row}")
-        return False
-    try:
-        driver.execute_script("arguments[0].scrollIntoView({block:'center', inline:'center'});", btn)
-        time.sleep(0.1)
-    except Exception:
-        pass
-    try:
-        ActionChains(driver).move_to_element(btn).pause(0.05).click(btn).perform()
-        return True
-    except Exception:
-        pass
-    try:
-        btn.click()
-        return True
-    except Exception:
-        pass
-    try:
-        driver.execute_script("arguments[0].click();", btn)
-        return True
-    except Exception:
-        return False
 
 
 def click_send_and_confirm(
-    driver: webdriver.Chrome,
-    composer: Any,
+    page: Page,
+    composer: Locator,
     expected_prompt: str | None = None,
     min_integrity_ratio: float = 0.98,
     debug_path: Path | None = None,
@@ -1759,69 +1528,60 @@ def click_send_and_confirm(
     submit_method: str = "auto",
     confirm_timeout: float = 35.0,
 ) -> None:
-    # Gemini's editor can take a moment to synchronize long pasted prompts.
-    # The user asked for this small wait before the final completeness check.
     if settle_wait > 0:
         print(f"  [send] Waiting {settle_wait:g}s for Gemini composer to settle before final prompt check...")
         time.sleep(settle_wait)
 
     try:
-        composer = find_composer(driver, timeout=5)
+        composer = find_composer(page, timeout=5)
     except Exception:
         pass
 
-    before_text = get_composer_text(driver, composer).strip()
+    before_text = get_composer_text(page, composer).strip()
     if expected_prompt is not None:
         report = prompt_integrity_report(expected_prompt, before_text, min_integrity_ratio)
         print(f"  [send] Final prompt check after settle wait: {format_prompt_integrity(report)}")
         if not report["ok"]:
             write_prompt_debug_file(debug_path, expected_prompt, before_text, report, "before-send-after-settle")
-            raise TimeoutException(
+            raise PWTimeoutError(
                 "Refusing to send because Gemini composer does not contain the complete prompt after the settle wait. "
                 + format_prompt_integrity(report)
             )
     elif not before_text:
-        raise TimeoutException("Cannot send because Gemini composer is empty")
+        raise PWTimeoutError("Cannot send because Gemini composer is empty")
 
-    before_marker_count = prompt_visible_outside_composer_count(driver, expected_prompt)
-    before_progress_active = generation_in_progress(driver)
+    before_marker_count = prompt_visible_outside_composer_count(page, expected_prompt)
+    before_progress_active = generation_in_progress(page)
+    try:
+        before_url = page.url or ""
+    except Exception:
+        before_url = ""
     print(f"  [send] Existing submitted-prompt markers before Send: {before_marker_count}")
     if before_progress_active:
         print("  [send] A progress indicator was already active before submit; progress alone will not be accepted as confirmation.")
 
     submit_method = (submit_method or "auto").lower().strip()
     if submit_method == "enter":
-        attempts = ["enter", "button", "cdp_enter", "ctrl_enter", "button_loose"]
+        attempts = ["enter", "button", "button_loose"]
     elif submit_method == "click":
-        attempts = ["button", "button_loose", "enter", "cdp_enter", "ctrl_enter"]
+        attempts = ["button", "button_loose", "enter"]
     else:
-        # Auto prioritizes the real Gemini submit button because long rich-text
-        # prompts often treat Enter as newline/no-op.
-        attempts = ["button", "enter", "cdp_enter", "ctrl_enter", "button_loose"]
+        attempts = ["button", "enter", "button_loose"]
 
     last_error = ""
     for method in attempts:
         print(f"  [send] Trying submit method: {method}")
         try:
             if method == "enter":
-                press_enter_to_send(driver, composer)
-            elif method == "cdp_enter":
-                press_cdp_enter_to_send(driver, composer)
-            elif method == "click":
-                # Backward-compatible alias; not used in the attempts list.
-                if not click_send_button(driver, composer=composer, loose=False):
+                press_enter_to_send(page, composer)
+            elif method == "button":
+                if not click_send_button(page, composer=composer, loose=False):
                     last_error = "enabled Send/Submit button was not found/clickable"
                     continue
-            elif method == "button":
-                if not click_send_button(driver, composer=composer, loose=False):
-                    last_error = "strict Send/Submit button was not found/clickable"
-                    continue
             elif method == "button_loose":
-                if not click_send_button(driver, composer=composer, loose=True):
+                if not click_send_button(page, composer=composer, loose=True):
                     last_error = "loose bottom-right composer submit button was not found/clickable"
                     continue
-            elif method == "ctrl_enter":
-                press_ctrl_enter_to_send(driver, composer)
             else:
                 continue
         except Exception as exc:
@@ -1829,29 +1589,27 @@ def click_send_and_confirm(
             continue
 
         if wait_for_send_confirmation(
-            driver,
+            page,
             expected_prompt=expected_prompt,
             before_marker_count=before_marker_count,
             timeout=confirm_timeout,
             allow_progress_marker=not before_progress_active,
+            before_url=before_url,
         ):
             return
 
-        # If Enter only inserted a newline or did nothing, reacquire composer and try next method.
         try:
-            composer = find_composer(driver, timeout=3)
+            composer = find_composer(page, timeout=3)
         except Exception:
             pass
         last_error = f"{method} did not produce a real submit/progress marker within {confirm_timeout:g}s"
 
-    raise TimeoutException(
-        "Gemini did not accept the prompt after button/Enter/Ctrl+Enter attempts. "
+    raise PWTimeoutError(
+        "Gemini did not accept the prompt after button/Enter attempts. "
         + last_error
         + " | The script is stopping this prompt instead of moving on silently."
     )
-
-
-def pro_model_selected(driver: webdriver.Chrome) -> bool:
+def pro_model_selected(page: Page) -> bool:
     script = r"""
         const roots = Array.from(document.querySelectorAll('header, main'));
         for (const root of roots) {
@@ -1865,26 +1623,25 @@ def pro_model_selected(driver: webdriver.Chrome) -> bool:
         return false;
     """
     try:
-        return bool(driver.execute_script(script))
+        return bool(page.evaluate(script))
     except Exception:
         return False
 
 
-def select_pro_model(driver: webdriver.Chrome) -> bool:
-    if pro_model_selected(driver):
+def select_pro_model(page: Page) -> bool:
+    if pro_model_selected(page):
         return True
-    # Open the model picker using safe labels. No generic button fallback.
-    opened = safe_click_labels(driver, ["model", "fast", "flash", "gemini"], timeout=4)
+    opened = safe_click_labels(page, ["model", "fast", "flash", "gemini"], timeout=4)
     if not opened:
-        return pro_model_selected(driver)
+        return pro_model_selected(page)
     time.sleep(0.8)
-    safe_click_labels(driver, ["gemini 2.5 pro", "2.5 pro", "gemini pro", "pro"], timeout=5)
+    safe_click_labels(page, ["gemini 2.5 pro", "2.5 pro", "gemini pro", "pro"], timeout=5)
     time.sleep(1.0)
-    dismiss_open_overlays(driver)
-    return pro_model_selected(driver)
+    dismiss_open_overlays(page)
+    return pro_model_selected(page)
 
 
-def create_image_tool_selected(driver: webdriver.Chrome) -> bool:
+def create_image_tool_selected(page: Page) -> bool:
     script = r"""
         const roots = Array.from(document.querySelectorAll('header, main'));
         for (const root of roots) {
@@ -1894,36 +1651,36 @@ def create_image_tool_selected(driver: webdriver.Chrome) -> bool:
         return false;
     """
     try:
-        return bool(driver.execute_script(script))
+        return bool(page.evaluate(script))
     except Exception:
         return False
 
 
-def select_create_image_tool(driver: webdriver.Chrome) -> bool:
-    if create_image_tool_selected(driver):
+def select_create_image_tool(page: Page) -> bool:
+    if create_image_tool_selected(page):
         return True
-    opened = safe_click_labels(driver, ["tools"], timeout=4)
+    opened = safe_click_labels(page, ["tools"], timeout=4)
     if not opened:
-        return create_image_tool_selected(driver)
+        return create_image_tool_selected(page)
     time.sleep(0.8)
-    safe_click_labels(driver, ["create image", "image generation", "generate image"], timeout=5)
+    safe_click_labels(page, ["create image", "image generation", "generate image"], timeout=5)
     time.sleep(0.8)
-    dismiss_open_overlays(driver)
-    return create_image_tool_selected(driver)
+    dismiss_open_overlays(page)
+    return create_image_tool_selected(page)
 
 
-def select_model_and_tool_if_requested(driver: webdriver.Chrome, args: argparse.Namespace) -> None:
+def select_model_and_tool_if_requested(page: Page, args: argparse.Namespace) -> None:
     if args.skip_model_selection:
         print("  [model] Skipping model/tool selection by request.")
         return
-    pro_ok = select_pro_model(driver)
+    pro_ok = select_pro_model(page)
     print(f"  [model] Pro selected/confirmed: {pro_ok}")
     if args.require_pro_model and not pro_ok:
-        raise TimeoutException("Could not confirm Pro model selection. Use --no-require-pro-model to continue anyway.")
-    tool_ok = select_create_image_tool(driver)
+        raise PWTimeoutError("Could not confirm Pro model selection. Use --no-require-pro-model to continue anyway.")
+    tool_ok = select_create_image_tool(page)
     print(f"  [tool] Create image selected/confirmed: {tool_ok}")
     if args.require_create_image_tool and not tool_ok:
-        raise TimeoutException("Could not confirm Create image tool. Use --no-require-create-image-tool to continue anyway.")
+        raise PWTimeoutError("Could not confirm Create image tool. Use --no-require-create-image-tool to continue anyway.")
 
 
 # ---------------------------------------------------------------------------
@@ -1931,116 +1688,622 @@ def select_model_and_tool_if_requested(driver: webdriver.Chrome, args: argparse.
 # ---------------------------------------------------------------------------
 
 
-def _find_file_input_anywhere(driver: webdriver.Chrome):
-    direct = driver.find_elements(By.CSS_SELECTOR, "input[type='file']")
-    for el in direct:
-        try:
-            if el.is_enabled():
-                return el
-        except Exception:
-            continue
-    script = r"""
-        function gather(root, out) {
-            if (!root) return;
-            const nodes = root.querySelectorAll ? root.querySelectorAll('input[type="file"]') : [];
-            for (const n of nodes) out.push(n);
-            const all = root.querySelectorAll ? root.querySelectorAll('*') : [];
-            for (const el of all) {
-                if (el.shadowRoot) gather(el.shadowRoot, out);
-            }
-        }
-        const out = [];
-        gather(document, out);
-        return out.find(el => !el.disabled) || out[0] || null;
-    """
-    try:
-        return driver.execute_script(script)
-    except Exception:
-        return None
-
-
-def _find_file_input_across_frames(driver: webdriver.Chrome):
-    driver.switch_to.default_content()
-    root_candidate = _find_file_input_anywhere(driver)
-    if root_candidate is not None:
-        return root_candidate
-
-    def search_frames(depth: int):
-        if depth > 4:
-            return None
-        frames = driver.find_elements(By.CSS_SELECTOR, "iframe, frame")
-        for idx in range(len(frames)):
+def _find_file_input_anywhere(page: Page) -> Locator | None:
+    """Find an existing file input. Hidden inputs are OK for set_input_files()."""
+    selectors = [
+        "input[type='file'][multiple]",
+        "input[type='file'][accept*='image']",
+        "input[type='file']",
+    ]
+    for frame in page.frames:
+        for selector in selectors:
             try:
-                frame_ref = driver.find_elements(By.CSS_SELECTOR, "iframe, frame")[idx]
-                driver.switch_to.frame(frame_ref)
-                candidate = _find_file_input_anywhere(driver)
-                if candidate is not None:
-                    return candidate
-                nested = search_frames(depth + 1)
-                if nested is not None:
-                    return nested
+                loc = frame.locator(selector).last
+                if loc.count() > 0:
+                    return loc
             except Exception:
-                pass
-            finally:
-                try:
-                    driver.switch_to.parent_frame()
-                except Exception:
-                    driver.switch_to.default_content()
-        return None
-
-    result = search_frames(0)
-    if result is None:
-        driver.switch_to.default_content()
-    return result
+                continue
+    return None
 
 
-def click_attach_button_near_composer(driver: webdriver.Chrome) -> bool:
+def _find_file_input_across_frames(page: Page) -> Locator | None:
+    return _find_file_input_anywhere(page)
+
+
+def click_attach_button_near_composer(page: Page) -> bool:
+    """Click the visible attachment/add-files control closest to the composer."""
     script = r"""
+    (() => {
+        const main = document.querySelector('main') || document.body;
+        const composer = document.querySelector(
+            'rich-textarea div[contenteditable="true"], div[contenteditable="true"][role="textbox"], main div[contenteditable="true"], textarea[aria-label*="message"], textarea'
+        );
+        const composerRect = composer ? composer.getBoundingClientRect() : null;
+        const bad = ['share','settings','help','account','new chat','temporary','history','recent'];
+        const good = ['add files','attach','upload','insert','add image','upload image','photo','image','+'];
         function visible(el) {
             const r = el.getBoundingClientRect();
             const s = getComputedStyle(el);
             return r.width > 0 && r.height > 0 && s.display !== 'none' && s.visibility !== 'hidden';
         }
-        const composer = document.querySelector("rich-textarea div[contenteditable='true'], div[contenteditable='true'][role='textbox'], main div[contenteditable='true'], textarea");
-        const cr = composer ? composer.getBoundingClientRect() : {left:0, right:window.innerWidth, top:window.innerHeight/2, bottom:window.innerHeight};
-        const main = document.querySelector('main') || document.body;
-        const nodes = Array.from(main.querySelectorAll('button,[role="button"]'));
-        const candidates = nodes.filter(el => {
-            if (!visible(el)) return false;
+        const candidates = [];
+        for (const el of Array.from(main.querySelectorAll('button,[role="button"],input[type="file"] + button'))) {
+            if (!visible(el)) continue;
+            if (el.closest('nav,[role="navigation"],[aria-label*="Recent"],header')) continue;
             const r = el.getBoundingClientRect();
-            const t = ((el.getAttribute('aria-label') || '') + ' ' + (el.title || '') + ' ' + (el.innerText || '')).toLowerCase();
-            const nameOk = t.includes('add files') || t.includes('attach') || t.includes('upload') || t.includes('insert') || t.trim() === '+';
-            if (!nameOk) return false;
-            if (t.includes('temporary') || t.includes('share') || t.includes('conversation')) return false;
-            const nearComposer = r.top > cr.top - 140 && r.bottom < cr.bottom + 140;
-            return nearComposer;
-        });
+            const label = ((el.getAttribute('aria-label') || '') + ' ' + (el.getAttribute('title') || '') + ' ' + (el.innerText || '') + ' ' + (el.textContent || '')).replace(/\s+/g, ' ').trim().toLowerCase();
+            if (bad.some(w => label.includes(w))) continue;
+            const looksLikePlus = label === '+' || label.includes('add') || label.includes('attach') || label.includes('upload') || label.includes('image') || label.includes('file');
+            if (!looksLikePlus && !good.some(w => label.includes(w))) continue;
+            let score = 0;
+            if (label.includes('add files')) score += 80;
+            if (label.includes('attach')) score += 70;
+            if (label.includes('upload')) score += 60;
+            if (label.includes('image')) score += 40;
+            if (label === '+') score += 35;
+            if (composerRect) {
+                const cy = r.top + r.height / 2;
+                const compY = composerRect.top + composerRect.height / 2;
+                const dist = Math.abs(cy - compY);
+                if (dist < 260) score += Math.max(0, 120 - dist / 2);
+                if (r.left < composerRect.left + composerRect.width * 0.35) score += 20;
+            } else if (r.top > window.innerHeight * 0.45) {
+                score += 25;
+            }
+            candidates.push({el, score, top: r.top, left: r.left, label});
+        }
         if (!candidates.length) return false;
-        candidates.sort((a,b) => {
-            const ar = a.getBoundingClientRect();
-            const br = b.getBoundingClientRect();
-            return Math.abs(ar.top - cr.top) - Math.abs(br.top - cr.top);
-        });
-        candidates[0].click();
+        candidates.sort((a, b) => (b.score - a.score) || (b.top - a.top) || (a.left - b.left));
+        candidates[0].el.scrollIntoView({block: 'center', inline: 'center'});
+        candidates[0].el.click();
         return true;
-    """
+    })()
+    """.strip()
     try:
-        return bool(driver.execute_script(script))
+        return bool(page.evaluate(script))
+    except Exception as exc:
+        print(f"  [upload] Attach button JS click failed: {exc}")
+        return False
+
+
+def _click_upload_files_menu_item(page: Page) -> bool:
+    """Click the Upload files item inside Gemini's opened attach menu."""
+    script = r"""
+    (() => {
+        function visible(el) {
+            const r = el.getBoundingClientRect();
+            const s = getComputedStyle(el);
+            return r.width > 0 && r.height > 0 && s.display !== 'none' && s.visibility !== 'hidden' && s.opacity !== '0';
+        }
+        const selectors = [
+            '[role="menuitem"]', '[role="option"]', 'button', 'a',
+            '.cdk-overlay-container *', '[class*="menu"] *', '[class*="overlay"] *'
+        ];
+        const seen = new Set();
+        const candidates = [];
+        for (const selector of selectors) {
+            for (const el of Array.from(document.querySelectorAll(selector))) {
+                if (seen.has(el) || !visible(el)) continue;
+                seen.add(el);
+                if (el.closest('nav,[role="navigation"],[aria-label*="Recent"],header')) continue;
+                const t = ((el.getAttribute('aria-label') || '') + ' ' +
+                           (el.getAttribute('title') || '') + ' ' +
+                           (el.innerText || '') + ' ' +
+                           (el.textContent || '')).replace(/\s+/g, ' ').trim().toLowerCase();
+                if (!t) continue;
+                if (t.includes('upload files') || t === 'upload' || (t.includes('upload') && t.includes('file'))) {
+                    const r = el.getBoundingClientRect();
+                    candidates.push({el, top: r.top, left: r.left, text: t});
+                }
+            }
+        }
+        if (!candidates.length) return false;
+        candidates.sort((a, b) => (b.top - a.top) || (a.left - b.left));
+        candidates[0].el.scrollIntoView({block: 'center', inline: 'center'});
+        candidates[0].el.click();
+        return true;
+    })()
+    """.strip()
+    try:
+        return bool(page.evaluate(script))
+    except Exception as exc:
+        print(f"  [upload] Upload-files menu click failed: {exc}")
+        return False
+
+
+def _click_attach_menu_button_only(page: Page) -> bool:
+    """Click only the composer + / Add files button, never the Upload files menu item."""
+    script = r"""
+    (() => {
+        const main = document.querySelector('main') || document.body;
+        const composer = document.querySelector(
+            'rich-textarea div[contenteditable="true"], div[contenteditable="true"][role="textbox"], main div[contenteditable="true"], textarea[aria-label*="message"], textarea'
+        );
+        if (!composer) return false;
+        const cr = composer.getBoundingClientRect();
+        const nodes = Array.from(main.querySelectorAll('button,[role="button"]'));
+        const candidates = [];
+        for (const el of nodes) {
+            const r = el.getBoundingClientRect();
+            const s = getComputedStyle(el);
+            if (r.width <= 0 || r.height <= 0 || s.display === 'none' || s.visibility === 'hidden') continue;
+            const t = ((el.getAttribute('aria-label') || '') + ' ' + (el.getAttribute('title') || '') + ' ' + (el.innerText || '')).replace(/\s+/g, ' ').trim().toLowerCase();
+            if (t.includes('upload files') || t.includes('add from drive') || t.includes('photos') || t.includes('import code') || t.includes('notebooklm')) continue;
+            const looksLikePlus = t === '+' || t.includes('add files') || t.includes('attach file') || t.includes('attach files');
+            if (!looksLikePlus) continue;
+            const centerY = r.top + r.height / 2;
+            const compCenterY = cr.top + cr.height / 2;
+            const nearComposer = Math.abs(centerY - compCenterY) < 220;
+            if (!nearComposer) continue;
+            candidates.push({el, dist: Math.abs(centerY - compCenterY), left: r.left});
+        }
+        if (!candidates.length) return false;
+        candidates.sort((a, b) => (a.dist - b.dist) || (a.left - b.left));
+        candidates[0].el.click();
+        return true;
+    })()
+    """.strip()
+    try:
+        return bool(page.evaluate(script))
     except Exception:
         return False
 
 
-def open_attachment_ui(driver: webdriver.Chrome) -> None:
-    if _find_file_input_across_frames(driver) is not None:
+def open_attachment_ui(page: Page) -> None:
+    """Open the + / attachment menu only.
+
+    Important: do NOT click the "Upload files" menu item here. In an already
+    running Chrome/CDP session that opens a native Linux file chooser, which
+    Playwright cannot reliably drive. We only need Gemini's hidden
+    input[type=file] to exist; the actual file assignment is done via CDP below.
+    """
+    if _find_file_input_across_frames(page) is not None:
         return
-    click_attach_button_near_composer(driver)
-    time.sleep(0.7)
-    # If a menu opened, pick only upload-related items from the dialog/overlay/main, never sidebar/history.
-    safe_click_labels(driver, ["upload files", "upload", "from computer", "add files"], timeout=3)
-    time.sleep(0.7)
+    try:
+        _click_attach_menu_button_only(page)
+    except Exception:
+        pass
+    time.sleep(0.5)
 
 
-def get_all_image_srcs(driver: webdriver.Chrome) -> set[str]:
+def _visible_uploaded_image_count(page: Page, before_srcs: set[str] | None = None) -> int:
+    before_srcs = before_srcs or set()
+    script = r"""
+    (before) => {
+        const baseline = new Set(before || []);
+        const main = document.querySelector('main') || document.body;
+        function visible(el) {
+            const r = el.getBoundingClientRect();
+            const s = getComputedStyle(el);
+            return r.width >= 32 && r.height >= 32 && s.display !== 'none' && s.visibility !== 'hidden';
+        }
+        function forbidden(el) {
+            return !!el.closest('nav,[role="navigation"],header,model-response,.model-response,[data-author="model"],[aria-label*="Recent" i]');
+        }
+        function srcBad(src) {
+            const s = (src || '').toLowerCase();
+            if (!s) return true;
+            if (s.includes('googlelogo') || s.includes('gstatic.com')) return true;
+            if (s.includes('/a-/') || s.includes('avatar') || s.includes('profile')) return true;
+            return false;
+        }
+        let count = 0;
+        const seen = new Set();
+        for (const img of Array.from(main.querySelectorAll('img'))) {
+            const src = img.currentSrc || img.src || '';
+            if (seen.has(src)) continue;
+            seen.add(src);
+            if (baseline.has(src)) continue;
+            if (srcBad(src) || forbidden(img) || !visible(img)) continue;
+            count += 1;
+        }
+        return count;
+    }
+    """.strip()
+    try:
+        return int(page.evaluate(script, list(before_srcs)) or 0)
+    except Exception:
+        return 0
+
+
+def _attachment_spinner_count(page: Page) -> int:
+    script = r"""
+    (() => {
+        const main = document.querySelector('main') || document.body;
+        function visible(el) {
+            const r = el.getBoundingClientRect();
+            const s = getComputedStyle(el);
+            return r.width > 0 && r.height > 0 && s.display !== 'none' && s.visibility !== 'hidden';
+        }
+        let count = 0;
+        const selectors = [
+            '[role="progressbar"]',
+            'mat-progress-spinner',
+            'mat-progress-bar',
+            '.spinner',
+            '.loading',
+            '[class*="spinner" i]',
+            '[class*="progress" i]'
+        ];
+        for (const selector of selectors) {
+            for (const el of Array.from(main.querySelectorAll(selector))) {
+                if (el.closest('model-response,.model-response,[data-author="model"]')) continue;
+                if (visible(el)) count += 1;
+            }
+        }
+        return count;
+    })()
+    """.strip()
+    try:
+        return int(page.evaluate(script) or 0)
+    except Exception:
+        return 0
+
+
+def _dispatch_file_input_events_via_cdp(session, node_id: int) -> None:
+    try:
+        resolved = session.send("DOM.resolveNode", {"nodeId": node_id})
+        object_id = resolved.get("object", {}).get("objectId")
+        if not object_id:
+            return
+        session.send(
+            "Runtime.callFunctionOn",
+            {
+                "objectId": object_id,
+                "functionDeclaration": """
+                    function() {
+                        try { this.dispatchEvent(new Event('input', {bubbles: true})); } catch (e) {}
+                        try { this.dispatchEvent(new Event('change', {bubbles: true})); } catch (e) {}
+                        return true;
+                    }
+                """,
+            },
+        )
+    except Exception:
+        pass
+
+
+def _describe_input_attrs(session, node_id: int) -> dict[str, str]:
+    try:
+        node = session.send("DOM.describeNode", {"nodeId": node_id}).get("node", {})
+        attrs = node.get("attributes", []) or []
+        return dict(zip(attrs[0::2], attrs[1::2]))
+    except Exception:
+        return {}
+
+
+def _upload_with_cdp_dom(page: Page, file_paths: list[str]) -> bool:
+    """Assign files to an existing Gemini file input through CDP.
+
+    Gemini usually creates the real input only after the + menu/upload control
+    is opened. This function never clicks the menu item that opens the native
+    Linux file chooser; it only uses inputs that already exist.
+    """
+    try:
+        session = page.context.new_cdp_session(page)
+    except Exception as exc:
+        print(f"  [upload] Could not create CDP session for direct file upload: {exc}")
+        return False
+
+    for attempt in range(1, 4):
+        try:
+            doc = session.send("DOM.getDocument", {"depth": -1, "pierce": True})
+            root_id = doc["root"]["nodeId"]
+            node_ids = session.send("DOM.querySelectorAll", {"nodeId": root_id, "selector": "input[type='file']"}).get("nodeIds", [])
+        except Exception as exc:
+            print(f"  [upload] CDP input scan failed on attempt {attempt}: {exc}")
+            node_ids = []
+
+        if not node_ids:
+            print(f"  [upload] No existing file input found for CDP direct upload (attempt {attempt}).")
+            open_attachment_ui(page)
+            time.sleep(0.6)
+            continue
+
+        print(f"  [upload] Found {len(node_ids)} file input(s); setting files directly via CDP.")
+        for node_id in reversed(node_ids):
+            attrs = _describe_input_attrs(session, int(node_id))
+            if "disabled" in attrs:
+                continue
+            try:
+                session.send("DOM.setFileInputFiles", {"nodeId": int(node_id), "files": file_paths})
+                _dispatch_file_input_events_via_cdp(session, int(node_id))
+                print(f"  [upload] CDP setFileInputFiles accepted {len(file_paths)} file(s).")
+                return True
+            except Exception as exc:
+                print(f"  [upload] CDP setFileInputFiles failed for one input: {str(exc).splitlines()[0] if str(exc) else type(exc).__name__}")
+                continue
+
+        time.sleep(0.6)
+
+    return False
+
+
+def _upload_with_playwright_input(page: Page, file_paths: list[str]) -> bool:
+    """Assign files to any existing file input using Playwright, without opening OS dialog."""
+    selectors = ["input[type='file'][multiple]", "input[type='file']"]
+    for selector in selectors:
+        try:
+            loc = page.locator(selector).last
+            loc.wait_for(state="attached", timeout=1500)
+            loc.set_input_files(file_paths, timeout=0)
+            print(f"  [upload] Playwright set_input_files accepted {len(file_paths)} file(s).")
+            return True
+        except Exception as exc:
+            print(f"  [upload] Playwright input fallback failed for {selector}: {str(exc).splitlines()[0] if str(exc) else type(exc).__name__}")
+            continue
+    return False
+
+
+def _active_window_title() -> str:
+    if not shutil.which("xdotool"):
+        return ""
+    try:
+        result = subprocess.run(
+            ["xdotool", "getactivewindow", "getwindowname"],
+            check=False,
+            capture_output=True,
+            text=True,
+            timeout=2,
+        )
+        return (result.stdout or "").strip()
+    except Exception:
+        return ""
+
+
+def _native_file_dialog_active() -> bool:
+    title = _active_window_title().lower()
+    if not title:
+        return False
+    return ("open" in title and "file" in title) or "select file" in title or "choose file" in title
+
+
+def _native_dialog_choose_file(file_path: str, timeout: int = 20) -> bool:
+    """Drive the Linux Open Files dialog with xdotool when Playwright misses it.
+
+    This is a last-resort path for CDP-connected Chrome. It uploads one file at
+    a time to avoid ambiguous multi-select behavior in GTK/KDE file choosers.
+    """
+    if not shutil.which("xdotool"):
+        print("  [upload] Native dialog fallback needs xdotool, but xdotool is not installed.")
+        return False
+
+    deadline = time.time() + timeout
+    while time.time() < deadline:
+        if _native_file_dialog_active():
+            break
+        time.sleep(0.25)
+    else:
+        print("  [upload] Native file dialog was not the active window; not typing into the desktop.")
+        return False
+
+    try:
+        print(f"  [upload] Native dialog fallback selecting: {file_path}")
+        subprocess.run(["xdotool", "key", "--clearmodifiers", "ctrl+l"], check=False, timeout=3)
+        time.sleep(0.25)
+        subprocess.run(["xdotool", "type", "--clearmodifiers", "--delay", "0", file_path], check=False, timeout=10)
+        time.sleep(0.25)
+        subprocess.run(["xdotool", "key", "--clearmodifiers", "Return"], check=False, timeout=3)
+        time.sleep(1.0)
+        # Some file choosers focus the file after the first Return and need a second Return/Open.
+        if _native_file_dialog_active():
+            subprocess.run(["xdotool", "key", "--clearmodifiers", "Return"], check=False, timeout=3)
+            time.sleep(0.8)
+        return not _native_file_dialog_active()
+    except Exception as exc:
+        print(f"  [upload] Native dialog fallback failed: {exc}")
+        return False
+
+
+def _open_upload_file_chooser(page: Page, timeout_ms: int = 7000):
+    """Open Gemini's Upload files chooser.
+
+    Returns a Playwright FileChooser when the event is captured, returns None
+    when a native OS dialog likely opened, and raises only when no upload menu
+    path could be clicked.
+    """
+    try:
+        page.keyboard.press("Escape")
+    except Exception:
+        pass
+    time.sleep(0.15)
+
+    opened_menu = _click_attach_menu_button_only(page) or click_attach_button_near_composer(page)
+    if not opened_menu:
+        raise PWTimeoutError("Could not open Gemini attachment menu")
+    time.sleep(0.25)
+
+    try:
+        with page.expect_file_chooser(timeout=timeout_ms) as chooser_info:
+            clicked = _click_upload_files_menu_item(page)
+            if not clicked:
+                # Fallback locator click for the same visible menu row.
+                page.get_by_text("Upload files", exact=True).click(timeout=2500)
+        return chooser_info.value
+    except PWTimeoutError:
+        # In CDP-attached Chrome on Linux, the native dialog can open while
+        # Playwright misses the filechooser event. Do not retry blindly here;
+        # the caller can use the native-dialog fallback once.
+        if _native_file_dialog_active():
+            print("  [upload] Native file dialog opened, but Playwright did not catch the filechooser event.")
+            return None
+        raise
+
+
+def _wait_for_uploaded_count_at_least(
+    page: Page,
+    before_srcs: set[str],
+    target_count: int,
+    timeout: int = 90,
+    stable_seconds: float = 2.0,
+) -> None:
+    deadline = time.time() + timeout
+    stable_since: float | None = None
+    last_state: tuple[int, bool, int] | None = None
+    last_log = 0.0
+    while time.time() < deadline:
+        images_added, active, spinners = _upload_counts(page, before_srcs)
+        state = (images_added, active, spinners)
+        if state != last_state:
+            stable_since = time.time()
+            last_state = state
+        if images_added >= target_count and not active and spinners == 0 and stable_since is not None and time.time() - stable_since >= stable_seconds:
+            return
+        if time.time() - last_log > 5:
+            print(f"  [upload] Waiting for uploaded images... visible={images_added}, target={target_count}, active={active}, spinners={spinners}")
+            last_log = time.time()
+        time.sleep(0.6)
+    images_added, active, spinners = _upload_counts(page, before_srcs)
+    raise PWTimeoutError(f"Timed out waiting for uploaded image count {target_count}; visible={images_added}, active={active}, spinners={spinners}")
+
+
+def _upload_one_file_via_menu(page: Page, file_path: str, before_srcs: set[str], target_count: int) -> None:
+    print(f"  [upload] Uploading file {target_count}: {Path(file_path).name}")
+    chooser = None
+    try:
+        chooser = _open_upload_file_chooser(page, timeout_ms=7000)
+    except Exception as exc:
+        # If the native dialog is active after this failure, xdotool can still rescue it.
+        if not _native_file_dialog_active():
+            raise PWTimeoutError(f"Could not open Upload files chooser for {file_path}: {exc}")
+
+    if chooser is not None:
+        try:
+            chooser.set_files(file_path, timeout=0)
+            print("  [upload] Playwright filechooser accepted file.")
+        except Exception as exc:
+            # Do not retry immediately. On CDP Chrome the file can still be
+            # handed to Gemini even when FileChooser.set_files reports a timeout.
+            print(f"  [upload] FileChooser.set_files reported: {str(exc).splitlines()[0] if str(exc) else type(exc).__name__}")
+            if _native_file_dialog_active():
+                if not _native_dialog_choose_file(file_path):
+                    raise PWTimeoutError("FileChooser.set_files failed and native dialog fallback could not select the file")
+    else:
+        if not _native_dialog_choose_file(file_path):
+            raise PWTimeoutError(
+                "Native file chooser opened and Playwright missed it. Install xdotool or run in a Playwright-launched Chrome profile."
+            )
+
+    _wait_for_uploaded_count_at_least(page, before_srcs, target_count=target_count, timeout=120)
+
+
+def _upload_one_by_one_via_menu(page: Page, file_paths: list[str], before_srcs: set[str]) -> bool:
+    """Upload files one at a time through Gemini's Upload files menu.
+
+    This avoids repeated all-file fallbacks and prevents duplicate batches. It
+    also works when Gemini only creates its file input after the menu item is
+    selected.
+    """
+    for idx, file_path in enumerate(file_paths, start=1):
+        _upload_one_file_via_menu(page, file_path, before_srcs, target_count=idx)
+    return True
+
+
+def _upload_counts(page: Page, before_srcs: set[str]) -> tuple[int, bool, int]:
+    images_added = _visible_uploaded_image_count(page, before_srcs)
+    active = upload_activity_present(page)
+    spinners = _attachment_spinner_count(page)
+    return images_added, active, spinners
+
+
+def wait_for_uploads_to_settle(
+    page: Page,
+    before_srcs: set[str],
+    before_chip_count: int = 0,
+    expected_count: int | None = None,
+    timeout: int = 180,
+) -> None:
+    expected_count = int(expected_count or 0)
+    deadline = time.time() + timeout
+    stable_since: float | None = None
+    last_state: tuple[int, bool, int] | None = None
+    last_log = 0.0
+
+    while time.time() < deadline:
+        images_added, active, spinners = _upload_counts(page, before_srcs)
+        enough_images = images_added >= expected_count if expected_count else images_added > 0
+        state = (images_added, active, spinners)
+
+        if state != last_state:
+            stable_since = time.time()
+            last_state = state
+
+        # Require all expected thumbnails, no upload spinner/progress, and a short stable period.
+        if enough_images and not active and spinners == 0 and stable_since is not None and time.time() - stable_since >= 5.0:
+            print(f"  [upload] Upload settled. visible_uploaded_images={images_added}, expected={expected_count}")
+            return
+
+        if time.time() - last_log > 6:
+            print(
+                f"  [upload] Waiting for upload settle... "
+                f"visible_uploaded_images={images_added}, expected={expected_count}, "
+                f"active={active}, spinners={spinners}"
+            )
+            last_log = time.time()
+        time.sleep(1.0)
+
+    images_added, active, spinners = _upload_counts(page, before_srcs)
+    raise PWTimeoutError(
+        "Upload did not fully settle before timeout: "
+        f"visible_uploaded_images={images_added}, expected={expected_count}, active={active}, spinners={spinners}"
+    )
+
+
+def upload_images(page: Page, image_paths: list[Path], timeout: int = 180) -> None:
+    for p in image_paths:
+        if not p.exists():
+            raise FileNotFoundError(f"Upload image not found: {p}")
+        if p.suffix.lower() not in IMAGE_EXTS:
+            raise ValueError(f"Upload path is not a supported image: {p}")
+
+    file_paths = [str(p) for p in image_paths]
+    before_srcs = get_all_image_srcs(page)
+    print(f"  [upload] Uploading {len(file_paths)} image(s). Existing page images={len(before_srcs)}")
+
+    try:
+        page.keyboard.press("Escape")
+    except Exception:
+        pass
+    time.sleep(0.2)
+
+    # Fast path: use any already-created hidden file input. This does not open
+    # the native chooser and uploads the entire batch once.
+    uploaded = _upload_with_cdp_dom(page, file_paths)
+    if not uploaded:
+        uploaded = _upload_with_playwright_input(page, file_paths)
+
+    # Gemini often creates the input only after the visible "Upload files" menu
+    # item is clicked. When that is the case, upload one file at a time through
+    # the real menu/filechooser path. This prevents the duplicate batch behavior
+    # seen in the previous version.
+    if not uploaded:
+        print("  [upload] No hidden input was available; using Upload files menu one file at a time.")
+        try:
+            uploaded = _upload_one_by_one_via_menu(page, file_paths, before_srcs)
+        except Exception as exc:
+            diag = _send_button_diagnostics(page, None)
+            if diag:
+                print("  [upload] Visible buttons near composer:")
+                for row in diag:
+                    print(f"  [upload]   {row}")
+            raise PWTimeoutError(str(exc))
+
+    if not uploaded:
+        raise PWTimeoutError("Could not upload images through Gemini")
+
+    wait_for_uploads_to_settle(
+        page,
+        before_srcs,
+        before_chip_count=0,
+        expected_count=len(file_paths),
+        timeout=timeout,
+    )
+    try:
+        page.keyboard.press("Escape")
+    except Exception:
+        pass
+
+def get_all_image_srcs(page: Page) -> set[str]:
     script = r"""
         const out = new Set();
         for (const img of document.querySelectorAll('img')) {
@@ -2050,106 +2313,58 @@ def get_all_image_srcs(driver: webdriver.Chrome) -> set[str]:
         return Array.from(out);
     """
     try:
-        return set(driver.execute_script(script) or [])
+        return set(page.evaluate(script) or [])
     except Exception:
         return set()
 
 
-def upload_activity_present(driver: webdriver.Chrome) -> bool:
+def upload_activity_present(page: Page) -> bool:
     script = r"""
-        const main = document.querySelector('main') || document.body;
-        const txt = (main.innerText || '').toLowerCase();
-        if (txt.includes('uploading') || txt.includes('attaching')) return true;
-        for (const el of main.querySelectorAll('[role="progressbar"], mat-progress-bar, mat-progress-spinner')) {
-            const r = el.getBoundingClientRect();
-            if (r.width > 0 && r.height > 0) return true;
-        }
-        return false;
+        (() => {
+            const main = document.querySelector('main') || document.body;
+            const txt = (main.innerText || '').toLowerCase();
+            if (txt.includes('uploading') || txt.includes('attaching') || txt.includes('scanning')) return true;
+
+            const composer = document.querySelector(
+                'rich-textarea div[contenteditable="true"], div[contenteditable="true"][role="textbox"], main div[contenteditable="true"], textarea[aria-label*="message"], textarea'
+            );
+            const cr = composer ? composer.getBoundingClientRect() : null;
+            function visible(el) {
+                const r = el.getBoundingClientRect();
+                const s = getComputedStyle(el);
+                return r.width > 0 && r.height > 0 && s.display !== 'none' && s.visibility !== 'hidden';
+            }
+            function nearComposer(el) {
+                if (!cr) return true;
+                const r = el.getBoundingClientRect();
+                return r.bottom >= cr.top - 220 && r.top <= cr.bottom + 160 &&
+                       r.right >= cr.left - 80 && r.left <= cr.right + 80;
+            }
+            const selectors = [
+                '[role="progressbar"]', 'mat-progress-bar', 'mat-progress-spinner',
+                '[class*="spinner" i]', '[class*="loading" i]', '[class*="progress" i]',
+                'svg[aria-label*="loading" i]', 'svg[aria-label*="upload" i]'
+            ];
+            for (const selector of selectors) {
+                for (const el of Array.from(main.querySelectorAll(selector))) {
+                    if (visible(el) && nearComposer(el)) return true;
+                }
+            }
+            for (const el of Array.from(main.querySelectorAll('*'))) {
+                if (!visible(el) || !nearComposer(el)) continue;
+                const s = getComputedStyle(el);
+                const anim = `${s.animationName || ''} ${s.animationDuration || ''}`.toLowerCase();
+                const label = ((el.getAttribute('aria-label') || '') + ' ' + (el.getAttribute('title') || '')).toLowerCase();
+                if ((label.includes('upload') || label.includes('loading')) && anim && !anim.includes('none') && !anim.includes('0s')) return true;
+            }
+            return false;
+        })()
     """
     try:
-        return bool(driver.execute_script(script))
+        return bool(page.evaluate(script))
     except Exception:
         return False
 
-
-def wait_for_uploads_to_settle(driver: webdriver.Chrome, before_srcs: set[str], timeout: int = 90) -> None:
-    deadline = time.time() + timeout
-    saw_new_image_or_chip = False
-    while time.time() < deadline:
-        current = get_all_image_srcs(driver)
-        if len(current - before_srcs) > 0:
-            saw_new_image_or_chip = True
-        try:
-            chipish = driver.execute_script(
-                r"""
-                const main = document.querySelector('main') || document.body;
-                const txt = (main.innerText || '').toLowerCase();
-                return txt.includes('image') || txt.includes('attached') || txt.includes('file');
-                """
-            )
-            if chipish:
-                saw_new_image_or_chip = True
-        except Exception:
-            pass
-        if saw_new_image_or_chip and not upload_activity_present(driver):
-            return
-        time.sleep(1.0)
-    raise TimeoutException("Upload did not appear to settle before timeout")
-
-
-def upload_images(driver: webdriver.Chrome, image_paths: list[Path], timeout: int = 45) -> None:
-    for p in image_paths:
-        if not p.exists():
-            raise FileNotFoundError(f"Upload image not found: {p}")
-
-    before_srcs = get_all_image_srcs(driver)
-    open_attachment_ui(driver)
-    end = time.time() + timeout
-    file_input = None
-    while time.time() < end:
-        file_input = _find_file_input_across_frames(driver)
-        if file_input is not None:
-            break
-        open_attachment_ui(driver)
-        time.sleep(0.6)
-
-    payload = "\n".join(str(p) for p in image_paths)
-    if file_input is not None:
-        file_input.send_keys(payload)
-        wait_for_uploads_to_settle(driver, before_srcs, timeout=90)
-        return
-
-    # Last resort: synthetic drag/drop onto composer/main. This does not click any sidebar UI.
-    driver.switch_to.default_content()
-    try:
-        drop_target = find_composer(driver, timeout=5)
-    except Exception:
-        candidates = driver.find_elements(By.CSS_SELECTOR, "main, body")
-        if not candidates:
-            raise TimeoutException("Could not find Gemini upload target")
-        drop_target = candidates[0]
-
-    temp_input = driver.execute_script(
-        "const i=document.createElement('input');"
-        "i.type='file'; i.multiple=true; i.style.display='none';"
-        "document.body.appendChild(i); return i;"
-    )
-    temp_input.send_keys(payload)
-    driver.execute_script(
-        r"""
-        const target = arguments[0], input = arguments[1];
-        const dt = new DataTransfer();
-        for (const f of input.files) dt.items.add(f);
-        for (const ev of ['dragenter', 'dragover', 'drop']) {
-            target.dispatchEvent(new DragEvent(ev, {bubbles:true, cancelable:true, dataTransfer:dt}));
-        }
-        target.dispatchEvent(new ClipboardEvent('paste', {bubbles:true, cancelable:true, clipboardData:dt}));
-        input.remove();
-        """,
-        drop_target,
-        temp_input,
-    )
-    wait_for_uploads_to_settle(driver, before_srcs, timeout=90)
 
 
 # ---------------------------------------------------------------------------
@@ -2157,36 +2372,59 @@ def upload_images(driver: webdriver.Chrome, image_paths: list[Path], timeout: in
 # ---------------------------------------------------------------------------
 
 
-def _image_candidates(driver: webdriver.Chrome, baseline_srcs: set[str]) -> list[dict[str, Any]]:
+def _image_candidates(page: Page, baseline_srcs: set[str]) -> list[dict[str, Any]]:
+    """Return visible generated-image candidates.
+
+    Use an arrow function for Playwright evaluation. Plain JS snippets with
+    top-level `return` throw `Illegal return statement` in page.evaluate.
+    """
     script = r"""
-        const baseline = new Set(arguments[0]);
+    (baselineArg) => {
+        const baseline = new Set(baselineArg || []);
+        function rect(el) { return el.getBoundingClientRect(); }
         function visible(el) {
-            const r = el.getBoundingClientRect();
+            if (!el) return false;
+            const r = rect(el);
             const s = getComputedStyle(el);
-            return r.width > 120 && r.height > 120 && s.display !== 'none' && s.visibility !== 'hidden';
+            return r.width > 0 && r.height > 0 && s.display !== 'none' && s.visibility !== 'hidden' && s.opacity !== '0';
         }
         function forbidden(el) {
-            return !!el.closest('rich-textarea, textarea, form, nav, [role="navigation"], header, user-query, .user-query, [data-author="user"], [class*="user-query"], [aria-label*="Recent"], [aria-label*="Conversation history"]');
+            return !!el.closest('rich-textarea, textarea, input, form, nav, [role="navigation"], header, user-query, .user-query, [data-author="user"], [class*="user-query"], [aria-label*="Recent"], [aria-label*="Conversation history"]');
         }
         function inAssistantArea(el) {
-            return !!el.closest('model-response, .model-response, .response-container, [data-response-index], [data-chunk-index], [data-testid*="response"], [class*="response"]');
+            return !!el.closest('model-response, .model-response, .response-container, [data-response-index], [data-chunk-index], [data-testid*="response"], [class*="response"], conversation-turn, [data-test-id*="conversation"], message-content, [id*="model-response"]');
         }
-        function srcBad(src) {
+        function srcBadForLargeImage(src) {
             const s = (src || '').toLowerCase();
             if (!s) return true;
-            if (s.includes('googlelogo') || s.includes('gstatic.com')) return true;
+            if (s.includes('googlelogo')) return true;
             if (s.includes('/a-/') || s.includes('avatar') || s.includes('profile')) return true;
             return false;
         }
-        const imgs = Array.from(document.querySelectorAll('main img'));
+        function looksLikeOutputImage(img, r) {
+            const nw = img.naturalWidth || 0;
+            const nh = img.naturalHeight || 0;
+            const visibleArea = r.width * r.height;
+            const naturalArea = nw * nh;
+            if (r.width >= 160 && r.height >= 160) return true;
+            if (nw >= 512 && nh >= 512 && r.width >= 90 && r.height >= 90) return true;
+            if (visibleArea >= 30000 || naturalArea >= 250000) return true;
+            return false;
+        }
+        const imgs = Array.from(document.querySelectorAll('main img, img'));
         const out = [];
-        for (const img of imgs) {
+        imgs.forEach((img, idx) => {
             const src = img.currentSrc || img.src || '';
-            if (baseline.has(src)) continue;
-            if (srcBad(src)) continue;
-            if (!visible(img)) continue;
-            if (forbidden(img)) continue;
-            const r = img.getBoundingClientRect();
+            if (baseline.has(src)) return;
+            if (srcBadForLargeImage(src)) return;
+            if (!visible(img)) return;
+            if (forbidden(img)) return;
+            const r = rect(img);
+            if (!looksLikeOutputImage(img, r)) return;
+            const assistantArea = inAssistantArea(img);
+            const inViewport = r.bottom > 0 && r.top < window.innerHeight && r.right > 0 && r.left < window.innerWidth;
+            const viewportBonus = inViewport ? 500000 : 0;
+            const area = r.width * r.height;
             out.push({
                 src,
                 top: r.top,
@@ -2195,72 +2433,151 @@ def _image_candidates(driver: webdriver.Chrome, baseline_srcs: set[str]) -> list
                 height: r.height,
                 naturalWidth: img.naturalWidth || 0,
                 naturalHeight: img.naturalHeight || 0,
-                assistantArea: inAssistantArea(img)
+                assistantArea,
+                domIndex: idx,
+                score: (assistantArea ? 10000000 : 0) + viewportBonus + area + Math.max(img.naturalWidth || 0, img.naturalHeight || 0)
             });
-        }
-        out.sort((a,b) => {
-            // Prefer assistant response images, then lower/later images, then larger area.
-            if (a.assistantArea !== b.assistantArea) return a.assistantArea ? -1 : 1;
-            const areaDiff = (b.width*b.height) - (a.width*a.height);
-            if (Math.abs(areaDiff) > 5000) return areaDiff;
-            return b.top - a.top;
         });
+        out.sort((a,b) => (b.score - a.score) || (b.top - a.top) || (b.left - a.left));
         return out;
-    """
+    }
+    """.strip()
     try:
-        rows = driver.execute_script(script, list(baseline_srcs)) or []
+        rows = page.evaluate(script, list(baseline_srcs)) or []
         return list(rows)
-    except Exception:
+    except Exception as exc:
+        print(f"  [wait-img] image candidate JS failed: {exc}")
         return []
 
 
-def wait_for_generated_image(driver: webdriver.Chrome, baseline_srcs: set[str], timeout: int) -> str:
+def mark_largest_generated_image(page: Page, src: str | None = None) -> str:
+    """Mark the best visible output image with a data attribute and return its src."""
+    script = r"""
+    (requestedSrc) => {
+        requestedSrc = requestedSrc || '';
+        const marker = 'gemini-auto-generated-image-candidate';
+        for (const old of document.querySelectorAll(`[data-${marker}]`)) old.removeAttribute(`data-${marker}`);
+        function visible(el) {
+            if (!el) return false;
+            const r = el.getBoundingClientRect();
+            const s = getComputedStyle(el);
+            return r.width > 0 && r.height > 0 && s.display !== 'none' && s.visibility !== 'hidden' && s.opacity !== '0';
+        }
+        function forbidden(el) {
+            return !!el.closest('rich-textarea, textarea, input, form, nav, [role="navigation"], header, user-query, .user-query, [data-author="user"], [class*="user-query"], [aria-label*="Recent"], [aria-label*="Conversation history"]');
+        }
+        const imgs = Array.from(document.querySelectorAll('main img, img')).filter(img => {
+            if (!visible(img) || forbidden(img)) return false;
+            const src = img.currentSrc || img.src || '';
+            if (requestedSrc && src !== requestedSrc) return false;
+            const s = src.toLowerCase();
+            if (!s || s.includes('googlelogo') || s.includes('avatar') || s.includes('profile') || s.includes('/a-/')) return false;
+            const r = img.getBoundingClientRect();
+            const nw = img.naturalWidth || 0;
+            const nh = img.naturalHeight || 0;
+            return (r.width >= 120 && r.height >= 120) || (nw >= 512 && nh >= 512);
+        });
+        if (!imgs.length && requestedSrc) return '';
+        imgs.sort((a,b) => {
+            const ar = a.getBoundingClientRect();
+            const br = b.getBoundingClientRect();
+            const aAssistant = !!a.closest('model-response, .model-response, .response-container, [data-response-index], [data-chunk-index], [data-testid*="response"], [class*="response"], conversation-turn, [data-test-id*="conversation"], message-content, [id*="model-response"]');
+            const bAssistant = !!b.closest('model-response, .model-response, .response-container, [data-response-index], [data-chunk-index], [data-testid*="response"], [class*="response"], conversation-turn, [data-test-id*="conversation"], message-content, [id*="model-response"]');
+            if (aAssistant !== bAssistant) return bAssistant ? 1 : -1;
+            const aInViewport = ar.bottom > 0 && ar.top < window.innerHeight && ar.right > 0 && ar.left < window.innerWidth;
+            const bInViewport = br.bottom > 0 && br.top < window.innerHeight && br.right > 0 && br.left < window.innerWidth;
+            if (aInViewport !== bInViewport) return bInViewport ? 1 : -1;
+            return (br.width * br.height) - (ar.width * ar.height);
+        });
+        const img = imgs[0];
+        if (!img) return '';
+        img.setAttribute(`data-${marker}`, '1');
+        img.scrollIntoView({block:'center', inline:'center'});
+        return img.currentSrc || img.src || '';
+    }
+    """.strip()
+    try:
+        return str(page.evaluate(script, src or "") or "")
+    except Exception as exc:
+        print(f"  [wait-img] mark image JS failed: {exc}")
+        return ""
+
+
+def response_completed_with_media(page: Page) -> bool:
+    script = r"""
+    () => {
+        function visible(el) {
+            if (!el) return false;
+            const r = el.getBoundingClientRect();
+            const s = getComputedStyle(el);
+            return r.width > 0 && r.height > 0 && s.display !== 'none' && s.visibility !== 'hidden' && s.opacity !== '0';
+        }
+        const main = document.querySelector('main') || document.body;
+        const hasStop = !!Array.from(main.querySelectorAll('button, [role="button"], span, div')).find(el => {
+            if (!visible(el)) return false;
+            const t = ((el.getAttribute('aria-label') || '') + ' ' + (el.textContent || '')).toLowerCase();
+            return t.includes('stop response');
+        });
+        const bigImgs = Array.from(document.querySelectorAll('main img, img')).filter(img => {
+            if (!visible(img)) return false;
+            if (img.closest('rich-textarea, textarea, input, form, nav, [role="navigation"], header, user-query, .user-query, [data-author="user"], [class*="user-query"]')) return false;
+            const r = img.getBoundingClientRect();
+            const src = (img.currentSrc || img.src || '').toLowerCase();
+            if (!src || src.includes('googlelogo') || src.includes('avatar') || src.includes('profile') || src.includes('/a-/')) return false;
+            return r.width >= 160 && r.height >= 160;
+        });
+        return !hasStop && bigImgs.length > 0;
+    }
+    """.strip()
+    try:
+        return bool(page.evaluate(script))
+    except Exception:
+        return False
+
+
+def wait_for_generated_image(page: Page, baseline_srcs: set[str], timeout: int) -> str:
     print("  [wait-img] Waiting for a new generated image in the assistant response...")
     deadline = time.time() + timeout
-    next_log = time.time() + 15
+    next_log = time.time() + 10
     last_seen_count = 0
     while time.time() < deadline:
-        candidates = _image_candidates(driver, baseline_srcs)
+        candidates = _image_candidates(page, baseline_srcs)
         last_seen_count = len(candidates)
-        assistant_candidates = [c for c in candidates if c.get("assistantArea")]
-        if assistant_candidates:
-            chosen = assistant_candidates[0]
-            # Prefer true assistant/model-response images. If a spinner is still active,
-            # give Gemini a little time to finish, then re-check in case a higher-res
-            # final image replaced the preview.
-            if generation_in_progress(driver):
-                time.sleep(5.0)
-                refreshed = [c for c in _image_candidates(driver, baseline_srcs) if c.get("assistantArea")]
+        if candidates:
+            assistant_candidates = [c for c in candidates if c.get("assistantArea")]
+            chosen = assistant_candidates[0] if assistant_candidates else candidates[0]
+            if generation_in_progress(page):
+                time.sleep(4.0)
+                refreshed = _image_candidates(page, baseline_srcs)
                 if refreshed:
-                    chosen = refreshed[0]
+                    assistant_refreshed = [c for c in refreshed if c.get("assistantArea")]
+                    chosen = assistant_refreshed[0] if assistant_refreshed else refreshed[0]
             print(
-                "  [wait-img] Found generated assistant image: "
+                "  [wait-img] Found generated image: "
                 f"{int(chosen.get('width', 0))}x{int(chosen.get('height', 0))}, "
                 f"assistantArea={chosen.get('assistantArea')}."
             )
-            return str(chosen["src"])
+            return str(chosen.get("src") or "")
 
-        # Do not accept a non-assistant image while generation is active; that is
-        # usually an uploaded reference thumbnail that moved from the composer
-        # into the user turn after Send. Only use this fallback after generation
-        # has ended and no assistant-specific container could be detected.
-        if candidates and not generation_in_progress(driver):
-            time.sleep(3.0)
-            refreshed = _image_candidates(driver, baseline_srcs)
-            assistant_candidates = [c for c in refreshed if c.get("assistantArea")]
-            chosen = assistant_candidates[0] if assistant_candidates else refreshed[0]
-            print(
-                "  [wait-img] Found generated image fallback: "
-                f"{int(chosen.get('width', 0))}x{int(chosen.get('height', 0))}, "
-                f"assistantArea={chosen.get('assistantArea')}."
-            )
-            return str(chosen["src"])
+        if response_completed_with_media(page):
+            marked_src = mark_largest_generated_image(page)
+            if marked_src:
+                print("  [wait-img] Found generated image using emergency largest-visible-image detection.")
+                return marked_src
 
         if time.time() >= next_log:
+            marked_src = mark_largest_generated_image(page)
+            if marked_src and not generation_in_progress(page):
+                print("  [wait-img] Found generated image using relaxed visible-image detection.")
+                return marked_src
             print(f"  [wait-img] Still waiting... candidate count={last_seen_count}")
-            next_log = time.time() + 15
+            next_log = time.time() + 10
         time.sleep(2.0)
-    raise TimeoutException(f"No generated image appeared within {timeout}s")
+    marked_src = mark_largest_generated_image(page)
+    if marked_src:
+        print("  [wait-img] Timeout reached, but visible image found; proceeding to download it.")
+        return marked_src
+    raise PWTimeoutError(f"No generated image appeared within {timeout}s")
 
 
 # ---------------------------------------------------------------------------
@@ -2300,6 +2617,109 @@ def _save_data_url(data_url: str, out_path_no_ext: Path, min_bytes: int) -> Path
         return None
 
 
+
+def _save_visible_generated_image_via_dom(page: Page, out_path_no_ext: Path, min_bytes: int) -> Path | None:
+    """Save the actual visible/generated image resource, not a screenshot.
+
+    This is a recovery path for Gemini/Chrome cases where the toolbar Download
+    button creates a zero-byte placeholder. It fetches the largest visible image
+    element's currentSrc/blob from inside the page and writes that image data.
+    """
+    script = r"""
+    () => new Promise(async (done) => {
+        function visible(el) {
+            if (!el) return false;
+            const r = el.getBoundingClientRect();
+            const s = getComputedStyle(el);
+            return r.width > 80 && r.height > 80 &&
+                   s.display !== 'none' && s.visibility !== 'hidden' && s.opacity !== '0';
+        }
+        function forbidden(el) {
+            return !!el.closest('rich-textarea, textarea, input, form, nav, [role="navigation"], header, user-query, .user-query, [data-author="user"], [class*="user-query"], [aria-label*="Recent"], [aria-label*="Conversation history"]');
+        }
+        const imgs = Array.from(document.querySelectorAll('main img, img')).filter(img => {
+            if (!visible(img) || forbidden(img)) return false;
+            const src = img.currentSrc || img.src || '';
+            if (!src) return false;
+            const s = src.toLowerCase();
+            if (s.includes('googlelogo') || s.includes('avatar') || s.includes('profile') || s.includes('/a-/')) return false;
+            const r = img.getBoundingClientRect();
+            const nw = img.naturalWidth || 0;
+            const nh = img.naturalHeight || 0;
+            return (r.width * r.height >= 30000) || (nw * nh >= 250000);
+        });
+        imgs.sort((a, b) => {
+            const ar = a.getBoundingClientRect();
+            const br = b.getBoundingClientRect();
+            const aScore = (a.naturalWidth || ar.width) * (a.naturalHeight || ar.height) + ar.width * ar.height;
+            const bScore = (b.naturalWidth || br.width) * (b.naturalHeight || br.height) + br.width * br.height;
+            return bScore - aScore;
+        });
+        const img = imgs[0];
+        if (!img) return done(null);
+
+        const src = img.currentSrc || img.src || '';
+        try {
+            const resp = await fetch(src, {credentials: 'include'});
+            const blob = await resp.blob();
+            if (!blob || blob.size < 1000) throw new Error('blob too small');
+            const reader = new FileReader();
+            reader.onloadend = () => done({
+                dataUrl: reader.result,
+                src,
+                blobSize: blob.size,
+                naturalWidth: img.naturalWidth || 0,
+                naturalHeight: img.naturalHeight || 0,
+                method: 'fetch-currentSrc'
+            });
+            reader.onerror = () => done(null);
+            reader.readAsDataURL(blob);
+            return;
+        } catch (e) {
+            // Last non-screenshot recovery: draw the loaded image element at its
+            // natural dimensions and export the image pixels. This is not a page
+            // screenshot; it uses the actual generated image element.
+            try {
+                const w = img.naturalWidth || img.width || Math.round(img.getBoundingClientRect().width);
+                const h = img.naturalHeight || img.height || Math.round(img.getBoundingClientRect().height);
+                if (!w || !h) throw new Error('bad dimensions');
+                const canvas = document.createElement('canvas');
+                canvas.width = w;
+                canvas.height = h;
+                const ctx = canvas.getContext('2d');
+                ctx.drawImage(img, 0, 0, w, h);
+                done({
+                    dataUrl: canvas.toDataURL('image/png'),
+                    src,
+                    blobSize: 0,
+                    naturalWidth: w,
+                    naturalHeight: h,
+                    method: 'canvas-from-image-element'
+                });
+            } catch (e2) {
+                done(null);
+            }
+        }
+    })
+    """.strip()
+    try:
+        result = page.evaluate(script)
+        if not result or not isinstance(result, dict):
+            return None
+        data_url = result.get("dataUrl") or ""
+        saved = _save_data_url(data_url, out_path_no_ext, min_bytes=min_bytes)
+        if saved:
+            print(
+                "  [dl] Saved generated image from DOM resource "
+                f"({result.get('method')}, {result.get('naturalWidth')}x{result.get('naturalHeight')}): "
+                f"{saved} ({saved.stat().st_size} bytes)"
+            )
+            return saved
+    except Exception as exc:
+        print(f"  [dl] DOM image-resource save failed: {exc}")
+    return None
+
+
 def snapshot_download_dir(download_dir: Path) -> dict[Path, tuple[float, int]]:
     download_dir.mkdir(parents=True, exist_ok=True)
     out: dict[Path, tuple[float, int]] = {}
@@ -2311,6 +2731,100 @@ def snapshot_download_dir(download_dir: Path) -> dict[Path, tuple[float, int]]:
             except Exception:
                 pass
     return out
+
+
+
+def _default_chrome_download_dirs(primary: Path) -> list[Path]:
+    """Return likely places Chrome may save files during CDP-attached sessions."""
+    dirs: list[Path] = []
+    for d in [
+        primary,
+        Path.home() / "Downloads",
+        Path.home() / "downloads",
+        Path("/home/mylappy/Downloads"),
+    ]:
+        try:
+            d = d.expanduser().resolve()
+        except Exception:
+            continue
+        if d not in dirs:
+            try:
+                d.mkdir(parents=True, exist_ok=True)
+            except Exception:
+                pass
+            dirs.append(d)
+    return dirs
+
+
+def snapshot_download_dirs(download_dirs: list[Path]) -> dict[Path, dict[Path, tuple[float, int]]]:
+    return {d: snapshot_download_dir(d) for d in download_dirs}
+
+
+def wait_for_completed_download_any(
+    download_dirs: list[Path],
+    before_by_dir: dict[Path, dict[Path, tuple[float, int]]],
+    started_at: float,
+    timeout: int,
+    min_bytes: int = 5000,
+) -> Path | None:
+    """Poll multiple download dirs.
+
+    Chrome sometimes shows a valid 6MB file in its normal Downloads folder while
+    Playwright/CDP reports a 0-byte placeholder in the configured folder. This
+    searches both locations and returns the newest stable, non-empty image file.
+    """
+    deadline = time.time() + timeout
+    last_candidate: Path | None = None
+    stable_since: float | None = None
+    last_size: int | None = None
+
+    while time.time() < deadline:
+        candidates: list[Path] = []
+        active_temp = False
+
+        for download_dir in download_dirs:
+            try:
+                entries = list(download_dir.iterdir())
+            except Exception:
+                continue
+            before = before_by_dir.get(download_dir, {})
+            for p in entries:
+                if not p.is_file():
+                    continue
+                if p.suffix.lower() in DOWNLOAD_TEMP_EXTS:
+                    active_temp = True
+                    continue
+                try:
+                    st = p.stat()
+                except Exception:
+                    continue
+                old = before.get(p)
+                changed = old is None or st.st_mtime > old[0] + 0.5 or st.st_size != old[1]
+                recent = st.st_mtime >= started_at - 2
+                looks_like_image_download = (
+                    p.suffix.lower() in {".png", ".jpg", ".jpeg", ".webp", ".gif"}
+                    or "gemini_generated_image" in p.name.lower()
+                    or "generated_image" in p.name.lower()
+                )
+                if changed and recent and looks_like_image_download and st.st_size >= min_bytes:
+                    candidates.append(p)
+
+        if candidates and not active_temp:
+            newest = max(candidates, key=lambda p: p.stat().st_mtime)
+            size = newest.stat().st_size
+            if newest == last_candidate and size == last_size:
+                if stable_since is None:
+                    stable_since = time.time()
+                if time.time() - stable_since >= 2.0:
+                    return newest
+            else:
+                last_candidate = newest
+                last_size = size
+                stable_since = time.time()
+
+        time.sleep(1.0)
+
+    return None
 
 
 def wait_for_completed_download(
@@ -2356,79 +2870,364 @@ def wait_for_completed_download(
     return None
 
 
-def click_exact_image_and_download(driver: webdriver.Chrome, src: str, download_dir: Path, timeout: int) -> Path | None:
-    before = snapshot_download_dir(download_dir)
-    started_at = time.time()
-    clicked = driver.execute_script(
-        r"""
-        const src = arguments[0];
-        function visible(el) {
-            const r = el.getBoundingClientRect();
-            const s = getComputedStyle(el);
-            return r.width > 50 && r.height > 50 && s.display !== 'none' && s.visibility !== 'hidden';
-        }
-        const img = Array.from(document.querySelectorAll('main img')).find(i => (i.currentSrc || i.src || '') === src && visible(i));
-        if (!img) return false;
-        img.scrollIntoView({block:'center', inline:'center'});
-        img.click();
-        return true;
-        """,
-        src,
-    )
-    if not clicked:
-        return None
-    time.sleep(2.0)
+def _unique_download_target(download_dir: Path, suggested_filename: str, fallback_ext: str = ".png") -> Path:
+    safe = re.sub(r"[^A-Za-z0-9_. -]+", "_", suggested_filename or "")
+    safe = safe.strip(" .") or f"gemini-download{fallback_ext}"
+    base = download_dir / safe
+    if not base.suffix:
+        base = base.with_suffix(fallback_ext)
+    if not base.exists():
+        return base
+    stem = base.stem
+    suffix = base.suffix
+    for i in range(2, 10000):
+        candidate = base.with_name(f"{stem}-{i}{suffix}")
+        if not candidate.exists():
+            return candidate
+    return base.with_name(f"{stem}-{int(time.time())}{suffix}")
 
-    button_clicked = driver.execute_script(
-        r"""
-        function visible(el) {
-            const r = el.getBoundingClientRect();
-            const s = getComputedStyle(el);
-            return r.width > 0 && r.height > 0 && s.display !== 'none' && s.visibility !== 'hidden';
-        }
-        const roots = Array.from(document.querySelectorAll('[role="dialog"], .cdk-overlay-container, main'));
-        for (const root of roots) {
-            const buttons = Array.from(root.querySelectorAll('button,a[href]')).reverse();
-            for (const b of buttons) {
-                if (!visible(b)) continue;
-                const t = ((b.getAttribute('aria-label') || '') + ' ' + (b.title || '') + ' ' + (b.innerText || '')).trim().toLowerCase();
-                if (t === 'download' || t.startsWith('download')) {
-                    b.click();
-                    return true;
-                }
-            }
-        }
-        return false;
-        """
-    )
-    if not button_clicked:
+
+def _save_playwright_download(download, download_dir: Path, src: str = "") -> Path:
+    ext = infer_ext_from_src(src) if src else ".png"
+    target = _unique_download_target(download_dir, getattr(download, "suggested_filename", "") or "", fallback_ext=ext)
+    download.save_as(str(target))
+    return target
+
+
+def _open_marked_image_viewer(page: Page, src: str | None = None) -> bool:
+    marked_src = mark_largest_generated_image(page, src) or mark_largest_generated_image(page)
+    if not marked_src:
+        print("  [dl] Could not mark a generated image for opening.")
+        return False
+
+    try:
+        candidate = page.locator('[data-gemini-auto-generated-image-candidate="1"]').first
+        candidate.scroll_into_view_if_needed(timeout=5000)
+    except Exception:
+        candidate = None
+
+    # Click the actual center point. This is more reliable than DOM click for
+    # Gemini image cards because overlay controls can intercept normal clicks.
+    try:
+        box = candidate.bounding_box(timeout=5000) if candidate is not None else None
+    except Exception:
+        box = None
+    if box:
         try:
-            driver.find_element(By.TAG_NAME, "body").send_keys(Keys.ESCAPE)
+            page.mouse.click(box["x"] + box["width"] / 2, box["y"] + box["height"] / 2)
         except Exception:
             pass
+    else:
+        try:
+            page.evaluate("""() => {
+                const el = document.querySelector('[data-gemini-auto-generated-image-candidate="1"]');
+                if (!el) return false;
+                el.scrollIntoView({block:'center', inline:'center'});
+                el.click();
+                return true;
+            }""")
+        except Exception:
+            pass
+
+    # Viewer is open if a Done button appears, or if top toolbar controls appear.
+    for _ in range(12):
+        try:
+            opened = bool(page.evaluate(r"""() => {
+                function visible(el) {
+                    if (!el) return false;
+                    const r = el.getBoundingClientRect();
+                    const s = getComputedStyle(el);
+                    return r.width > 0 && r.height > 0 && s.display !== 'none' && s.visibility !== 'hidden' && s.opacity !== '0';
+                }
+                const nodes = Array.from(document.querySelectorAll('button, [role="button"]')).filter(visible);
+                for (const el of nodes) {
+                    const t = ((el.getAttribute('aria-label') || '') + ' ' + (el.getAttribute('title') || '') + ' ' + (el.innerText || '')).toLowerCase().trim();
+                    if (t === 'done' || t.includes('done')) return true;
+                }
+                // Full-screen viewer usually has several top toolbar buttons.
+                const topButtons = nodes.filter(el => {
+                    const r = el.getBoundingClientRect();
+                    return r.top >= 0 && r.top < 170 && r.width >= 16 && r.height >= 16;
+                });
+                return topButtons.length >= 4;
+            }"""))
+            if opened:
+                return True
+        except Exception:
+            pass
+        time.sleep(0.5)
+    return True  # Even if not detected, try hover/download path.
+
+
+def _download_control_available(page: Page) -> bool:
+    try:
+        return bool(page.evaluate(r"""() => {
+            function visible(el) {
+                if (!el) return false;
+                const r = el.getBoundingClientRect();
+                const s = getComputedStyle(el);
+                return r.width > 0 && r.height > 0 && s.display !== 'none' && s.visibility !== 'hidden' && s.opacity !== '0';
+            }
+            function textOf(el) {
+                const iconText = Array.from(el.querySelectorAll('mat-icon, .material-icons, .material-symbols-outlined, svg title'))
+                    .map(x => x.textContent || '').join(' ');
+                return ((el.getAttribute('aria-label') || '') + ' ' +
+                        (el.getAttribute('title') || '') + ' ' +
+                        (el.getAttribute('data-tooltip') || '') + ' ' +
+                        (el.getAttribute('data-testid') || '') + ' ' +
+                        (el.getAttribute('data-test-id') || '') + ' ' +
+                        (el.innerText || '') + ' ' + iconText).replace(/\s+/g, ' ').trim().toLowerCase();
+            }
+            const nodes = Array.from(document.querySelectorAll('button, [role="button"], a[href], a[download]')).filter(visible);
+            if (nodes.some(el => {
+                const t = textOf(el);
+                return t === 'download' || t.includes('download image') || t.includes('download');
+            })) return true;
+
+            // Geometry fallback for Gemini image viewer: if Done exists, the
+            // Download icon is typically the 3rd small top toolbar button left of Done.
+            const done = nodes.find(el => {
+                const t = textOf(el);
+                return t === 'done' || t.includes('done');
+            });
+            if (done) {
+                const dr = done.getBoundingClientRect();
+                const leftControls = nodes.filter(el => {
+                    if (el === done) return false;
+                    const r = el.getBoundingClientRect();
+                    return r.top >= dr.top - 45 && r.bottom <= dr.bottom + 45 &&
+                           r.right < dr.left && r.width >= 16 && r.width <= 80 &&
+                           r.height >= 16 && r.height <= 80;
+                }).sort((a, b) => b.getBoundingClientRect().left - a.getBoundingClientRect().left);
+                if (leftControls.length >= 3) return true;
+            }
+            return false;
+        }"""))
+    except Exception:
+        return False
+
+
+def _click_download_control_js(page: Page) -> str:
+    try:
+        return str(page.evaluate(r"""() => {
+            function visible(el) {
+                if (!el) return false;
+                const r = el.getBoundingClientRect();
+                const s = getComputedStyle(el);
+                return r.width > 0 && r.height > 0 && s.display !== 'none' && s.visibility !== 'hidden' && s.opacity !== '0';
+            }
+            function textOf(el) {
+                const iconText = Array.from(el.querySelectorAll('mat-icon, .material-icons, .material-symbols-outlined, svg title'))
+                    .map(x => x.textContent || '').join(' ');
+                return ((el.getAttribute('aria-label') || '') + ' ' +
+                        (el.getAttribute('title') || '') + ' ' +
+                        (el.getAttribute('data-tooltip') || '') + ' ' +
+                        (el.getAttribute('data-testid') || '') + ' ' +
+                        (el.getAttribute('data-test-id') || '') + ' ' +
+                        (el.innerText || '') + ' ' + iconText).replace(/\s+/g, ' ').trim().toLowerCase();
+            }
+            const nodes = Array.from(document.querySelectorAll('button, [role="button"], a[href], a[download]')).filter(visible);
+
+            // Label/icon-text path.
+            const labelled = [];
+            for (const el of nodes) {
+                const t = textOf(el);
+                let score = 0;
+                if (t === 'download') score += 500;
+                if (t.includes('download image')) score += 450;
+                if (t.includes('download')) score += 400;
+                if (t.includes('file_download') || t.includes('download_for_offline') || t.includes('arrow_downward')) score += 300;
+                const r = el.getBoundingClientRect();
+                if (r.top < 180) score += 50;
+                if (score > 0) labelled.push({el, score});
+            }
+            labelled.sort((a,b) => b.score - a.score);
+            if (labelled.length) {
+                labelled[0].el.click();
+                return 'labelled-download';
+            }
+
+            // Geometry fallback for Gemini full image viewer. In the viewer,
+            // the toolbar is top-right: Share, Copy, Download, Undo, Redo, Done.
+            // Therefore Download is usually the third small button to the left
+            // of Done when scanning from right to left.
+            const done = nodes.find(el => {
+                const t = textOf(el);
+                return t === 'done' || t.includes('done');
+            });
+            if (done) {
+                const dr = done.getBoundingClientRect();
+                const leftControls = nodes.filter(el => {
+                    if (el === done) return false;
+                    const r = el.getBoundingClientRect();
+                    return r.top >= dr.top - 45 && r.bottom <= dr.bottom + 45 &&
+                           r.right < dr.left && r.width >= 16 && r.width <= 80 &&
+                           r.height >= 16 && r.height <= 80;
+                }).sort((a, b) => b.getBoundingClientRect().left - a.getBoundingClientRect().left);
+                if (leftControls.length >= 3) {
+                    leftControls[2].click();
+                    return 'viewer-third-left-of-done';
+                }
+            }
+
+            return '';
+        }""") or "")
+    except Exception as exc:
+        print(f"  [dl] Download button click JS failed: {exc}")
+        return ""
+
+
+def _capture_download_from_click(page: Page, download_dir: Path, src: str, click_timeout: int = 20) -> Path | None:
+    if not _download_control_available(page):
         return None
 
-    downloaded = wait_for_completed_download(download_dir, before, started_at, timeout)
+    download_dirs = _default_chrome_download_dirs(download_dir)
+    before_by_dir = snapshot_download_dirs(download_dirs)
+    started_at = time.time()
+    method = ""
+
     try:
-        driver.find_element(By.TAG_NAME, "body").send_keys(Keys.ESCAPE)
-    except Exception:
-        pass
-    return downloaded
+        with page.expect_download(timeout=click_timeout * 1000) as dl_info:
+            method = _click_download_control_js(page)
+            if not method:
+                raise RuntimeError("download control disappeared before click")
+        download = dl_info.value
+        saved = _save_playwright_download(download, download_dir, src=src)
+        size = saved.stat().st_size if saved.exists() else 0
+        print(f"  [dl] Browser download captured via Playwright ({method}): {saved} ({size} bytes)")
+        if size >= 5000:
+            return saved
+
+        # This is the Chrome/CDP mismatch the screenshots show: Chrome's toolbar
+        # history may contain the real 6MB file, but Playwright exposes a 0-byte
+        # placeholder. Do not fail yet; poll Chrome's real Downloads folder below.
+        print("  [dl] Playwright file is zero/tiny; checking Chrome's real Downloads folder.")
+        try:
+            saved.unlink(missing_ok=True)
+        except Exception:
+            pass
+    except Exception as exc:
+        if method:
+            print(f"  [dl] Clicked download control ({method}) but Playwright did not capture download: {exc}")
+        else:
+            print(f"  [dl] Could not click/capture download control: {exc}")
+
+    downloaded = wait_for_completed_download_any(
+        download_dirs=download_dirs,
+        before_by_dir=before_by_dir,
+        started_at=started_at,
+        timeout=min(60, click_timeout + 30),
+        min_bytes=5000,
+    )
+    if downloaded:
+        print(f"  [dl] Valid Chrome download found: {downloaded} ({downloaded.stat().st_size} bytes)")
+        return downloaded
+
+    return None
 
 
-def screenshot_exact_image(driver: webdriver.Chrome, src: str, out_path_no_ext: Path, min_bytes: int) -> Path | None:
-    try:
-        img_el = driver.execute_script(
-            r"""
-            const src = arguments[0];
-            return Array.from(document.querySelectorAll('main img')).find(i => (i.currentSrc || i.src || '') === src) || null;
-            """,
-            src,
+def click_exact_image_and_download(page: Page, context, src: str, download_dir: Path, timeout: int) -> Path | None:
+    _configure_download_dir(context, download_dir)
+
+    # Primary path for this Chrome/CDP setup:
+    #   1. open Gemini's full image viewer
+    #   2. click Gemini's Download control
+    #   3. poll the real download folders for a stable non-empty image file
+    #
+    # This avoids Playwright's flaky expect_download path, which often reports
+    # a 0-byte placeholder before Chrome finishes or before the real file is
+    # visible in .browser_downloads / Downloads.
+    print("  [dl] Opening generated image viewer...")
+    _open_marked_image_viewer(page, src)
+    time.sleep(1.0)
+
+    download_dirs = _default_chrome_download_dirs(download_dir)
+    before_by_dir = snapshot_download_dirs(download_dirs)
+    started_at = time.time()
+
+    method = _click_download_control_js(page)
+    if method:
+        print(f"  [dl] Clicked Gemini download control: {method}")
+        downloaded = wait_for_completed_download_any(
+            download_dirs=download_dirs,
+            before_by_dir=before_by_dir,
+            started_at=started_at,
+            timeout=min(75, max(30, timeout)),
+            min_bytes=5000,
         )
-        if not img_el:
+        if downloaded:
+            print(f"  [dl] Valid Chrome download found: {downloaded} ({downloaded.stat().st_size} bytes)")
+            try:
+                page.locator('button:has-text("Done"), [role="button"]:has-text("Done")').first.click(timeout=1500)
+            except Exception:
+                try:
+                    page.keyboard.press("Escape")
+                except Exception:
+                    pass
+            return downloaded
+        print("  [dl] Clicked Download, but no valid non-empty Chrome file appeared yet.")
+    else:
+        print("  [dl] Download control not found in viewer.")
+
+    # Fallback A: close viewer, hover the generated image card, click any
+    # hover/card Download control, and again poll real folders directly.
+    try:
+        page.locator('button:has-text("Done"), [role="button"]:has-text("Done")').first.click(timeout=1500)
+    except Exception:
+        try:
+            page.keyboard.press("Escape")
+        except Exception:
+            pass
+    time.sleep(0.8)
+
+    mark_largest_generated_image(page, src) or mark_largest_generated_image(page)
+    try:
+        candidate = page.locator('[data-gemini-auto-generated-image-candidate="1"]').first
+        candidate.hover(timeout=5000)
+        time.sleep(1.0)
+
+        before_by_dir = snapshot_download_dirs(download_dirs)
+        started_at = time.time()
+        method = _click_download_control_js(page)
+        if method:
+            print(f"  [dl] Clicked hover/card download control: {method}")
+            downloaded = wait_for_completed_download_any(
+                download_dirs=download_dirs,
+                before_by_dir=before_by_dir,
+                started_at=started_at,
+                timeout=min(75, max(30, timeout)),
+                min_bytes=5000,
+            )
+            if downloaded:
+                print(f"  [dl] Valid Chrome download found: {downloaded} ({downloaded.stat().st_size} bytes)")
+                return downloaded
+            print("  [dl] Hover/card Download clicked, but no valid non-empty Chrome file appeared.")
+    except Exception as exc:
+        print(f"  [dl] Hover download path failed: {exc}")
+
+    # Fallback B: keep the old Playwright download-event path as a last resort.
+    # It is slower/flakier in this environment, so it is no longer first.
+    try:
+        print("  [dl] Fallback: trying Playwright download-event capture.")
+        _open_marked_image_viewer(page, src)
+        time.sleep(1.0)
+        downloaded = _capture_download_from_click(page, download_dir, src, click_timeout=min(20, max(8, timeout)))
+        if downloaded:
+            return downloaded
+    except Exception as exc:
+        print(f"  [dl] Playwright download-event fallback failed: {exc}")
+
+    return None
+
+
+def screenshot_exact_image(page: Page, src: str, out_path_no_ext: Path, min_bytes: int) -> Path | None:
+    try:
+        marked_src = mark_largest_generated_image(page, src) or mark_largest_generated_image(page)
+        if not marked_src:
             return None
+        locator = page.locator('[data-gemini-auto-generated-image-candidate="1"]').first
         out_path = out_path_no_ext.with_suffix(".png")
-        img_el.screenshot(str(out_path))
+        locator.screenshot(path=str(out_path))
         if out_path.exists() and out_path.stat().st_size >= min_bytes:
             print(f"  [dl] Saved exact image screenshot: {out_path} ({out_path.stat().st_size} bytes)")
             return out_path
@@ -2440,7 +3239,8 @@ def screenshot_exact_image(driver: webdriver.Chrome, src: str, out_path_no_ext: 
 
 
 def download_generated_image(
-    driver: webdriver.Chrome,
+    page: Page,
+    context,
     src: str,
     out_path_no_ext: Path,
     download_dir: Path,
@@ -2448,24 +3248,45 @@ def download_generated_image(
     download_timeout: int,
 ) -> Path:
     out_path_no_ext.parent.mkdir(parents=True, exist_ok=True)
-    configure_download_dir(driver, download_dir)
+    _configure_download_dir(context, download_dir)
 
-    print(f"  [dl] Strategy 1: fetch exact src: {src[:100]}...")
+    marked_src = mark_largest_generated_image(page, src) or src
+    if marked_src and marked_src != src:
+        print("  [dl] Updated generated image src from marked visible image.")
+        src = marked_src
+
+    print("  [dl] Strategy 1: click generated image, open viewer, then click Download.")
     try:
-        data_url = driver.execute_async_script(
-            r"""
-            const src = arguments[0];
-            const done = arguments[arguments.length - 1];
-            fetch(src, {credentials: 'include'})
-                .then(r => r.blob())
-                .then(blob => {
-                    const reader = new FileReader();
-                    reader.onloadend = () => done(reader.result);
-                    reader.onerror = () => done(null);
-                    reader.readAsDataURL(blob);
-                })
-                .catch(() => done(null));
-            """,
+        downloaded = click_exact_image_and_download(page, context, src, download_dir, timeout=download_timeout)
+        if downloaded and downloaded.exists() and downloaded.stat().st_size >= min_bytes:
+            ext = downloaded.suffix if downloaded.suffix else ".png"
+            out_path = out_path_no_ext.with_suffix(ext)
+            shutil.copy2(downloaded, out_path)
+            print(f"  [dl] Saved browser download: {out_path} ({out_path.stat().st_size} bytes)")
+            return out_path
+        if downloaded:
+            print(f"  [dl] Browser download too small/corrupt: {downloaded} ({downloaded.stat().st_size} bytes)")
+    except Exception as exc:
+        print(f"  [dl] viewer/button strategy failed: {exc}")
+
+    # Re-mark the actual viewer image after opening. Gemini sometimes gives the
+    # prompt card a small blob src, while the viewer contains the real image src.
+    src = mark_largest_generated_image(page) or src
+
+    print(f"  [dl] Strategy 2: fetch exact current image src: {src[:100]}...")
+    try:
+        data_url = page.evaluate(
+            """src => new Promise((done) => {
+                fetch(src, {credentials: 'include'})
+                    .then(r => r.blob())
+                    .then(blob => {
+                        const reader = new FileReader();
+                        reader.onloadend = () => done(reader.result);
+                        reader.onerror = () => done(null);
+                        reader.readAsDataURL(blob);
+                    })
+                    .catch(() => done(null));
+            })""",
             src,
         )
         saved = _save_data_url(data_url, out_path_no_ext, min_bytes=min_bytes)
@@ -2474,50 +3295,31 @@ def download_generated_image(
     except Exception as exc:
         print(f"  [dl] fetch strategy failed: {exc}")
 
-    print("  [dl] Strategy 2: click exact generated image, then its Download button.")
-    try:
-        downloaded = click_exact_image_and_download(driver, src, download_dir, timeout=download_timeout)
-        if downloaded and downloaded.exists() and downloaded.stat().st_size >= min_bytes:
-            ext = downloaded.suffix if downloaded.suffix else ".png"
-            out_path = out_path_no_ext.with_suffix(ext)
-            shutil.copy2(downloaded, out_path)
-            print(f"  [dl] Saved browser download: {out_path} ({out_path.stat().st_size} bytes)")
-            return out_path
-        if downloaded:
-            print(f"  [dl] Browser download too small: {downloaded} ({downloaded.stat().st_size} bytes)")
-    except Exception as exc:
-        print(f"  [dl] button strategy failed: {exc}")
-
-    print("  [dl] Strategy 3: screenshot the exact generated image element.")
-    saved = screenshot_exact_image(driver, src, out_path_no_ext, min_bytes=min_bytes)
+    print("  [dl] Strategy 3: save actual visible generated image resource from DOM.")
+    saved = _save_visible_generated_image_via_dom(page, out_path_no_ext, min_bytes=min_bytes)
     if saved:
         return saved
 
-    raise RuntimeError("All download strategies failed for the exact generated image")
+    raise RuntimeError("Full download failed: Gemini image was detected, but no valid image file could be found in Playwright or Chrome Downloads")
 
 
-# ---------------------------------------------------------------------------
-# Diagnostics
-# ---------------------------------------------------------------------------
-
-
-def save_debug_snapshot(driver: webdriver.Chrome, base: Path, label: str) -> dict[str, str | None]:
+def save_debug_snapshot(page: Page, base: Path, label: str) -> dict[str, str | None]:
     base.parent.mkdir(parents=True, exist_ok=True)
     png = base.with_name(base.name + f".{label}.png")
     html = base.with_name(base.name + f".{label}.html")
     current_url = None
     try:
-        current_url = driver.current_url
+        current_url = page.url
     except Exception:
         pass
     try:
-        driver.save_screenshot(str(png))
+        page.screenshot(path=str(png))
     except Exception:
-        png = None  # type: ignore[assignment]
+        png = None
     try:
-        html.write_text(driver.page_source, encoding="utf-8", errors="replace")
+        html.write_text(page.content(), encoding="utf-8", errors="replace")
     except Exception:
-        html = None  # type: ignore[assignment]
+        html = None
     return {
         "screenshot": str(png) if png else None,
         "html": str(html) if html else None,
@@ -2536,6 +3338,17 @@ def run() -> None:
     out_dir = Path(args.out_dir).expanduser().resolve()
     upload_dir = Path(args.upload_dir).expanduser().resolve()
     out_dir.mkdir(parents=True, exist_ok=True)
+    generated_images_dir = out_dir / 'generated images'
+    generated_images_dir.mkdir(parents=True, exist_ok=True)
+
+    # Shared progress log for dashboard polling
+    log_path = out_dir / "_headless_progress.json"
+    def log_progress(step: str, msg: str) -> None:
+        payload = {"step": step, "message": msg, "time": int(time.time())}
+        log_path.write_text(json.dumps(payload, ensure_ascii=False) + "\n", encoding="utf-8")
+        print(f"  [headless] {step}: {msg}", flush=True)
+
+    log_progress("init", f"Starting headless={args.headless} headless mode, prompts in {prompt_dir}")
 
     jobs, duplicates = discover_prompt_jobs(
         prompt_dir=prompt_dir,
@@ -2550,8 +3363,6 @@ def run() -> None:
 
     browser_download_dir = Path(args.browser_download_dir).expanduser().resolve() if args.browser_download_dir else out_dir / ".browser_downloads"
     browser_download_dir.mkdir(parents=True, exist_ok=True)
-
-    auto_launch_debug_browser(args)
 
     with tempfile.TemporaryDirectory(prefix="gemini_uploads_") as tmp:
         temp_dir = Path(tmp)
@@ -2570,15 +3381,23 @@ def run() -> None:
         if len(upload_paths) > 20:
             print("WARNING: Gemini may reject very large attachment batches.")
 
-        driver = build_driver(args, download_dir=browser_download_dir)
+        log_progress("browser_launch", f"Launching browser, headless={args.headless}")
+        pw, context = build_browser_context(args, download_dir=browser_download_dir)
+        page = context.pages[0]
+
+        log_progress("browser_ready", f"Browser launched, headless={args.headless}")
+        print(f"\nBrowser launched in {'HEADLESS' if args.headless else 'VISIBLE'} mode.")
+
+        results: list[dict[str, Any]] = []
         try:
             strict_login = args.login_wait_mode == "strict"
             for idx, job in enumerate(jobs, start=1):
                 print("\n" + "=" * 72)
                 print(f"[{idx}/{len(jobs)}] {job.job_key}: {job.prompt_path.name}")
                 print("=" * 72)
+                log_progress("job_start", f"Starting job {idx}/{len(jobs)}: {job.job_key}")
                 prompt_text = job.prompt_path.read_text(encoding="utf-8")
-                out_base = out_dir / job.output_stem
+                out_base = generated_images_dir / job.output_stem
                 print(f"  Prompt file stats: {len(prompt_text)} chars, {prompt_text.count(chr(10)) + 1} lines")
 
                 success = False
@@ -2588,30 +3407,27 @@ def run() -> None:
                     if attempts > 1:
                         print(f"  Attempt {attempt}/{attempts}")
                     try:
-                        open_prompt_tab(driver, idx if attempt == 1 else 999999, args.first_tab_mode, browser_download_dir)
+                        log_progress("opening_tab", f"Job {idx}: opening tab, attempt {attempt}")
+                        page = open_prompt_tab(context, page, idx if attempt == 1 else 999999, args.first_tab_mode, browser_download_dir)
+                        log_progress("navigating", f"Job {idx}: navigating to Gemini")
                         navigate_to_fresh_chat(
-                            driver,
+                            page,
                             manual_login_timeout=args.manual_login_timeout,
                             strict_login=strict_login,
                         )
-                        configure_download_dir(driver, browser_download_dir)
-
-                        assert_clean_fresh_chat_before_upload(driver)
-
-                        print("  Selecting model/tool before typing prompt...")
-                        select_model_and_tool_if_requested(driver, args)
-
-                        # Model/tool clicks must not switch us into an old conversation.
-                        assert_clean_fresh_chat_before_upload(driver)
+                        _configure_download_dir(context, browser_download_dir)
 
                         print("  Uploading reference images...")
-                        upload_images(driver, upload_paths)
-                        dismiss_open_overlays(driver)
+                        print("  [DEBUG] About to call upload_images")
+                        log_progress("uploading", f"Job {idx}: uploading images")
+                        upload_images(page, upload_paths)
+                        dismiss_open_overlays(page)
                         time.sleep(1.0)
 
                         print("  Typing prompt with strict integrity check...")
+                        log_progress("typing_prompt", f"Job {idx}: typing prompt ({len(prompt_text)} chars)")
                         composer = set_prompt_text(
-                            driver,
+                            page,
                             prompt_text,
                             method=args.prompt_paste_method,
                             verify_timeout=args.prompt_paste_timeout,
@@ -2620,14 +3436,13 @@ def run() -> None:
                         )
                         time.sleep(0.5)
 
-                        baseline_srcs = get_all_image_srcs(driver)
+                        baseline_srcs = get_all_image_srcs(page)
                         print(f"  Baseline image src count before Send: {len(baseline_srcs)}")
 
-                        assert_fresh_url_immediately_before_send(driver)
-
                         print("  Sending prompt...")
+                        log_progress("sending", f"Job {idx}: sending prompt")
                         click_send_and_confirm(
-                            driver,
+                            page,
                             composer,
                             expected_prompt=prompt_text,
                             min_integrity_ratio=args.prompt_integrity_ratio,
@@ -2637,11 +3452,13 @@ def run() -> None:
                             confirm_timeout=args.send_confirm_timeout,
                         )
 
-                        image_src = wait_for_generated_image(driver, baseline_srcs, timeout=args.timeout)
+                        log_progress("waiting_image", f"Job {idx}: waiting for generated image (timeout={args.timeout}s)")
+                        image_src = wait_for_generated_image(page, baseline_srcs, timeout=args.timeout)
 
-                        print("  Downloading generated image and waiting for completion...")
+                        log_progress("downloading", f"Job {idx}: downloading image")
                         saved_path = download_generated_image(
-                            driver,
+                            page,
+                            context,
                             image_src,
                             out_base,
                             download_dir=browser_download_dir,
@@ -2660,10 +3477,15 @@ def run() -> None:
                             "generated_image_src": image_src,
                             "saved_file": str(saved_path),
                             "saved_size": saved_path.stat().st_size,
+                            "saved_ext": saved_path.suffix,
+                            "output_dir": str(saved_path.parent),
+                            "metadata_file": str(out_base.with_suffix(".json")),
                             "timestamp": int(time.time()),
                         }
                         out_base.with_suffix(".json").write_text(json.dumps(metadata, indent=2), encoding="utf-8")
+                        log_progress("done", f"Job {idx} SUCCESS: {saved_path} ({saved_path.stat().st_size} bytes)")
                         print(f"  SUCCESS: saved {saved_path} ({saved_path.stat().st_size} bytes)")
+                        results.append({"job": job.job_key, "status": "success", "file": str(saved_path)})
                         if args.sleep_after_download > 0:
                             print(f"  Waiting {args.sleep_after_download:g}s before next prompt tab...")
                             time.sleep(args.sleep_after_download)
@@ -2671,17 +3493,21 @@ def run() -> None:
                         print("  [loop] Finished this prompt. Returning to job loop now.")
                         break
 
-                    except (InvalidSessionIdException, WebDriverException) as exc:
+                    except PWTimeoutError as exc:
                         last_exc = exc
-                        print(f"  Driver/session error: {exc}")
+                        print(f"  Timeout/pw error: {exc}")
+                        log_progress("error", f"Job {idx} attempt {attempt}: {exc}")
                         if attempt < attempts:
-                            auto_launch_debug_browser(args)
-                            driver = build_driver(args, download_dir=browser_download_dir)
+                            try:
+                                page = context.new_page()
+                            except Exception:
+                                pass
                             continue
                         break
                     except Exception as exc:
                         last_exc = exc
                         print(f"  ERROR: {exc}")
+                        log_progress("error", f"Job {idx} attempt {attempt}: {exc}")
                         if attempt < attempts:
                             continue
                         break
@@ -2691,7 +3517,7 @@ def run() -> None:
                         print("  [next] Moving to next prompt; a new tab will be opened and this tab will stay open.")
                     continue
 
-                diag = save_debug_snapshot(driver, out_base, "error")
+                diag = save_debug_snapshot(page, out_base, "error")
                 metadata = {
                     "status": "error",
                     "prompt_file": str(job.prompt_path),
@@ -2703,11 +3529,21 @@ def run() -> None:
                     **diag,
                 }
                 out_base.with_suffix(".json").write_text(json.dumps(metadata, indent=2), encoding="utf-8")
-                print(f"  FAILED: {job.job_key}. Continuing to next prompt.")
+                results.append({"job": job.job_key, "status": "error", "error": str(last_exc)})
+                log_progress("failed", f"Job {idx} FAILED: {last_exc}")
+                if args.continue_on_error:
+                    print(f"  FAILED: {job.job_key}. Continuing to next prompt because --continue-on-error is set.")
+                    continue
+                print(f"  FAILED: {job.job_key}. Stopping run so this prompt is not silently skipped. Use --continue-on-error to keep going.")
+                break
 
+            # Final summary
+            log_progress("complete", f"All done. {sum(1 for r in results if r['status'] == 'success')}/{len(results)} succeeded.")
             print("\nAll prompt jobs finished.")
         finally:
-            print("Browser left open for inspection. Close it manually when done.")
+            context.close()
+            pw.stop()
+            print("Browser closed.")
 
 
 if __name__ == "__main__":

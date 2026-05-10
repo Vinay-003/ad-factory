@@ -797,7 +797,11 @@ def store_uploaded_input_images(files: list[UploadFile], clear_existing: bool) -
 
 
 def run_cmd(cmd: list[str], cwd: Path) -> subprocess.CompletedProcess[str]:
-    return subprocess.run(cmd, cwd=str(cwd), text=True, capture_output=True, check=False)
+    env = dict(os.environ)
+    playwright_path = "/home/mylappy/.local/lib/python3.12/site-packages"
+    if playwright_path not in env.get("PYTHONPATH", ""):
+        env["PYTHONPATH"] = playwright_path + ((":" + env["PYTHONPATH"]) if env.get("PYTHONPATH") else "")
+    return subprocess.run(cmd, cwd=str(cwd), text=True, capture_output=True, check=False, env=env)
 
 
 def generated_image_roots() -> list[Path]:
@@ -848,8 +852,8 @@ def run_gemini_generation(
     aspect_ratio: str,
     image_sources_file: str | None,
     prompt_reference_map: Path | None = None,
+    headless: bool = False,
 ) -> subprocess.CompletedProcess[str]:
-    debugger_args = gemini_debugger_args()
     aspect_folder = "9_16" if aspect_ratio == "9:16" else "4_5"
     prompt_work_dir = RUNTIME_ROOT / "gemini_selected_prompts" / f"{batch}_{aspect_folder}_{int(time.time())}_{uuid.uuid4().hex[:8]}"
     prompt_work_dir.mkdir(parents=True, exist_ok=True)
@@ -899,12 +903,11 @@ def run_gemini_generation(
         str(int(os.getenv("GEMINI_GENERATION_TIMEOUT_SECONDS") or "420")),
         "--manual-login-timeout",
         str(int(os.getenv("GEMINI_MANUAL_LOGIN_TIMEOUT_SECONDS") or "180")),
-        "--browser",
-        "chrome",
         "--upload-dir",
         str(INPUT_IMAGES_DIR),
-        *debugger_args,
     ]
+    if headless:
+        cmd.append("--headless")
     if image_source_arg:
         cmd.extend(["--image-source-file", image_source_arg])
     return run_cmd(cmd, cwd=ROOT)
@@ -2757,6 +2760,36 @@ def api_defaults() -> dict[str, Any]:
     }
 
 
+@app.get("/api/progress/{batch_key}")
+def api_progress(batch_key: str) -> dict[str, Any]:
+    batch_key_clean = str(batch_key).strip()
+    for root in generated_image_roots():
+        log_path = root / batch_key_clean / "_headless_progress.json"
+        if not log_path.exists():
+            continue
+        lines = log_path.read_text(encoding="utf-8", errors="ignore").splitlines()
+        entries = []
+        for line in lines:
+            line = line.strip()
+            if not line:
+                continue
+            try:
+                entries.append(json.loads(line))
+            except json.JSONDecodeError:
+                pass
+        if not entries:
+            continue
+        latest = entries[-1]
+        return {
+            "batch_key": batch_key_clean,
+            "step": latest.get("step", ""),
+            "message": latest.get("message", ""),
+            "time": latest.get("time", 0),
+            "entries": entries,
+        }
+    raise HTTPException(status_code=404, detail=f"No progress found for batch: {batch_key_clean}")
+
+
 @app.get("/api/opencode/catalog")
 def api_opencode_catalog() -> dict[str, Any]:
     return build_opencode_catalog()
@@ -3515,8 +3548,7 @@ def api_run_generate_images_45(run_id: str, payload: dict[str, Any] = Body(...))
     run_dir = RUNS_ROOT / run_id
     manifest_path = run_dir / "manifest.json"
     if not manifest_path.exists():
-        raise HTTPException(status_code=404, detail="Run not found")
-
+        raise HTTPException(status_code=404, detail=f"Run not found: {run_id}")
     manifest = json.loads(manifest_path.read_text(encoding="utf-8"))
     batch = str(manifest.get("batch") or "").strip()
     if not batch:
@@ -3530,12 +3562,14 @@ def api_run_generate_images_45(run_id: str, payload: dict[str, Any] = Body(...))
     if not selected_45:
         raise HTTPException(status_code=400, detail="No valid 4:5 prompt files selected")
 
+    headless = bool(payload.get("headless", False))
     try:
         result = run_gemini_generation(
             batch=batch,
             prompt_files=selected_45,
             aspect_ratio="4:5",
             image_sources_file=None,
+            headless=headless,
         )
     except RuntimeError as exc:
         raise HTTPException(status_code=400, detail=str(exc)) from exc
@@ -3556,8 +3590,7 @@ def api_run_generate_images_916_from_45(run_id: str, payload: dict[str, Any] = B
     run_dir = RUNS_ROOT / run_id
     manifest_path = run_dir / "manifest.json"
     if not manifest_path.exists():
-        raise HTTPException(status_code=404, detail="Run not found")
-
+        raise HTTPException(status_code=404, detail=f"Run not found: {run_id}")
     manifest = json.loads(manifest_path.read_text(encoding="utf-8"))
     batch = str(manifest.get("batch") or "").strip()
     if not batch:
@@ -3569,29 +3602,29 @@ def api_run_generate_images_916_from_45(run_id: str, payload: dict[str, Any] = B
 
     selected_45 = validate_selected_45_prompts(batch, prompt_files)
     if not selected_45:
-        raise HTTPException(status_code=400, detail="No valid 4:5 prompt files selected")
-
-    selected_96 = map_45_to_96_prompts(selected_45)
-    if not selected_96:
-        raise HTTPException(status_code=400, detail="No matching 9:16 prompt files found for selected 4:5 prompts")
-
-    jobs = load_batch_image_summary(batch)
-    job_by_prompt: dict[str, dict[str, Any]] = {}
-    for job in jobs:
-        prompt_file = str(job.get("prompt_file") or "").strip().replace("\\", "/")
-        if prompt_file:
-            job_by_prompt[prompt_file] = job
+        raise HTTPException(status_code=400, detail="No valid 4:5 prompt files for 9:16 generation")
 
     prompt_reference_map: dict[str, list[str]] = {}
-    for prompt_45 in selected_45:
-        prompt_96 = prompt_45.replace("/45/", "/96/")
-        if prompt_96 not in selected_96:
-            continue
-        job = job_by_prompt.get(prompt_45)
-        if not job:
-            continue
-        saved_files = job.get("saved_files")
-        if not isinstance(saved_files, list) or not saved_files:
+    for pf in selected_45:
+        rel_45 = str(pf).replace("\\", "/")
+        fmt_dir = "4_5"
+        parts = rel_45.rsplit("/", 1)
+        if len(parts) >= 2:
+            fmt_dir = parts[-2] if parts[-2] in ("4_5", "9_16") else fmt_dir
+            pf_stem = parts[-1]
+        else:
+            pf_stem = rel_45
+
+        fmt_prefix = rel_45.split("/output/")[-1].split("/")[0] if "/output/" in rel_45 else "output"
+        pf_stem_base = Path(pf_stem).stem
+        prompt_96 = f"output/{fmt_prefix}/{pf_stem_base.replace('_45_', '_916_').replace('_4_5_', '_9_16_')}.txt"
+
+        gen_dir = LEGACY_GENERATED_IMAGE_ROOT / batch / "GEMINI_4_5"
+        saved_files = sorted(gen_dir.glob(f"*{Path(pf).stem}*.png")) or sorted(gen_dir.glob(f"*{Path(pf).stem}*.jpg"))
+        if not saved_files:
+            gen_dir2 = GENERATED_IMAGES_ROOT / batch / "GEMINI_4_5"
+            saved_files = sorted(gen_dir2.glob(f"*{Path(pf).stem}*.png")) or sorted(gen_dir2.glob(f"*{Path(pf).stem}*.jpg"))
+        if not saved_files:
             continue
         image_rel = str(saved_files[0]).strip().replace("\\", "/")
         image_path = ROOT / image_rel
@@ -3605,6 +3638,7 @@ def api_run_generate_images_916_from_45(run_id: str, payload: dict[str, Any] = B
     map_path = run_dir / "context" / "prompt_reference_map_916.json"
     map_path.write_text(json.dumps(prompt_reference_map, ensure_ascii=False, indent=2) + "\n", encoding="utf-8")
 
+    headless = bool(payload.get("headless", False))
     try:
         result = run_gemini_generation(
             batch=batch,
@@ -3612,6 +3646,7 @@ def api_run_generate_images_916_from_45(run_id: str, payload: dict[str, Any] = B
             aspect_ratio="9:16",
             image_sources_file=None,
             prompt_reference_map=map_path,
+            headless=headless,
         )
     except RuntimeError as exc:
         raise HTTPException(status_code=400, detail=str(exc)) from exc
@@ -3661,89 +3696,27 @@ def api_batch_generate_images_45(payload: dict[str, Any] = Body(...)) -> dict[st
         raise HTTPException(status_code=400, detail="No 4:5 prompt files found for any run")
 
     batch_str = f"batch_{int(time.time())}_{uuid.uuid4().hex[:8]}"
-    try:
-        result = run_gemini_generation(
-            batch=batch_str,
-            prompt_files=all_prompt_files,
-            aspect_ratio="4:5",
-            image_sources_file=None,
-        )
-    except RuntimeError as exc:
-        raise HTTPException(status_code=400, detail=str(exc)) from exc
-
-    if result.returncode != 0:
-        error_text = result.stderr or result.stdout
-        raise HTTPException(status_code=500, detail=f"Batch 4:5 generation failed: {error_text[:500]}")
-
-    return {
-        "status": "completed",
-        "batch_key": batch_str,
-        "total_prompts": len(all_prompt_files),
-        "runs": run_info,
-    }
-
-
-@app.post("/api/batch/generate-images-916")
-def api_batch_generate_images_916(payload: dict[str, Any] = Body(...)) -> dict[str, Any]:
-    run_ids = payload.get("run_ids")
-    if not isinstance(run_ids, list) or not run_ids:
-        raise HTTPException(status_code=400, detail="run_ids must be a non-empty array")
-
-    persona_prompt_blocks: list[dict[str, Any]] = []
-
-    for run_id in run_ids:
-        run_dir = RUNS_ROOT / run_id
-        manifest_path = run_dir / "manifest.json"
-        if not manifest_path.exists():
-            continue
-        manifest = json.loads(manifest_path.read_text(encoding="utf-8"))
-        batch = str(manifest.get("batch") or "").strip()
-        if not batch:
-            continue
-        prompt_files_all = manifest.get("prompt_files") or []
-        prompt_files_45 = [path for path in prompt_files_all if "/45/" in str(path)]
-
-        for pf in prompt_files_45:
-            prompt_path = ROOT / pf
-            if not prompt_path.exists():
-                continue
-            prompt_text = prompt_path.read_text(encoding="utf-8", errors="ignore")
-            parsed = parse_prompt_filename(pf)
-            fmt = parsed[0] if parsed else ""
-            persona_num = parsed[2] if parsed else None
-
-            persona_input_block = extract_persona_input_block(prompt_text)
-            if persona_input_block:
-                persona_prompt_blocks.append({
-                    "run_id": run_id,
-                    "batch": batch,
-                    "prompt_file": pf,
-                    "format": fmt,
-                    "persona_number": persona_num,
-                    "persona_input_block": persona_input_block,
-                })
-
-    if not persona_prompt_blocks:
-        raise HTTPException(status_code=400, detail="No persona input blocks found for any run")
-
-    batch_str = f"batch_916_{int(time.time())}_{uuid.uuid4().hex[:8]}"
-    prompt_work_dir = RUNTIME_ROOT / "gemini_selected_prompts" / f"{batch_str}_9_16"
+    prompt_work_dir = RUNTIME_ROOT / "gemini_selected_prompts" / batch_str
     prompt_work_dir.mkdir(parents=True, exist_ok=True)
-
+    starting_prompt = ""
     starting_prompt_path = ROOT / "input" / "startingprompt.txt"
-    starting_prompt = starting_prompt_path.read_text(encoding="utf-8").strip() if starting_prompt_path.exists() else ""
-
+    if starting_prompt_path.exists():
+        starting_prompt = starting_prompt_path.read_text(encoding="utf-8").strip()
     prompt_files_created: list[str] = []
-    for idx, block in enumerate(persona_prompt_blocks):
-        persona_block = block.get("persona_input_block", "")
-        combined = f"{starting_prompt}\n\n{persona_block.strip()}\n" if starting_prompt else persona_block
-        output_name = f"FINAL_OUTPUT_{block.get('format', 'AD')}_P{block.get('persona_number', 1):02d}_EN.txt"
-        output_path = prompt_work_dir / output_name
-        output_path.write_text(combined, encoding="utf-8")
-        prompt_files_created.append(str(output_path))
-
-    out_dir = LEGACY_GENERATED_IMAGE_ROOT / batch_str / "GEMINI_9_16"
-    debugger_args = gemini_debugger_args()
+    for src_pf in all_prompt_files:
+        src = Path(src_pf)
+        if not src.is_absolute():
+            src = ROOT / src
+        src = src.resolve()
+        if not src.exists():
+            continue
+        prompt_text = src.read_text(encoding="utf-8")
+        combined = f"{starting_prompt}\n\n{prompt_text.strip()}\n" if starting_prompt else prompt_text
+        dest = prompt_work_dir / src.name
+        dest.write_text(combined, encoding="utf-8")
+        prompt_files_created.append(str(dest))
+    headless = bool(payload.get("headless", False))
+    out_dir = LEGACY_GENERATED_IMAGE_ROOT / batch_str / "GEMINI_4_5"
     cmd = [
         sys.executable,
         "scripts/gemini_web_automation.py",
@@ -3757,12 +3730,11 @@ def api_batch_generate_images_916(payload: dict[str, Any] = Body(...)) -> dict[s
         str(int(os.getenv("GEMINI_GENERATION_TIMEOUT_SECONDS") or "420")),
         "--manual-login-timeout",
         str(int(os.getenv("GEMINI_MANUAL_LOGIN_TIMEOUT_SECONDS") or "180")),
-        "--browser",
-        "chrome",
         "--upload-dir",
         str(INPUT_IMAGES_DIR),
-        *debugger_args,
     ]
+    if headless:
+        cmd.append("--headless")
 
     result = run_cmd(cmd, cwd=ROOT)
     if result.returncode != 0:
