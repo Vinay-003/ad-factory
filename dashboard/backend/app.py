@@ -909,7 +909,23 @@ def run_gemini_generation(
         cmd.append("--headless")
     if image_source_arg:
         cmd.extend(["--image-source-file", image_source_arg])
-    return run_cmd(cmd, cwd=ROOT)
+
+    log_dir = RUNTIME_ROOT / "generation_logs"
+    log_dir.mkdir(parents=True, exist_ok=True)
+    log_path = log_dir / f"gen_{batch}_{aspect_folder}.log"
+
+    env = dict(os.environ)
+    playwright_path = "/home/mylappy/.local/lib/python3.12/site-packages"
+    if playwright_path not in env.get("PYTHONPATH", ""):
+        env["PYTHONPATH"] = playwright_path + ((":" + env["PYTHONPATH"]) if env.get("PYTHONPATH") else "")
+
+    with open(log_path, "w") as log_file:
+        result = subprocess.run(cmd, cwd=str(ROOT), text=True, stdout=log_file, stderr=subprocess.STDOUT, check=False, env=env)
+
+    full_output = log_path.read_text() if log_path.exists() else ""
+    result.stdout = full_output
+    result.stderr = ""
+    return result
 
 
 def build_multipart_form(fields: dict[str, str], file_field: str, file_path: Path) -> tuple[bytes, str]:
@@ -1252,8 +1268,7 @@ def choose_text(items: list[str], fallback: str) -> str:
     return fallback
 
 
-def shorten_copy_line(text: str, limit: int = 92) -> str:
-    _ = limit
+def shorten_copy_line(text: str) -> str:
     return " ".join((text or "").split()).strip()
 
 
@@ -1610,25 +1625,25 @@ def concept_ids_from_requirements(copy_req: dict[str, Any]) -> dict[str, str]:
 
 
 def ensure_testimonial_headline(headline: str, lang: str, persona: dict[str, Any]) -> str:
-    clean = shorten_copy_line(headline, limit=90)
+    clean = shorten_copy_line(headline)
     if lang == "EN":
         if re.search(r"\b(i|i'm|i’ve|i'd|my|me)\b", clean, flags=re.IGNORECASE):
             if re.search(r"\b(weight|obesity|excess\s*weight|kg|kilo)\b", clean, flags=re.IGNORECASE):
                 return clean
-            return shorten_copy_line(f'{clean.rstrip(".")}. It finally fit my weight-loss routine.', limit=90)
+            return shorten_copy_line(f'{clean.rstrip(".")}. It finally fit my weight-loss routine.')
         desire = _clean_str(persona.get("desire_en")).rstrip(".")
         if desire:
             desire_phrase = desire[:1].lower() + desire[1:] if len(desire) > 1 else desire.lower()
-            return shorten_copy_line(f'"I finally found {desire_phrase} for my weight-loss goal."', limit=90)
+            return shorten_copy_line(f'"I finally found {desire_phrase} for my weight-loss goal."')
         return '"I finally found a routine I can follow for weight loss every day."'
 
     if re.search(r"(मैं|मेरी|मेरा|मुझे|मैंने)", clean):
         if re.search(r"(वजन|मोटापा|किलो|kg)", clean):
             return clean
-        return shorten_copy_line(f'{clean.rstrip("।")}। यह मेरे वजन घटाने के लिए काम आया।', limit=90)
+        return shorten_copy_line(f'{clean.rstrip("।")}। यह मेरे वजन घटाने के लिए काम आया।')
     desire_hi = _clean_str(persona.get("desire_hi")).rstrip("।")
     if desire_hi:
-        return shorten_copy_line(f'"मुझे आखिर {desire_hi} वाला रूटीन मिला जो वजन घटाने में मदद करता है।"', limit=90)
+        return shorten_copy_line(f'"मुझे आखिर {desire_hi} वाला रूटीन मिला जो वजन घटाने में मदद करता है।"')
     return '"मुझे आखिर ऐसा रूटीन मिला जिसे मैं रोज निभा सकूं और वजन घटा सकूं।"'
 
 
@@ -1672,7 +1687,7 @@ def ensure_testimonial_attribution(attribution: str, lang: str, persona: dict[st
         return chosen
     if re.search(r"[\u0900-\u097F]{2,}\s+[\u0900-\u097F]{2,}", current):
         return chosen
-    return shorten_copy_line(current, limit=86)
+    return shorten_copy_line(current)
 
 
 def _persona_number_from_candidate(candidate: dict[str, Any]) -> int | None:
@@ -1759,7 +1774,7 @@ def normalize_generated_copy(
             headline = _clean_str(src_lang.get("headline"))
             cta = _clean_str(src_lang.get("cta"))
             if headline:
-                base_lang["headline"] = shorten_copy_line(headline, limit=90)
+                base_lang["headline"] = shorten_copy_line(headline)
             if cta:
                 base_lang["cta"] = cta
 
@@ -1782,7 +1797,7 @@ def normalize_generated_copy(
                 if len(bullets) >= 2:
                     if fmt == "BA":
                         bullets = [strip_ba_panel_label(b) for b in bullets]
-                    base_lang["bullets"] = [shorten_copy_line(b, limit=88) for b in bullets]
+                    base_lang["bullets"] = [shorten_copy_line(b) for b in bullets]
             else:
                 trust = _clean_str(src_lang.get("trust_line"))
                 if trust:
@@ -1868,7 +1883,7 @@ def build_template_copy(context: dict[str, Any], run_id: str) -> dict[str, Any]:
         }
         cta_en, cta_hi = cta_by_format.get(fmt, ("Start Today", "आज शुरू करें"))
         if fmt == "TEST":
-            headline_en = shorten_copy_line(f"I trusted the 15-day kit because the steps felt clear for weight loss.", limit=90)
+            headline_en = shorten_copy_line(f"I trusted the 15-day kit because the steps felt clear for weight loss.")
             headline_hi = "मैंने 15 दिन की किट पर भरोसा किया क्योंकि वजन-घटाने के कदम साफ लगे।"
 
         copy_en: dict[str, Any]
@@ -3620,9 +3635,10 @@ def api_run_generate_images_45(run_id: str, payload: dict[str, Any] = Body(...))
         raise HTTPException(status_code=400, detail=str(exc)) from exc
     if result.returncode != 0:
         error_text = result.stderr or result.stdout
+        log_path = RUNTIME_ROOT / "generation_logs" / f"gen_{batch}_4_5.log"
         (run_dir / "logs" / "image_generation_45_error.txt").write_text(error_text, encoding="utf-8")
-        short_error = "\n".join([line for line in error_text.splitlines() if line.strip()][-12:])
-        raise HTTPException(status_code=500, detail=f"Gemini image generation failed (4:5): {short_error}")
+        short_error = "\n".join([line for line in error_text.splitlines() if line.strip()][-6:])
+        raise HTTPException(status_code=500, detail=f"Gemini image generation failed (4:5). Log: {log_path}\n{short_error}")
 
     refreshed = collect_run_result(run_dir, batch, True)
     refreshed["generated_images_for_prompts_45"] = selected_45
@@ -3727,9 +3743,10 @@ def api_run_generate_images_916_from_45(run_id: str, payload: dict[str, Any] = B
         raise HTTPException(status_code=400, detail=str(exc)) from exc
     if result.returncode != 0:
         error_text = result.stderr or result.stdout
+        log_path = RUNTIME_ROOT / "generation_logs" / f"gen_{batch}_9_16.log"
         (run_dir / "logs" / "image_generation_916_from_45_error.txt").write_text(error_text, encoding="utf-8")
-        short_error = "\n".join([line for line in error_text.splitlines() if line.strip()][-12:])
-        raise HTTPException(status_code=500, detail=f"Gemini image generation failed (9:16 from 4:5 refs): {short_error}")
+        short_error = "\n".join([line for line in error_text.splitlines() if line.strip()][-6:])
+        raise HTTPException(status_code=500, detail=f"Gemini image generation failed (9:16 from 4:5 refs). Log: {log_path}\n{short_error}")
 
     refreshed = collect_run_result(run_dir, batch, True)
     refreshed["generated_images_for_prompts_916"] = sorted(prompt_reference_map.keys())
@@ -3774,8 +3791,10 @@ def api_batch_generate_images_45(payload: dict[str, Any] = Body(...)) -> dict[st
     if not all_prompt_files:
         raise HTTPException(status_code=400, detail="No 4:5 prompt files found for any run")
 
-    batch_str = f"batch_{int(time.time())}_{uuid.uuid4().hex[:8]}"
-    prompt_work_dir = RUNTIME_ROOT / "gemini_selected_prompts" / batch_str
+    batch_names = sorted({r["batch"] for r in run_info})
+    batch_name = batch_names[0] if len(batch_names) == 1 else "_".join(batch_names)
+    work_id = f"{int(time.time())}_{uuid.uuid4().hex[:8]}"
+    prompt_work_dir = RUNTIME_ROOT / "gemini_selected_prompts" / f"{batch_name}_{work_id}"
     prompt_work_dir.mkdir(parents=True, exist_ok=True)
     starting_prompt = ""
     starting_prompt_path = ROOT / "input" / "startingprompt.txt"
@@ -3795,9 +3814,8 @@ def api_batch_generate_images_45(payload: dict[str, Any] = Body(...)) -> dict[st
         dest.write_text(combined, encoding="utf-8")
         prompt_files_created.append(str(dest))
     headless = bool(payload.get("headless", False))
-    out_dir = GENERATED_IMAGES_ROOT / batch_str / "GEMINI_4_5"
+    out_dir = GENERATED_IMAGES_ROOT / batch_name / "GEMINI_4_5"
     out_dir.mkdir(parents=True, exist_ok=True)
-    # Keep single output path (new unified location only)
     cmd = [
         sys.executable,
         "scripts/gemini_web_automation.py",
@@ -3822,18 +3840,17 @@ def api_batch_generate_images_45(payload: dict[str, Any] = Body(...)) -> dict[st
         error_text = result.stderr or result.stdout
         raise HTTPException(status_code=500, detail=f"Batch 4:5 generation failed: {error_text[:500]}")
 
-    # Write generation metadata
     try:
         _write_generation_metadata(
             RUNS_ROOT / run_ids[0] if run_ids else RUNTIME_ROOT,
-            batch_str, "4:5", {"batch": batch_str, "prompt_count": len(prompt_files_created)}
+            batch_name, "4:5", {"batch": batch_name, "prompt_count": len(prompt_files_created)}
         )
     except Exception:
         pass
 
     return {
         "status": "completed",
-        "batch_key": batch_str,
+        "batch_key": batch_name,
         "total_prompts": len(prompt_files_created),
         "run_count": len(run_ids),
     }
@@ -4001,8 +4018,8 @@ def api_batch_generate_images_916(payload: dict[str, Any] = Body(...)) -> dict[s
             )
             if result.returncode != 0:
                 error_text = result.stderr or result.stdout
-                (run_dir / "logs" / "image_generation_916_error.txt").write_text(error_text, encoding="utf-8")
-                short_error = "\n".join([line for line in error_text.splitlines() if line.strip()][-12:])
+                log_path = RUNTIME_ROOT / "generation_logs" / f"gen_{batch}_9_16.log"
+                (run_dir / "logs" / "image_generation_916_error.txt").write_text(f"Log: {log_path}\n{error_text}", encoding="utf-8")
                 # Continue to next run instead of failing everything
                 continue
 
@@ -4425,7 +4442,7 @@ def api_kill_chrome() -> dict[str, Any]:
 
 
 def api_edit_prompt(run_id: str, payload: dict[str, Any] = Body(...)) -> dict[str, Any]:
-    """Edit a prompt file in-place."""
+    """Edit a prompt file in-place, replacing only the EXACT ON-IMAGE COPY block."""
     run_dir = RUNS_ROOT / run_id
     prompt_path = payload.get("prompt_file", "")
     new_text = payload.get("text", "")
@@ -4436,7 +4453,11 @@ def api_edit_prompt(run_id: str, payload: dict[str, Any] = Body(...)) -> dict[st
     if not full_path.exists():
         raise HTTPException(status_code=404, detail="Prompt file not found")
 
-    full_path.write_text(new_text, encoding="utf-8")
+    old_text = full_path.read_text(encoding="utf-8")
+    updated_text = _replace_exact_copy_block(old_text, new_text)
+    if updated_text is None:
+        raise HTTPException(status_code=400, detail="No EXACT ON-IMAGE COPY block found in prompt file")
+    full_path.write_text(updated_text, encoding="utf-8")
     return {"status": "saved", "prompt_file": prompt_path}
 
 
@@ -4483,6 +4504,115 @@ def api_delete_image(run_id: str, payload: dict[str, Any] = Body(...)) -> dict[s
         manifest_path.write_text(json.dumps(manifest, ensure_ascii=False, indent=2) + "\n", encoding="utf-8")
 
     return {"status": "deleted", "image_file": image_path}
+
+
+def _parse_image_naming(image_path_str: str, run_dir: Path) -> dict[str, str]:
+    """Extract format, persona, language from an image's companion JSON metadata
+    and build a human-readable stem for download naming."""
+    full_path = ROOT / image_path_str
+    meta_path = full_path.with_suffix(".json")
+    base = {"format": "UNKNOWN", "persona": "00", "lang": "EN", "stem": "image"}
+
+    if meta_path.exists():
+        try:
+            meta = json.loads(meta_path.read_text(encoding="utf-8"))
+        except Exception:
+            meta = {}
+        prompt_file = str(meta.get("prompt_file_relative") or meta.get("prompt_file") or "").strip().replace("\\", "/")
+        if not prompt_file:
+            prompt_file = str(meta.get("prompt_file_relative") or meta.get("prompt_file") or "").strip().replace("\\", "/")
+        parsed = parse_prompt_filename(prompt_file)
+        if parsed:
+            fmt, lang, persona_num = parsed
+            base["format"] = fmt
+            base["persona"] = f"P{persona_num:02d}" if persona_num else "P00"
+            base["lang"] = lang
+
+    # Try hypothesis
+    hyp_label = ""
+    hyp_path = run_dir / "context" / "hypothesis_config.json"
+    if hyp_path.exists():
+        try:
+            hyp_cfg = json.loads(hyp_path.read_text(encoding="utf-8"))
+            htype = hyp_cfg.get("type", "")
+            hvar = hyp_cfg.get("variant", "")
+            if htype and htype != "none":
+                parts = [htype]
+                if hvar:
+                    parts.append(hvar)
+                hyp_label = "_" + "_".join(parts)
+        except Exception:
+            pass
+
+    ext = Path(image_path_str).suffix
+    stem = f"{base['format']}_{base['persona']}_{base['lang']}{hyp_label}"
+    base["stem"] = stem
+    base["ext"] = ext
+    return base
+
+
+def api_download_single_image(run_id: str, image_file: str):
+    """Return a zip containing the image file and its metadata JSON."""
+    run_dir = RUNS_ROOT / run_id
+    full_path = ROOT / image_file
+    if not full_path.exists():
+        raise HTTPException(status_code=404, detail="Image file not found")
+
+    naming = _parse_image_naming(image_file, run_dir)
+    meta_path = full_path.with_suffix(".json")
+
+    import io, zipfile
+    buf = io.BytesIO()
+    with zipfile.ZipFile(buf, "w", zipfile.ZIP_DEFLATED) as zf:
+        zf.write(full_path, f"{naming['stem']}{naming['ext']}")
+        meta_content = {"source": image_file}
+        if meta_path.exists():
+            try:
+                meta_content = json.loads(meta_path.read_text(encoding="utf-8"))
+            except Exception:
+                pass
+        meta_content["_download_name"] = naming["stem"]
+        zf.writestr(f"{naming['stem']}_metadata.json", json.dumps(meta_content, ensure_ascii=False, indent=2))
+
+    buf.seek(0)
+    return StreamingResponse(buf, media_type="application/zip",
+                             headers={"Content-Disposition": f'attachment; filename="{naming["stem"]}.zip"'})
+
+
+def api_download_batch_images(run_id: str):
+    """Return a zip containing all images in a run with their metadata."""
+    run_dir = RUNS_ROOT / run_id
+    manifest_path = run_dir / "manifest.json"
+    if not manifest_path.exists():
+        raise HTTPException(status_code=404, detail="Run not found")
+    manifest = json.loads(manifest_path.read_text(encoding="utf-8"))
+    image_files = manifest.get("image_files", [])
+    if not image_files:
+        raise HTTPException(status_code=404, detail="No images found for this run")
+
+    batch_label = manifest.get("batch", run_id)
+    import io, zipfile
+    buf = io.BytesIO()
+    with zipfile.ZipFile(buf, "w", zipfile.ZIP_DEFLATED) as zf:
+        for img_path in image_files:
+            full_path = ROOT / img_path
+            if not full_path.exists():
+                continue
+            naming = _parse_image_naming(img_path, run_dir)
+            meta_path = full_path.with_suffix(".json")
+            zf.write(full_path, f"{naming['stem']}{naming['ext']}")
+            meta_content = {"source": img_path}
+            if meta_path.exists():
+                try:
+                    meta_content = json.loads(meta_path.read_text(encoding="utf-8"))
+                except Exception:
+                    pass
+            meta_content["_download_name"] = naming["stem"]
+            zf.writestr(f"{naming['stem']}_metadata.json", json.dumps(meta_content, ensure_ascii=False, indent=2))
+
+    buf.seek(0)
+    return StreamingResponse(buf, media_type="application/zip",
+                             headers={"Content-Disposition": f'attachment; filename="batch_{batch_label}.zip"'})
 
 
 # ── Modular routes ───────────────────────────────────────────────────────────

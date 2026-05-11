@@ -70,6 +70,13 @@ export function buildImageGallery(run) {
     imgDeleteBtn.title = "Delete this image";
     imgWrap.appendChild(imgDeleteBtn);
 
+    const imgDlBtn = document.createElement("button");
+    imgDlBtn.type = "button";
+    imgDlBtn.className = "image-download-btn";
+    imgDlBtn.textContent = "\u2B07";
+    imgDlBtn.title = "Download image with metadata";
+    imgWrap.appendChild(imgDlBtn);
+
     const badge = document.createElement("span");
     badge.className = `aspect-badge ${is916 ? "ar-916" : "ar-45"}`;
     badge.textContent = arLabel;
@@ -103,6 +110,17 @@ export function buildImageGallery(run) {
         setStatus(`Delete error: ${String(err)}`);
         imgDeleteBtn.disabled = false;
       }
+    });
+
+    imgDlBtn.addEventListener("click", (event) => {
+      event.stopPropagation();
+      const dlUrl = `/api/runs/${run.run_id}/download-image?image_file=${encodeURIComponent(path)}`;
+      const a = document.createElement("a");
+      a.href = dlUrl;
+      a.download = "";
+      document.body.appendChild(a);
+      a.click();
+      a.remove();
     });
 
     grid.appendChild(card);

@@ -1,0 +1,12 @@
+{
+  "batch": "batch_1778518220_1a7f2427",
+  "aspect_ratio": "4:5",
+  "run_id": "run_1778517967_6251",
+  "personas": [],
+  "hypothesis": {
+    "type": "awareness_stage",
+    "variant": "product_aware"
+  },
+  "image_files": [],
+  "generated_at": "2026-05-11T16:50:41Z"
+}

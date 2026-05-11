@@ -71,6 +71,7 @@ class PromptJob:
     prompt_path: Path
     format_id: str
     persona_id: str
+    lang_id: str
     job_key: str
     output_stem: str
 
@@ -201,24 +202,21 @@ def _format_sort_key(fmt: str) -> tuple[int, str]:
     return (999, fmt_up)
 
 
-def _parse_prompt_name(path: Path) -> tuple[str, str]:
+def _parse_prompt_name(path: Path) -> tuple[str, str, str]:
     stem = path.stem
-
-    # Supported names include:
-    #   FINAL_BA_P07_EN.txt
-    #   OUTPUT_BA_P07_EN.txt
-    #   BA_P07_EN.txt
-    # The older parser treated OUTPUT_BA_P07_EN as format=OUTPUT, so every
-    # OUTPUT_*_P07_EN file collapsed into the same OUTPUT_P07 job key and the
-    # duplicate-skip logic processed only one prompt.
     patterns = [
-        r"^(?:FINAL|OUTPUT)_(?P<fmt>[A-Za-z0-9]+)_P(?P<num>\d+)(?:_[A-Za-z0-9]+)?$",
-        r"^(?P<fmt>[A-Za-z0-9]+)_P(?P<num>\d+)(?:_[A-Za-z0-9]+)?$",
+        r"^(?:FINAL|OUTPUT)_(?P<fmt>[A-Za-z0-9]+)_P(?P<num>\d+)_(?P<lang>[A-Za-z0-9]+)$",
+        r"^(?:FINAL|OUTPUT)_(?P<fmt>[A-Za-z0-9]+)_P(?P<num>\d+)$",
+        r"^(?P<fmt>[A-Za-z0-9]+)_P(?P<num>\d+)_(?P<lang>[A-Za-z0-9]+)$",
+        r"^(?P<fmt>[A-Za-z0-9]+)_P(?P<num>\d+)$",
     ]
     for pat in patterns:
         m = re.search(pat, stem, flags=re.IGNORECASE)
         if m:
-            return m.group("fmt").upper(), f"P{int(m.group('num')):02d}"
+            fmt = m.group("fmt").upper()
+            persona = f"P{int(m.group('num')):02d}"
+            lang = m.group("lang").upper() if "lang" in m.groupdict() and m.group("lang") else "XX"
+            return fmt, persona, lang
 
     # Defensive fallback: find a known format token anywhere before Pxx.
     m_persona = re.search(r"(?:^|_)P(?P<num>\d+)(?:_|$)", stem, flags=re.IGNORECASE)
@@ -227,10 +225,10 @@ def _parse_prompt_name(path: Path) -> tuple[str, str]:
     known_formats = ["BA", "FEAT", "HERO", "TEST", "UGC"]
     for token in tokens:
         if token in known_formats:
-            return token, persona_id
+            return token, persona_id, "XX"
 
     fmt = next((t for t in tokens if t not in {"FINAL", "OUTPUT", persona_id}), "PROMPT")
-    return fmt, persona_id
+    return fmt, persona_id, "XX"
 
 
 def discover_prompt_jobs(prompt_dir: Path, pattern: str, allow_duplicates: bool) -> tuple[list[PromptJob], list[PromptJob]]:
@@ -240,14 +238,15 @@ def discover_prompt_jobs(prompt_dir: Path, pattern: str, allow_duplicates: bool)
 
     raw_jobs: list[PromptJob] = []
     for path in raw_paths:
-        fmt, persona = _parse_prompt_name(path)
-        key = f"{fmt}_{persona}"
-        safe_stem = f"gemini-{fmt.lower()}-{persona.lower()}"
+        fmt, persona, lang = _parse_prompt_name(path)
+        key = f"{fmt}_{persona}_{lang}"
+        safe_stem = f"gemini-{fmt.lower()}-{persona.lower()}-{lang.lower()}"
         raw_jobs.append(
             PromptJob(
                 prompt_path=path.resolve(),
                 format_id=fmt,
                 persona_id=persona,
+                lang_id=lang,
                 job_key=key,
                 output_stem=safe_stem,
             )
@@ -3474,6 +3473,7 @@ def run() -> None:
                             "prompt_file": str(job.prompt_path),
                             "format_id": job.format_id,
                             "persona_id": job.persona_id,
+                            "lang_id": job.lang_id,
                             "job_key": job.job_key,
                             "generated_image_src": image_src,
                             "saved_file": str(saved_path),

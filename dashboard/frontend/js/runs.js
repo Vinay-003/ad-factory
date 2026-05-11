@@ -253,3 +253,16 @@ document.getElementById("batchGen916")?.addEventListener("click", async () => {
     setStatus(String(err));
   }
 });
+
+document.getElementById("batchDownload")?.addEventListener("click", () => {
+  const idx = state.currentRunIndex;
+  const run = state.runsData[idx];
+  if (!run) { setStatus("No run selected."); return; }
+  const a = document.createElement("a");
+  a.href = `/api/runs/${run.run_id}/download-batch`;
+  a.download = "";
+  document.body.appendChild(a);
+  a.click();
+  a.remove();
+  setStatus("Batch download started.");
+});

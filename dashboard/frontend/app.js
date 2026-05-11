@@ -761,8 +761,12 @@ function renderRun(run) {
 
         // Save edited prompt
         saveBtn.onclick = async () => {
-          const editTextareas = editForm.querySelectorAll("textarea");
-          const newText = [...editTextareas].map(ta => ta.value).join("\n");
+          const lineRows = editForm.querySelectorAll(".prompt-line");
+          const newText = [...lineRows].map((row) => {
+            const label = row.querySelector("label").textContent;
+            const value = row.querySelector("textarea").value;
+            return `- ${label}: ${value}`;
+          }).join("\n");
           if (!newText.trim()) {
             setStatus("Prompt text cannot be empty.");
             return;

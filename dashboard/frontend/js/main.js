@@ -1,5 +1,5 @@
 import { state, getPersonaSelection, getFormatsByPersona, getHypothesisConfig, loadDefaults } from "./state.js";
-import { setStatus, showGlobalLoading, hideGlobalLoading, setSelectOptions } from "./ui.js";
+import { setStatus, setSelectOptions } from "./ui.js";
 import { renderPersonas, showPersonaSkeletons, renderGlobalFormats, renderLanguageModes } from "./personas.js";
 import { renderHypothesisUI } from "./hypothesis.js";
 import { loadRuns as loadAndRenderRuns, showRunsSkeletons } from "./runs.js";
@@ -44,6 +44,8 @@ async function initDefaults() {
   }
 }
 
+const runBtn = document.getElementById("runBtn");
+
 async function runPipeline() {
   const selectedPersonas = getPersonaSelection();
   if (!selectedPersonas.length) {
@@ -84,8 +86,11 @@ async function runPipeline() {
   }
   form.append("clear_input_images", clearInputImagesEl?.checked ? "true" : "false");
 
-  showGlobalLoading("Running pipeline...");
   setStatus("Running pipeline... this can take time.");
+  if (runBtn) {
+    runBtn.disabled = true;
+    runBtn.classList.add("is-loading");
+  }
   try {
     const data = await fetchJSON("/api/runs/execute", { method: "POST", body: form });
     setStatus(`Done\nRun: ${data.run_id}\nBatch: ${data.batch}\nLLM mode: ${data.llm_mode}\nCopy source: ${data.copy_source || data.llm_mode}\nPrompts: ${data.prompt_files.length}\nImages: ${data.image_files.length}`);
@@ -94,8 +99,11 @@ async function runPipeline() {
   } catch (err) {
     setStatus(`Failed: ${String(err)}`);
   } finally {
-    hideGlobalLoading();
     stopProgressPolling();
+    if (runBtn) {
+      runBtn.disabled = false;
+      runBtn.classList.remove("is-loading");
+    }
   }
 }
 

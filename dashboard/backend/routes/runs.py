@@ -1,5 +1,6 @@
 from typing import Any
 from fastapi import APIRouter, Body
+from fastapi.responses import StreamingResponse
 
 from dashboard.backend.app import (
     api_runs,
@@ -9,6 +10,8 @@ from dashboard.backend.app import (
     api_edit_prompt,
     api_delete_prompt,
     api_delete_image,
+    api_download_single_image,
+    api_download_batch_images,
 )
 
 router = APIRouter()
@@ -40,3 +43,11 @@ def _delete_prompt(run_id: str, payload: dict[str, Any] = Body(...)) -> dict[str
 @router.post("/api/runs/{run_id}/delete-image")
 def _delete_image(run_id: str, payload: dict[str, Any] = Body(...)) -> dict[str, Any]:
     return api_delete_image(run_id, payload)
+
+@router.get("/api/runs/{run_id}/download-image")
+def _download_single_image(run_id: str, image_file: str) -> StreamingResponse:
+    return api_download_single_image(run_id, image_file)
+
+@router.get("/api/runs/{run_id}/download-batch")
+def _download_batch_images(run_id: str) -> StreamingResponse:
+    return api_download_batch_images(run_id)

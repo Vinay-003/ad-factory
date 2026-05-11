@@ -610,6 +610,25 @@ button {
 
 button:hover { transform: translateY(-2px); filter: brightness(1.04); box-shadow: 0 10px 22px color-mix(in srgb, var(--primary) 28%, transparent); }
 button:disabled { opacity: 0.5; cursor: not-allowed; transform: none; filter: none; box-shadow: none; }
+button.is-loading {
+  position: relative;
+  padding-right: 44px;
+  pointer-events: none;
+  opacity: 0.65;
+}
+button.is-loading::after {
+  content: "";
+  position: absolute;
+  right: 14px;
+  top: 50%;
+  margin-top: -8px;
+  width: 16px;
+  height: 16px;
+  border: 2px solid color-mix(in srgb, #fff 40%, transparent);
+  border-top-color: #fff;
+  border-radius: 50%;
+  animation: spin 0.7s linear infinite;
+}
 
 .ghost-btn {
   background: color-mix(in srgb, var(--surface) 80%, var(--surface-2));
@@ -873,6 +892,29 @@ button:disabled { opacity: 0.5; cursor: not-allowed; transform: none; filter: no
 .image-card:hover .image-delete-btn { opacity: 1; }
 .image-delete-btn:hover { background: color-mix(in srgb, var(--accent-coral) 70%, #00000088); color: #fff; }
 
+.image-download-btn {
+  position: absolute;
+  top: 6px;
+  right: 6px;
+  width: 24px;
+  height: 24px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: none;
+  border-radius: 6px;
+  padding: 0;
+  font-size: 13px;
+  cursor: pointer;
+  background: color-mix(in srgb, var(--surface) 90%, #00000055);
+  color: var(--muted);
+  z-index: 3;
+  opacity: 0;
+  transition: opacity var(--transition-fast), background var(--transition-fast);
+}
+.image-card:hover .image-download-btn { opacity: 1; }
+.image-download-btn:hover { background: color-mix(in srgb, var(--accent-teal) 70%, #00000088); color: #fff; }
+
 /* ── Prompt Inline Controls ──────────────────────────────────────────────── */
 .prompt-inline-controls { display: inline-flex; gap: 4px; margin-left: auto; }
 
@@ -976,34 +1018,6 @@ button:disabled { opacity: 0.5; cursor: not-allowed; transform: none; filter: no
   -webkit-backdrop-filter: blur(6px);
 }
 
-.global-loader {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 16px;
-  padding: 28px 36px;
-  background: var(--surface);
-  border-radius: var(--radius-lg);
-  box-shadow: var(--shadow);
-  border: 1px solid var(--line);
-}
-
-.global-loader p {
-  margin: 0;
-  font-size: 14px;
-  font-weight: 600;
-  color: var(--ink);
-}
-
-.spinner {
-  width: 32px;
-  height: 32px;
-  border: 3px solid color-mix(in srgb, var(--line) 50%, transparent);
-  border-top-color: var(--primary);
-  border-radius: 50%;
-  animation: spin 0.8s linear infinite;
-}
-
 @keyframes spin { to { transform: rotate(360deg); } }
 
 /* ── Empty States ───────────────────────────────────────────────────────────── */
@@ -1040,5 +1054,7 @@ button:disabled { opacity: 0.5; cursor: not-allowed; transform: none; filter: no
 [data-theme="dark"] .prompt-edit-form { background: color-mix(in srgb, var(--accent-teal) 12%, var(--surface-2)); border-color: color-mix(in srgb, var(--accent-teal) 30%, var(--line)); }
 [data-theme="dark"] .image-delete-btn { background: color-mix(in srgb, var(--surface-2) 80%, #00000066); color: var(--muted); }
 [data-theme="dark"] .image-delete-btn:hover { background: color-mix(in srgb, var(--accent-coral) 70%, #00000088); color: #fff; }
+[data-theme="dark"] .image-download-btn { background: color-mix(in srgb, var(--surface-2) 80%, #00000066); color: var(--muted); }
+[data-theme="dark"] .image-download-btn:hover { background: color-mix(in srgb, var(--accent-teal) 70%, #00000088); color: #fff; }
 [data-theme="dark"] .image-wrap { background: color-mix(in srgb, var(--line) 18%, var(--surface-2)); }
 [data-theme="dark"] .skeleton-line, [data-theme="dark"] .skeleton-chip { background: color-mix(in srgb, var(--line) 25%, transparent); }

@@ -1,0 +1,12 @@
+{
+  "status": "error",
+  "prompt_file": "/home/mylappy/myspace/info/runtime/gemini_selected_prompts/batch_1778518220_1a7f2427/OUTPUT_BA_P04_EN.txt",
+  "format_id": "BA",
+  "persona_id": "P04",
+  "job_key": "BA_P04",
+  "error": "Could not open Upload files chooser for /home/mylappy/myspace/info/input/images/1.png: Timeout 7000ms exceeded while waiting for event \"filechooser\"\n=========================== logs ===========================\nwaiting for event \"filechooser\"\n============================================================",
+  "timestamp": 1778518241,
+  "screenshot": "/home/mylappy/myspace/info/generated_images/batch_1778518220_1a7f2427/GEMINI_4_5/generated images/gemini-ba-p04.error.png",
+  "html": "/home/mylappy/myspace/info/generated_images/batch_1778518220_1a7f2427/GEMINI_4_5/generated images/gemini-ba-p04.error.html",
+  "current_url": "https://gemini.google.com/app"
+}

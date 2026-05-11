@@ -6,7 +6,6 @@ const globalFormatsEl = document.getElementById("globalFormats");
 
 export function renderPersonas() {
   if (!personaListEl || !state.defaultData?.personas) return;
-  personaListEl.classList.remove("persona-virtual-grid");
   personaListEl.innerHTML = "";
 
   const frag = document.createDocumentFragment();
@@ -18,7 +17,6 @@ export function renderPersonas() {
 
 export function showPersonaSkeletons(count = 8) {
   if (!personaListEl) return;
-  personaListEl.classList.remove("persona-virtual-grid");
   personaListEl.innerHTML = "";
   const frag = document.createDocumentFragment();
   for (let i = 0; i < count; i++) frag.appendChild(skeletonPersonaCard());
