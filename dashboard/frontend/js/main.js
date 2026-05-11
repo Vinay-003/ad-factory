@@ -71,8 +71,6 @@ async function runPipeline() {
 
   const uploads = [
     ["product_info_file", document.getElementById("productFile")],
-    ["mechanism_file", document.getElementById("mechanismFile")],
-    ["faq_file", document.getElementById("faqFile")],
     ["image_source_file", document.getElementById("imageSourcesFile")],
   ];
   uploads.forEach(([name, input]) => {
@@ -93,7 +91,19 @@ async function runPipeline() {
   }
   try {
     const data = await fetchJSON("/api/runs/execute", { method: "POST", body: form });
-    setStatus(`Done\nRun: ${data.run_id}\nBatch: ${data.batch}\nLLM mode: ${data.llm_mode}\nCopy source: ${data.copy_source || data.llm_mode}\nPrompts: ${data.prompt_files.length}\nImages: ${data.image_files.length}`);
+    const fallbackLine = data.copy_generation_failures
+      ? `\nCopy fallbacks: ${data.copy_generation_failures} failed ad(s); log: ${data.copy_fallback_log || "run logs"}`
+      : "";
+    const warningLine = data.copy_generation_warnings
+      ? `\nCopy warnings: ${data.copy_generation_warnings}; log: ${data.copy_warning_log || "run logs"}`
+      : "";
+    const sessionLine = data.copy_session_fallback
+      ? `\nSession fallback: product doc attached per request; log: ${data.copy_session_log || "run logs"}`
+      : "";
+    const noteLine = Array.isArray(data.copy_generation_notes) && data.copy_generation_notes.length
+      ? `\nNotes:\n${data.copy_generation_notes.map((note) => `- ${note}`).join("\n")}`
+      : "";
+    setStatus(`Done\nRun: ${data.run_id}\nBatch: ${data.batch}\nLLM mode: ${data.llm_mode}\nCopy source: ${data.copy_source || data.llm_mode}${fallbackLine}${warningLine}${sessionLine}${noteLine}\nPrompts: ${data.prompt_files.length}\nImages: ${data.image_files.length}`);
     invalidateRuns();
     await loadAndRenderRuns();
   } catch (err) {
@@ -107,27 +117,10 @@ async function runPipeline() {
   }
 }
 
-// Server type change handler
-document.getElementById("serverType")?.addEventListener("change", async (e) => {
-  state.currentServerType = e.target.value;
-  const apiUrlInput = document.getElementById("opencodeApiUrl");
-  if (state.currentServerType === "blackbox") {
-    apiUrlInput.value = "http://127.0.0.1:4091";
-    try {
-      const data = await fetchJSON("http://127.0.0.1:4091/v1/models", {
-        headers: { Authorization: "Basic " + btoa("user:blackbox-local-pass") },
-      });
-      const models = data.data || [];
-      state.modelsByProvider = { blackbox: models.map((m) => m.id) };
-      setSelectOptions(providerSelectEl, ["blackbox"], "blackbox");
-      setSelectOptions(modelSelectEl, models.map((m) => m.id), models[0]?.id || "");
-    } catch (err) {
-      console.error("Failed to fetch Blackbox models:", err);
-    }
-  } else {
-    apiUrlInput.value = "http://127.0.0.1:4090";
-    initDefaults();
-  }
+document.getElementById("serverType")?.addEventListener("change", () => {
+  state.currentServerType = "opencode";
+  document.getElementById("opencodeApiUrl").value = "http://127.0.0.1:4090";
+  initDefaults();
 });
 
 document.getElementById("runBtn")?.addEventListener("click", () => {

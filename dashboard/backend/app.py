@@ -12,14 +12,16 @@ import sys
 import tempfile
 import time
 import urllib.request
+import fcntl
 import hashlib
 import mimetypes
 import uuid
 import urllib.request
 import psutil
+from contextlib import contextmanager
 from datetime import datetime, timezone
 from pathlib import Path
-from typing import Any
+from typing import Any, Iterator
 
 from fastapi import Body, FastAPI, File, Form, HTTPException, UploadFile
 from fastapi.responses import StreamingResponse
@@ -36,7 +38,6 @@ ENV_PATH = ROOT / ".env.dashboard"
 DEFAULT_PRODUCT_MASTER = ROOT / "product master doc.txt"
 DEFAULT_PLAYBOOK = ROOT / "AD_CREATIVE_SYSTEM_PLAYBOOK.md"
 DEFAULT_IMAGE_SOURCES_FILE = ROOT / "input" / "image_sources.txt"
-PRODUCT_CONTEXT_CACHE = RUNTIME_ROOT / "product_context_cache.json"
 LEGACY_ACTIVE_IMAGES_FILE = ROOT / "input" / "activeimages.txt"
 INPUT_IMAGES_DIR = ROOT / "input" / "images"
 GENERATED_IMAGES_ROOT = ROOT / "generated_images"
@@ -44,25 +45,9 @@ GENERATED_IMAGES_ROOT = ROOT / "generated_images"
 
 FORMATS = ["HERO", "BA", "TEST", "FEAT", "UGC"]
 DEFAULT_OPENCODE_API_URL = os.getenv("OPENCODE_API_URL", "http://127.0.0.1:4090")
-
-HEADLINE_EXECUTION_RULES = [
-    "Write the headline and support line as one hierarchy: headline earns attention, support line explains the product reason to believe, CTA asks for the next step.",
-    "Pick one concept path for the ad: one audience stage, one lead angle, and one message structure. Do not mix multiple hooks into one headline and do not randomize claims across the layout.",
-    "The headline can lead with tension, proof, identity, deadline, or desired feeling, but the paired support line must make weight loss, obesity reduction, or a 15-day weight outcome unmistakable.",
-    "Support lines must add a second lane such as routine, proof, mechanism, ease, event timing, or non-draining reassurance; never paraphrase the headline.",
-    "Headline carries one clean idea only; move mechanism, proof, routine timing, and extra explanation into support line or bullets.",
-    "Most headlines should be 5-12 words unless a longer testimonial quote still sounds natural and edited.",
-    "Use human-edited ad rhythm: simple, declarative, specific, and easy to read at mobile size.",
-    "Prefer patterns like authority stamp, pain question, stubborn-weight proof, deadline direct, sacrifice reduction, emotional outcome, or messy-life curiosity.",
-    "Support lines should use one clear proof lane: simple 2-step routine, 5-minute ease, doctor-formulated system, 70,000+ users, visible 15-day progress, cravings/fullness, digestion support, or less sacrifice.",
-    "Do not lead headlines with instructional verbs like Start/Begin/Kickstart/Follow; headlines should sound like statements or questions, not how-to steps.",
-    "Do not put AM/PM timing, 4-hour windows, or protocol mechanics in the headline. Keep those in support lines or bullets.",
-    "Avoid policy/meta text in on-image copy (eg. persona notes, proof-needed notes).",
-    "Use plain human phrasing. Avoid AI-ad words like unlock, transform your journey, revolutionary, holistic wellness, game-changing, effortlessly, and tailored solution.",
-    "Prefer crisp spoken lines with natural rhythm over SEO-style keyword stuffing. If the line sounds like a spreadsheet label, rewrite it.",
-    "Before returning JSON, do a final human editor pass: shorten headline, remove generic phrases, keep one central idea, and ensure support line adds proof/mechanism/ease instead of repeating the headline.",
-    "Use the concept framework only as direction. Do not output framework labels and do not copy any reference wording from the prompt.",
-]
+OPENCODE_MAX_CONCURRENT = 2
+OPENCODE_QUEUE_DIR = RUNTIME_ROOT / "opencode_queue"
+OPENCODE_QUEUE_LOG = OPENCODE_QUEUE_DIR / "queue.log"
 
 HEADLINE_CONCEPT_FRAMEWORK = {
     "audience_stage": [
@@ -530,23 +515,138 @@ def build_copy_requirements(persona_number: int, fmt: str, format_sequence_index
     }
 
 
-def build_generation_payload_for_llm(context: dict[str, Any]) -> dict[str, Any]:
-    product_context = context.get("product_context") if isinstance(context.get("product_context"), dict) else {}
-    compact_product_context: dict[str, list[str]] = {}
-    for key, value in product_context.items():
-        if isinstance(value, list):
-            compact_product_context[key] = [str(item).strip() for item in value[:40] if str(item).strip()]
+FORMAT_COPY_RULE_KEYWORDS: dict[str, list[str]] = {
+    "HERO": ["copy", "headline", "support", "cta", "text budget", "minimum", "persona"],
+    "BA": ["copy", "headline", "bullet", "cta", "text budget", "minimum", "persona", "before", "after", "outcome"],
+    "TEST": ["copy", "headline", "quote", "attribution", "trust", "cta", "text budget", "minimum", "persona"],
+    "FEAT": ["copy", "headline", "bullet", "feature", "cta", "text budget", "minimum", "persona"],
+    "UGC": ["copy", "headline", "support", "cta", "creator", "text budget", "minimum", "persona"],
+}
 
+FORMAT_VISUAL_RULE_KEYWORDS = [
+    "split-screen",
+    "side:",
+    "tone",
+    "energy",
+    "product fidelity",
+    "redraw",
+    "packaging",
+    "visual",
+    "background",
+    "environment",
+    "context-shift",
+    "time-of-day",
+    "choice-architecture",
+    "posture",
+    "frame",
+    "divider",
+    "image",
+]
+
+def compact_format_rules_for_copy(fmt: str, format_rules: dict[str, Any]) -> dict[str, Any]:
+    fmt = fmt.strip().upper()
+    wanted = FORMAT_COPY_RULE_KEYWORDS.get(fmt, [])
+    out: list[str] = []
+    for raw_rule in format_rules.get("rules") or []:
+        rule = str(raw_rule).strip()
+        if not rule:
+            continue
+        lower = rule.lower()
+        if any(blocked in lower for blocked in FORMAT_VISUAL_RULE_KEYWORDS):
+            continue
+        if wanted and not any(keyword in lower for keyword in wanted):
+            continue
+        out.append(rule)
+        if len(out) >= 8:
+            break
+    return {"format": fmt or format_rules.get("format"), "rules": out}
+
+def build_ad_copy_system_prompt(fmt: str) -> str:
+    fmt = fmt.strip().upper()
+    base_rules = [
+        "You generate ad copy JSON only. Return valid JSON with keys default_aspect_ratio and ads.",
+        "Each ads item must include format, headline_angle, awareness_stage, concept_angle, concept_structure, persona, and copy.EN/copy.HI fields compatible with assembler.",
+        "Use the attached/read product master doc as the single source of product truth; the JSON payload is only request metadata, format/persona guidance, concept selection, and schema control.",
+        "Derive benefits, proof, mechanisms, differentiators, exclusions, and priority hierarchy from the product master doc, not from memory or invented claims.",
+        "Make obesity and weight-loss intent obvious to a first-time viewer; headline or paired copy must mention weight loss, obesity reduction, excess-weight reduction, or a direct 15-day result framing.",
+        "Never include price in on-image copy fields. Do not use currency symbols or words like INR, price, only, discount, off, or MRP.",
+        "Use copy_requirements.concept_variation as the selected execution path; copy its selected ids into awareness_stage, concept_angle, and concept_structure.",
+        "If copy_requirements.hypothesis exists and type is not none, obey it as the controlled test.",
+        "Use any provided hook/proof/CTA guidance only when present in concept_variation.",
+        "Write one clean, short, concrete headline. Do not lead headlines with Start, Begin, Kickstart, or Follow.",
+        "Keep AM/PM timing, protocol mechanics, and product component names out of the headline; put them in support lines or bullets when needed.",
+        "Avoid AI-ad words such as unlock, transform your journey, revolutionary, holistic wellness, game-changing, effortlessly, and tailored solution.",
+        "Do a final editor pass: shorten the headline, remove generic phrasing, and ensure supporting copy adds proof, mechanism, or ease instead of repeating the headline.",
+        "Prioritize fast visible weight loss, safer natural-feeling differentiation, real proof, and practical ease; do not let digestion or emotional benefits overshadow weight loss.",
+    ]
+    format_rules = {
+        "BA": [
+            "For BA format only: never prefix copy with BEFORE:/AFTER: labels or Hindi equivalents.",
+            "For BA format only: write explicit split contrast copy. Use 2 or 4 bullets total; bullet 1/2 are left-side struggle state and bullet 3/4 are right-side fix or progress state. If using 2 bullets, bullet 1 is struggle and bullet 2 is fix.",
+        ],
+        "TEST": [
+            "For TEST format only: headline must read like a first-person review line suitable for a quote card, not generic highly-rated phrasing.",
+            "For TEST format only: attribution must be role/source-based without personal names. If no real quote is provided, create one believable representative review grounded in persona pain/desire and safe claims.",
+        ],
+        "FEAT": ["For FEAT format only: make each bullet a different product feature."],
+        "HERO": ["For HERO format only: support line must add a second feature or proof lane instead of restating the headline."],
+        "UGC": ["For UGC format only: use creator-like clarity, and make support line add a second feature or proof lane instead of restating the headline."],
+    }
+    return " ".join(base_rules + format_rules.get(fmt, []))
+
+
+def build_strict_schema_note(fmt: str) -> str:
+    fmt = fmt.strip().upper()
+    field_map = {
+        "HERO": "headline, support_line, cta",
+        "UGC": "headline, support_line, cta",
+        "BA": "headline, bullets (list), cta",
+        "FEAT": "headline, bullets (list), cta",
+        "TEST": "headline, attribution, trust_line, cta",
+    }
+    copy_fields = field_map.get(fmt, "headline, cta")
+    return (
+        "STRICT_SCHEMA: Return JSON only. Do not include copy_requirements, disclaimers, or extra keys. "
+        "persona must be an object with number, name, pain_en, desire_en, friction_en, proof_needed_en, tone_cue_en, "
+        "pain_hi, desire_hi, friction_hi, proof_needed_hi, tone_cue_hi. "
+        f"For {fmt or 'this'} format, copy.EN and copy.HI must contain only: {copy_fields}."
+    )
+
+
+def build_ad_prompt_tail(fmt: str) -> str:
+    fmt = fmt.strip().upper()
+    support_target = {
+        "BA": "right-side shift",
+        "FEAT": "feature stack",
+        "TEST": "trust line",
+    }.get(fmt, "support line")
+    return (
+        "Return only valid JSON. No markdown. No extra text.\n"
+        "Return one ad only. You may return either a single ad object or an object with default_aspect_ratio and a one-item ads array.\n"
+        "Before writing, rely on the product master doc already attached/read in this OpenCode session. Do not ask for the doc again and do not ignore it.\n"
+        f"The current {fmt or 'ad'} ad must use a new persuasion angle in both the headline and the {support_target} compared with generated_same_format_so_far.\n"
+        "Do not reuse the same angle family or sentence pattern from generated_same_format_so_far.\n"
+        "Before writing, read copy_requirements.concept_variation and make the headline/support hierarchy match that chosen concept path.\n"
+        "If hook_structure_override is present, the EN headline must visibly match it. For contrast_loop, use a clear but natural contrast word such as but, yet, still, without, before/after, or even with.\n"
+        "Final editor pass before JSON: rewrite the headline into a finished human ad line, usually 5-12 words, one central idea only. Move mechanism/proof/timing details into support line or bullets.\n"
+        "Use supporting copy to explain why the headline is believable: simple routine, 5-minute ease, doctor-formulated proof, 70,000+ users, 15-day progress, cravings/fullness, digestion support, or less sacrifice.\n"
+        "Reject your own first draft if the headline reads like a generic AI slogan, a keyword list, or a paraphrase of supporting copy.\n"
+        "Do not return framework labels, rationale, or explanations."
+    )
+
+
+def build_generation_payload_for_llm(context: dict[str, Any]) -> dict[str, Any]:
     compact_ads: list[dict[str, Any]] = []
     for item in context.get("ads") or []:
         if not isinstance(item, dict):
             continue
+        fmt = str(item.get("format") or "").strip().upper()
         persona = item.get("persona") if isinstance(item.get("persona"), dict) else {}
         format_rules = item.get("format_rules") if isinstance(item.get("format_rules"), dict) else {}
-        hypothesis = item.get("hypothesis") if isinstance(item.get("hypothesis"), dict) else {}
+        copy_requirements = item.get("copy_requirements") if isinstance(item.get("copy_requirements"), dict) else {}
         compact_ads.append(
             {
-                "format": item.get("format"),
+                "format": fmt,
                 "persona": {
                     "persona_number": persona.get("persona_number"),
                     "persona_name": persona.get("persona_name"),
@@ -557,12 +657,8 @@ def build_generation_payload_for_llm(context: dict[str, Any]) -> dict[str, Any]:
                     "english_ready": persona.get("english_ready") or [],
                     "hindi_ready": persona.get("hindi_ready") or [],
                 },
-                "format_rules": {
-                    "format": format_rules.get("format"),
-                    "rules": [str(rule).strip() for rule in (format_rules.get("rules") or [])[:18] if str(rule).strip()],
-                },
-                "copy_requirements": item.get("copy_requirements") or {},
-                "hypothesis": hypothesis,
+                "format_rules": compact_format_rules_for_copy(fmt, format_rules),
+                "copy_requirements": copy_requirements,
             }
         )
 
@@ -574,7 +670,6 @@ def build_generation_payload_for_llm(context: dict[str, Any]) -> dict[str, Any]:
                 "format": item.get("format"),
                 "persona_number": persona.get("persona_number"),
                 "persona_name": persona.get("persona_name"),
-                "primary_feature": (item.get("copy_requirements") or {}).get("primary_feature"),
             }
         )
 
@@ -583,12 +678,13 @@ def build_generation_payload_for_llm(context: dict[str, Any]) -> dict[str, Any]:
         "run_id": context.get("run_id"),
         "language_mode": context.get("language_mode"),
         "context_source": context.get("context_source"),
-        "context_extractor_model": context.get("context_extractor_model"),
         "requested_ad_count": len(compact_ads),
         "requested_plan": requested_plan,
-        "headline_execution_rules": HEADLINE_EXECUTION_RULES,
-        "headline_concept_framework": HEADLINE_CONCEPT_FRAMEWORK,
-        "product_context": compact_product_context,
+        "product_doc": {
+            "attached_in_session": True,
+            "source_file": context.get("product_file_path"),
+            "instruction": "Read and use the attached product master doc as source of truth for all product claims.",
+        },
         "ads": compact_ads,
     }
 
@@ -797,11 +893,67 @@ def store_uploaded_input_images(files: list[UploadFile], clear_existing: bool) -
     return saved
 
 
-def run_cmd(cmd: list[str], cwd: Path) -> subprocess.CompletedProcess[str]:
+def _is_opencode_run_cmd(cmd: list[str]) -> bool:
+    return bool(cmd) and Path(cmd[0]).name == "opencode" and len(cmd) > 1 and cmd[1] == "run"
+
+
+def _append_opencode_queue_log(message: str) -> None:
+    try:
+        OPENCODE_QUEUE_DIR.mkdir(parents=True, exist_ok=True)
+        with OPENCODE_QUEUE_LOG.open("a", encoding="utf-8") as handle:
+            handle.write(f"{now_iso()} {message}\n")
+    except OSError:
+        pass
+
+
+def dashboard_subprocess_env() -> dict[str, str]:
     env = dict(os.environ)
     playwright_path = "/home/mylappy/.local/lib/python3.12/site-packages"
     if playwright_path not in env.get("PYTHONPATH", ""):
         env["PYTHONPATH"] = playwright_path + ((":" + env["PYTHONPATH"]) if env.get("PYTHONPATH") else "")
+    return env
+
+
+@contextmanager
+def _opencode_queue_slot(label: str) -> Iterator[None]:
+    OPENCODE_QUEUE_DIR.mkdir(parents=True, exist_ok=True)
+    queued_at = time.time()
+    logged_wait = False
+    while True:
+        for slot in range(OPENCODE_MAX_CONCURRENT):
+            lock_path = OPENCODE_QUEUE_DIR / f"slot_{slot}.lock"
+            lock_handle = lock_path.open("a+")
+            try:
+                fcntl.flock(lock_handle.fileno(), fcntl.LOCK_EX | fcntl.LOCK_NB)
+            except BlockingIOError:
+                lock_handle.close()
+                continue
+            wait_seconds = time.time() - queued_at
+            if wait_seconds >= 0.25:
+                _append_opencode_queue_log(f"{label} started slot={slot} wait_seconds={wait_seconds:.1f}")
+            try:
+                yield
+                return
+            finally:
+                try:
+                    fcntl.flock(lock_handle.fileno(), fcntl.LOCK_UN)
+                finally:
+                    lock_handle.close()
+        if not logged_wait:
+            _append_opencode_queue_log(f"{label} queued max_concurrent={OPENCODE_MAX_CONCURRENT}")
+            logged_wait = True
+        time.sleep(0.25)
+
+
+def _run_opencode_queued(cmd: list[str], cwd: Path, env: dict[str, str]) -> subprocess.CompletedProcess[str]:
+    with _opencode_queue_slot("command"):
+        return subprocess.run(cmd, cwd=str(cwd), text=True, capture_output=True, check=False, env=env)
+
+
+def run_cmd(cmd: list[str], cwd: Path) -> subprocess.CompletedProcess[str]:
+    env = dashboard_subprocess_env()
+    if _is_opencode_run_cmd(cmd):
+        return _run_opencode_queued(cmd, cwd, env)
     return subprocess.run(cmd, cwd=str(cwd), text=True, capture_output=True, check=False, env=env)
 
 
@@ -1179,18 +1331,6 @@ def build_opencode_catalog() -> dict[str, Any]:
     }
 
 
-def choose_extractor_model(config: dict[str, Any]) -> str:
-    models = list_opencode_models()
-    explicit = (config.get("opencode_extractor_model") or "").strip()
-    if explicit:
-        return sanitize_dashboard_model(explicit, models)
-
-    selected = (config.get("opencode_model") or "").strip()
-    if selected:
-        return sanitize_dashboard_model(selected, models)
-    return choose_openai_gpt52(models)
-
-
 def parse_json_stdout(result: subprocess.CompletedProcess[str], context: str) -> Any:
     if result.returncode != 0:
         raise RuntimeError(f"{context} failed: {result.stderr.strip() or result.stdout.strip()}")
@@ -1211,46 +1351,6 @@ def save_upload(target: Path, upload: UploadFile | None) -> Path | None:
 
 def coalesce_path(uploaded: Path | None, default_path: Path) -> Path:
     return uploaded if uploaded and uploaded.exists() else default_path
-
-
-def file_sha256(path: Path) -> str:
-    return hashlib.sha256(path.read_bytes()).hexdigest()
-
-
-def product_context_cache_key(product_file: Path, config: dict[str, Any], extractor_model: str) -> dict[str, Any]:
-    return {
-        "source_hash": file_sha256(product_file),
-        "extractor_model": extractor_model,
-        "api_url": str((config.get("opencode_api_url") or DEFAULT_OPENCODE_API_URL)).strip(),
-        "single_source": True,
-    }
-
-
-def load_cached_product_context(cache_key: dict[str, Any]) -> dict[str, Any] | None:
-    if not PRODUCT_CONTEXT_CACHE.exists():
-        return None
-    try:
-        cached = json.loads(PRODUCT_CONTEXT_CACHE.read_text(encoding="utf-8"))
-    except Exception:
-        return None
-    if cached.get("cache_key") != cache_key:
-        return None
-    product_ctx = cached.get("product_ctx")
-    if not isinstance(product_ctx, dict) or not product_ctx:
-        return None
-    return cached
-
-
-def write_product_context_cache(cache_key: dict[str, Any], product_ctx: dict[str, Any], source: str, canonical_payload: Any = None) -> None:
-    PRODUCT_CONTEXT_CACHE.parent.mkdir(parents=True, exist_ok=True)
-    payload = {
-        "cache_key": cache_key,
-        "cached_at": now_iso(),
-        "source": source,
-        "product_ctx": product_ctx,
-        "canonical_payload": canonical_payload if isinstance(canonical_payload, dict) else None,
-    }
-    PRODUCT_CONTEXT_CACHE.write_text(json.dumps(payload, ensure_ascii=False, indent=2) + "\n", encoding="utf-8")
 
 
 def resolve_safe_path(relative_path: str) -> Path:
@@ -1525,6 +1625,66 @@ def parse_opencode_json_output(stdout: str) -> dict[str, Any] | None:
             return parsed
 
     return parse_json_object_from_text((stdout or "").strip())
+
+
+def _find_session_id(value: Any, session_scoped: bool = False) -> str | None:
+    if isinstance(value, dict):
+        event_type = str(value.get("type") or "").lower()
+        scoped = session_scoped or "session" in event_type
+        for key in ("sessionID", "sessionId", "session_id"):
+            candidate = value.get(key)
+            if isinstance(candidate, str) and candidate.strip():
+                return candidate.strip()
+        if scoped:
+            candidate = value.get("id")
+            if isinstance(candidate, str) and candidate.strip():
+                return candidate.strip()
+        for key, nested in value.items():
+            nested_scoped = scoped or "session" in str(key).lower()
+            found = _find_session_id(nested, nested_scoped)
+            if found:
+                return found
+    elif isinstance(value, list):
+        for item in value:
+            found = _find_session_id(item, session_scoped)
+            if found:
+                return found
+    return None
+
+
+def parse_opencode_session_id(stdout: str) -> str | None:
+    for raw_line in (stdout or "").splitlines():
+        line = raw_line.strip()
+        if not line:
+            continue
+        try:
+            event = json.loads(line)
+        except json.JSONDecodeError:
+            continue
+        found = _find_session_id(event)
+        if found:
+            return found
+
+    match = re.search(r'"session(?:ID|Id|_id)"\s*:\s*"([^"]+)"', stdout or "")
+    if match:
+        return match.group(1).strip()
+    return None
+
+
+def build_product_doc_bootstrap_prompt() -> str:
+    return (
+        "Read the attached product master doc completely. For every following ad-copy request in this same OpenCode session, "
+        "use that doc as the single source of product truth for benefits, proof, mechanism, differentiators, exclusions, and priority hierarchy. "
+        "Do not rewrite, summarize, modify, or ignore the doc. The following messages will provide only ad format/persona/concept/schema instructions. "
+        "Return only valid JSON: {\"status\":\"product_doc_loaded\"}."
+    )
+
+
+def append_run_log(run_dir: Path, filename: str, message: str) -> None:
+    log_path = run_dir / "logs" / filename
+    log_path.parent.mkdir(parents=True, exist_ok=True)
+    with log_path.open("a", encoding="utf-8") as handle:
+        handle.write(message.rstrip() + "\n")
 
 
 def call_opencode_repair_copy(
@@ -1846,9 +2006,6 @@ def build_template_copy(context: dict[str, Any], run_id: str) -> dict[str, Any]:
         concept_ids = concept_ids_from_requirements(copy_req)
         primary_key = _clean_str(copy_req.get("primary_feature_key")) or "structured_system"
         secondary_key = _clean_str(copy_req.get("secondary_feature_key")) or "cravings_down"
-        primary_feature = _clean_str(copy_req.get("primary_feature")) or "Guided system"
-        headline_driver = _clean_str(copy_req.get("headline_driver")) or "guided weight-loss support"
-        support_driver = _clean_str(copy_req.get("support_driver")) or "clear routine and follow-through"
 
         pain_en = choose_text(persona.get("pain_points", []), f"Daily routine feels heavy and hard to sustain for persona {persona_num}.")
         desire_en = choose_text(persona.get("core_message", []), "A practical routine that feels easy to follow.")
@@ -1968,316 +2125,33 @@ def build_template_copy(context: dict[str, Any], run_id: str) -> dict[str, Any]:
     return {"default_aspect_ratio": "4:5", "ads": ads}
 
 
-def call_blackbox_http(config: dict[str, Any], context: dict[str, Any], run_dir: Path) -> dict[str, Any] | None:
-    """Call Blackbox server via HTTP API"""
-    import requests
-    
-    api_url = (config.get("opencode_api_url") or "").strip()
-    api_key = (config.get("opencode_api_key") or "").strip() or "blackbox-local-pass"
-    model = (config.get("opencode_model") or "").strip() or "blackboxai/moonshotai/kimi-k2.6"
-    
-    print(f"[call_blackbox_http] api_url={api_url}, model={model}", file=sys.stderr)
-    
-    # Extract base URL
-    if not api_url:
-        return None
-    
-    # Build auth
-    auth = ("user", api_key)
-    
-    language_mode = resolve_language_mode(config)
-    system = (
-        "You generate ad copy JSON only. Return valid JSON with keys default_aspect_ratio and ads. "
-        "Each ads item must include format, headline_angle, awareness_stage, concept_angle, concept_structure, persona fields and copy.EN/copy.HI fields compatible with assembler. "
-        "Every ad unit must make the obesity and weight-loss intent obvious to a first-time viewer. "
-        "At minimum, headline or support line must explicitly mention weight loss, obesity reduction, excess-weight reduction, or a direct 15-day result framing. "
-        "Avoid abstract lines that hide the product goal. "
-        "Never include price in any on-image copy field (headline/support_line/trust_line/bullets/cta/attribution). "
-        "Do not use currency symbols or words like INR, price, only, discount, off, MRP in on-image copy. "
-        "For BA format, never prefix copy with BEFORE:/AFTER: labels (or Hindi equivalents). "
-        "For BA format, write explicit split contrast copy: bullet 1/2 = left-side struggle state, bullet 3/4 = right-side fix/progress state. "
-        "Use 2 or 4 BA bullets total (if 2, bullet 1 = struggle and bullet 2 = fix). "
-        "For TEST format, headline must read like a first-person review line suitable for quote card (not generic 'highly rated' phrasing). "
-        "For TEST format, attribution must be role/source-based without personal names; avoid repeating generic text like 'Representative user review' across ads. "
-        "If no real quote is provided in context, create one believable representative review line grounded in persona pain/desire and safe claims. "
-        "Keep each format's core shape intact, but vary headline/support/trust framing using persona pain, desire, friction, proof needed, and tone cue. "
-        "For the same format across runs, rotate variation lane and wording rhythm while preserving format-specific structure. "
-        "Each ad item includes copy_requirements; treat primary_feature/headline_driver as the headline lane and secondary_feature/support_driver as the supporting lane. "
-        "Use headline_execution_rules, headline_concept_framework, and each ad's copy_requirements.concept_variation as the execution model. "
-        "The concept variation tells you the awareness stage, lead angle, and message structure; copy its ids into awareness_stage, concept_angle, and concept_structure, but treat the directions as guidance only, not copy to reuse. "
-        "If copy_requirements.hypothesis is present and type is not 'none', obey it as a controlled test. "
-        "If concept_variation includes hook_structure_override, the headline opening must follow that pattern (question, proof, contrast, confession, or command lead), using concept_variation.hook_structure_guidance when present. "
-        "If concept_variation includes concept_angle_guidance, awareness_stage_guidance, or concept_structure_guidance, use it as concrete execution guidance. "
-        "If concept_variation includes proof_style_override, shape the trust/support line using that proof style and proof_style_guidance. "
-        "If concept_variation includes cta_voice_override, make the CTA match that voice and cta_voice_guidance. "
-        "Use the 4U writing lens before finalizing every headline: Useful, honestly Urgent, Unique, and Ultra-specific. This is a writing instruction, not a label to output. "
-        "Write headlines like a human editor revised them from rough AI copy: one clean idea, short, concrete, and spoken. "
-        "Do not make the headline carry the whole pitch; put proof, mechanism, and timing in support_line, trust_line, or bullets. "
-        "Do not lead headlines with instructional verbs (Start, Begin, Kickstart, Follow). Use statements or questions that sound like finished ad copy. "
-        "Do not place AM/PM timing, 4-hour windows, or protocol mechanics in headlines; those belong in support_line or bullets. "
-        "Do not put product component names (OK Liquid / OK Tablet / OK Powder / OKP) in the headline; keep them in support_line or bullets. "
-        "Never output internal persona notes or proof-needed notes as on-image copy. "
-        "Use these pattern families as execution guidance only, not text to copy: authority stamp; protocol identity; pain question; stubborn-weight proof; deadline direct; sacrifice reduction; emotional outcome; messy-life curiosity. "
-        "Good support-line patterns include: product identity plus ease, simple 2-step routine, about 5-minute effort, doctor credibility plus 70,000+ users, visible 15-day progress, morning fullness plus night digestion support, or result plus less sacrifice. "
-        "Before returning JSON, perform a final headline editor pass: shorten, remove generic AI phrases, keep one central idea, move explanation into support line, and rewrite if headline/support say the same thing. "
-        "Avoid weak planning-label headlines like 'support for visible progress', 'guided support for practical progress', or 'start mornings with a clearer routine'; make them sound like finished ad copy instead. "
-        "Good headlines should sound edited by a human, not generated: concrete, restrained, mobile-readable, and shaped like a line someone would approve on an actual ad. "
-        "Avoid AI-slop wording such as unlock, transform your journey, revolutionary, holistic wellness, game-changing, effortlessly, tailored solution, and vague transformation slogans. "
-        "Do not force every headline to carry every keyword; the headline/support pair must make the weight-loss intent obvious together. "
-        "Within the same format in a single batch, do not reuse the same headline skeleton or subheadline skeleton across personas. "
-        "Follow the master-doc benefit hierarchy first: fast visible results, cravings down, natural safe-feeling, homemade-food fit, structured low-guesswork system, guided support, emotional control, then secondary digestive benefits. "
-        "Use AM routine or PM routine only when the chosen feature lane genuinely needs mechanism detail. Do not default to AM/PM wording in every ad. "
-        "Do not flatten multiple ads under a format into near-duplicate headlines with only minor wording swaps. "
-        "For FEAT, make each bullet a different product feature. For HERO and UGC, support line must add a second feature instead of restating the headline. "
-        "Do not make homemade-food compatibility the center of brand positioning even when you use it as a benefit lane. "
-        "Do not let secondary digestive or emotional benefits overshadow the main promise of fast visible weight loss with a safer, easier, more guided experience. "
-        "Ensure obesity and weight-loss intent is obvious to someone who has never heard of the product."
-    )
-    
-    strict_schema_note = (
-        "STRICT_SCHEMA: Return JSON only. Do not include copy_requirements, disclaimers, or extra keys. "
-        "persona must be an object with number, name, pain_en, desire_en, friction_en, proof_needed_en, tone_cue_en, "
-        "pain_hi, desire_hi, friction_hi, proof_needed_hi, tone_cue_hi. "
-        "copy.EN and copy.HI must contain only the required fields for the format. "
-        "If format is HERO or UGC: headline, support_line, cta. "
-        "If format is BA/FEAT: headline, bullets (list), cta. "
-        "If format is TEST: headline, attribution, trust_line, cta."
-    )
-    
-    generated_ads: list[dict[str, Any]] = []
-    errors: list[str] = []
-    
-    for index, ad_item in enumerate(context.get("ads") or [], start=1):
-        previous_same_format: list[dict[str, Any]] = []
-        target_format = str(ad_item.get("format") or "").strip().upper()
-        for prev in generated_ads:
-            if not isinstance(prev, dict):
-                continue
-            if str(prev.get("format") or "").strip().upper() != target_format:
-                continue
-            prev_copy = prev.get("copy") if isinstance(prev.get("copy"), dict) else {}
-            prev_en = prev_copy.get("EN") if isinstance(prev_copy.get("EN"), dict) else {}
-            previous_same_format.append(prev_en.get("headline", ""))
-        
-        user_payload = {
-            "ad_index": index,
-            "ad_item": ad_item,
-            "generated_same_format_so_far": previous_same_format,
-            "constraints": {
-                "language": ["EN", "HI"],
-                "language_mode": language_mode,
-                "formats": FORMATS,
-                "return_json_only": True,
-            },
-        }
-        
-        cli_prompt = (
-            "SYSTEM:\n"
-            f"{system}\n\n"
-            "USER_PAYLOAD_JSON:\n"
-            f"{json.dumps(user_payload, ensure_ascii=False)}\n\n"
-            "Return only valid JSON. No markdown. No extra text.\n"
-            "Return one ad only. You may return either a single ad object or an object with default_aspect_ratio and a one-item ads array.\n"
-            "The current ad must use a new persuasion angle in both the headline and the support line / right-side shift / feature stack compared with generated_same_format_so_far.\n"
-            "Do not reuse the same angle family such as guided support, structured system, cravings control, proof, natural-safe, homemade-food fit, or AM/PM mechanism as the lead angle if it already appeared in generated_same_format_so_far for this format.\n"
-            "Do not reuse the same sentence pattern or opening structure from generated_same_format_so_far.\n"
-            "Before writing, read copy_requirements.concept_variation and make the headline/support hierarchy match that chosen concept path.\n"
-            "If hook_structure_override is present, the EN headline must visibly match it. For contrast_loop, use a clear but natural contrast word such as but, yet, still, without, before/after, or even with.\n"
-            "Final editor pass before JSON: rewrite the headline into a finished human ad line, usually 5-12 words, one central idea only. Move mechanism/proof/timing details into support line or bullets.\n"
-            "Use support copy to explain why the headline is believable: 2-step routine, 5-minute ease, doctor-formulated proof, 70,000+ users, 15-day progress, cravings/fullness, digestion support, or less sacrifice.\n"
-            "Reject your own first draft if the headline reads like a generic AI slogan, a keyword list, or a paraphrase of the support line.\n"
-            "Do not return framework labels, rationale, or explanations."
-        )
-        
-        def run_blackbox_once(prompt: str) -> tuple[dict[str, Any] | None, str, str]:
-            try:
-                response = requests.post(
-                    f"{api_url}/v1/chat/completions",
-                    auth=auth,
-                    json={
-                        "model": model,
-                        "messages": [{"role": "user", "content": prompt}],
-                        "max_tokens": 4000,
-                    },
-                    timeout=180,
-                )
-                if response.status_code != 200:
-                    errors.append(f"Ad {index}: HTTP {response.status_code}\n{response.text}")
-                    return None, "", response.text
-                
-                result = response.json()
-                content = result.get("choices", [{}])[0].get("message", {}).get("content", "")
-                
-                # Try to parse JSON from the response
-                parsed = parse_opencode_json_output(content)
-                return (extract_generated_ad_candidate(parsed) if parsed else None), content, ""
-            except Exception as e:
-                errors.append(f"Ad {index}: {e}")
-                return None, "", str(e)
-        
-        try:
-            candidate, last_stdout, last_stderr = run_blackbox_once(cli_prompt)
-        except Exception as exc:
-            errors.append(f"Ad {index}: launch failed: {exc}")
-            continue
-        
-        if not candidate:
-            retry_prompt = f"{cli_prompt}\n\n{strict_schema_note}\n"
-            candidate, last_stdout, last_stderr = run_blackbox_once(retry_prompt)
-        
-        mismatch = hypothesis_mismatch(candidate, ad_item) if candidate else None
-        if mismatch:
-            retry_prompt = (
-                f"{cli_prompt}\n\n"
-                f"REVISION_REQUIRED: {mismatch}\n"
-                "Rewrite only this ad so it satisfies the requested hypothesis while keeping schema valid."
-            )
-            candidate, last_stdout, last_stderr = run_blackbox_once(retry_prompt)
-        
-        if candidate:
-            generated_ads.append(candidate)
-        else:
-            errors.append(f"Ad {index}: returned no usable ad JSON\nSTDOUT:\n{last_stdout}\nSTDERR:\n{last_stderr}")
-    
-    if errors:
-        (run_dir / "logs" / "blackbox_error.txt").write_text("\n\n---\n\n".join(errors), encoding="utf-8")
-    
-    if not generated_ads:
-        return None
-    
-    return {"default_aspect_ratio": "4:5", "ads": generated_ads}
-
-
 def call_opencode_compatible(config: dict[str, Any], context: dict[str, Any], run_dir: Path) -> dict[str, Any] | None:
     api_url = (config.get("opencode_api_url") or "").strip()
     api_key = (config.get("opencode_api_key") or "").strip() or os.getenv("OPENCODE_SERVER_PASSWORD", "").strip()
     model = sanitize_dashboard_model((config.get("opencode_model") or "").strip(), list_opencode_models())
-    server_type = (config.get("server_type") or "opencode").strip().lower()
     if not api_url:
         return None
 
-    # Log for debugging
-    print(f"[call_opencode_compatible] server_type={server_type}, api_url={api_url}, model={model}", file=sys.stderr)
-
-    # Handle Blackbox via HTTP
-    if server_type == "blackbox":
-        return call_blackbox_http(config, context, run_dir)
+    print(f"[call_opencode_compatible] api_url={api_url}, model={model}", file=sys.stderr)
 
     language_mode = resolve_language_mode(config)
-    system = (
-        "You generate ad copy JSON only. Return valid JSON with keys default_aspect_ratio and ads. "
-        "Each ads item must include format, headline_angle, awareness_stage, concept_angle, concept_structure, persona fields and copy.EN/copy.HI fields compatible with assembler. "
-        "Every ad unit must make the obesity and weight-loss intent obvious to a first-time viewer. "
-        "At minimum, headline or support line must explicitly mention weight loss, obesity reduction, excess-weight reduction, or a direct 15-day result framing. "
-        "Avoid abstract lines that hide the product goal. "
-        "Never include price in any on-image copy field (headline/support_line/trust_line/bullets/cta/attribution). "
-        "Do not use currency symbols or words like INR, price, only, discount, off, MRP in on-image copy. "
-        "For BA format, never prefix copy with BEFORE:/AFTER: labels (or Hindi equivalents). "
-        "For BA format, write explicit split contrast copy: bullet 1/2 = left-side struggle state, bullet 3/4 = right-side fix/progress state. "
-        "Use 2 or 4 BA bullets total (if 2, bullet 1 = struggle and bullet 2 = fix). "
-        "For TEST format, headline must read like a first-person review line suitable for quote card (not generic 'highly rated' phrasing). "
-        "For TEST format, attribution must be role/source-based without personal names; avoid repeating generic text like 'Representative user review' across ads. "
-        "If no real quote is provided in context, create one believable representative review line grounded in persona pain/desire and safe claims. "
-        "Keep each format's core shape intact, but vary headline/support/trust framing using persona pain, desire, friction, proof needed, and tone cue. "
-        "For the same format across runs, rotate variation lane and wording rhythm while preserving format-specific structure. "
-        "Each ad item includes copy_requirements; treat primary_feature/headline_driver as the headline lane and secondary_feature/support_driver as the supporting lane. "
-        "Use headline_execution_rules, headline_concept_framework, and each ad's copy_requirements.concept_variation as the execution model. "
-        "The concept variation tells you the awareness stage, lead angle, and message structure; copy its ids into awareness_stage, concept_angle, and concept_structure, but treat the directions as guidance only, not copy to reuse. "
-        "If copy_requirements.hypothesis is present and type is not 'none', obey it as a controlled test. "
-        "If concept_variation includes hook_structure_override, the headline opening must follow that pattern (question, proof, contrast, confession, or command lead), using concept_variation.hook_structure_guidance when present. "
-        "If concept_variation includes concept_angle_guidance, awareness_stage_guidance, or concept_structure_guidance, use it as concrete execution guidance. "
-        "If concept_variation includes proof_style_override, shape the trust/support line using that proof style and proof_style_guidance. "
-        "If concept_variation includes cta_voice_override, make the CTA match that voice and cta_voice_guidance. "
-        "Use the 4U writing lens before finalizing every headline: Useful, honestly Urgent, Unique, and Ultra-specific. This is a writing instruction, not a label to output. "
-        "Write headlines like a human editor revised them from rough AI copy: one clean idea, short, concrete, and spoken. "
-        "Do not make the headline carry the whole pitch; put proof, mechanism, and timing in support_line, trust_line, or bullets. "
-        "Do not lead headlines with instructional verbs (Start, Begin, Kickstart, Follow). Use statements or questions that sound like finished ad copy. "
-        "Do not place AM/PM timing, 4-hour windows, or protocol mechanics in headlines; those belong in support_line or bullets. "
-        "Do not put product component names (OK Liquid / OK Tablet / OK Powder / OKP) in the headline; keep them in support_line or bullets. "
-        "Never output internal persona notes or proof-needed notes as on-image copy. "
-        "Use these pattern families as execution guidance only, not text to copy: authority stamp; protocol identity; pain question; stubborn-weight proof; deadline direct; sacrifice reduction; emotional outcome; messy-life curiosity. "
-        "Good support-line patterns include: product identity plus ease, simple 2-step routine, about 5-minute effort, doctor credibility plus 70,000+ users, visible 15-day progress, morning fullness plus night digestion support, or result plus less sacrifice. "
-        "Before returning JSON, perform a final headline editor pass: shorten, remove generic AI phrases, keep one central idea, move explanation into support line, and rewrite if headline/support say the same thing. "
-        "Avoid weak planning-label headlines like 'support for visible progress', 'guided support for practical progress', or 'start mornings with a clearer routine'; make them sound like finished ad copy instead. "
-        "Good headlines should sound edited by a human, not generated: concrete, restrained, mobile-readable, and shaped like a line someone would approve on an actual ad. "
-        "Avoid AI-slop wording such as unlock, transform your journey, revolutionary, holistic wellness, game-changing, effortlessly, tailored solution, and vague transformation slogans. "
-        "Do not force every headline to carry every keyword; the headline/support pair must make the weight-loss intent obvious together. "
-        "Within the same format in a single batch, do not reuse the same headline skeleton or subheadline skeleton across personas. "
-        "Follow the master-doc benefit hierarchy first: fast visible results, cravings down, natural safe-feeling, homemade-food fit, structured low-guesswork system, guided support, emotional control, then secondary digestive benefits. "
-        "Use AM routine or PM routine only when the chosen feature lane genuinely needs mechanism detail. Do not default to AM/PM wording in every ad. "
-        "Do not flatten multiple ads under a format into near-duplicate headlines with only minor wording swaps. "
-        "For FEAT, make each bullet a different product feature. For HERO and UGC, support line must add a second feature instead of restating the headline. "
-        "Do not make homemade-food compatibility the center of brand positioning even when you use it as a benefit lane. "
-        "Do not let secondary digestive or emotional benefits overshadow the main promise of fast visible weight loss with a safer, easier, more guided experience. "
-        "Ensure obesity and weight-loss intent is obvious to someone who has never heard of the product."
-    )
     cli_password = api_key or os.getenv("OPENCODE_SERVER_PASSWORD", "").strip()
+    product_file = Path(str(context.get("product_file_path") or DEFAULT_PRODUCT_MASTER))
     generated_ads: list[dict[str, Any]] = []
     errors: list[str] = []
     warnings: list[str] = []
+    session_id: str | None = None
+    session_fallback_used = False
 
-    strict_schema_note = (
-        "STRICT_SCHEMA: Return JSON only. Do not include copy_requirements, disclaimers, or extra keys. "
-        "persona must be an object with number, name, pain_en, desire_en, friction_en, proof_needed_en, tone_cue_en, "
-        "pain_hi, desire_hi, friction_hi, proof_needed_hi, tone_cue_hi. "
-        "copy.EN and copy.HI must contain only the required fields for the format. "
-        "If format is HERO or UGC: headline, support_line, cta. "
-        "If format is BA/FEAT: headline, bullets (list), cta. "
-        "If format is TEST: headline, attribution, trust_line, cta."
-    )
+    if not product_file.exists() or not product_file.is_file():
+        errors.append(f"Product master doc missing: {product_file}")
+        (run_dir / "logs" / "opencode_error.txt").write_text("\n\n---\n\n".join(errors), encoding="utf-8")
+        return None
 
-    for index, ad_item in enumerate(context.get("ads") or [], start=1):
-        previous_same_format: list[dict[str, Any]] = []
-        target_format = str(ad_item.get("format") or "").strip().upper()
-        for prev in generated_ads:
-            if not isinstance(prev, dict):
-                continue
-            if str(prev.get("format") or "").strip().upper() != target_format:
-                continue
-            prev_copy = prev.get("copy") if isinstance(prev.get("copy"), dict) else {}
-            prev_en = prev_copy.get("EN") if isinstance(prev_copy.get("EN"), dict) else {}
-            previous_same_format.append(
-                {
-                    "persona": (prev.get("persona") or {}).get("name") if isinstance(prev.get("persona"), dict) else "",
-                    "headline_angle": prev.get("headline_angle"),
-                    "headline": prev_en.get("headline"),
-                    "support_line": prev_en.get("support_line"),
-                    "bullets": prev_en.get("bullets") if isinstance(prev_en.get("bullets"), list) else [],
-                }
-            )
-        single_context = {
-            **context,
-            "ads": [ad_item],
-        }
-        user_payload = {
-            "task": "Generate fresh ad copy JSON for provided context.",
-            "context": build_generation_payload_for_llm(single_context),
-            "generated_same_format_so_far": previous_same_format,
-            "constraints": {
-                "language": ["EN", "HI"],
-                "language_mode": language_mode,
-                "formats": FORMATS,
-                "return_json_only": True,
-            },
-        }
-        cli_prompt = (
-            "SYSTEM:\n"
-            f"{system}\n\n"
-            "USER_PAYLOAD_JSON:\n"
-            f"{json.dumps(user_payload, ensure_ascii=False)}\n\n"
-            "Return only valid JSON. No markdown. No extra text.\n"
-            "Return one ad only. You may return either a single ad object or an object with default_aspect_ratio and a one-item ads array.\n"
-            "The current ad must use a new persuasion angle in both the headline and the support line / right-side shift / feature stack compared with generated_same_format_so_far.\n"
-            "Do not reuse the same angle family such as guided support, structured system, cravings control, proof, natural-safe, homemade-food fit, or AM/PM mechanism as the lead angle if it already appeared in generated_same_format_so_far for this format.\n"
-            "Do not reuse the same sentence pattern or opening structure from generated_same_format_so_far.\n"
-            "Before writing, read copy_requirements.concept_variation and make the headline/support hierarchy match that chosen concept path.\n"
-            "If hook_structure_override is present, the EN headline must visibly match it. For contrast_loop, use a clear but natural contrast word such as but, yet, still, without, before/after, or even with.\n"
-            "Final editor pass before JSON: rewrite the headline into a finished human ad line, usually 5-12 words, one central idea only. Move mechanism/proof/timing details into support line or bullets.\n"
-            "Use support copy to explain why the headline is believable: 2-step routine, 5-minute ease, doctor-formulated proof, 70,000+ users, 15-day progress, cravings/fullness, digestion support, or less sacrifice.\n"
-            "Reject your own first draft if the headline reads like a generic AI slogan, a keyword list, or a paraphrase of the support line.\n"
-            "Do not return framework labels, rationale, or explanations."
-        )
-        cli_cmd = [
+    env = dashboard_subprocess_env()
+
+    def build_cmd(prompt: str, *, use_session: bool, attach_product_doc: bool) -> list[str]:
+        cmd = [
             "opencode",
             "run",
             "--pure",
@@ -2287,62 +2161,134 @@ def call_opencode_compatible(config: dict[str, Any], context: dict[str, Any], ru
             model,
             "--format",
             "json",
-            cli_prompt,
         ]
+        if use_session and session_id:
+            cmd.extend(["--session", session_id])
+        if attach_product_doc:
+            cmd.extend(["--file", str(product_file)])
         if cli_password:
-            cli_cmd.extend(["--password", cli_password])
-        def run_once(prompt: str) -> tuple[dict[str, Any] | None, str, str]:
-            cmd = [
-                "opencode",
-                "run",
-                "--pure",
-                "--attach",
-                api_url,
-                "--model",
-                model,
-                "--format",
-                "json",
-                prompt,
-            ]
-            if cli_password:
-                cmd.extend(["--password", cli_password])
-            result = run_cmd(cmd, cwd=ROOT)
-            stdout = result.stdout or ""
-            stderr = result.stderr or ""
-            if result.returncode != 0:
-                errors.append(
-                    f"Ad {index}: return code {result.returncode}\nSTDOUT:\n{stdout}\nSTDERR:\n{stderr}"
+            cmd.extend(["--password", cli_password])
+        cmd.extend(["--", prompt])
+        return cmd
+
+    def run_opencode(prompt: str, *, force_file: bool = False) -> tuple[dict[str, Any] | None, str, str, int]:
+        use_session = bool(session_id) and not force_file
+        cmd = build_cmd(prompt, use_session=use_session, attach_product_doc=force_file or not use_session)
+        result = subprocess.run(cmd, cwd=str(ROOT), text=True, capture_output=True, check=False, env=env)
+        stdout = result.stdout or ""
+        stderr = result.stderr or ""
+        if result.returncode != 0:
+            return None, stdout, stderr, result.returncode
+        parsed = parse_opencode_json_output(stdout)
+        return (extract_generated_ad_candidate(parsed) if parsed else None), stdout, stderr, result.returncode
+
+    with _opencode_queue_slot(f"copy_session {run_dir.name}"):
+        append_run_log(
+            run_dir,
+            "opencode_session.log",
+            f"{now_iso()} Starting OpenCode product-doc session with file: {product_file}",
+        )
+        bootstrap_cmd = build_cmd(build_product_doc_bootstrap_prompt(), use_session=False, attach_product_doc=True)
+        bootstrap = subprocess.run(bootstrap_cmd, cwd=str(ROOT), text=True, capture_output=True, check=False, env=env)
+        append_run_log(
+            run_dir,
+            "opencode_session.log",
+            (
+                f"{now_iso()} Bootstrap return_code={bootstrap.returncode}\n"
+                f"STDOUT:\n{bootstrap.stdout or ''}\nSTDERR:\n{bootstrap.stderr or ''}"
+            ),
+        )
+        if bootstrap.returncode == 0:
+            session_id = parse_opencode_session_id(bootstrap.stdout or "")
+            if session_id:
+                append_run_log(run_dir, "opencode_session.log", f"{now_iso()} Reusing OpenCode session: {session_id}")
+            else:
+                session_fallback_used = True
+                warning = "OpenCode did not expose a session id; falling back to attaching product master doc on every ad request."
+                warnings.append(warning)
+                append_run_log(run_dir, "opencode_session.log", f"{now_iso()} FALLBACK: {warning}")
+        else:
+            session_fallback_used = True
+            warning = "OpenCode product-doc session bootstrap failed; falling back to attaching product master doc on every ad request."
+            warnings.append(warning)
+            append_run_log(run_dir, "opencode_session.log", f"{now_iso()} FALLBACK: {warning}")
+
+        for index, ad_item in enumerate(context.get("ads") or [], start=1):
+            previous_same_format: list[dict[str, Any]] = []
+            target_format = str(ad_item.get("format") or "").strip().upper()
+            for prev in generated_ads:
+                if not isinstance(prev, dict):
+                    continue
+                if str(prev.get("format") or "").strip().upper() != target_format:
+                    continue
+                prev_copy = prev.get("copy") if isinstance(prev.get("copy"), dict) else {}
+                prev_en = prev_copy.get("EN") if isinstance(prev_copy.get("EN"), dict) else {}
+                previous_same_format.append(
+                    {
+                        "persona": (prev.get("persona") or {}).get("name") if isinstance(prev.get("persona"), dict) else "",
+                        "headline_angle": prev.get("headline_angle"),
+                        "headline": prev_en.get("headline"),
+                        "support_line": prev_en.get("support_line"),
+                        "bullets": prev_en.get("bullets") if isinstance(prev_en.get("bullets"), list) else [],
+                    }
                 )
-                return None, stdout, stderr
-            parsed = parse_opencode_json_output(stdout)
-            return (extract_generated_ad_candidate(parsed) if parsed else None), stdout, stderr
-
-        try:
-            candidate, last_stdout, last_stderr = run_once(cli_prompt)
-        except OSError as exc:
-            errors.append(f"Ad {index}: launch failed: {exc}")
-            continue
-
-        if not candidate:
-            retry_prompt = f"{cli_prompt}\n\n{strict_schema_note}\n"
-            candidate, last_stdout, last_stderr = run_once(retry_prompt)
-
-        mismatch = hypothesis_mismatch(candidate, ad_item) if candidate else None
-        if mismatch:
-            retry_prompt = (
-                f"{cli_prompt}\n\n"
-                f"REVISION_REQUIRED: {mismatch}\n"
-                "Rewrite only this ad so it satisfies the requested hypothesis while keeping schema valid.\n"
+            single_context = {
+                **context,
+                "ads": [ad_item],
+            }
+            user_payload = {
+                "task": "Generate fresh ad copy JSON for provided context.",
+                "context": build_generation_payload_for_llm(single_context),
+                "generated_same_format_so_far": previous_same_format,
+                "constraints": {
+                    "language": ["EN", "HI"],
+                    "language_mode": language_mode,
+                    "format": target_format,
+                    "return_json_only": True,
+                },
+            }
+            cli_prompt = (
+                "SYSTEM:\n"
+                f"{build_ad_copy_system_prompt(target_format)}\n\n"
+                "USER_PAYLOAD_JSON:\n"
+                f"{json.dumps(user_payload, ensure_ascii=False)}\n\n"
+                f"{build_ad_prompt_tail(target_format)}"
             )
-            candidate, last_stdout, last_stderr = run_once(retry_prompt)
-            mismatch_after = hypothesis_mismatch(candidate, ad_item) if candidate else None
-            if mismatch_after:
-                warnings.append(f"Ad {index}: hypothesis retry mismatch persisted; accepting generated copy: {mismatch_after}\nSTDOUT:\n{last_stdout}\nSTDERR:\n{last_stderr}")
 
-        if not candidate:
-            errors.append(f"Ad {index}: returned no usable ad JSON\nSTDOUT:\n{last_stdout}\nSTDERR:\n{last_stderr}")
-            continue
-        generated_ads.append(hydrate_generated_ad_candidate(candidate, ad_item))
+            try:
+                candidate, last_stdout, last_stderr, last_code = run_opencode(cli_prompt)
+            except OSError as exc:
+                errors.append(f"Ad {index}: launch failed: {exc}")
+                continue
+
+            if last_code != 0 and session_id:
+                session_id = None
+                session_fallback_used = True
+                warning = f"OpenCode reusable session failed on ad {index}; falling back to product-doc file attachment for remaining requests."
+                warnings.append(f"{warning}\nSTDOUT:\n{last_stdout}\nSTDERR:\n{last_stderr}")
+                append_run_log(run_dir, "opencode_session.log", f"{now_iso()} FALLBACK: {warning}")
+                candidate, last_stdout, last_stderr, last_code = run_opencode(cli_prompt, force_file=True)
+
+            if not candidate:
+                retry_prompt = f"{cli_prompt}\n\n{build_strict_schema_note(target_format)}\n"
+                candidate, last_stdout, last_stderr, last_code = run_opencode(retry_prompt, force_file=session_fallback_used and not session_id)
+
+            mismatch = hypothesis_mismatch(candidate, ad_item) if candidate else None
+            if mismatch:
+                retry_prompt = (
+                    f"{cli_prompt}\n\n"
+                    f"REVISION_REQUIRED: {mismatch}\n"
+                    "Rewrite only this ad so it satisfies the requested hypothesis while keeping schema valid.\n"
+                )
+                candidate, last_stdout, last_stderr, last_code = run_opencode(retry_prompt, force_file=session_fallback_used and not session_id)
+                mismatch_after = hypothesis_mismatch(candidate, ad_item) if candidate else None
+                if mismatch_after:
+                    warnings.append(f"Ad {index}: hypothesis retry mismatch persisted; accepting generated copy: {mismatch_after}\nSTDOUT:\n{last_stdout}\nSTDERR:\n{last_stderr}")
+
+            if not candidate:
+                errors.append(f"Ad {index}: returned no usable ad JSON; return code {last_code}\nSTDOUT:\n{last_stdout}\nSTDERR:\n{last_stderr}")
+                continue
+            generated_ads.append(hydrate_generated_ad_candidate(candidate, ad_item))
 
     if errors or warnings:
         (run_dir / "logs" / "opencode_error.txt").write_text("\n\n---\n\n".join(errors + warnings), encoding="utf-8")
@@ -2350,7 +2296,14 @@ def call_opencode_compatible(config: dict[str, Any], context: dict[str, Any], ru
     if not generated_ads:
         return None
 
-    return {"default_aspect_ratio": "4:5", "ads": generated_ads}
+    result_payload: dict[str, Any] = {"default_aspect_ratio": "4:5", "ads": generated_ads}
+    if errors:
+        result_payload["_opencode_failures"] = errors
+    if warnings:
+        result_payload["_opencode_warnings"] = warnings
+    if session_fallback_used:
+        result_payload["_opencode_session_fallback"] = True
+    return result_payload
 
 
 def collect_run_result(run_dir: Path, batch_name: str, image_generated: bool) -> dict[str, Any]:
@@ -4089,6 +4042,8 @@ async def api_run_execute(
         cfg = json.loads(config)
     except json.JSONDecodeError as exc:
         raise HTTPException(status_code=400, detail="Invalid config JSON") from exc
+    if str((cfg.get("server_type") or "opencode")).strip().lower() != "opencode":
+        raise HTTPException(status_code=400, detail="Unsupported server type. Use OpenCode.")
 
     run_id = make_run_id()
     run_dir = RUNS_ROOT / run_id
@@ -4122,80 +4077,21 @@ async def api_run_execute(
             json.dumps(hypothesis_cfg, ensure_ascii=False, indent=2) + "\n", encoding="utf-8"
         )
 
-    product_ctx: dict[str, Any]
-    product_ctx_source = "extract_product_context"
-    extractor_model = choose_extractor_model(cfg)
-    cache_key = product_context_cache_key(product_file, cfg, extractor_model)
-    cached_context = load_cached_product_context(cache_key)
-
-    if cached_context:
-        product_ctx = cached_context["product_ctx"]
-        product_ctx_source = f"cached_{cached_context.get('source') or 'product_context'}"
-        cached_canonical = cached_context.get("canonical_payload")
-        if isinstance(cached_canonical, dict):
-            (run_dir / "context" / "context_canonical.json").write_text(
-                json.dumps(cached_canonical, ensure_ascii=False, indent=2) + "\n", encoding="utf-8"
-            )
-    else:
-        canonical_payload: dict[str, Any] | None = None
-        canonical_path = RUNTIME_ROOT / "context_canonical.json"
-        canonical_cmd = [
-            "python3",
-            "scripts/build_canonical_context.py",
-            "--product",
-            str(product_file),
-            "--output",
-            str(canonical_path),
-            "--api-url",
-            str((cfg.get("opencode_api_url") or DEFAULT_OPENCODE_API_URL)).strip(),
-            "--model",
-            extractor_model,
-        ]
-        extractor_key = (cfg.get("opencode_api_key") or "").strip() or os.getenv("OPENCODE_SERVER_PASSWORD", "").strip()
-        if extractor_key:
-            canonical_cmd.extend(["--api-key", extractor_key])
-
-        canonical_result = run_cmd(canonical_cmd, cwd=ROOT)
-        if canonical_result.returncode == 0 and canonical_path.exists():
-            try:
-                canonical_payload = json.loads(canonical_path.read_text(encoding="utf-8"))
-                generated_ctx = canonical_payload.get("generation_context")
-                if isinstance(generated_ctx, dict):
-                    product_ctx = generated_ctx
-                    product_ctx_source = "canonical_llm"
-                    (run_dir / "context" / "context_canonical.json").write_text(
-                        json.dumps(canonical_payload, ensure_ascii=False, indent=2) + "\n", encoding="utf-8"
-                    )
-                else:
-                    raise RuntimeError("Missing generation_context in canonical payload")
-            except Exception as exc:
-                (run_dir / "logs" / "canonical_context_error.txt").write_text(
-                    f"Canonical context parse failed: {exc}\nSTDOUT:\n{canonical_result.stdout}\n\nSTDERR:\n{canonical_result.stderr}",
-                    encoding="utf-8",
-                )
-                product_ctx = {}
-        else:
-            (run_dir / "logs" / "canonical_context_error.txt").write_text(
-                f"Canonical context generation failed\nSTDOUT:\n{canonical_result.stdout}\n\nSTDERR:\n{canonical_result.stderr}",
-                encoding="utf-8",
-            )
-            product_ctx = {}
-
-        if not product_ctx:
-            product_ctx_source = "extract_product_context"
-            product_ctx_result = run_cmd(
-                [
-                    "python3",
-                    "scripts/extract_product_context.py",
-                    "--product",
-                    str(product_file),
-                    "--json",
-                ],
-                cwd=ROOT,
-            )
-            product_ctx = parse_json_stdout(product_ctx_result, "extract_product_context")
-
-        write_product_context_cache(cache_key, product_ctx, product_ctx_source, canonical_payload)
+    product_ctx_source = "attached_product_master_doc"
+    extractor_model = "none"
+    (run_dir / "context" / "product_doc_source.json").write_text(
+        json.dumps(
+            {
+                "source": product_ctx_source,
+                "product_file": str(product_file),
+                "note": "Canonical extraction is disabled; the full product master doc is attached to the OpenCode copy session unchanged.",
+            },
+            ensure_ascii=False,
+            indent=2,
+        )
+        + "\n",
+        encoding="utf-8",
+    )
 
     persona_library = parse_persona_library(DEFAULT_PLAYBOOK)
     ads_context: list[dict[str, Any]] = []
@@ -4274,8 +4170,8 @@ async def api_run_execute(
         "language_mode": resolve_language_mode(cfg),
         "context_source": product_ctx_source,
         "context_extractor_model": extractor_model,
+        "product_file_path": str(product_file),
         "ads": ads_context,
-        "product_context": product_ctx,
         "banlist": banlist_payload,
     }
     (run_dir / "context" / "run_context.json").write_text(
@@ -4284,13 +4180,25 @@ async def api_run_execute(
 
     llm_mode = "opencode"
     copy_json = call_opencode_compatible(cfg, full_context, run_dir)
+    used_template_fallback = False
     if not copy_json:
         llm_mode = "fallback_template"
+        used_template_fallback = True
         (run_dir / "logs" / "opencode_fallback.txt").write_text(
             "OpenCode copy generation unavailable; using deterministic schema-compatible fallback copy.\n",
             encoding="utf-8",
         )
         copy_json = build_template_copy(full_context, run_id)
+    opencode_failures = copy_json.pop("_opencode_failures", []) if isinstance(copy_json, dict) else []
+    opencode_warnings = copy_json.pop("_opencode_warnings", []) if isinstance(copy_json, dict) else []
+    opencode_session_fallback = bool(copy_json.pop("_opencode_session_fallback", False)) if isinstance(copy_json, dict) else False
+    if opencode_failures and llm_mode == "opencode":
+        llm_mode = "opencode_partial_fallback"
+        (run_dir / "logs" / "opencode_fallback.txt").write_text(
+            "Some OpenCode ad generations failed; normalize_generated_copy filled those outputs with deterministic template copy.\n\n"
+            + "\n\n---\n\n".join(opencode_failures),
+            encoding="utf-8",
+        )
     copy_json = normalize_generated_copy(copy_json, full_context, run_id)
     copy_json = strip_internal_markers_from_payload(copy_json)
     copy_json = enforce_unique_ctas(copy_json, full_context)
@@ -4354,7 +4262,26 @@ async def api_run_execute(
 
     manifest = collect_run_result(run_dir, batch, image_generated)
     manifest["llm_mode"] = llm_mode
-    manifest["copy_source"] = "deterministic fallback template" if llm_mode == "fallback_template" else "opencode generated copy"
+    if llm_mode == "fallback_template":
+        manifest["copy_source"] = "deterministic fallback template"
+    elif llm_mode == "opencode_partial_fallback":
+        manifest["copy_source"] = f"opencode generated copy with template fallback for {len(opencode_failures)} failed ad(s)"
+    else:
+        manifest["copy_source"] = "opencode generated copy"
+    if opencode_failures:
+        manifest["copy_generation_failures"] = len(opencode_failures)
+        manifest["copy_fallback_log"] = str((run_dir / "logs" / "opencode_fallback.txt").relative_to(ROOT))
+    if used_template_fallback:
+        manifest["copy_generation_failures"] = max(int(manifest.get("copy_generation_failures") or 0), 1)
+        manifest["copy_fallback_log"] = str((run_dir / "logs" / "opencode_fallback.txt").relative_to(ROOT))
+        manifest["copy_generation_notes"] = ["OpenCode copy generation unavailable; deterministic fallback copy was used."]
+    if opencode_warnings:
+        manifest["copy_generation_warnings"] = len(opencode_warnings)
+        manifest["copy_warning_log"] = str((run_dir / "logs" / "opencode_error.txt").relative_to(ROOT))
+        manifest["copy_generation_notes"] = [str(item).splitlines()[0] for item in opencode_warnings[:3]]
+    if opencode_session_fallback:
+        manifest["copy_session_fallback"] = True
+        manifest["copy_session_log"] = str((run_dir / "logs" / "opencode_session.log").relative_to(ROOT))
     manifest["context_source"] = product_ctx_source
     manifest["context_extractor_model"] = extractor_model
     manifest["image_sources_file"] = str(image_sources_file_path)

@@ -273,7 +273,7 @@ async function fetchDefaults() {
   renderLanguageModes();
   renderHypothesisUI();
   const imageCount = (defaultData.input_images || []).length;
-  defaultsInfoEl.textContent = `Using defaults: product=${defaultData.default_files.product_info}, mechanism=${defaultData.default_files.mechanism}, faq=${defaultData.default_files.faq}, input/images=${imageCount} file(s)`;
+  defaultsInfoEl.textContent = `Using defaults: product=${defaultData.default_files.product_info}, input/images=${imageCount} file(s)`;
 
   const opencode = defaultData.opencode || {};
   modelsByProvider = opencode.models_by_provider || {};
@@ -286,29 +286,10 @@ async function fetchDefaults() {
   setSelectOptions(providerSelectEl, providers.length ? providers : [""], defaultProvider);
   renderModelOptions(defaultProvider, defaultModel);
 
-  // Server type change handler
-  document.getElementById("serverType").addEventListener("change", async (e) => {
-    currentServerType = e.target.value;
-    const apiUrlInput = document.getElementById("opencodeApiUrl");
-    
-    if (currentServerType === "blackbox") {
-      apiUrlInput.value = "http://127.0.0.1:4091";
-      try {
-        const res = await fetch("http://127.0.0.1:4091/v1/models", {
-          headers: { "Authorization": "Basic " + btoa("user:blackbox-local-pass") }
-        });
-        const data = await res.json();
-        const models = data.data || [];
-        modelsByProvider = { "blackbox": models.map(m => m.id) };
-        setSelectOptions(providerSelectEl, ["blackbox"], "blackbox");
-        setSelectOptions(modelSelectEl, models.map(m => m.id), models[0]?.id || "");
-      } catch (err) {
-        console.error("Failed to fetch Blackbox models:", err);
-      }
-    } else {
-      apiUrlInput.value = "http://127.0.0.1:4090";
-      fetchDefaults();
-    }
+  document.getElementById("serverType").addEventListener("change", () => {
+    currentServerType = "opencode";
+    document.getElementById("opencodeApiUrl").value = "http://127.0.0.1:4090";
+    fetchDefaults();
   });
 }
 
@@ -368,8 +349,6 @@ async function runPipeline() {
 
   const uploads = [
     ["product_info_file", fileInput("productFile")],
-    ["mechanism_file", fileInput("mechanismFile")],
-    ["faq_file", fileInput("faqFile")],
     ["image_source_file", fileInput("imageSourcesFile")],
   ];
 
@@ -396,7 +375,19 @@ async function runPipeline() {
     setStatus(`Failed: ${data.detail || "unknown error"}`);
     return;
   }
-  setStatus(`Done\nRun: ${data.run_id}\nBatch: ${data.batch}\nLLM mode: ${data.llm_mode}\nCopy source: ${data.copy_source || data.llm_mode}\nPrompts: ${data.prompt_files.length}\nImages: ${data.image_files.length}`);
+  const fallbackLine = data.copy_generation_failures
+    ? `\nCopy fallbacks: ${data.copy_generation_failures} failed ad(s); log: ${data.copy_fallback_log || "run logs"}`
+    : "";
+  const warningLine = data.copy_generation_warnings
+    ? `\nCopy warnings: ${data.copy_generation_warnings}; log: ${data.copy_warning_log || "run logs"}`
+    : "";
+  const sessionLine = data.copy_session_fallback
+    ? `\nSession fallback: product doc attached per request; log: ${data.copy_session_log || "run logs"}`
+    : "";
+  const noteLine = Array.isArray(data.copy_generation_notes) && data.copy_generation_notes.length
+    ? `\nNotes:\n${data.copy_generation_notes.map((note) => `- ${note}`).join("\n")}`
+    : "";
+  setStatus(`Done\nRun: ${data.run_id}\nBatch: ${data.batch}\nLLM mode: ${data.llm_mode}\nCopy source: ${data.copy_source || data.llm_mode}${fallbackLine}${warningLine}${sessionLine}${noteLine}\nPrompts: ${data.prompt_files.length}\nImages: ${data.image_files.length}`);
   await loadRuns();
 }
 

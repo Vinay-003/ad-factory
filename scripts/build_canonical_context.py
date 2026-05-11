@@ -3,11 +3,12 @@
 from __future__ import annotations
 
 import argparse
+import fcntl
 import json
 import os
 import re
 import subprocess
-import tempfile
+import time
 import urllib.request
 from datetime import datetime, timezone
 from pathlib import Path
@@ -15,6 +16,9 @@ from typing import Any
 
 
 ROOT = Path(__file__).resolve().parents[1]
+OPENCODE_MAX_CONCURRENT = 2
+OPENCODE_QUEUE_DIR = ROOT / "runtime" / "opencode_queue"
+OPENCODE_QUEUE_LOG = OPENCODE_QUEUE_DIR / "queue.log"
 
 
 def default_product_path() -> str:
@@ -68,7 +72,51 @@ def now_iso() -> str:
     return datetime.now(timezone.utc).replace(microsecond=0).isoformat().replace("+00:00", "Z")
 
 
+def _is_opencode_run_cmd(cmd: list[str]) -> bool:
+    return bool(cmd) and Path(cmd[0]).name == "opencode" and len(cmd) > 1 and cmd[1] == "run"
+
+
+def _append_opencode_queue_log(message: str) -> None:
+    try:
+        OPENCODE_QUEUE_DIR.mkdir(parents=True, exist_ok=True)
+        with OPENCODE_QUEUE_LOG.open("a", encoding="utf-8") as handle:
+            handle.write(f"{now_iso()} canonical_context {message}\n")
+    except OSError:
+        pass
+
+
+def _run_opencode_queued(cmd: list[str], cwd: Path) -> subprocess.CompletedProcess[str]:
+    OPENCODE_QUEUE_DIR.mkdir(parents=True, exist_ok=True)
+    queued_at = time.time()
+    logged_wait = False
+    while True:
+        for slot in range(OPENCODE_MAX_CONCURRENT):
+            lock_path = OPENCODE_QUEUE_DIR / f"slot_{slot}.lock"
+            lock_handle = lock_path.open("a+")
+            try:
+                fcntl.flock(lock_handle.fileno(), fcntl.LOCK_EX | fcntl.LOCK_NB)
+            except BlockingIOError:
+                lock_handle.close()
+                continue
+            wait_seconds = time.time() - queued_at
+            if wait_seconds >= 0.25:
+                _append_opencode_queue_log(f"started slot={slot} wait_seconds={wait_seconds:.1f}")
+            try:
+                return subprocess.run(cmd, cwd=str(cwd), text=True, capture_output=True, check=False)
+            finally:
+                try:
+                    fcntl.flock(lock_handle.fileno(), fcntl.LOCK_UN)
+                finally:
+                    lock_handle.close()
+        if not logged_wait:
+            _append_opencode_queue_log(f"queued max_concurrent={OPENCODE_MAX_CONCURRENT}")
+            logged_wait = True
+        time.sleep(0.25)
+
+
 def run_cmd(cmd: list[str], cwd: Path) -> subprocess.CompletedProcess[str]:
+    if _is_opencode_run_cmd(cmd):
+        return _run_opencode_queued(cmd, cwd)
     return subprocess.run(cmd, cwd=str(cwd), text=True, capture_output=True, check=False)
 
 
@@ -306,31 +354,21 @@ def main() -> int:
 
     prompt = build_prompt(product_text, mechanism_text, faq_text)
 
-    prompt_file = ""
-    try:
-        with tempfile.NamedTemporaryFile("w", encoding="utf-8", suffix=".txt", delete=False) as handle:
-            handle.write(prompt)
-            prompt_file = handle.name
-        cmd = [
-            "opencode",
-            "run",
-            "--pure",
-            "--attach",
-            args.api_url.strip(),
-            "--model",
-            args.model.strip(),
-            "--format",
-            "json",
-            "--file",
-            prompt_file,
-        ]
-        if args.api_key.strip():
-            cmd.extend(["--password", args.api_key.strip()])
-        cmd.extend(["--", "Read the attached prompt file and follow it exactly. Return only valid JSON. No markdown."])
-        result = run_cmd(cmd, cwd=ROOT)
-    finally:
-        if prompt_file:
-            Path(prompt_file).unlink(missing_ok=True)
+    cmd = [
+        "opencode",
+        "run",
+        "--pure",
+        "--attach",
+        args.api_url.strip(),
+        "--model",
+        args.model.strip(),
+        "--format",
+        "json",
+    ]
+    if args.api_key.strip():
+        cmd.extend(["--password", args.api_key.strip()])
+    cmd.extend(["--", prompt])
+    result = run_cmd(cmd, cwd=ROOT)
     raw_content = ""
     if result.returncode == 0:
         raw_content = parse_opencode_stream(result.stdout)
