@@ -1,0 +1,12 @@
+{
+  "batch": "v74",
+  "aspect_ratio": "4:5",
+  "run_id": "run_1778526777_1746",
+  "personas": [],
+  "hypothesis": {
+    "type": "proof_style",
+    "variant": "mechanism_explainer"
+  },
+  "image_files": [],
+  "generated_at": "2026-05-11T19:40:25Z"
+}

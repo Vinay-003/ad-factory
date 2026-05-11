@@ -17,9 +17,9 @@ export function buildPromptEditor(run, container) {
     loadHint.textContent = "Loading editable on-image copy...";
     fetchJSON(`/api/runs/${run.run_id}/prompt-copies`)
       .then((data) => {
-        const prompts = (data.prompts || []).filter((item) => (item.copy_lines || []).length > 0);
+        const prompts = data.prompts || [];
         if (!prompts.length) {
-          loadHint.textContent = "No editable copy block found for this run.";
+          loadHint.textContent = "No prompts found for this run.";
           loadBtn.disabled = false;
           return;
         }
@@ -233,24 +233,32 @@ function buildPromptCard(prompt, run, items) {
 
   const linesDisplay = document.createElement("div");
   linesDisplay.className = "prompt-lines-display";
-  (prompt.copy_lines || []).forEach((line) => {
-    const row = document.createElement("div");
-    row.className = "prompt-line-display";
-    const label = document.createElement("span");
-    label.className = "prompt-line-label";
-    label.textContent = line.label + ": ";
-    const value = document.createElement("span");
-    value.className = "prompt-line-value";
-    value.textContent = line.value || "(empty)";
-    row.append(label, value);
-    linesDisplay.appendChild(row);
-  });
+  const copyLines = prompt.copy_lines || [];
+  if (!copyLines.length) {
+    const empty = document.createElement("div");
+    empty.className = "hint";
+    empty.textContent = "No editable EXACT ON-IMAGE COPY block found in this prompt.";
+    linesDisplay.appendChild(empty);
+  } else {
+    copyLines.forEach((line) => {
+      const row = document.createElement("div");
+      row.className = "prompt-line-display";
+      const label = document.createElement("span");
+      label.className = "prompt-line-label";
+      label.textContent = line.label + ": ";
+      const value = document.createElement("span");
+      value.className = "prompt-line-value";
+      value.textContent = line.value || "(empty)";
+      row.append(label, value);
+      linesDisplay.appendChild(row);
+    });
+  }
   card.appendChild(linesDisplay);
 
   const editForm = document.createElement("div");
   editForm.className = "prompt-edit-form";
   editForm.style.display = "none";
-  (prompt.copy_lines || []).forEach((line) => {
+  copyLines.forEach((line) => {
     const row = document.createElement("div");
     row.className = "prompt-line";
     const label = document.createElement("label");
@@ -274,7 +282,12 @@ function buildPromptCard(prompt, run, items) {
   card.appendChild(editForm);
 
   let editing = false;
+  const hasEditableCopy = copyLines.length > 0;
+  editBtn.disabled = !hasEditableCopy;
+  editBtn.title = hasEditableCopy ? "Edit prompt text" : "No editable copy block found";
+
   editBtn.onclick = () => {
+    if (!hasEditableCopy) return;
     editing = true;
     linesDisplay.style.display = "none";
     editForm.style.display = "";

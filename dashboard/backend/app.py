@@ -1004,6 +1004,7 @@ def run_gemini_generation(
     image_sources_file: str | None,
     prompt_reference_map: Path | None = None,
     headless: bool = False,
+    run_dir: Path | None = None,
 ) -> subprocess.CompletedProcess[str]:
     aspect_folder = "9_16" if aspect_ratio == "9:16" else "4_5"
     prompt_work_dir = RUNTIME_ROOT / "gemini_selected_prompts" / f"{batch}_{aspect_folder}_{int(time.time())}_{uuid.uuid4().hex[:8]}"
@@ -1061,6 +1062,10 @@ def run_gemini_generation(
         cmd.append("--headless")
     if image_source_arg:
         cmd.extend(["--image-source-file", image_source_arg])
+    if run_dir is not None:
+        hyp_path = run_dir / "context" / "hypothesis_config.json"
+        if hyp_path.exists():
+            cmd.extend(["--hypothesis-config", str(hyp_path)])
 
     log_dir = RUNTIME_ROOT / "generation_logs"
     log_dir.mkdir(parents=True, exist_ok=True)
@@ -2398,13 +2403,20 @@ def scan_prompt_files_for_batch(batch_name: str) -> list[str]:
 
 def scan_image_files_for_batch(batch_name: str) -> list[str]:
     image_files: list[str] = []
+    seen: set[str] = set()
     for generated_root in generated_image_roots():
         image_dir = generated_root / batch_name
         if not image_dir.exists():
             continue
         for ext in ("*.png", "*.jpg", "*.jpeg", "*.webp"):
             for file in sorted(image_dir.glob(f"**/{ext}")):
-                image_files.append(str(file.relative_to(ROOT)))
+                rel = str(file.relative_to(ROOT)).replace("\\", "/")
+                if "/.browser_downloads/" in rel:
+                    continue
+                if rel in seen:
+                    continue
+                seen.add(rel)
+                image_files.append(rel)
     return image_files
 
 
@@ -2814,13 +2826,48 @@ def api_opencode_catalog() -> dict[str, Any]:
 def api_runs() -> dict[str, Any]:
     ensure_dirs()
     runs: list[dict[str, Any]] = []
+    seen_run_ids: set[str] = set()
+    seen_batches: set[str] = set()
     for run_dir in sorted(RUNS_ROOT.glob("run_*"), reverse=True):
         manifest = run_dir / "manifest.json"
         if manifest.exists():
             payload = json.loads(manifest.read_text(encoding="utf-8"))
             refreshed = refresh_manifest_file_state(run_dir, payload)
-            if refreshed.get("prompt_files"):
-                runs.append(refreshed)
+            run_id = str(refreshed.get("run_id") or run_dir.name)
+            batch = str(refreshed.get("batch") or "").strip()
+            if run_id in seen_run_ids:
+                continue
+            seen_run_ids.add(run_id)
+            if batch:
+                seen_batches.add(batch)
+            runs.append(refreshed)
+
+    # Backfill batches that exist on disk but have no run manifest
+    # (e.g., older/generated output imported from another machine).
+    output_root = ROOT / "output"
+    if output_root.exists():
+        for batch_dir in sorted(output_root.glob("v*"), reverse=True):
+            if not batch_dir.is_dir():
+                continue
+            batch_name = batch_dir.name
+            if batch_name in seen_batches:
+                continue
+            prompt_files = scan_prompt_files_for_batch(batch_name)
+            if not prompt_files:
+                continue
+            image_files = scan_image_files_for_batch(batch_name)
+            updated_at = datetime.fromtimestamp(batch_dir.stat().st_mtime, tz=timezone.utc).replace(microsecond=0).isoformat().replace("+00:00", "Z")
+            runs.append(
+                {
+                    "run_id": f"batch_{batch_name}",
+                    "batch": batch_name,
+                    "prompt_files": prompt_files,
+                    "image_files": image_files,
+                    "image_generated": bool(image_files),
+                    "updated_at": updated_at,
+                    "source": "output_backfill",
+                }
+            )
 
     def batch_sort_key(run: dict[str, Any]) -> tuple[int, float]:
         batch = str(run.get("batch") or "").strip().lower()
@@ -3583,6 +3630,7 @@ def api_run_generate_images_45(run_id: str, payload: dict[str, Any] = Body(...))
             aspect_ratio="4:5",
             image_sources_file=None,
             headless=headless,
+            run_dir=run_dir,
         )
     except RuntimeError as exc:
         raise HTTPException(status_code=400, detail=str(exc)) from exc
@@ -3691,6 +3739,7 @@ def api_run_generate_images_916_from_45(run_id: str, payload: dict[str, Any] = B
             image_sources_file=None,
             prompt_reference_map=map_path,
             headless=headless,
+            run_dir=run_dir,
         )
     except RuntimeError as exc:
         raise HTTPException(status_code=400, detail=str(exc)) from exc
@@ -3968,6 +4017,7 @@ def api_batch_generate_images_916(payload: dict[str, Any] = Body(...)) -> dict[s
                 image_sources_file=None,
                 prompt_reference_map=map_path,
                 headless=headless,
+                run_dir=run_dir,
             )
             if result.returncode != 0:
                 error_text = result.stderr or result.stdout

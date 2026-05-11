@@ -105,6 +105,7 @@ def parse_args() -> argparse.Namespace:
     parser.add_argument("--min-image-bytes", type=int, default=20_000)
     parser.add_argument("--max-attempts", type=int, default=1, help="Default 1 avoids accidental repeat tabs")
     parser.add_argument("--dry-run", action="store_true", help="Print resolved prompt jobs and exit")
+    parser.add_argument("--hypothesis-config", default="", help="Path to hypothesis config JSON (type, variant)")
 
     parser.add_argument(
         "--expected-formats",
@@ -3360,6 +3361,15 @@ def save_debug_snapshot(page: Page, base: Path, label: str) -> dict[str, str | N
 
 def run() -> None:
     args = parse_args()
+    hypothesis_config: dict[str, Any] = {}
+    if args.hypothesis_config:
+        hyp_path = Path(args.hypothesis_config).expanduser().resolve()
+        if hyp_path.exists():
+            try:
+                hypothesis_config = json.loads(hyp_path.read_text(encoding="utf-8"))
+            except Exception as exc:
+                print(f"Warning: could not read hypothesis config: {exc}")
+
     prompt_dir = Path(args.prompt_dir).expanduser().resolve()
     out_dir = Path(args.out_dir).expanduser().resolve()
     upload_dir = Path(args.upload_dir).expanduser().resolve()
@@ -3520,6 +3530,9 @@ def run() -> None:
                             "metadata_file": str(out_base.with_suffix(".json")),
                             "timestamp": int(time.time()),
                         }
+                        if hypothesis_config:
+                            metadata["hypothesis_type"] = hypothesis_config.get("type", "")
+                            metadata["hypothesis_variant"] = hypothesis_config.get("variant", "")
                         out_base.with_suffix(".json").write_text(json.dumps(metadata, indent=2), encoding="utf-8")
                         log_progress("done", f"Job {idx} SUCCESS: {saved_path} ({saved_path.stat().st_size} bytes)")
                         print(f"  SUCCESS: saved {saved_path} ({saved_path.stat().st_size} bytes)")
@@ -3566,6 +3579,9 @@ def run() -> None:
                     "timestamp": int(time.time()),
                     **diag,
                 }
+                if hypothesis_config:
+                    metadata["hypothesis_type"] = hypothesis_config.get("type", "")
+                    metadata["hypothesis_variant"] = hypothesis_config.get("variant", "")
                 out_base.with_suffix(".json").write_text(json.dumps(metadata, indent=2), encoding="utf-8")
                 results.append({"job": job.job_key, "status": "error", "error": str(last_exc)})
                 log_progress("failed", f"Job {idx} FAILED: {last_exc}")
