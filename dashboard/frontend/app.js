@@ -470,10 +470,6 @@ function renderRun(run) {
       clearBtn.type = "button";
       clearBtn.textContent = "Clear selection";
 
-      const saveBtn = document.createElement("button");
-      saveBtn.type = "button";
-      saveBtn.textContent = "Save edited copy";
-
       const exportCopyBtn = document.createElement("button");
       exportCopyBtn.type = "button";
       exportCopyBtn.textContent = "EXPORT ON-IMAGE COPY";
@@ -609,10 +605,6 @@ function renderRun(run) {
         }
       };
 
-      const generate916PromptBtn = document.createElement("button");
-      generate916PromptBtn.type = "button";
-      generate916PromptBtn.textContent = "Generate 9:16 prompts for selected";
-
       const generate45Btn = document.createElement("button");
       generate45Btn.type = "button";
       generate45Btn.textContent = "Generate 4:5 in Gemini";
@@ -624,10 +616,8 @@ function renderRun(run) {
       controls.append(
         selectAllBtn,
         clearBtn,
-        saveBtn,
         exportCopyBtn,
         importCopyBtn,
-        generate916PromptBtn,
         generate45Btn,
         generate916Btn
       );
@@ -824,76 +814,6 @@ function renderRun(run) {
         items.forEach((item) => {
           item.checkbox.checked = false;
         });
-      };
-
-      saveBtn.onclick = async () => {
-        saveBtn.disabled = true;
-        try {
-          const edits = items.map((item) => ({
-            prompt_file: item.promptFile,
-            persona_number: item.personaNumber,
-            copy_lines: item.lineInputs.map((line) => ({ label: line.label, value: line.input.value.trim() })),
-          }));
-          const res = await fetch(`/api/runs/${run.run_id}/prompt-copies`, {
-            method: "POST",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({ edits }),
-          });
-          const raw = await res.text();
-          let data = null;
-          try {
-            data = raw ? JSON.parse(raw) : {};
-          } catch {
-            setStatus(`Failed: ${raw || "save error"}`);
-            return;
-          }
-          if (!res.ok) {
-            setStatus(`Failed: ${data.detail || "save error"}`);
-            return;
-          }
-          setStatus(`Saved edited copy for ${run.run_id}. Prompt files regenerated.`);
-          await loadRuns();
-        } catch (err) {
-          setStatus(String(err));
-        } finally {
-          saveBtn.disabled = false;
-        }
-      };
-
-      generate916PromptBtn.onclick = async () => {
-        const selected = items.filter((item) => item.checkbox.checked).map((item) => item.promptFile);
-        if (!selected.length) {
-          setStatus("Select at least one 4:5 prompt.");
-          return;
-        }
-
-        generate916PromptBtn.disabled = true;
-        setStatus(`Generating 9:16 prompts for ${selected.length} selected 4:5 prompt(s) from ${run.run_id}...`);
-        try {
-          const res = await fetch(`/api/runs/${run.run_id}/generate-916-selected`, {
-            method: "POST",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({ prompt_files: selected }),
-          });
-          const raw = await res.text();
-          let data = null;
-          try {
-            data = raw ? JSON.parse(raw) : {};
-          } catch {
-            setStatus(`Failed: ${raw || "9:16 prompt generation error"}`);
-            return;
-          }
-          if (!res.ok) {
-            setStatus(`Failed: ${data.detail || "9:16 prompt generation error"}`);
-            return;
-          }
-          setStatus(`Done\nRun: ${data.run_id}\nBatch: ${data.batch}\nGenerated 9:16 prompts for selected items`);
-          await loadRuns();
-        } catch (err) {
-          setStatus(String(err));
-        } finally {
-          generate916PromptBtn.disabled = false;
-        }
       };
 
       generate45Btn.onclick = async () => {

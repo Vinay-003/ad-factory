@@ -267,81 +267,137 @@ body {
   background-position: center;
 }
 
-.batch-dropdown .dropdown-menu {
-  position: absolute;
-  top: 100%;
-  left: 0;
-  background: var(--bg-card);
-  border: 1px solid var(--border);
-  padding: 10px;
-  min-width: 220px;
-  max-height: 320px;
-  overflow-y: auto;
-  z-index: 100;
-  margin-top: 4px;
-  box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+.batch-dropdown {
+  position: relative;
 }
 
-/* Multi-column / multi-row batch selector */
+.batch-dropdown-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.batch-dropdown-btn::after {
+  content: "";
+  width: 0;
+  height: 0;
+  border-left: 5px solid transparent;
+  border-right: 5px solid transparent;
+  border-top: 5px solid var(--ink);
+  transition: transform 0.25s ease;
+}
+
+.batch-dropdown-btn[aria-expanded="true"]::after {
+  transform: rotate(180deg);
+}
+
+.batch-dropdown .dropdown-menu {
+  position: absolute;
+  top: calc(100% + 6px);
+  left: 0;
+  background: var(--surface);
+  border: 1px solid color-mix(in srgb, var(--line) 80%, var(--ink));
+  border-radius: 14px;
+  padding: 8px;
+  min-width: 260px;
+  max-height: 340px;
+  overflow-y: auto;
+  z-index: 100;
+  box-shadow: var(--shadow), 0 0 0 1px color-mix(in srgb, var(--line) 30%, transparent);
+  opacity: 1;
+  transform: translateY(0) scale(1);
+  transition: opacity 0.2s ease, transform 0.2s ease;
+}
+
+.batch-dropdown .dropdown-menu.hidden {
+  display: block;
+  opacity: 0;
+  transform: translateY(-6px) scale(0.97);
+  pointer-events: none;
+  transition: opacity 0.15s ease, transform 0.2s ease;
+}
+
 .batch-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(170px, 1fr));
-  gap: 8px 10px;
+  grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
+  gap: 6px;
 }
 
 .batch-grid-item {
   display: flex;
   align-items: center;
-  gap: 8px;
-  padding: 6px 8px;
+  gap: 10px;
+  padding: 8px 10px;
   border-radius: 10px;
-  background: color-mix(in srgb, var(--surface) 90%, var(--surface-2));
-  border: 1px solid color-mix(in srgb, var(--line) 70%, transparent);
+  background: color-mix(in srgb, var(--surface-2) 60%, transparent);
+  border: 1px solid color-mix(in srgb, var(--line) 50%, transparent);
   cursor: pointer;
   user-select: none;
+  transition: background 0.15s ease, border-color 0.15s ease, box-shadow 0.15s ease;
 }
 
 .batch-grid-item:hover {
-  border-color: color-mix(in srgb, var(--primary) 45%, var(--line));
-  box-shadow: 0 10px 18px color-mix(in srgb, var(--primary) 14%, transparent);
+  background: color-mix(in srgb, var(--primary) 12%, var(--surface));
+  border-color: color-mix(in srgb, var(--primary) 50%, var(--line));
+}
+
+.batch-grid-item:has(input:checked) {
+  background: color-mix(in srgb, var(--primary) 15%, var(--surface-2));
+  border-color: var(--primary);
+  box-shadow: 0 0 0 1px color-mix(in srgb, var(--primary) 30%, transparent);
 }
 
 .batch-grid-item input.batch-check {
+  appearance: none;
+  -webkit-appearance: none;
+  width: 18px;
+  height: 18px;
   margin: 0;
+  border: 2px solid color-mix(in srgb, var(--line) 75%, var(--ink));
+  border-radius: 5px;
+  background: var(--surface);
+  cursor: pointer;
+  flex-shrink: 0;
+  transition: all 0.15s ease;
+  position: relative;
 }
 
-/* Ensure grid label text is readable */
+.batch-grid-item input.batch-check:checked {
+  background: var(--primary);
+  border-color: var(--primary);
+}
+
+.batch-grid-item input.batch-check:checked::after {
+  content: "";
+  position: absolute;
+  left: 4.5px;
+  top: 1.5px;
+  width: 5px;
+  height: 9px;
+  border: solid #fff;
+  border-width: 0 2px 2px 0;
+  transform: rotate(45deg);
+}
+
 .batch-grid-item .batch-label {
   font-size: 13px;
-  font-weight: 700;
+  font-weight: 600;
   color: var(--ink);
+  line-height: 1.3;
 }
 
-.batch-dropdown .dropdown-menu.hidden {
-  display: none;
+.batch-dropdown .dropdown-menu::-webkit-scrollbar {
+  width: 5px;
+}
+.batch-dropdown .dropdown-menu::-webkit-scrollbar-thumb {
+  background: color-mix(in srgb, var(--line) 50%, transparent);
+  border-radius: 4px;
 }
 
 .carousel-controls {
   display: inline-flex;
   align-items: center;
   gap: 8px;
-}
-
-.dropdown-menu {
-  position: absolute;
-  top: 100%;
-  left: 0;
-  background: var(--bg-card);
-  border: 1px solid var(--border);
-  padding: 8px;
-  max-height: 200px;
-  overflow-y: auto;
-  z-index: 100;
-  margin-top: 4px;
-}
-
-.dropdown-menu.hidden {
-  display: none;
 }
 
 .carousel-btn {
@@ -648,20 +704,6 @@ button:hover {
   color: var(--muted);
   font-size: 12px;
   line-height: 1.45;
-}
-
-.dropdown-menu {
-  position: absolute;
-  background: var(--bg-card);
-  border: 1px solid var(--border);
-  padding: 8px;
-  max-height: 200px;
-  overflow-y: auto;
-  z-index: 100;
-}
-
-.dropdown-menu.hidden {
-  display: none;
 }
 
 .card-hypothesis {
@@ -979,12 +1021,6 @@ button:hover {
   display: inline-flex;
   gap: 4px;
   margin-left: auto;
-  opacity: 0;
-  transition: opacity 0.2s ease;
-}
-
-.prompt-editor-top:hover .prompt-inline-controls {
-  opacity: 1;
 }
 
 .prompt-edit-btn,
