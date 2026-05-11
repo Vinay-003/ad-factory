@@ -89,7 +89,8 @@ def parse_args() -> argparse.Namespace:
         help="Prompt glob. Use 'FINAL_HERO_P*_EN.txt' for HERO only.",
     )
     parser.add_argument("--image-source-file", default="")
-    parser.add_argument("--upload-dir", default="/home/mylappy/Downloads/Untitled design")
+    parser.add_argument("--upload-dir", default=str(Path.home() / "myspace/info/input/images"),
+                        help="Directory containing reference images to upload")
     parser.add_argument("--logo-key", default="LIGHT_LOGO_URL")
     parser.add_argument("--out-dir", required=True)
     parser.add_argument("--timeout", type=int, default=420, help="Generation timeout per prompt")

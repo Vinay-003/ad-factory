@@ -6,6 +6,7 @@ import json
 import os
 import random
 import re
+import signal
 import subprocess
 import sys
 import tempfile
@@ -15,6 +16,7 @@ import hashlib
 import mimetypes
 import uuid
 import urllib.request
+import psutil
 from datetime import datetime, timezone
 from pathlib import Path
 from typing import Any
@@ -38,7 +40,6 @@ PRODUCT_CONTEXT_CACHE = RUNTIME_ROOT / "product_context_cache.json"
 LEGACY_ACTIVE_IMAGES_FILE = ROOT / "input" / "activeimages.txt"
 INPUT_IMAGES_DIR = ROOT / "input" / "images"
 GENERATED_IMAGES_ROOT = ROOT / "generated_images"
-LEGACY_GENERATED_IMAGE_ROOT = ROOT / "generated_image"
 
 
 FORMATS = ["HERO", "BA", "TEST", "FEAT", "UGC"]
@@ -805,15 +806,13 @@ def run_cmd(cmd: list[str], cwd: Path) -> subprocess.CompletedProcess[str]:
 
 
 def generated_image_roots() -> list[Path]:
-    return [GENERATED_IMAGES_ROOT, LEGACY_GENERATED_IMAGE_ROOT]
+    return [GENERATED_IMAGES_ROOT]
 
 
 def image_static_route_for_path(path: str) -> str:
     normalized = path.replace("\\", "/")
     if normalized.startswith("generated_images/"):
         return f"/generated_images/{normalized.removeprefix('generated_images/')}"
-    if normalized.startswith("generated_image/"):
-        return f"/generated_image/{normalized.removeprefix('generated_image/')}"
     return f"/generated_images/{normalized}"
 
 
@@ -871,7 +870,7 @@ def run_gemini_generation(
         combined = f"{starting_prompt}\n\n{prompt_text.strip()}\n" if starting_prompt else prompt_text
         (prompt_work_dir / source.name).write_text(combined, encoding="utf-8")
 
-    out_dir = LEGACY_GENERATED_IMAGE_ROOT / batch / f"GEMINI_{aspect_folder}"
+    out_dir = GENERATED_IMAGES_ROOT / batch / f"GEMINI_{aspect_folder}"
     image_source_arg = image_sources_file
     if prompt_reference_map is not None:
         try:
@@ -970,7 +969,7 @@ def upload_image_to_cloudinary(image_path: Path, cloud_name: str, api_key: str, 
 
 
 def load_batch_image_summary(batch: str) -> list[dict[str, Any]]:
-    summary_path = LEGACY_GENERATED_IMAGE_ROOT / batch / "batch_run_summary.json"
+    summary_path = GENERATED_IMAGES_ROOT / batch / "batch_run_summary.json"
     if not summary_path.exists():
         jobs_by_prompt: dict[str, dict[str, Any]] = {}
         for generated_root in generated_image_roots():
@@ -2350,10 +2349,11 @@ def collect_run_result(run_dir: Path, batch_name: str, image_generated: bool) ->
     if image_generated:
         for generated_root in generated_image_roots():
             image_dir = generated_root / batch_name
-            if image_dir.exists():
-                for ext in ("*.png", "*.jpg", "*.jpeg", "*.webp"):
-                    for file in sorted(image_dir.glob(f"**/{ext}")):
-                        image_files.append(str(file.relative_to(ROOT)))
+            if not image_dir.exists():
+                continue
+            for ext in ("*.png", "*.jpg", "*.jpeg", "*.webp"):
+                for file in sorted(image_dir.glob(f"**/{ext}")):
+                    image_files.append(str(file.relative_to(ROOT)))
 
     result = {
         "run_id": run_dir.name,
@@ -2365,6 +2365,57 @@ def collect_run_result(run_dir: Path, batch_name: str, image_generated: bool) ->
     }
     (run_dir / "manifest.json").write_text(json.dumps(result, ensure_ascii=False, indent=2) + "\n", encoding="utf-8")
     return result
+
+
+def _collect_aspect_ratio_images(batch_name: str, aspect_ratio: str) -> list[str]:
+    """Collect generated image paths for a specific aspect ratio.
+
+    Searches both legacy and new unified output roots, looking under
+    generated_images/{batch}/GEMINI_{aspect}/ for image files recursively.
+    """
+    aspect_folder = "GEMINI_4_5" if aspect_ratio == "4:5" else "GEMINI_9_16"
+    image_files: list[str] = []
+    for generated_root in generated_image_roots():
+        image_dir = generated_root / batch_name / aspect_folder
+        if not image_dir.exists():
+            continue
+        for ext in ("*.png", "*.jpg", "*.jpeg", "*.webp"):
+            for file in sorted(image_dir.glob(f"**/{ext}")):
+                image_files.append(str(file.relative_to(ROOT)))
+    return image_files
+
+
+def _write_generation_metadata(run_dir: Path, batch: str, aspect_ratio: str,
+                                manifest: dict[str, Any]) -> None:
+    """Write generation_metadata.json alongside generated images with persona,
+    format, hypothesis and run-level context."""
+    aspect_folder = "GEMINI_4_5" if aspect_ratio == "4:5" else "GEMINI_9_16"
+    meta_dir = GENERATED_IMAGES_ROOT / batch / aspect_folder / "generated images"
+    meta_dir.mkdir(parents=True, exist_ok=True)
+    meta_path = meta_dir / "generation_metadata.json"
+
+    # Load hypothesis config if it exists
+    hypothesis_cfg: dict[str, Any] = {}
+    hyp_path = run_dir / "context" / "hypothesis_config.json"
+    if hyp_path.exists():
+        try:
+            hypothesis_cfg = json.loads(hyp_path.read_text(encoding="utf-8"))
+        except Exception:
+            pass
+
+    metadata = {
+        "batch": batch,
+        "aspect_ratio": aspect_ratio,
+        "run_id": run_dir.name,
+        "personas": manifest.get("prompt_files", []),
+        "hypothesis": hypothesis_cfg,
+        "image_files": sorted(
+            p for p in manifest.get("image_files", [])
+            if f"/{aspect_folder}/" in p
+        ),
+        "generated_at": now_iso(),
+    }
+    meta_path.write_text(json.dumps(metadata, ensure_ascii=False, indent=2) + "\n", encoding="utf-8")
 
 
 def scan_prompt_files_for_batch(batch_name: str) -> list[str]:
@@ -3082,16 +3133,22 @@ def _replace_exact_copy_block(prompt_text: str, new_block_text: str) -> str | No
     return (prompt_text[:start_idx] + new_block_text + prompt_text[end_idx:])
 
 
-def _load_run_prompt_files(run_id: str) -> list[str]:
+def _load_run_prompt_files(run_id: str, aspect_ratios: list[str] | None = None) -> list[str]:
     run_dir = RUNS_ROOT / run_id
     manifest_path = run_dir / "manifest.json"
     if not manifest_path.exists():
         raise HTTPException(status_code=404, detail="Run not found")
     manifest = json.loads(manifest_path.read_text(encoding="utf-8"))
     prompt_files_all = manifest.get("prompt_files") or []
-    # Export only 4:5 prompt copies (align with existing editor/generation selection)
-    prompt_files = [path for path in prompt_files_all if "/45/" in str(path)] or prompt_files_all
-    return prompt_files
+    if not aspect_ratios:
+        return prompt_files_all
+    result: list[str] = []
+    for p in prompt_files_all:
+        for ar in aspect_ratios:
+            if f"/{ar}/" in str(p):
+                result.append(p)
+                break
+    return result or prompt_files_all
 
 
 def _extract_prompt_row_metadata(run_id: str, copy_batch: dict[str, Any], prompt_rel_path: str, batch_vn: str = "") -> dict[str, Any]:
@@ -3582,6 +3639,11 @@ def api_run_generate_images_45(run_id: str, payload: dict[str, Any] = Body(...))
     refreshed = collect_run_result(run_dir, batch, True)
     refreshed["generated_images_for_prompts_45"] = selected_45
     merged = merge_manifest(run_dir, manifest, refreshed)
+    # Write generation metadata for 4:5 images
+    try:
+        _write_generation_metadata(run_dir, batch, "4:5", merged)
+    except Exception:
+        pass
     return merged
 
 
@@ -3604,33 +3666,59 @@ def api_run_generate_images_916_from_45(run_id: str, payload: dict[str, Any] = B
     if not selected_45:
         raise HTTPException(status_code=400, detail="No valid 4:5 prompt files for 9:16 generation")
 
+    # Use image summary to map 4:5 prompt files to their generated image paths
+    image_summary = load_batch_image_summary(batch)
+    prompt_to_images: dict[str, list[str]] = {}
+    for entry in image_summary:
+        pf = entry.get("prompt_file") or ""
+        saved = entry.get("saved_files") or []
+        if pf and saved:
+            prompt_to_images[pf] = saved
+
+    # Build mapping: 9:16 prompt path -> [reference image paths]
     prompt_reference_map: dict[str, list[str]] = {}
     for pf in selected_45:
         rel_45 = str(pf).replace("\\", "/")
-        fmt_dir = "4_5"
-        parts = rel_45.rsplit("/", 1)
-        if len(parts) >= 2:
-            fmt_dir = parts[-2] if parts[-2] in ("4_5", "9_16") else fmt_dir
-            pf_stem = parts[-1]
-        else:
-            pf_stem = rel_45
 
-        fmt_prefix = rel_45.split("/output/")[-1].split("/")[0] if "/output/" in rel_45 else "output"
-        pf_stem_base = Path(pf_stem).stem
-        prompt_96 = f"output/{fmt_prefix}/{pf_stem_base.replace('_45_', '_916_').replace('_4_5_', '_9_16_')}.txt"
+        # Parse format and persona number from the 4:5 prompt filename
+        parsed = parse_prompt_filename(rel_45)
+        if not parsed:
+            continue
+        fmt, lang, persona_num = parsed
 
-        gen_dir = LEGACY_GENERATED_IMAGE_ROOT / batch / "GEMINI_4_5"
-        saved_files = sorted(gen_dir.glob(f"*{Path(pf).stem}*.png")) or sorted(gen_dir.glob(f"*{Path(pf).stem}*.jpg"))
-        if not saved_files:
-            gen_dir2 = GENERATED_IMAGES_ROOT / batch / "GEMINI_4_5"
-            saved_files = sorted(gen_dir2.glob(f"*{Path(pf).stem}*.png")) or sorted(gen_dir2.glob(f"*{Path(pf).stem}*.jpg"))
-        if not saved_files:
+        # Find existing 9:16 prompt file created by generate_ads.py (via generate-916 endpoint).
+        # It lives at output/{batch}/96/OUTPUT_{FMT}_P{persona}_{lang}.txt
+        pf_filename = f"OUTPUT_{fmt}_P{persona_num:02d}_{lang}.txt"
+        prompt_96 = f"output/{batch}/96/{pf_filename}"
+        prompt_96_path = ROOT / prompt_96
+        if not prompt_96_path.exists():
             continue
-        image_rel = str(saved_files[0]).strip().replace("\\", "/")
-        image_path = ROOT / image_rel
-        if not image_path.exists() or not image_path.is_file():
+
+        # Find the 4:5 generated image(s) for this prompt via image summary
+        image_sources = prompt_to_images.get(rel_45, [])
+        if not image_sources:
+            # Fallback: search recursively in both image roots under GEMINI_4_5
+            gemini_name = f"gemini-{fmt.lower()}-p{persona_num:02d}"
+            for img_root in generated_image_roots():
+                gemini_dir = img_root / batch / "GEMINI_4_5"
+                if not gemini_dir.exists():
+                    continue
+                for ext in ("*.png", "*.jpg", "*.jpeg", "*.webp"):
+                    for f in sorted(gemini_dir.glob(f"**/{gemini_name}*.{ext.lstrip('*')}")):
+                        rel = str(f.relative_to(ROOT))
+                        if rel not in image_sources:
+                            image_sources.append(rel)
+                        break
+                    if image_sources:
+                        break
+                if image_sources:
+                    break
+
+        if not image_sources:
             continue
-        prompt_reference_map[prompt_96] = [str(image_path)]
+
+        # Resolve to absolute paths for the reference map
+        prompt_reference_map[prompt_96] = [str(ROOT / img) for img in image_sources]
 
     if not prompt_reference_map:
         raise HTTPException(status_code=400, detail="Could not build 9:16 reference images from selected 4:5 outputs")
@@ -3660,6 +3748,11 @@ def api_run_generate_images_916_from_45(run_id: str, payload: dict[str, Any] = B
     refreshed["generated_images_for_prompts_916"] = sorted(prompt_reference_map.keys())
     refreshed["reference_images_916"] = prompt_reference_map
     merged = merge_manifest(run_dir, manifest, refreshed)
+    # Write generation metadata for 9:16 images
+    try:
+        _write_generation_metadata(run_dir, batch, "9:16", merged)
+    except Exception:
+        pass
     return merged
 
 
@@ -3716,7 +3809,9 @@ def api_batch_generate_images_45(payload: dict[str, Any] = Body(...)) -> dict[st
         dest.write_text(combined, encoding="utf-8")
         prompt_files_created.append(str(dest))
     headless = bool(payload.get("headless", False))
-    out_dir = LEGACY_GENERATED_IMAGE_ROOT / batch_str / "GEMINI_4_5"
+    out_dir = GENERATED_IMAGES_ROOT / batch_str / "GEMINI_4_5"
+    out_dir.mkdir(parents=True, exist_ok=True)
+    # Keep single output path (new unified location only)
     cmd = [
         sys.executable,
         "scripts/gemini_web_automation.py",
@@ -3739,13 +3834,215 @@ def api_batch_generate_images_45(payload: dict[str, Any] = Body(...)) -> dict[st
     result = run_cmd(cmd, cwd=ROOT)
     if result.returncode != 0:
         error_text = result.stderr or result.stdout
-        raise HTTPException(status_code=500, detail=f"Batch 9:16 generation failed: {error_text[:500]}")
+        raise HTTPException(status_code=500, detail=f"Batch 4:5 generation failed: {error_text[:500]}")
+
+    # Write generation metadata
+    try:
+        _write_generation_metadata(
+            RUNS_ROOT / run_ids[0] if run_ids else RUNTIME_ROOT,
+            batch_str, "4:5", {"batch": batch_str, "prompt_count": len(prompt_files_created)}
+        )
+    except Exception:
+        pass
 
     return {
         "status": "completed",
         "batch_key": batch_str,
         "total_prompts": len(prompt_files_created),
         "run_count": len(run_ids),
+    }
+
+
+def _resolve_916_generation_for_run(run_dir: Path, manifest: dict[str, Any]) -> list[dict[str, Any]]:
+    """For a single run, build the list of {prompt_96, image_sources} entries for 9:16 generation.
+
+    Checks manifest for existing 9:16 prompt files, falls back to deriving from 4:5 prompts.
+    Uses load_batch_image_summary to find existing 4:5 images as references.
+    """
+    batch = (manifest.get("batch") or "").strip()
+    if not batch:
+        return []
+
+    prompt_files_all = manifest.get("prompt_files") or []
+
+    # First try to use existing 9:16 prompt files from the manifest
+    prompt_files_96 = [p for p in prompt_files_all if "/96/" in str(p)]
+
+    if prompt_files_96:
+        # We have 9:16 prompts already; find their corresponding 4:5 images
+        image_summary = load_batch_image_summary(batch)
+        prompt_to_images: dict[str, list[str]] = {}
+        for entry in image_summary:
+            pf = entry.get("prompt_file") or ""
+            saved = entry.get("saved_files") or []
+            if pf and saved:
+                prompt_to_images[pf] = saved
+
+        entries: list[dict[str, Any]] = []
+        for pf96 in prompt_files_96:
+            rel_96 = str(pf96).replace("\\", "/")
+            parsed = parse_prompt_filename(rel_96)
+            if not parsed:
+                continue
+            fmt, lang, persona_num = parsed
+
+            # Look for 4:5 image by matching format+persona
+            gemini_name = f"gemini-{fmt.lower()}-p{persona_num:02d}"
+            image_sources: list[str] = []
+            for pf45, imgs in prompt_to_images.items():
+                if f"OUTPUT_{fmt}_P{persona_num:02d}" in str(pf45).upper():
+                    image_sources = list(imgs)
+                    break
+
+            # Fallback: search image roots directly for the 4:5 image
+            if not image_sources:
+                for img_root in generated_image_roots():
+                    gemini_dir = img_root / batch / "GEMINI_4_5"
+                    if not gemini_dir.exists():
+                        continue
+                    for ext in ("png", "jpg", "jpeg", "webp"):
+                        for f in sorted(gemini_dir.glob(f"**/{gemini_name}*.{ext}")):
+                            rel = str(f.relative_to(ROOT))
+                            if rel not in image_sources:
+                                image_sources.append(rel)
+                        if image_sources:
+                            break
+                    if image_sources:
+                        break
+
+            if not image_sources:
+                continue
+
+            pf96_path = f"output/{batch}/96/{Path(pf96).name}"
+            entries.append({
+                "prompt_96": pf96_path,
+                "image_sources": image_sources,
+            })
+        return entries
+
+    # Fallback: derive 9:16 prompts from 4:5 prompts (if 96 outputs exist on disk)
+    prompt_files_45 = [p for p in prompt_files_all if "/45/" in str(p)]
+    image_summary = load_batch_image_summary(batch)
+    prompt_to_images: dict[str, list[str]] = {}
+    for entry in image_summary:
+        pf = entry.get("prompt_file") or ""
+        saved = entry.get("saved_files") or []
+        if pf and saved:
+            prompt_to_images[pf] = saved
+
+    entries = []
+    for pf in prompt_files_45:
+        rel_45 = str(pf).replace("\\", "/")
+        parsed = parse_prompt_filename(rel_45)
+        if not parsed:
+            continue
+        fmt, lang, persona_num = parsed
+
+        # 9:16 prompt expected at output/{batch}/96/
+        pf_filename = f"OUTPUT_{fmt}_P{persona_num:02d}_{lang}.txt"
+        prompt_96 = f"output/{batch}/96/{pf_filename}"
+        prompt_96_path = ROOT / prompt_96
+        if not prompt_96_path.exists():
+            continue
+
+        image_sources = list(prompt_to_images.get(rel_45, []))
+
+        # Fallback: search image roots directly
+        if not image_sources:
+            gemini_name = f"gemini-{fmt.lower()}-p{persona_num:02d}"
+            for img_root in generated_image_roots():
+                gemini_dir = img_root / batch / "GEMINI_4_5"
+                if not gemini_dir.exists():
+                    continue
+                for ext in ("png", "jpg", "jpeg", "webp"):
+                    for f in sorted(gemini_dir.glob(f"**/{gemini_name}*.{ext}")):
+                        rel = str(f.relative_to(ROOT))
+                        if rel not in image_sources:
+                            image_sources.append(rel)
+                        break
+                    if image_sources:
+                        break
+                if image_sources:
+                    break
+
+        if not image_sources:
+            continue
+
+        entries.append({
+            "prompt_96": prompt_96,
+            "image_sources": image_sources,
+        })
+
+    return entries
+
+
+@app.post("/api/batch/generate-images-916")
+def api_batch_generate_images_916(payload: dict[str, Any] = Body(...)) -> dict[str, Any]:
+    run_ids = payload.get("run_ids")
+    if not isinstance(run_ids, list) or not run_ids:
+        raise HTTPException(status_code=400, detail="run_ids must be a non-empty array")
+
+    headless = bool(payload.get("headless", False))
+    all_entries: list[dict[str, Any]] = []
+    run_count = 0
+
+    for run_id in run_ids:
+        run_dir = RUNS_ROOT / run_id
+        manifest_path = run_dir / "manifest.json"
+        if not manifest_path.exists():
+            continue
+        manifest = json.loads(manifest_path.read_text(encoding="utf-8"))
+
+        entries = _resolve_916_generation_for_run(run_dir, manifest)
+        if not entries:
+            continue
+
+        batch = str(manifest.get("batch") or "").strip()
+        prompt_reference_map: dict[str, list[str]] = {}
+        for e in entries:
+            prompt_reference_map[e["prompt_96"]] = e["image_sources"]
+
+        map_path = run_dir / "context" / "prompt_reference_map_916.json"
+        map_path.write_text(json.dumps(prompt_reference_map, ensure_ascii=False, indent=2) + "\n", encoding="utf-8")
+
+        try:
+            result = run_gemini_generation(
+                batch=batch,
+                prompt_files=sorted(prompt_reference_map.keys()),
+                aspect_ratio="9:16",
+                image_sources_file=None,
+                prompt_reference_map=map_path,
+                headless=headless,
+            )
+            if result.returncode != 0:
+                error_text = result.stderr or result.stdout
+                (run_dir / "logs" / "image_generation_916_error.txt").write_text(error_text, encoding="utf-8")
+                short_error = "\n".join([line for line in error_text.splitlines() if line.strip()][-12:])
+                # Continue to next run instead of failing everything
+                continue
+
+            refreshed = collect_run_result(run_dir, batch, True)
+            refreshed["generated_images_for_prompts_916"] = sorted(prompt_reference_map.keys())
+            refreshed["reference_images_916"] = prompt_reference_map
+            merge_manifest(run_dir, manifest, refreshed)
+            run_count += 1
+            # Write generation metadata for this run's 9:16 images
+            try:
+                _write_generation_metadata(run_dir, batch, "9:16", refreshed)
+            except Exception:
+                pass
+        except Exception:
+            continue
+
+        all_entries.extend(entries)
+
+    if not all_entries:
+        raise HTTPException(status_code=400, detail="No 9:16 images could be generated for any run")
+
+    return {
+        "status": "completed",
+        "total_prompts": len(all_entries),
+        "run_count": run_count,
     }
 
 
@@ -4067,10 +4364,151 @@ async def api_run_execute(
     return manifest
 
 
+# Chrome process tracking
+_chrome_process: subprocess.Popen | None = None
+
+
+@app.post("/api/launch-visible-browser")
+def api_launch_visible_browser() -> dict[str, Any]:
+    """Launch a visible Chrome instance with CDP enabled so the user can log in
+    before automation begins."""
+    global _chrome_process
+
+    chrome_bin = None
+    for candidate in [
+        "/usr/bin/google-chrome",
+        "/usr/bin/google-chrome-stable",
+    ]:
+        if Path(candidate).exists():
+            chrome_bin = candidate
+            break
+
+    if not chrome_bin:
+        raise HTTPException(status_code=500, detail="Chrome binary not found on system")
+
+    cmd = [
+        chrome_bin,
+        "--remote-debugging-port=9222",
+        f"--user-data-dir={os.path.expandvars('$HOME')}/.config/google-chrome-gemini-cdp",
+        "--no-first-run",
+        "--no-default-browser-check",
+    ]
+    _chrome_process = subprocess.Popen(cmd, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
+    time.sleep(2)
+
+    for attempt in range(10):
+        try:
+            resp = urllib.request.urlopen("http://127.0.0.1:9222/json/version", timeout=2)
+            if resp.status == 200:
+                return {
+                    "status": "launched",
+                    "cdp_url": "http://127.0.0.1:9222",
+                    "message": "Chrome launched. Log in, then trigger generation.",
+                }
+        except Exception:
+            time.sleep(1)
+
+    raise HTTPException(status_code=500, detail="Chrome launched but CDP not responding on port 9222")
+
+
+@app.post("/api/kill-chrome")
+def api_kill_chrome() -> dict[str, Any]:
+    """Kill the Chrome process started by launch-visible-browser and stop any running automation."""
+    global _chrome_process
+    killed = False
+    if _chrome_process and _chrome_process.poll() is None:
+        try:
+            _chrome_process.terminate()
+            try:
+                _chrome_process.wait(timeout=5)
+            except subprocess.TimeoutExpired:
+                _chrome_process.kill()
+                _chrome_process.wait(timeout=3)
+            killed = True
+        except Exception:
+            pass
+        _chrome_process = None
+
+    # Also kill any running gemini automation processes
+    gemini_killed = 0
+    for proc in psutil.process_iter(["pid", "name", "cmdline"]):
+        try:
+            cmdline = proc.info.get("cmdline") or []
+            if any("gemini_web_automation" in c for c in cmdline):
+                proc.kill()
+                gemini_killed += 1
+        except Exception:
+            continue
+
+    return {"status": "killed", "chrome": killed, "gemini_processes": gemini_killed}
+
+
+@app.post("/api/runs/{run_id}/edit-prompt")
+def api_edit_prompt(run_id: str, payload: dict[str, Any] = Body(...)) -> dict[str, Any]:
+    """Edit a prompt file in-place."""
+    run_dir = RUNS_ROOT / run_id
+    prompt_path = payload.get("prompt_file", "")
+    new_text = payload.get("text", "")
+    if not prompt_path or not new_text:
+        raise HTTPException(status_code=400, detail="prompt_file and text are required")
+
+    full_path = ROOT / prompt_path
+    if not full_path.exists():
+        raise HTTPException(status_code=404, detail="Prompt file not found")
+
+    full_path.write_text(new_text, encoding="utf-8")
+    return {"status": "saved", "prompt_file": prompt_path}
+
+
+@app.post("/api/runs/{run_id}/delete-prompt")
+def api_delete_prompt(run_id: str, payload: dict[str, Any] = Body(...)) -> dict[str, Any]:
+    """Delete a prompt file and remove it from the run manifest."""
+    run_dir = RUNS_ROOT / run_id
+    manifest_path = run_dir / "manifest.json"
+    prompt_path = payload.get("prompt_file", "")
+    if not prompt_path:
+        raise HTTPException(status_code=400, detail="prompt_file is required")
+
+    full_path = ROOT / prompt_path
+    if full_path.exists():
+        full_path.unlink()
+
+    if manifest_path.exists():
+        manifest = json.loads(manifest_path.read_text(encoding="utf-8"))
+        manifest["prompt_files"] = [p for p in manifest.get("prompt_files", []) if p != prompt_path]
+        manifest_path.write_text(json.dumps(manifest, ensure_ascii=False, indent=2) + "\n", encoding="utf-8")
+
+    return {"status": "deleted", "prompt_file": prompt_path}
+
+
+@app.post("/api/runs/{run_id}/delete-image")
+def api_delete_image(run_id: str, payload: dict[str, Any] = Body(...)) -> dict[str, Any]:
+    """Delete a generated image and its metadata JSON."""
+    run_dir = RUNS_ROOT / run_id
+    manifest_path = run_dir / "manifest.json"
+    image_path = payload.get("image_file", "")
+    if not image_path:
+        raise HTTPException(status_code=400, detail="image_file is required")
+
+    full_path = ROOT / image_path
+    if full_path.exists():
+        full_path.unlink()
+
+    # Also delete companion JSON metadata if it exists
+    json_path = full_path.with_suffix(".json")
+    if json_path.exists():
+        json_path.unlink()
+
+    if manifest_path.exists():
+        manifest = json.loads(manifest_path.read_text(encoding="utf-8"))
+        manifest["image_files"] = [p for p in manifest.get("image_files", []) if p != image_path]
+        manifest_path.write_text(json.dumps(manifest, ensure_ascii=False, indent=2) + "\n", encoding="utf-8")
+
+    return {"status": "deleted", "image_file": image_path}
+
+
 app.mount("/storage", StaticFiles(directory=str(STORAGE_ROOT)), name="storage")
 app.mount("/output", StaticFiles(directory=str(ROOT / "output")), name="output")
 GENERATED_IMAGES_ROOT.mkdir(parents=True, exist_ok=True)
-LEGACY_GENERATED_IMAGE_ROOT.mkdir(parents=True, exist_ok=True)
 app.mount("/generated_images", StaticFiles(directory=str(GENERATED_IMAGES_ROOT)), name="generated_images")
-app.mount("/generated_image", StaticFiles(directory=str(LEGACY_GENERATED_IMAGE_ROOT)), name="generated_image")
 app.mount("/", StaticFiles(directory=str(ROOT / "dashboard" / "frontend"), html=True), name="frontend")

@@ -307,6 +307,33 @@ function fileInput(id) {
   return document.getElementById(id);
 }
 
+// ── Chrome launch/kill ───────────────────────────────────────────────────────
+
+function showChromeKillButton() {
+  const btn = document.getElementById("killChrome");
+  if (btn) btn.style.display = "";
+}
+
+function hideChromeKillButton() {
+  const btn = document.getElementById("killChrome");
+  if (btn) btn.style.display = "none";
+}
+
+async function killChrome() {
+  try {
+    const res = await fetch(`/api/kill-chrome`, { method: "POST" });
+    const data = await res.json();
+    if (!res.ok) {
+      setStatus(`Kill failed: ${data.detail || "unknown error"}`);
+      return;
+    }
+    hideChromeKillButton();
+    setStatus(`Chrome killed. Chrome: ${data.chrome}, Gemini: ${data.gemini_processes}`);
+  } catch (err) {
+    setStatus(`Kill error: ${String(err)}`);
+  }
+}
+
 async function runPipeline() {
   const selectedPersonas = getPersonaSelection();
   if (!selectedPersonas.length) {
@@ -376,6 +403,7 @@ function renderRun(run) {
   llm.textContent = `Updated: ${run.updated_at || "-"}`;
   div.appendChild(llm);
 
+  // ── Prompt files list (read-only links) ────────────────────────────────
   if (run.prompt_files && run.prompt_files.length) {
     const p = document.createElement("div");
     p.innerHTML = `<strong>Prompt files</strong>`;
@@ -390,6 +418,7 @@ function renderRun(run) {
     });
   }
 
+  // ── Prompt actions (load, generate, export, import) ────────────────────
   const promptActions = document.createElement("div");
   promptActions.className = "prompt-actions";
   const loadBtn = document.createElement("button");
@@ -605,33 +634,175 @@ function renderRun(run) {
         const card = document.createElement("div");
         card.className = "prompt-editor";
 
+        // Top row: checkbox, filename link, edit toggle, delete button
         const top = document.createElement("div");
         top.className = "prompt-editor-top";
         const checkbox = document.createElement("input");
         checkbox.type = "checkbox";
         checkbox.checked = true;
+
+        // Filename link (view source)
         const link = document.createElement("a");
         link.href = prompt.review_url;
         link.target = "_blank";
         link.textContent = prompt.prompt_file;
-        top.append(checkbox, link);
+
+        // Inline edit/delete controls
+        const inlineControls = document.createElement("span");
+        inlineControls.className = "prompt-inline-controls";
+
+        const editBtn = document.createElement("button");
+        editBtn.type = "button";
+        editBtn.className = "ghost-btn prompt-edit-btn";
+        editBtn.textContent = "✏️";
+        editBtn.title = "Edit prompt text";
+
+        const deleteBtn = document.createElement("button");
+        deleteBtn.type = "button";
+        deleteBtn.className = "ghost-btn prompt-delete-btn";
+        deleteBtn.textContent = "🗑️";
+        deleteBtn.title = "Delete prompt file";
+
+        inlineControls.append(editBtn, deleteBtn);
+        top.append(checkbox, link, inlineControls);
         card.appendChild(top);
 
-        const lineInputs = [];
+        // Lines display (default view)
+        const linesDisplay = document.createElement("div");
+        linesDisplay.className = "prompt-lines-display";
+        (prompt.copy_lines || []).forEach((line) => {
+          const row = document.createElement("div");
+          row.className = "prompt-line-display";
+          const label = document.createElement("span");
+          label.className = "prompt-line-label";
+          label.textContent = line.label + ": ";
+          const value = document.createElement("span");
+          value.className = "prompt-line-value";
+          value.textContent = line.value || "(empty)";
+          row.append(label, value);
+          linesDisplay.appendChild(row);
+        });
+        card.appendChild(linesDisplay);
+
+        // Inline edit mode (textarea) — hidden by default
+        const editForm = document.createElement("div");
+        editForm.className = "prompt-edit-form";
+        editForm.style.display = "none";
         (prompt.copy_lines || []).forEach((line) => {
           const row = document.createElement("div");
           row.className = "prompt-line";
           const label = document.createElement("label");
           label.textContent = line.label;
-          const input = document.createElement("input");
-          input.type = "text";
-          input.value = line.value || "";
-          row.append(label, input);
-          card.appendChild(row);
-          lineInputs.push({ label: line.label, input });
+          const textarea = document.createElement("textarea");
+          textarea.value = line.value || "";
+          textarea.rows = 2;
+          row.append(label, textarea);
+          editForm.appendChild(row);
         });
 
-        items.push({ promptFile: prompt.prompt_file, personaNumber: prompt.persona_number, checkbox, lineInputs });
+        // Save / Cancel buttons for edit mode
+        const editActions = document.createElement("div");
+        editActions.className = "prompt-edit-actions";
+        editActions.style.display = "none";
+
+        const saveBtn = document.createElement("button");
+        saveBtn.type = "button";
+        saveBtn.className = "ghost-btn";
+        saveBtn.textContent = "💾 Save";
+
+        const cancelBtn = document.createElement("button");
+        cancelBtn.type = "button";
+        cancelBtn.className = "ghost-btn";
+        cancelBtn.textContent = "✕ Cancel";
+
+        editActions.append(saveBtn, cancelBtn);
+        card.appendChild(editActions);
+        card.appendChild(editForm);
+
+        // Edit mode toggle
+        let editing = false;
+        editBtn.onclick = () => {
+          editing = true;
+          linesDisplay.style.display = "none";
+          editForm.style.display = "";
+          editActions.style.display = "";
+          top.classList.add("editing");
+        };
+        cancelBtn.onclick = () => {
+          editing = false;
+          linesDisplay.style.display = "";
+          editForm.style.display = "none";
+          editActions.style.display = "none";
+          top.classList.remove("editing");
+        };
+
+        // Delete prompt
+        deleteBtn.onclick = async () => {
+          if (!confirm(`Delete prompt file "${prompt.prompt_file}"? This cannot be undone.`)) return;
+          deleteBtn.disabled = true;
+          try {
+            const res = await fetch(`/api/runs/${run.run_id}/delete-prompt`, {
+              method: "POST",
+              headers: { "Content-Type": "application/json" },
+              body: JSON.stringify({ prompt_file: prompt.prompt_file }),
+            });
+            const data = await res.json();
+            if (!res.ok) {
+              setStatus(`Delete failed: ${data.detail || "unknown error"}`);
+              return;
+            }
+            setStatus(`Deleted prompt: ${prompt.prompt_file}`);
+            card.remove();
+            await loadRuns();
+          } catch (err) {
+            setStatus(`Delete error: ${String(err)}`);
+            deleteBtn.disabled = false;
+          }
+        };
+
+        // Save edited prompt
+        saveBtn.onclick = async () => {
+          const editTextareas = editForm.querySelectorAll("textarea");
+          const newText = [...editTextareas].map(ta => ta.value).join("\n");
+          if (!newText.trim()) {
+            setStatus("Prompt text cannot be empty.");
+            return;
+          }
+          saveBtn.disabled = true;
+          try {
+            const res = await fetch(`/api/runs/${run.run_id}/edit-prompt`, {
+              method: "POST",
+              headers: { "Content-Type": "application/json" },
+              body: JSON.stringify({
+                prompt_file: prompt.prompt_file,
+                text: newText,
+              }),
+            });
+            const data = await res.json();
+            if (!res.ok) {
+              setStatus(`Edit failed: ${data.detail || "unknown error"}`);
+              saveBtn.disabled = false;
+              return;
+            }
+            setStatus(`Saved edits to: ${prompt.prompt_file}`);
+            editing = false;
+            linesDisplay.style.display = "";
+            editForm.style.display = "none";
+            editActions.style.display = "none";
+            top.classList.remove("editing");
+            // Update displayed values
+            const displayValues = linesDisplay.querySelectorAll(".prompt-line-value");
+            editTextareas.forEach((ta, i) => {
+              if (displayValues[i]) displayValues[i].textContent = ta.value || "(empty)";
+            });
+            await loadRuns();
+          } catch (err) {
+            setStatus(`Edit error: ${String(err)}`);
+            saveBtn.disabled = false;
+          }
+        };
+
+        items.push({ promptFile: prompt.prompt_file, personaNumber: prompt.persona_number, checkbox, lineInputs: [] });
         editorList.appendChild(card);
       });
 
@@ -808,21 +979,131 @@ function renderRun(run) {
     });
   };
 
+  // ── Image gallery with inline delete ──────────────────────────────────
   if (run.image_files && run.image_files.length) {
-    const p = document.createElement("div");
-    p.style.marginTop = "6px";
-    p.innerHTML = `<strong>Image files</strong>`;
-    div.appendChild(p);
+    const gal = document.createElement("div");
+    gal.className = "image-gallery";
+
+    const galHeader = document.createElement("div");
+    galHeader.className = "gallery-header";
+    galHeader.innerHTML = `<strong>Generated Images (${run.image_files.length})</strong>`;
+    gal.appendChild(galHeader);
+
+    // Aspect ratio filter tabs
+    const allCount = run.image_files.length;
+    const ar45 = run.image_files.filter((f) => f.includes("/GEMINI_4_5/")).length;
+    const ar916 = run.image_files.filter((f) => f.includes("/GEMINI_9_16/")).length;
+
+    if (ar45 > 0 && ar916 > 0) {
+      const filterBar = document.createElement("div");
+      filterBar.className = "gallery-filters";
+      [{ label: `All (${allCount})`, value: "" }, { label: `4:5 (${ar45})`, value: "GEMINI_4_5" }, { label: `9:16 (${ar916})`, value: "GEMINI_9_16" }].forEach((f) => {
+        const btn = document.createElement("button");
+        btn.type = "button";
+        btn.className = `gallery-filter ${f.value === "" ? "active" : ""}`;
+        btn.textContent = f.label;
+        btn.dataset.filter = f.value;
+        btn.onclick = () => {
+          filterBar.querySelectorAll(".gallery-filter").forEach((b) => b.classList.remove("active"));
+          btn.classList.add("active");
+          const cards = gal.querySelectorAll(".image-card");
+          cards.forEach((c) => {
+            c.style.display = !f.value || c.dataset.aspect === f.value ? "" : "none";
+          });
+        };
+        filterBar.appendChild(btn);
+      });
+      gal.appendChild(filterBar);
+    }
+
+    const grid = document.createElement("div");
+    grid.className = "image-grid";
+
     run.image_files.forEach((path) => {
-      const a = document.createElement("a");
-      a.href = path.startsWith("generated_images/")
-        ? `/generated_images/${path.replace(/^generated_images\//, "")}`
-        : `/generated_image/${path.replace(/^generated_image\//, "")}`;
-      a.target = "_blank";
-      a.textContent = path;
-      div.appendChild(a);
-      div.appendChild(document.createElement("br"));
+      const card = document.createElement("div");
+      card.className = "image-card";
+
+      const is916 = path.includes("/GEMINI_9_16/");
+      const arLabel = is916 ? "9:16" : "4:5";
+      const arClass = is916 ? "ar-916" : "ar-45";
+      card.dataset.aspect = is916 ? "GEMINI_9_16" : "GEMINI_4_5";
+      card.dataset.aspectLabel = arLabel;
+
+      // Resolve URL
+      const url = `/generated_images/${path}`;
+
+      const thumbUrl = url.replace(/\.(png|jpg|jpeg|webp)$/i, (m, ext) => {
+        const dir = url.slice(0, url.lastIndexOf("/"));
+        const file = url.slice(url.lastIndexOf("/") + 1);
+        return `${dir}/thumb_${file}`;
+      });
+
+      const imgWrap = document.createElement("div");
+      imgWrap.className = "image-wrap";
+
+      const img = document.createElement("img");
+      img.className = "gallery-thumb";
+      img.loading = "lazy";
+      img.src = url;
+      img.alt = path.split("/").pop() || "generated image";
+      img.title = arLabel;
+      imgWrap.appendChild(img);
+
+      // Inline delete button on image card
+      const imgDeleteBtn = document.createElement("button");
+      imgDeleteBtn.type = "button";
+      imgDeleteBtn.className = "image-delete-btn";
+      imgDeleteBtn.textContent = "✕";
+      imgDeleteBtn.title = "Delete this image";
+      imgWrap.appendChild(imgDeleteBtn);
+
+      const badge = document.createElement("span");
+      badge.className = `aspect-badge ${arClass}`;
+      badge.textContent = arLabel;
+      card.appendChild(badge);
+
+      card.appendChild(imgWrap);
+
+      const fname = document.createElement("div");
+      fname.className = "image-filename";
+      fname.textContent = path.split("/").pop() || path;
+      card.appendChild(fname);
+
+      card.addEventListener("click", (event) => {
+        // Don't open image if delete button was clicked
+        if (event.target.closest(".image-delete-btn")) return;
+        window.open(url, "_blank");
+      });
+
+      // Delete image handler
+      imgDeleteBtn.addEventListener("click", async (event) => {
+        event.stopPropagation();
+        if (!confirm(`Delete image "${path.split("/").pop()}"?`)) return;
+        imgDeleteBtn.disabled = true;
+        try {
+          const res = await fetch(`/api/runs/${run.run_id}/delete-image`, {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ image_file: path }),
+          });
+          const data = await res.json();
+          if (!res.ok) {
+            setStatus(`Delete failed: ${data.detail || "unknown error"}`);
+            return;
+          }
+          setStatus(`Deleted image: ${path.split("/").pop()}`);
+          card.remove();
+          await loadRuns();
+        } catch (err) {
+          setStatus(`Delete error: ${String(err)}`);
+          imgDeleteBtn.disabled = false;
+        }
+      });
+
+      grid.appendChild(card);
     });
+    gal.appendChild(grid);
+    div.appendChild(gal);
   }
 
   return div;
@@ -1150,5 +1431,37 @@ if (headlessToggle) {
   headlessToggle.addEventListener("change", () => {
     headlessModeEnabled = headlessToggle.checked;
     setStatus(`Headless mode ${headlessModeEnabled ? "ON" : "OFF"}`);
+  });
+}
+
+const launchChromeBtn = document.getElementById("launchChrome");
+if (launchChromeBtn) {
+  launchChromeBtn.addEventListener("click", async () => {
+    launchChromeBtn.disabled = true;
+    try {
+      const res = await fetch(`/api/launch-visible-browser`, {
+        method: "POST",
+      });
+      const data = await res.json();
+      if (!res.ok) {
+        setStatus(`Chrome launch failed: ${data.detail || "unknown error"}`);
+        return;
+      }
+      showChromeKillButton();
+      setStatus(`${data.message}\nCDP: ${data.cdp_url}`);
+    } catch (err) {
+      setStatus(`Launch error: ${String(err)}`);
+    } finally {
+      launchChromeBtn.disabled = false;
+    }
+  });
+}
+
+const killChromeBtn = document.getElementById("killChrome");
+if (killChromeBtn) {
+  killChromeBtn.addEventListener("click", async () => {
+    killChromeBtn.disabled = true;
+    await killChrome();
+    killChromeBtn.disabled = false;
   });
 }

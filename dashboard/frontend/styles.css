@@ -817,3 +817,315 @@ button:hover {
     grid-template-columns: 1fr;
   }
 }
+
+/* === Image Gallery === */
+
+.image-gallery {
+  margin-top: 10px;
+}
+
+.gallery-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 8px;
+}
+
+.gallery-filters {
+  display: flex;
+  gap: 6px;
+  margin-bottom: 10px;
+  flex-wrap: wrap;
+}
+
+.gallery-filter {
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  padding: 5px 12px;
+  font-size: 12px;
+  font-weight: 600;
+  cursor: pointer;
+  background: color-mix(in srgb, var(--surface) 90%, var(--surface-2));
+  color: var(--muted);
+  transition: all 0.18s ease;
+}
+
+.gallery-filter:hover {
+  border-color: color-mix(in srgb, var(--primary) 40%, var(--line));
+}
+
+.gallery-filter.active {
+  background: linear-gradient(130deg, var(--primary), var(--primary-2));
+  border-color: transparent;
+  color: #fff;
+}
+
+.image-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
+  gap: 10px;
+}
+
+.image-card {
+  position: relative;
+  border: 1px solid color-mix(in srgb, var(--line) 70%, transparent);
+  border-radius: 12px;
+  overflow: hidden;
+  background: var(--surface);
+  cursor: pointer;
+  transition: transform 0.18s ease, box-shadow 0.18s ease, border-color 0.18s ease;
+}
+
+.image-card:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 20px color-mix(in srgb, var(--primary) 12%, transparent);
+  border-color: color-mix(in srgb, var(--primary) 35%, var(--line));
+}
+
+.image-wrap {
+  overflow: hidden;
+  aspect-ratio: 4 / 5;
+  background: color-mix(in srgb, var(--line) 12%, var(--surface));
+}
+
+.gallery-thumb {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+  transition: transform 0.25s ease;
+}
+
+.image-card:hover .gallery-thumb {
+  transform: scale(1.04);
+}
+
+.aspect-badge {
+  position: absolute;
+  top: 8px;
+  right: 8px;
+  padding: 3px 8px;
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  border-radius: 6px;
+  color: #fff;
+  z-index: 2;
+}
+
+.ar-45 {
+  background: color-mix(in srgb, var(--primary) 75%, #000 20%);
+}
+
+.ar-916 {
+  background: color-mix(in srgb, var(--accent-violet) 70%, #000 20%);
+}
+
+.image-filename {
+  padding: 6px 8px;
+  font-size: 11px;
+  color: var(--muted);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+[data-theme="dark"] .image-card {
+  border-color: color-mix(in srgb, var(--line) 55%, transparent);
+  background: var(--surface-2);
+}
+
+[data-theme="dark"] .gallery-filter {
+  background: color-mix(in srgb, var(--surface) 80%, var(--surface-2));
+  color: var(--muted);
+}
+
+[data-theme="dark"] .gallery-filter.active {
+  background: linear-gradient(130deg, var(--primary), var(--primary-2));
+  color: #121821;
+}
+
+[placeholder]:focus {
+  outline: none;
+  border-color: var(--primary);
+  box-shadow: 0 0 0 3px color-mix(in srgb, var(--primary) 18%, transparent);
+}
+
+/* === Prompt Inline Controls === */
+
+.prompt-inline-controls {
+  display: inline-flex;
+  gap: 4px;
+  margin-left: auto;
+  opacity: 0;
+  transition: opacity 0.2s ease;
+}
+
+.prompt-editor-top:hover .prompt-inline-controls {
+  opacity: 1;
+}
+
+.prompt-edit-btn,
+.prompt-delete-btn {
+  border: 1px solid color-mix(in srgb, var(--line) 60%, transparent);
+  border-radius: 6px;
+  padding: 3px 8px;
+  font-size: 12px;
+  cursor: pointer;
+  background: color-mix(in srgb, var(--surface) 90%, var(--surface-2));
+  color: var(--muted);
+  transition: all 0.18s ease;
+}
+
+.prompt-edit-btn:hover,
+.prompt-delete-btn:hover {
+  border-color: color-mix(in srgb, var(--primary) 40%, var(--line));
+  background: color-mix(in srgb, var(--primary) 10%, var(--surface));
+  color: var(--primary);
+}
+
+.prompt-delete-btn:hover {
+  border-color: color-mix(in srgb, var(--accent-coral) 40%, var(--line));
+  color: var(--accent-coral);
+}
+
+/* === Inline Edit Form === */
+
+.prompt-edit-form {
+  margin-top: 8px;
+  padding: 10px;
+  border: 1px dashed color-mix(in srgb, var(--accent-teal) 30%, var(--line));
+  border-radius: 8px;
+  background: color-mix(in srgb, var(--accent-teal) 6%, var(--surface));
+}
+
+.prompt-edit-actions {
+  display: flex;
+  gap: 6px;
+  margin-top: 6px;
+  margin-bottom: 4px;
+}
+
+.prompt-lines-display {
+  margin-top: 6px;
+}
+
+.prompt-line-display {
+  display: flex;
+  gap: 6px;
+  padding: 3px 0;
+  font-size: 12px;
+  color: var(--muted);
+}
+
+.prompt-line-display .prompt-line-label {
+  font-weight: 600;
+  color: var(--ink);
+  min-width: 80px;
+  flex-shrink: 0;
+}
+
+.prompt-line-display .prompt-line-value {
+  color: var(--muted);
+  word-break: break-word;
+}
+
+/* Prompt textarea rows in edit mode */
+.prompt-edit-form .prompt-line label {
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--accent-teal);
+  margin: 0;
+}
+
+.prompt-edit-form .prompt-line textarea {
+  margin: 0;
+  min-height: 50px;
+  font-size: 12px;
+  resize: vertical;
+}
+
+/* === Image Delete Button === */
+
+.image-delete-btn {
+  position: absolute;
+  top: 6px;
+  left: 6px;
+  width: 24px;
+  height: 24px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: none;
+  border-radius: 6px;
+  padding: 0;
+  font-size: 13px;
+  cursor: pointer;
+  background: color-mix(in srgb, var(--surface) 90%, #00000055);
+  color: var(--muted);
+  z-index: 3;
+  opacity: 0;
+  transition: opacity 0.18s ease, background 0.18s ease;
+}
+
+.image-card:hover .image-delete-btn {
+  opacity: 1;
+}
+
+.image-delete-btn:hover {
+  background: color-mix(in srgb, var(--accent-coral) 70%, #00000088);
+  color: #fff;
+}
+
+/* === Image Wrap aspect ratio override for 9:16 === */
+
+.image-card[data-aspect="GEMINI_9_16"] .image-wrap {
+  aspect-ratio: 9 / 16;
+}
+
+/* === Editable prompt highlight when in edit mode === */
+
+.prompt-editor-top.editing {
+  border-bottom: 1px solid color-mix(in srgb, var(--accent-teal) 30%, var(--line));
+  padding-bottom: 6px;
+  margin-bottom: 4px;
+}
+
+/* === Dark theme overrides for new controls === */
+
+[data-theme="dark"] .prompt-edit-btn,
+[data-theme="dark"] .prompt-delete-btn {
+  background: color-mix(in srgb, var(--surface-2) 80%, var(--surface) 20%);
+  color: var(--muted);
+}
+
+[data-theme="dark"] .prompt-edit-btn:hover,
+[data-theme="dark"] .prompt-delete-btn:hover {
+  border-color: color-mix(in srgb, var(--primary) 40%, var(--line));
+  background: color-mix(in srgb, var(--primary) 15%, var(--surface-2));
+  color: var(--primary);
+}
+
+[data-theme="dark"] .prompt-delete-btn:hover {
+  border-color: color-mix(in srgb, var(--accent-coral) 40%, var(--line));
+  color: var(--accent-coral);
+}
+
+[data-theme="dark"] .prompt-edit-form {
+  background: color-mix(in srgb, var(--accent-teal) 12%, var(--surface-2));
+  border-color: color-mix(in srgb, var(--accent-teal) 30%, var(--line));
+}
+
+[data-theme="dark"] .image-delete-btn {
+  background: color-mix(in srgb, var(--surface-2) 80%, #00000066);
+  color: var(--muted);
+}
+
+[data-theme="dark"] .image-delete-btn:hover {
+  background: color-mix(in srgb, var(--accent-coral) 70%, #00000088);
+  color: #fff;
+}
+
+[data-theme="dark"] .image-wrap {
+  background: color-mix(in srgb, var(--line) 18%, var(--surface-2));
+}

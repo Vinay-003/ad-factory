@@ -1,0 +1,14 @@
+{
+  "status": "success",
+  "prompt_file": "/home/mylappy/myspace/info/output/v70/45/OUTPUT_BA_P07_EN.txt",
+  "format_id": "BA",
+  "persona_id": "P07",
+  "job_key": "BA_P07",
+  "generated_image_src": "blob:https://gemini.google.com/f541bc21-9409-4fc8-bbde-d43103934163",
+  "saved_file": "/home/mylappy/myspace/info/output/v70/45/generated images/gemini-ba-p07.png",
+  "saved_size": 6649616,
+  "saved_ext": ".png",
+  "output_dir": "/home/mylappy/myspace/info/output/v70/45/generated images",
+  "metadata_file": "/home/mylappy/myspace/info/output/v70/45/generated images/gemini-ba-p07.json",
+  "timestamp": 1778426592
+}

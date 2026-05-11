@@ -1,0 +1,14 @@
+{
+  "status": "success",
+  "prompt_file": "/home/mylappy/myspace/info/output/v70/45/OUTPUT_HERO_P07_EN.txt",
+  "format_id": "HERO",
+  "persona_id": "P07",
+  "job_key": "HERO_P07",
+  "generated_image_src": "blob:https://gemini.google.com/64b70057-8481-4912-aacf-f0d8ea321c82",
+  "saved_file": "/home/mylappy/myspace/info/output/v70/45/generated images/gemini-hero-p07.png",
+  "saved_size": 5907251,
+  "saved_ext": ".png",
+  "output_dir": "/home/mylappy/myspace/info/output/v70/45/generated images",
+  "metadata_file": "/home/mylappy/myspace/info/output/v70/45/generated images/gemini-hero-p07.json",
+  "timestamp": 1778427071
+}
