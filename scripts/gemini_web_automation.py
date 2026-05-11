@@ -89,6 +89,11 @@ def parse_args() -> argparse.Namespace:
         default="FINAL_*_P*_EN.txt",
         help="Prompt glob. Use 'FINAL_HERO_P*_EN.txt' for HERO only.",
     )
+    parser.add_argument(
+        "--starting-prompt-file",
+        default="input/startingprompt.txt",
+        help="Starter prompt prepended to each prompt before sending. Use an empty value to disable.",
+    )
     parser.add_argument("--image-source-file", default="")
     parser.add_argument("--upload-dir", default=str(Path.home() / "myspace/info/input/images"),
                         help="Directory containing reference images to upload")
@@ -303,6 +308,27 @@ def validate_expected_formats(jobs: list[PromptJob], expected_csv: str, strict: 
         if strict:
             raise RuntimeError(msg)
         print("\nWARNING: " + msg)
+
+
+def load_starting_prompt(path_value: str) -> str:
+    if not path_value.strip():
+        return ""
+    path = Path(path_value).expanduser()
+    if not path.is_absolute():
+        path = Path.cwd() / path
+    if not path.exists():
+        print(f"\nWARNING: starting prompt file not found, continuing without it: {path}")
+        return ""
+    return path.read_text(encoding="utf-8").strip()
+
+
+def prepend_starting_prompt(starting_prompt: str, prompt_text: str) -> str:
+    body = prompt_text.strip()
+    if not starting_prompt:
+        return prompt_text
+    if body.startswith(starting_prompt):
+        return prompt_text
+    return f"{starting_prompt}\n\n{body}\n"
 
 
 # ---------------------------------------------------------------------------
@@ -3357,6 +3383,9 @@ def run() -> None:
     )
     print_job_manifest(jobs, duplicates)
     validate_expected_formats(jobs, args.expected_formats, args.strict_expected_formats)
+    starting_prompt = load_starting_prompt(args.starting_prompt_file)
+    if starting_prompt:
+        print(f"\nStarting prompt: {len(starting_prompt)} chars from {args.starting_prompt_file}")
     if args.dry_run:
         print("\nDry run complete. Browser was not started.")
         return
@@ -3396,9 +3425,17 @@ def run() -> None:
                 print(f"[{idx}/{len(jobs)}] {job.job_key}: {job.prompt_path.name}")
                 print("=" * 72)
                 log_progress("job_start", f"Starting job {idx}/{len(jobs)}: {job.job_key}")
-                prompt_text = job.prompt_path.read_text(encoding="utf-8")
+                prompt_body = job.prompt_path.read_text(encoding="utf-8")
+                prompt_text = prepend_starting_prompt(starting_prompt, prompt_body)
                 out_base = generated_images_dir / job.output_stem
-                print(f"  Prompt file stats: {len(prompt_text)} chars, {prompt_text.count(chr(10)) + 1} lines")
+                if prompt_text == prompt_body:
+                    print(f"  Prompt file stats: {len(prompt_text)} chars, {prompt_text.count(chr(10)) + 1} lines")
+                else:
+                    print(
+                        "  Prompt file stats: "
+                        f"{len(prompt_body)} body chars + {len(starting_prompt)} starter chars "
+                        f"= {len(prompt_text)} sent chars"
+                    )
 
                 success = False
                 last_exc: Exception | None = None
