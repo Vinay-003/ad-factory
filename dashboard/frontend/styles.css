@@ -690,10 +690,32 @@ button:hover {
   background: var(--status-bg);
   color: var(--status-fg);
   border-radius: 12px;
-  padding: 12px;
-  min-height: 78px;
+  padding: 14px;
+  min-height: 60px;
+  max-height: 360px;
+  overflow-y: auto;
   white-space: pre-wrap;
+  font-family: "JetBrains Mono", "Fira Code", "Cascadia Code", "Consolas", monospace;
+  font-size: 13px;
+  line-height: 1.5;
   border: 1px solid color-mix(in srgb, var(--status-fg) 20%, transparent);
+  scrollbar-width: thin;
+  scrollbar-color: color-mix(in srgb, var(--status-fg) 30%, transparent) transparent;
+}
+
+.status::-webkit-scrollbar {
+  width: 6px;
+}
+.status::-webkit-scrollbar-thumb {
+  background: color-mix(in srgb, var(--status-fg) 30%, transparent);
+  border-radius: 3px;
+}
+
+.chrome-status {
+  max-height: 200px;
+  min-height: 40px;
+  margin-top: 8px;
+  font-size: 12px;
 }
 
 .run {

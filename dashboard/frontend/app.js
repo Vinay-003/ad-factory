@@ -4,6 +4,7 @@ const inputImageFilesEl = document.getElementById("inputImageFiles");
 const clearInputImagesEl = document.getElementById("clearInputImages");
 const defaultsInfoEl = document.getElementById("defaultsInfo");
 const statusEl = document.getElementById("status");
+const chromeStatusEl = document.getElementById("chromeStatus");
 const runsEl = document.getElementById("runs");
 const runPrevEl = document.getElementById("runPrev");
 const runNextEl = document.getElementById("runNext");
@@ -75,6 +76,14 @@ function chip(label, active, onClick) {
 
 function setStatus(text) {
   statusEl.textContent = text;
+  statusEl.scrollTop = 0;
+}
+
+function setChromeStatus(text) {
+  if (chromeStatusEl) {
+    chromeStatusEl.textContent = text;
+    chromeStatusEl.scrollTop = 0;
+  }
 }
 
 function getPersonaSelection() {
@@ -324,13 +333,13 @@ async function killChrome() {
     const res = await fetch(`/api/kill-chrome`, { method: "POST" });
     const data = await res.json();
     if (!res.ok) {
-      setStatus(`Kill failed: ${data.detail || "unknown error"}`);
+      setChromeStatus(`Kill failed: ${data.detail || "unknown error"}`);
       return;
     }
     hideChromeKillButton();
-    setStatus(`Chrome killed. Chrome: ${data.chrome}, Gemini: ${data.gemini_processes}`);
+    setChromeStatus(`Chrome killed. Chrome: ${data.chrome}, Gemini: ${data.gemini_processes}`);
   } catch (err) {
-    setStatus(`Kill error: ${String(err)}`);
+    setChromeStatus(`Kill error: ${String(err)}`);
   }
 }
 
@@ -1030,7 +1039,8 @@ function renderRun(run) {
       card.dataset.aspectLabel = arLabel;
 
       // Resolve URL
-      const url = `/generated_images/${path}`;
+      const cleanPath = path.replace(/^generated_images\//, "");
+      const url = `/generated_images/${cleanPath}`;
 
       const thumbUrl = url.replace(/\.(png|jpg|jpeg|webp)$/i, (m, ext) => {
         const dir = url.slice(0, url.lastIndexOf("/"));
@@ -1411,7 +1421,7 @@ function startProgressPolling(batchKey) {
       const step = data.step || "";
       const msg = data.message || "";
       const time = data.time ? new Date(data.time * 1000).toLocaleTimeString() : "";
-      setStatus(`[${time}] [${step}] ${msg}\n`);
+      setChromeStatus(`[${time}] [${step}] ${msg}\n`);
     } catch (_) {}
   }, 3000);
 }
@@ -1424,13 +1434,13 @@ function stopProgressPolling() {
 }
 
 initTheme();
-fetchDefaults().then(loadRuns).catch((err) => setStatus(String(err)));
+fetchDefaults().then(loadRuns).catch((err) => setChromeStatus(String(err)));
 
 const headlessToggle = document.getElementById("headlessMode");
 if (headlessToggle) {
   headlessToggle.addEventListener("change", () => {
     headlessModeEnabled = headlessToggle.checked;
-    setStatus(`Headless mode ${headlessModeEnabled ? "ON" : "OFF"}`);
+    setChromeStatus(`Headless mode ${headlessModeEnabled ? "ON" : "OFF"}`);
   });
 }
 
@@ -1444,13 +1454,13 @@ if (launchChromeBtn) {
       });
       const data = await res.json();
       if (!res.ok) {
-        setStatus(`Chrome launch failed: ${data.detail || "unknown error"}`);
+        setChromeStatus(`Chrome launch failed: ${data.detail || "unknown error"}`);
         return;
       }
       showChromeKillButton();
-      setStatus(`${data.message}\nCDP: ${data.cdp_url}`);
+      setChromeStatus(`${data.message}\nCDP: ${data.cdp_url}`);
     } catch (err) {
-      setStatus(`Launch error: ${String(err)}`);
+      setChromeStatus(`Launch error: ${String(err)}`);
     } finally {
       launchChromeBtn.disabled = false;
     }
