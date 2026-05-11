@@ -2,5 +2,27 @@
   "$schema": "https://opencode.ai/config.json",
   "plugin": [
     ".opencode/plugins/graphify.js"
-  ]
+  ],
+  "mcp": {
+    "playwright": {
+      "type": "local",
+      "command": ["$HOME/.nvm/versions/node/v24.14.1/bin/playwright-mcp"],
+      "enabled": true
+    },
+    "firecrawl": {
+      "type": "local",
+      "command": ["$HOME/.nvm/versions/node/v24.14.1/bin/firecrawl-mcp"],
+      "enabled": true
+    },
+    "chrome-devtools": {
+      "type": "local",
+      "command": ["$HOME/.nvm/versions/node/v24.14.1/bin/chrome-devtools-mcp"],
+      "enabled": true
+    },
+    "glif": {
+      "type": "local",
+      "command": ["$HOME/.nvm/versions/node/v24.14.1/bin/glif-mcp-server"],
+      "enabled": true
+    }
+  }
 }

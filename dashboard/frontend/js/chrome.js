@@ -1,0 +1,84 @@
+import { setChromeStatus } from "./ui.js";
+import { fetchJSON } from "./api.js";
+import { state } from "./state.js";
+
+const launchChromeBtn = document.getElementById("launchChrome");
+const killChromeBtn = document.getElementById("killChrome");
+const headlessToggle = document.getElementById("headlessMode");
+
+function showChromeKillButton() {
+  if (killChromeBtn) killChromeBtn.style.display = "";
+  state.chromeProcessActive = true;
+}
+
+function hideChromeKillButton() {
+  if (killChromeBtn) killChromeBtn.style.display = "none";
+  state.chromeProcessActive = false;
+}
+
+async function killChrome() {
+  try {
+    const data = await fetchJSON(`/api/kill-chrome`, { method: "POST" });
+    hideChromeKillButton();
+    setChromeStatus(`Chrome killed. Chrome: ${data.chrome}, Gemini: ${data.gemini_processes}`);
+  } catch (err) {
+    setChromeStatus(`Kill error: ${String(err)}`);
+  }
+}
+
+if (headlessToggle) {
+  headlessToggle.addEventListener("change", () => {
+    state.headlessModeEnabled = headlessToggle.checked;
+    setChromeStatus(`Headless mode ${state.headlessModeEnabled ? "ON" : "OFF"}`);
+  });
+}
+
+if (launchChromeBtn) {
+  launchChromeBtn.addEventListener("click", async () => {
+    launchChromeBtn.disabled = true;
+    try {
+      const data = await fetchJSON(`/api/launch-visible-browser`, { method: "POST" });
+      showChromeKillButton();
+      setChromeStatus(`${data.message}\nCDP: ${data.cdp_url}`);
+    } catch (err) {
+      setChromeStatus(`Launch error: ${String(err)}`);
+    } finally {
+      launchChromeBtn.disabled = false;
+    }
+  });
+}
+
+if (killChromeBtn) {
+  killChromeBtn.addEventListener("click", async () => {
+    killChromeBtn.disabled = true;
+    await killChrome();
+    killChromeBtn.disabled = false;
+  });
+}
+
+let currentPollingInterval = null;
+
+export function startProgressPolling(batchKey) {
+  if (currentPollingInterval) clearInterval(currentPollingInterval);
+  currentPollingInterval = setInterval(async () => {
+    try {
+      const res = await fetch(`/api/progress/${encodeURIComponent(batchKey)}`);
+      if (!res.ok) {
+        if (res.status === 404) { clearInterval(currentPollingInterval); return; }
+        return;
+      }
+      const data = await res.json();
+      const step = data.step || "";
+      const msg = data.message || "";
+      const time = data.time ? new Date(data.time * 1000).toLocaleTimeString() : "";
+      setChromeStatus(`[${time}] [${step}] ${msg}\n`);
+    } catch (_) {}
+  }, 3000);
+}
+
+export function stopProgressPolling() {
+  if (currentPollingInterval) {
+    clearInterval(currentPollingInterval);
+    currentPollingInterval = null;
+  }
+}

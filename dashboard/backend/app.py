@@ -2790,7 +2790,6 @@ def startup() -> None:
     ensure_dirs()
 
 
-@app.get("/api/defaults")
 def api_defaults() -> dict[str, Any]:
     personas = parse_persona_library(DEFAULT_PLAYBOOK)
     opencode = build_opencode_catalog()
@@ -2811,7 +2810,6 @@ def api_defaults() -> dict[str, Any]:
     }
 
 
-@app.get("/api/progress/{batch_key}")
 def api_progress(batch_key: str) -> dict[str, Any]:
     batch_key_clean = str(batch_key).strip()
     for root in generated_image_roots():
@@ -2841,12 +2839,10 @@ def api_progress(batch_key: str) -> dict[str, Any]:
     raise HTTPException(status_code=404, detail=f"No progress found for batch: {batch_key_clean}")
 
 
-@app.get("/api/opencode/catalog")
 def api_opencode_catalog() -> dict[str, Any]:
     return build_opencode_catalog()
 
 
-@app.get("/api/runs")
 def api_runs() -> dict[str, Any]:
     ensure_dirs()
     runs: list[dict[str, Any]] = []
@@ -2875,7 +2871,6 @@ def api_runs() -> dict[str, Any]:
     return {"runs": runs}
 
 
-@app.get("/api/runs/{run_id}")
 def api_run(run_id: str) -> dict[str, Any]:
     run_dir = RUNS_ROOT / run_id
     manifest = run_dir / "manifest.json"
@@ -2885,7 +2880,6 @@ def api_run(run_id: str) -> dict[str, Any]:
     return refresh_manifest_file_state(run_dir, payload)
 
 
-@app.get("/api/runs/{run_id}/prompt-copies")
 def api_run_prompt_copies(run_id: str) -> dict[str, Any]:
     run_dir = RUNS_ROOT / run_id
     manifest_path = run_dir / "manifest.json"
@@ -2919,7 +2913,6 @@ def api_run_prompt_copies(run_id: str) -> dict[str, Any]:
     return {"run_id": run_id, "batch": manifest.get("batch"), "prompts": records}
 
 
-@app.post("/api/runs/{run_id}/prompt-copies")
 def api_run_update_prompt_copies(run_id: str, payload: dict[str, Any] = Body(...)) -> dict[str, Any]:
     run_dir = RUNS_ROOT / run_id
     manifest_path = run_dir / "manifest.json"
@@ -3221,7 +3214,6 @@ def _append_audit_log(run_dir: Path, event_type: str, payload: dict[str, Any]) -
         f.write(json.dumps(entry, ensure_ascii=False) + "\n")
 
 
-@app.get("/api/runs/{run_id}/export-on-image-copy")
 def api_export_on_image_copy(run_id: str) -> StreamingResponse:
     from openpyxl import Workbook
     import io
@@ -3289,7 +3281,6 @@ def api_export_on_image_copy(run_id: str) -> StreamingResponse:
     )
 
 
-@app.post("/api/runs/{run_id}/import-on-image-copy")
 async def api_import_on_image_copy(
     run_id: str,
     file: UploadFile = File(...),
@@ -3464,7 +3455,6 @@ async def api_import_on_image_copy(
     }
 
 
-@app.post("/api/runs/{run_id}/generate-916")
 def api_run_generate_916(run_id: str) -> dict[str, Any]:
     run_dir = RUNS_ROOT / run_id
     manifest_path = run_dir / "manifest.json"
@@ -3475,7 +3465,6 @@ def api_run_generate_916(run_id: str) -> dict[str, Any]:
     return generate_916_for_run(run_dir, manifest)
 
 
-@app.post("/api/runs/{run_id}/generate-916-selected")
 def api_run_generate_916_selected(run_id: str, payload: dict[str, Any] = Body(...)) -> dict[str, Any]:
     run_dir = RUNS_ROOT / run_id
     manifest_path = run_dir / "manifest.json"
@@ -3600,7 +3589,6 @@ def filter_copy_json_for_selected_ads(copy_json: dict[str, Any], selected_keys: 
     return cloned
 
 
-@app.post("/api/runs/{run_id}/generate-images-45")
 def api_run_generate_images_45(run_id: str, payload: dict[str, Any] = Body(...)) -> dict[str, Any]:
     run_dir = RUNS_ROOT / run_id
     manifest_path = run_dir / "manifest.json"
@@ -3647,7 +3635,6 @@ def api_run_generate_images_45(run_id: str, payload: dict[str, Any] = Body(...))
     return merged
 
 
-@app.post("/api/runs/{run_id}/generate-images-916-from-45")
 def api_run_generate_images_916_from_45(run_id: str, payload: dict[str, Any] = Body(...)) -> dict[str, Any]:
     run_dir = RUNS_ROOT / run_id
     manifest_path = run_dir / "manifest.json"
@@ -3756,7 +3743,6 @@ def api_run_generate_images_916_from_45(run_id: str, payload: dict[str, Any] = B
     return merged
 
 
-@app.post("/api/batch/generate-images-45")
 def api_batch_generate_images_45(payload: dict[str, Any] = Body(...)) -> dict[str, Any]:
     run_ids = payload.get("run_ids")
     if not isinstance(run_ids, list) or not run_ids:
@@ -3976,7 +3962,6 @@ def _resolve_916_generation_for_run(run_dir: Path, manifest: dict[str, Any]) -> 
     return entries
 
 
-@app.post("/api/batch/generate-images-916")
 def api_batch_generate_images_916(payload: dict[str, Any] = Body(...)) -> dict[str, Any]:
     run_ids = payload.get("run_ids")
     if not isinstance(run_ids, list) or not run_ids:
@@ -4058,7 +4043,6 @@ def extract_persona_input_block(prompt_text: str) -> str:
     return ""
 
 
-@app.get("/api/file-content")
 def api_file_content(path: str, max_lines: int = 400) -> dict[str, Any]:
     file_path = resolve_safe_path(path)
     if not file_path.exists() or not file_path.is_file():
@@ -4073,7 +4057,6 @@ def api_file_content(path: str, max_lines: int = 400) -> dict[str, Any]:
     }
 
 
-@app.post("/api/runs/execute")
 async def api_run_execute(
     config: str = Form(...),
     product_info_file: UploadFile | None = File(None),
@@ -4368,7 +4351,6 @@ async def api_run_execute(
 _chrome_process: subprocess.Popen | None = None
 
 
-@app.post("/api/launch-visible-browser")
 def api_launch_visible_browser() -> dict[str, Any]:
     """Launch a visible Chrome instance with CDP enabled so the user can log in
     before automation begins."""
@@ -4411,7 +4393,6 @@ def api_launch_visible_browser() -> dict[str, Any]:
     raise HTTPException(status_code=500, detail="Chrome launched but CDP not responding on port 9222")
 
 
-@app.post("/api/kill-chrome")
 def api_kill_chrome() -> dict[str, Any]:
     """Kill the Chrome process started by launch-visible-browser and stop any running automation."""
     global _chrome_process
@@ -4443,7 +4424,6 @@ def api_kill_chrome() -> dict[str, Any]:
     return {"status": "killed", "chrome": killed, "gemini_processes": gemini_killed}
 
 
-@app.post("/api/runs/{run_id}/edit-prompt")
 def api_edit_prompt(run_id: str, payload: dict[str, Any] = Body(...)) -> dict[str, Any]:
     """Edit a prompt file in-place."""
     run_dir = RUNS_ROOT / run_id
@@ -4460,7 +4440,6 @@ def api_edit_prompt(run_id: str, payload: dict[str, Any] = Body(...)) -> dict[st
     return {"status": "saved", "prompt_file": prompt_path}
 
 
-@app.post("/api/runs/{run_id}/delete-prompt")
 def api_delete_prompt(run_id: str, payload: dict[str, Any] = Body(...)) -> dict[str, Any]:
     """Delete a prompt file and remove it from the run manifest."""
     run_dir = RUNS_ROOT / run_id
@@ -4481,7 +4460,6 @@ def api_delete_prompt(run_id: str, payload: dict[str, Any] = Body(...)) -> dict[
     return {"status": "deleted", "prompt_file": prompt_path}
 
 
-@app.post("/api/runs/{run_id}/delete-image")
 def api_delete_image(run_id: str, payload: dict[str, Any] = Body(...)) -> dict[str, Any]:
     """Delete a generated image and its metadata JSON."""
     run_dir = RUNS_ROOT / run_id
@@ -4506,6 +4484,18 @@ def api_delete_image(run_id: str, payload: dict[str, Any] = Body(...)) -> dict[s
 
     return {"status": "deleted", "image_file": image_path}
 
+
+# ── Modular routes ───────────────────────────────────────────────────────────
+from dashboard.backend.routes import defaults, progress, runs, generate, batch, export_import, execute, chrome
+
+app.include_router(defaults.router)
+app.include_router(progress.router)
+app.include_router(runs.router)
+app.include_router(generate.router)
+app.include_router(batch.router)
+app.include_router(export_import.router)
+app.include_router(execute.router)
+app.include_router(chrome.router)
 
 app.mount("/storage", StaticFiles(directory=str(STORAGE_ROOT)), name="storage")
 app.mount("/output", StaticFiles(directory=str(ROOT / "output")), name="output")
