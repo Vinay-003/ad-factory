@@ -1,5 +1,5 @@
 import { state } from "./state.js";
-import { setStatus, setChromeStatus, skeletonRunCard } from "./ui.js";
+import { appendLog, skeletonRunCard } from "./ui.js";
 import { fetchJSON, invalidateRuns } from "./api.js";
 import { buildImageGallery } from "./images.js";
 import { buildPromptEditor } from "./prompts.js";
@@ -208,11 +208,11 @@ document.getElementById("refreshRuns")?.addEventListener("click", () => {
 
 document.getElementById("batchGen45")?.addEventListener("click", async () => {
   const selectedBatches = getSelectedBatchValues();
-  if (!selectedBatches.length) { setStatus("Select at least one batch."); return; }
+  if (!selectedBatches.length) { appendLog("Select at least one batch."); return; }
   const runsForBatches = state.runsData.filter((r) => selectedBatches.includes(r.batch));
-  if (!runsForBatches.length) { setStatus("No runs found for selected batch(es)."); return; }
+  if (!runsForBatches.length) { appendLog("No runs found for selected batch(es)."); return; }
   const runIds = runsForBatches.map((r) => r.run_id);
-  setStatus(`Batch generating 4:5 for ${runIds.length} run(s)...`);
+  appendLog(`Batch generating 4:5 for ${runIds.length} run(s)...`);
   try {
     const data = await fetchJSON("/api/batch/generate-images-45", {
       method: "POST",
@@ -223,20 +223,20 @@ document.getElementById("batchGen45")?.addEventListener("click", async () => {
     if (batchKey && state.headlessModeEnabled) {
       import("./chrome.js").then((m) => m.startProgressPolling(batchKey));
     }
-    setStatus(`Done. Batch: ${data.batch_key}, Prompts: ${data.total_prompts}`);
+    appendLog(`Done. Batch: ${data.batch_key}, Prompts: ${data.total_prompts}`);
     loadRuns();
   } catch (err) {
-    setStatus(String(err));
+    appendLog(String(err));
   }
 });
 
 document.getElementById("batchGen916")?.addEventListener("click", async () => {
   const selectedBatches = getSelectedBatchValues();
-  if (!selectedBatches.length) { setStatus("Select at least one batch."); return; }
+  if (!selectedBatches.length) { appendLog("Select at least one batch."); return; }
   const runsForBatches = state.runsData.filter((r) => selectedBatches.includes(r.batch));
-  if (!runsForBatches.length) { setStatus("No runs found for selected batch(es)."); return; }
+  if (!runsForBatches.length) { appendLog("No runs found for selected batch(es)."); return; }
   const runIds = runsForBatches.map((r) => r.run_id);
-  setStatus(`Batch generating 9:16 for ${runIds.length} run(s)...`);
+  appendLog(`Batch generating 9:16 for ${runIds.length} run(s)...`);
   try {
     const data = await fetchJSON("/api/batch/generate-images-916", {
       method: "POST",
@@ -247,22 +247,40 @@ document.getElementById("batchGen916")?.addEventListener("click", async () => {
     if (batchKey && state.headlessModeEnabled) {
       import("./chrome.js").then((m) => m.startProgressPolling(batchKey));
     }
-    setStatus(`Done. Batch: ${data.batch_key}, Prompts: ${data.total_prompts}`);
+    appendLog(`Done. Batch: ${data.batch_key}, Prompts: ${data.total_prompts}`);
     loadRuns();
   } catch (err) {
-    setStatus(String(err));
+    appendLog(String(err));
   }
 });
 
-document.getElementById("batchDownload")?.addEventListener("click", () => {
-  const idx = state.currentRunIndex;
-  const run = state.runsData[idx];
-  if (!run) { setStatus("No run selected."); return; }
-  const a = document.createElement("a");
-  a.href = `/api/runs/${run.run_id}/download-batch`;
-  a.download = "";
-  document.body.appendChild(a);
-  a.click();
-  a.remove();
-  setStatus("Batch download started.");
+document.getElementById("batchDownload")?.addEventListener("click", async () => {
+  const selectedBatches = getSelectedBatchValues();
+  if (!selectedBatches.length) { appendLog("Select at least one batch from the dropdown."); return; }
+  appendLog(`Preparing download for ${selectedBatches.length} batch(es)...`);
+  try {
+    const res = await fetch("/api/runs/download-batches", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ batch_ids: selectedBatches }),
+    });
+    if (!res.ok) {
+      const err = await res.json().catch(() => ({ detail: res.statusText }));
+      appendLog(`Download failed: ${err.detail || res.statusText}`);
+      return;
+    }
+    const blob = await res.blob();
+    const a = document.createElement("a");
+    a.href = URL.createObjectURL(blob);
+    const disposition = res.headers.get("Content-Disposition") || "";
+    const match = disposition.match(/filename="?(.+?)"?$/);
+    a.download = match ? match[1] : `${selectedBatches.join("_")}.zip`;
+    document.body.appendChild(a);
+    a.click();
+    a.remove();
+    URL.revokeObjectURL(a.href);
+    appendLog("Batch download complete.");
+  } catch (err) {
+    appendLog(`Download error: ${String(err)}`);
+  }
 });

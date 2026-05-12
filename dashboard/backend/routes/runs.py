@@ -12,6 +12,7 @@ from dashboard.backend.app import (
     api_delete_image,
     api_download_single_image,
     api_download_batch_images,
+    api_download_batches,
 )
 
 router = APIRouter()
@@ -51,3 +52,8 @@ def _download_single_image(run_id: str, image_file: str) -> StreamingResponse:
 @router.get("/api/runs/{run_id}/download-batch")
 def _download_batch_images(run_id: str) -> StreamingResponse:
     return api_download_batch_images(run_id)
+
+
+@router.post("/api/runs/download-batches")
+def _download_batches(payload: dict[str, Any] = Body(...)) -> StreamingResponse:
+    return api_download_batches(payload.get("batch_ids", []))

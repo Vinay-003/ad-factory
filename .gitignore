@@ -9,9 +9,9 @@ __pycache__/
 
 output/*
 trash/
-generated_image
-generated_image/*
 
+generated_images/*
+graphify-out/*
 trash/*
 runtime/*
 runtime

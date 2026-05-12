@@ -1,4 +1,4 @@
-import { setChromeStatus } from "./ui.js";
+import { appendLog } from "./ui.js";
 import { fetchJSON } from "./api.js";
 import { state } from "./state.js";
 
@@ -20,16 +20,16 @@ async function killChrome() {
   try {
     const data = await fetchJSON(`/api/kill-chrome`, { method: "POST" });
     hideChromeKillButton();
-    setChromeStatus(`Chrome killed. Chrome: ${data.chrome}, Gemini: ${data.gemini_processes}`);
+    appendLog(`Chrome killed. Chrome: ${data.chrome}, Gemini: ${data.gemini_processes}`);
   } catch (err) {
-    setChromeStatus(`Kill error: ${String(err)}`);
+    appendLog(`Kill error: ${String(err)}`);
   }
 }
 
 if (headlessToggle) {
   headlessToggle.addEventListener("change", () => {
     state.headlessModeEnabled = headlessToggle.checked;
-    setChromeStatus(`Headless mode ${state.headlessModeEnabled ? "ON" : "OFF"}`);
+    appendLog(`Headless mode ${state.headlessModeEnabled ? "ON" : "OFF"}`);
   });
 }
 
@@ -39,9 +39,9 @@ if (launchChromeBtn) {
     try {
       const data = await fetchJSON(`/api/launch-visible-browser`, { method: "POST" });
       showChromeKillButton();
-      setChromeStatus(`${data.message}\nCDP: ${data.cdp_url}`);
+      appendLog(`${data.message} | CDP: ${data.cdp_url}`);
     } catch (err) {
-      setChromeStatus(`Launch error: ${String(err)}`);
+      appendLog(`Launch error: ${String(err)}`);
     } finally {
       launchChromeBtn.disabled = false;
     }
@@ -79,9 +79,9 @@ export function startProgressPolling(batchKey) {
           const msg = e.message || "";
           const time = e.time ? new Date(e.time * 1000).toLocaleTimeString() : "";
           progressEntries.push(`[${time}] [${step}] ${msg}`);
+          appendLog(`[${time}] [${step}] ${msg}`);
         }
         lastCount = entries.length;
-        setChromeStatus(progressEntries.join("\n"));
       }
     } catch (_) {}
   }, 3000);

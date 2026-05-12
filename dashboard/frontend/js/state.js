@@ -6,7 +6,7 @@ export const LANGUAGE_MODES = ["ALL", "EN", "HI", "HINGLISH"];
 export const state = {
   defaultData: null,
   selectedGlobalFormats: new Set(["HERO"]),
-  selectedLanguageMode: "ALL",
+  selectedLanguageMode: "EN",
   selectedPersonas: new Set(),
   personaFormatsByNumber: new Map(),
   modelsByProvider: {},

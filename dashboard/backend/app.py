@@ -396,6 +396,8 @@ def assembler_language_mode(config: dict[str, Any]) -> str:
         return "EN"
     if mode == "HI":
         return "HI"
+    if mode == "HINGLISH":
+        return "HINGLISH"
     return "BOTH"
 
 
@@ -586,7 +588,7 @@ def build_ad_copy_system_prompt(fmt: str) -> str:
     fmt = fmt.strip().upper()
     base_rules = [
         "You generate ad copy JSON only. Return valid JSON with keys default_aspect_ratio and ads.",
-        "Each ads item must include format, headline_angle, awareness_stage, concept_angle, concept_structure, persona, and copy.EN/copy.HI fields compatible with assembler.",
+        "Each ads item must include format, headline_angle, awareness_stage, concept_angle, concept_structure, persona, and copy fields. Provide copy.EN, copy.HI, and copy.HINGLISH blocks when constraints.language includes them.",
         "Use the attached/read product master doc as the single source of product truth; the JSON payload is only request metadata, format/persona guidance, concept selection, and schema control.",
         "Derive benefits, proof, mechanisms, differentiators, exclusions, and priority hierarchy from the product master doc, not from memory or invented claims.",
         "Make obesity and weight-loss intent obvious to a first-time viewer; headline or paired copy must mention weight loss, obesity reduction, excess-weight reduction, or a direct 15-day result framing.",
@@ -630,7 +632,8 @@ def build_strict_schema_note(fmt: str) -> str:
         "STRICT_SCHEMA: Return JSON only. Do not include copy_requirements, disclaimers, or extra keys. "
         "persona must be an object with number, name, pain_en, desire_en, friction_en, proof_needed_en, tone_cue_en, "
         "pain_hi, desire_hi, friction_hi, proof_needed_hi, tone_cue_hi. "
-        f"For {fmt or 'this'} format, copy.EN and copy.HI must contain only: {copy_fields}."
+        "When constraints.language includes HINGLISH, also include pain_hinglish, desire_hinglish, friction_hinglish, proof_needed_hinglish, tone_cue_hinglish in persona. "
+        f"For {fmt or 'this'} format, copy.EN, copy.HI, and copy.HINGLISH (when requested) must contain only: {copy_fields}."
     )
 
 
@@ -2372,12 +2375,13 @@ def call_opencode_compatible(config: dict[str, Any], context: dict[str, Any], ru
                 **context,
                 "ads": [ad_item],
             }
+            target_langs = {"EN": ["EN"], "HI": ["HI"], "HINGLISH": ["HINGLISH"], "ALL": ["EN", "HI", "HINGLISH"]}
             user_payload = {
                 "task": "Generate fresh ad copy JSON for provided context.",
                 "context": build_generation_payload_for_llm(single_context),
                 "generated_same_format_so_far": previous_same_format,
                 "constraints": {
-                    "language": ["EN", "HI"],
+                    "language": target_langs.get(language_mode, ["EN", "HI"]),
                     "language_mode": language_mode,
                     "format": target_format,
                     "return_json_only": True,
@@ -3270,6 +3274,18 @@ def _extract_vn_from_prompt_rel_path(prompt_rel_path: str) -> str:
     # Expected pattern: output/v{N}/...
     # Keep backward compatible: if not found, return empty string.
     m = re.search(r"/output/(v\d+)(/|$)", prompt_rel_path.replace("\\", "/"))
+    return m.group(1) if m else ""
+
+
+def _extract_vn_from_image_path(image_path: str) -> str:
+    # Expected pattern: generated_images/v{N}/...
+    m = re.search(r"/generated_images/(v\d+)(/|$)", image_path.replace("\\", "/"))
+    return m.group(1) if m else ""
+
+
+def _extract_aspect_from_image_path(image_path: str) -> str:
+    # Extract aspect folder e.g. GEMINI_4_5 from generated_images/v77/GEMINI_4_5/...
+    m = re.search(r"/(GEMINI_\d+_\d+)/", image_path.replace("\\", "/"))
     return m.group(1) if m else ""
 
 
@@ -4386,7 +4402,20 @@ async def api_run_execute(
         "banlist": banlist_payload,
     }
     (run_dir / "context" / "run_context.json").write_text(
-        json.dumps(full_context, ensure_ascii=False, indent=2) + "\n", encoding="utf-8"
+        json.dumps(
+            {
+                "generated_at": full_context["generated_at"],
+                "run_id": full_context["run_id"],
+                "language_mode": full_context["language_mode"],
+                "context_source": full_context["context_source"],
+                "context_extractor_model": full_context["context_extractor_model"],
+                "product_file_path": full_context["product_file_path"],
+            },
+            ensure_ascii=False,
+            indent=2,
+        )
+        + "\n",
+        encoding="utf-8",
     )
 
     llm_mode = "opencode"
@@ -4621,7 +4650,7 @@ def api_delete_image(run_id: str, payload: dict[str, Any] = Body(...)) -> dict[s
     return {"status": "deleted", "image_file": image_path}
 
 
-def _parse_image_naming(image_path_str: str, run_dir: Path) -> dict[str, str]:
+def _parse_image_naming(image_path_str: str, run_dir: Path | None) -> dict[str, str]:
     """Extract format, persona, language from an image's companion JSON metadata
     and build a human-readable stem for download naming."""
     full_path = ROOT / image_path_str
@@ -4645,19 +4674,20 @@ def _parse_image_naming(image_path_str: str, run_dir: Path) -> dict[str, str]:
 
     # Try hypothesis
     hyp_label = ""
-    hyp_path = run_dir / "context" / "hypothesis_config.json"
-    if hyp_path.exists():
-        try:
-            hyp_cfg = json.loads(hyp_path.read_text(encoding="utf-8"))
-            htype = hyp_cfg.get("type", "")
-            hvar = hyp_cfg.get("variant", "")
-            if htype and htype != "none":
-                parts = [htype]
-                if hvar:
-                    parts.append(hvar)
-                hyp_label = "_" + "_".join(parts)
-        except Exception:
-            pass
+    if run_dir is not None:
+        hyp_path = run_dir / "context" / "hypothesis_config.json"
+        if hyp_path.exists():
+            try:
+                hyp_cfg = json.loads(hyp_path.read_text(encoding="utf-8"))
+                htype = hyp_cfg.get("type", "")
+                hvar = hyp_cfg.get("variant", "")
+                if htype and htype != "none":
+                    parts = [htype]
+                    if hvar:
+                        parts.append(hvar)
+                    hyp_label = "_" + "_".join(parts)
+            except Exception:
+                pass
 
     ext = Path(image_path_str).suffix
     stem = f"{base['format']}_{base['persona']}_{base['lang']}{hyp_label}"
@@ -4695,27 +4725,39 @@ def api_download_single_image(run_id: str, image_file: str):
 
 
 def api_download_batch_images(run_id: str):
-    """Return a zip containing all images in a run with their metadata."""
+    """Return a zip of all images grouped by VN subfolders with metadata.
+    Always scans the filesystem directly so newly generated images
+    (e.g. 9:16 added after the manifest was saved) are included."""
     run_dir = RUNS_ROOT / run_id
-    manifest_path = run_dir / "manifest.json"
-    if not manifest_path.exists():
-        raise HTTPException(status_code=404, detail="Run not found")
-    manifest = json.loads(manifest_path.read_text(encoding="utf-8"))
-    image_files = manifest.get("image_files", [])
-    if not image_files:
-        raise HTTPException(status_code=404, detail="No images found for this run")
 
-    batch_label = manifest.get("batch", run_id)
+    # Refresh cached thumbnail summary before scanning
+    batch_label = run_id
+    manifest_path = run_dir / "manifest.json"
+    if manifest_path.exists():
+        manifest = json.loads(manifest_path.read_text(encoding="utf-8"))
+        batch_label = manifest.get("batch", run_id)
+
+    # Always scan the filesystem — manifest may be stale
+    image_files = scan_image_files_for_batch(batch_label) if batch_label != run_id else []
+
     import io, zipfile
     buf = io.BytesIO()
     with zipfile.ZipFile(buf, "w", zipfile.ZIP_DEFLATED) as zf:
+        vns: set[str] = set()
         for img_path in image_files:
             full_path = ROOT / img_path
             if not full_path.exists():
                 continue
+
+            vn = _extract_vn_from_image_path(img_path) or batch_label or "images"
+            vns.add(vn)
+            aspect = _extract_aspect_from_image_path(img_path)
             naming = _parse_image_naming(img_path, run_dir)
             meta_path = full_path.with_suffix(".json")
-            zf.write(full_path, f"{naming['stem']}{naming['ext']}")
+
+            folder = f"{vn}/{aspect}" if aspect else vn
+            zf.write(full_path, f"{folder}/{naming['stem']}{naming['ext']}")
+
             meta_content = {"source": img_path}
             if meta_path.exists():
                 try:
@@ -4723,11 +4765,60 @@ def api_download_batch_images(run_id: str):
                 except Exception:
                     pass
             meta_content["_download_name"] = naming["stem"]
-            zf.writestr(f"{naming['stem']}_metadata.json", json.dumps(meta_content, ensure_ascii=False, indent=2))
+            zf.writestr(f"{folder}/{naming['stem']}_metadata.json",
+                        json.dumps(meta_content, ensure_ascii=False, indent=2))
+
+        if not image_files:
+            zf.writestr("README.txt",
+                        "No generated images found for this run.\n"
+                        "Run image generation first, then try again.")
 
     buf.seek(0)
+    label = "_".join(sorted(vns)) if vns else (batch_label if batch_label != run_id else run_id)
     return StreamingResponse(buf, media_type="application/zip",
-                             headers={"Content-Disposition": f'attachment; filename="batch_{batch_label}.zip"'})
+                             headers={"Content-Disposition": f'attachment; filename="batch_{label}.zip"'})
+
+
+def api_download_batches(batch_names: list[str]):
+    """Return a zip of all images for given batch names, grouped by VN folder."""
+    image_files_by_vn: dict[str, list[str]] = {}
+    for batch_name in batch_names:
+        files = scan_image_files_for_batch(batch_name)
+        if files:
+            image_files_by_vn[batch_name] = files
+
+    import io, zipfile
+    buf = io.BytesIO()
+    with zipfile.ZipFile(buf, "w", zipfile.ZIP_DEFLATED) as zf:
+        for vn, files in image_files_by_vn.items():
+            for img_path in files:
+                full_path = ROOT / img_path
+                if not full_path.exists():
+                    continue
+                naming = _parse_image_naming(img_path, None)
+                aspect = _extract_aspect_from_image_path(img_path)
+                meta_path = full_path.with_suffix(".json")
+                folder = f"{vn}/{aspect}" if aspect else vn
+                zf.write(full_path, f"{folder}/{naming['stem']}{naming['ext']}")
+                meta_content = {"source": img_path}
+                if meta_path.exists():
+                    try:
+                        meta_content = json.loads(meta_path.read_text(encoding="utf-8"))
+                    except Exception:
+                        pass
+                meta_content["_download_name"] = naming["stem"]
+                zf.writestr(f"{folder}/{naming['stem']}_metadata.json",
+                            json.dumps(meta_content, ensure_ascii=False, indent=2))
+
+        if not image_files_by_vn:
+            zf.writestr("README.txt",
+                        "No generated images found for selected batch(es).\n"
+                        "Run image generation first, then try again.")
+
+    buf.seek(0)
+    label = "_".join(batch_names) if batch_names else "batches"
+    return StreamingResponse(buf, media_type="application/zip",
+                             headers={"Content-Disposition": f'attachment; filename="{label}.zip"'})
 
 
 # ── Modular routes ───────────────────────────────────────────────────────────

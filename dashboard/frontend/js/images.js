@@ -1,4 +1,4 @@
-import { setStatus } from "./ui.js";
+import { appendLog } from "./ui.js";
 import { fetchJSON, invalidateRuns } from "./api.js";
 
 export function buildImageGallery(run) {
@@ -103,11 +103,11 @@ export function buildImageGallery(run) {
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({ image_file: path }),
         });
-        setStatus(`Deleted image: ${path.split("/").pop()}`);
+        appendLog(`Deleted image: ${path.split("/").pop()}`);
         card.remove();
         invalidateRuns();
       } catch (err) {
-        setStatus(`Delete error: ${String(err)}`);
+        appendLog(`Delete error: ${String(err)}`);
         imgDeleteBtn.disabled = false;
       }
     });

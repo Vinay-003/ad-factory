@@ -1,5 +1,5 @@
 const statusEl = document.getElementById("status");
-const chromeStatusEl = document.getElementById("chromeStatus");
+const logStatusEl = document.getElementById("logStatus");
 
 export function setStatus(text) {
   if (!statusEl) return;
@@ -7,16 +7,18 @@ export function setStatus(text) {
   statusEl.scrollTop = 0;
 }
 
-export function appendStatus(text) {
-  if (!statusEl) return;
-  statusEl.textContent += text + "\n";
-  statusEl.scrollTop = statusEl.scrollHeight;
+export function appendLog(text) {
+  if (!logStatusEl) return;
+  const ts = new Date().toLocaleTimeString();
+  const prefix = logStatusEl.textContent ? "\n" : "";
+  logStatusEl.textContent += `${prefix}[${ts}] ${text}`;
+  logStatusEl.scrollTop = logStatusEl.scrollHeight;
 }
 
-export function setChromeStatus(text) {
-  if (!chromeStatusEl) return;
-  chromeStatusEl.textContent = text;
-  chromeStatusEl.scrollTop = 0;
+export function setLogStatus(text) {
+  if (!logStatusEl) return;
+  logStatusEl.textContent = text;
+  logStatusEl.scrollTop = 0;
 }
 
 export function chip(label, active, onClick) {

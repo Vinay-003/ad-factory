@@ -1402,7 +1402,7 @@
       "label": "api_launch_visible_browser()",
       "file_type": "code",
       "source_file": "dashboard/backend/app.py",
-      "source_location": "L4486",
+      "source_location": "L4499",
       "id": "app_api_launch_visible_browser",
       "community": 10,
       "norm_label": "api_launch_visible_browser()"
@@ -1411,7 +1411,7 @@
       "label": "api_kill_chrome()",
       "file_type": "code",
       "source_file": "dashboard/backend/app.py",
-      "source_location": "L4528",
+      "source_location": "L4541",
       "id": "app_api_kill_chrome",
       "community": 10,
       "norm_label": "api_kill_chrome()"
@@ -1420,7 +1420,7 @@
       "label": "api_edit_prompt()",
       "file_type": "code",
       "source_file": "dashboard/backend/app.py",
-      "source_location": "L4559",
+      "source_location": "L4572",
       "id": "app_api_edit_prompt",
       "community": 6,
       "norm_label": "api_edit_prompt()"
@@ -1429,7 +1429,7 @@
       "label": "api_delete_prompt()",
       "file_type": "code",
       "source_file": "dashboard/backend/app.py",
-      "source_location": "L4579",
+      "source_location": "L4592",
       "id": "app_api_delete_prompt",
       "community": 6,
       "norm_label": "api_delete_prompt()"
@@ -1438,7 +1438,7 @@
       "label": "api_delete_image()",
       "file_type": "code",
       "source_file": "dashboard/backend/app.py",
-      "source_location": "L4599",
+      "source_location": "L4612",
       "id": "app_api_delete_image",
       "community": 6,
       "norm_label": "api_delete_image()"
@@ -1447,7 +1447,7 @@
       "label": "_parse_image_naming()",
       "file_type": "code",
       "source_file": "dashboard/backend/app.py",
-      "source_location": "L4624",
+      "source_location": "L4637",
       "id": "app_parse_image_naming",
       "community": 6,
       "norm_label": "_parse_image_naming()"
@@ -1456,7 +1456,7 @@
       "label": "api_download_single_image()",
       "file_type": "code",
       "source_file": "dashboard/backend/app.py",
-      "source_location": "L4669",
+      "source_location": "L4682",
       "id": "app_api_download_single_image",
       "community": 6,
       "norm_label": "api_download_single_image()"
@@ -1465,7 +1465,7 @@
       "label": "api_download_batch_images()",
       "file_type": "code",
       "source_file": "dashboard/backend/app.py",
-      "source_location": "L4697",
+      "source_location": "L4710",
       "id": "app_api_download_batch_images",
       "community": 6,
       "norm_label": "api_download_batch_images()"
@@ -1475,79 +1475,79 @@
       "file_type": "rationale",
       "source_file": "dashboard/backend/app.py",
       "source_location": "L154",
-      "id": "app_rationale_154",
       "community": 0,
-      "norm_label": "classify a headline opening pattern for hypothesis sanity checks.      the class"
+      "norm_label": "classify a headline opening pattern for hypothesis sanity checks.      the class",
+      "id": "app_rationale_154"
     },
     {
       "label": "Collect generated image paths for a specific aspect ratio.      Searches both le",
       "file_type": "rationale",
       "source_file": "dashboard/backend/app.py",
       "source_location": "L2475",
-      "id": "app_rationale_2475",
       "community": 0,
-      "norm_label": "collect generated image paths for a specific aspect ratio.      searches both le"
+      "norm_label": "collect generated image paths for a specific aspect ratio.      searches both le",
+      "id": "app_rationale_2475"
     },
     {
       "label": "Write generation_metadata.json alongside generated images with persona,     form",
       "file_type": "rationale",
       "source_file": "dashboard/backend/app.py",
       "source_location": "L2494",
-      "id": "app_rationale_2494",
       "community": 0,
-      "norm_label": "write generation_metadata.json alongside generated images with persona,     form"
+      "norm_label": "write generation_metadata.json alongside generated images with persona,     form",
+      "id": "app_rationale_2494"
     },
     {
       "label": "Legacy-ish extractor used by the dashboard editor.      It DOES NOT preserve exa",
       "file_type": "rationale",
       "source_file": "dashboard/backend/app.py",
       "source_location": "L2622",
-      "id": "app_rationale_2622",
       "community": 0,
-      "norm_label": "legacy-ish extractor used by the dashboard editor.      it does not preserve exa"
+      "norm_label": "legacy-ish extractor used by the dashboard editor.      it does not preserve exa",
+      "id": "app_rationale_2622"
     },
     {
       "label": "Task 5: Extract ONLY the content inside:       EXACT ON-IMAGE COPY - DO NOT ALTE",
       "file_type": "rationale",
       "source_file": "dashboard/backend/app.py",
       "source_location": "L2645",
-      "id": "app_rationale_2645",
       "community": 0,
-      "norm_label": "task 5: extract only the content inside:       exact on-image copy - do not alte"
+      "norm_label": "task 5: extract only the content inside:       exact on-image copy - do not alte",
+      "id": "app_rationale_2645"
     },
     {
       "label": "Expand ad plan to include hypothesis style.      When a hypothesis is active, ge",
       "file_type": "rationale",
       "source_file": "dashboard/backend/app.py",
       "source_location": "L2858",
-      "id": "app_rationale_2858",
       "community": 4,
-      "norm_label": "expand ad plan to include hypothesis style.      when a hypothesis is active, ge"
+      "norm_label": "expand ad plan to include hypothesis style.      when a hypothesis is active, ge",
+      "id": "app_rationale_2858"
     },
     {
       "label": "Preserve EXACT headline value text as written in the exact block.      We intent",
       "file_type": "rationale",
       "source_file": "dashboard/backend/app.py",
       "source_location": "L3285",
-      "id": "app_rationale_3285",
       "community": 0,
-      "norm_label": "preserve exact headline value text as written in the exact block.      we intent"
+      "norm_label": "preserve exact headline value text as written in the exact block.      we intent",
+      "id": "app_rationale_3285"
     },
     {
       "label": "For a single run, build the list of {prompt_96, image_sources} entries for 9:16",
       "file_type": "rationale",
       "source_file": "dashboard/backend/app.py",
       "source_location": "L3956",
-      "id": "app_rationale_3956",
       "community": 0,
-      "norm_label": "for a single run, build the list of {prompt_96, image_sources} entries for 9:16"
+      "norm_label": "for a single run, build the list of {prompt_96, image_sources} entries for 9:16",
+      "id": "app_rationale_3956"
     },
     {
       "label": "Launch a visible Chrome instance with CDP enabled so the user can log in     bef",
       "file_type": "rationale",
       "source_file": "dashboard/backend/app.py",
-      "source_location": "L4487",
-      "id": "app_rationale_4487",
+      "source_location": "L4500",
+      "id": "app_rationale_4500",
       "community": 10,
       "norm_label": "launch a visible chrome instance with cdp enabled so the user can log in     bef"
     },
@@ -1555,8 +1555,8 @@
       "label": "Kill the Chrome process started by launch-visible-browser and stop any running a",
       "file_type": "rationale",
       "source_file": "dashboard/backend/app.py",
-      "source_location": "L4529",
-      "id": "app_rationale_4529",
+      "source_location": "L4542",
+      "id": "app_rationale_4542",
       "community": 10,
       "norm_label": "kill the chrome process started by launch-visible-browser and stop any running a"
     },
@@ -1564,8 +1564,8 @@
       "label": "Edit a prompt file in-place, replacing only the EXACT ON-IMAGE COPY block.",
       "file_type": "rationale",
       "source_file": "dashboard/backend/app.py",
-      "source_location": "L4560",
-      "id": "app_rationale_4560",
+      "source_location": "L4573",
+      "id": "app_rationale_4573",
       "community": 6,
       "norm_label": "edit a prompt file in-place, replacing only the exact on-image copy block."
     },
@@ -1573,8 +1573,8 @@
       "label": "Delete a prompt file and remove it from the run manifest.",
       "file_type": "rationale",
       "source_file": "dashboard/backend/app.py",
-      "source_location": "L4580",
-      "id": "app_rationale_4580",
+      "source_location": "L4593",
+      "id": "app_rationale_4593",
       "community": 6,
       "norm_label": "delete a prompt file and remove it from the run manifest."
     },
@@ -1582,8 +1582,8 @@
       "label": "Delete a generated image and its metadata JSON.",
       "file_type": "rationale",
       "source_file": "dashboard/backend/app.py",
-      "source_location": "L4600",
-      "id": "app_rationale_4600",
+      "source_location": "L4613",
+      "id": "app_rationale_4613",
       "community": 6,
       "norm_label": "delete a generated image and its metadata json."
     },
@@ -1591,8 +1591,8 @@
       "label": "Extract format, persona, language from an image's companion JSON metadata     an",
       "file_type": "rationale",
       "source_file": "dashboard/backend/app.py",
-      "source_location": "L4625",
-      "id": "app_rationale_4625",
+      "source_location": "L4638",
+      "id": "app_rationale_4638",
       "community": 6,
       "norm_label": "extract format, persona, language from an image's companion json metadata     an"
     },
@@ -1600,8 +1600,8 @@
       "label": "Return a zip containing the image file and its metadata JSON.",
       "file_type": "rationale",
       "source_file": "dashboard/backend/app.py",
-      "source_location": "L4670",
-      "id": "app_rationale_4670",
+      "source_location": "L4683",
+      "id": "app_rationale_4683",
       "community": 6,
       "norm_label": "return a zip containing the image file and its metadata json."
     },
@@ -1609,8 +1609,8 @@
       "label": "Return a zip containing all images in a run with their metadata.",
       "file_type": "rationale",
       "source_file": "dashboard/backend/app.py",
-      "source_location": "L4698",
-      "id": "app_rationale_4698",
+      "source_location": "L4711",
+      "id": "app_rationale_4711",
       "community": 6,
       "norm_label": "return a zip containing all images in a run with their metadata."
     },
@@ -3545,27 +3545,27 @@
       "file_type": "rationale",
       "source_file": "scripts/gemini_web_automation.py",
       "source_location": "L421",
-      "id": "gemini_web_automation_rationale_421",
       "community": 1,
-      "norm_label": "best-effort permissions needed for clipboard paste in cdp/visible chrome."
+      "norm_label": "best-effort permissions needed for clipboard paste in cdp/visible chrome.",
+      "id": "gemini_web_automation_rationale_421"
     },
     {
       "label": "Best-effort configure Chrome's download directory.      This matters when attach",
       "file_type": "rationale",
       "source_file": "scripts/gemini_web_automation.py",
       "source_location": "L481",
-      "id": "gemini_web_automation_rationale_481",
       "community": 1,
-      "norm_label": "best-effort configure chrome's download directory.      this matters when attach"
+      "norm_label": "best-effort configure chrome's download directory.      this matters when attach",
+      "id": "gemini_web_automation_rationale_481"
     },
     {
       "label": "Open/switch to the tab that will own this prompt.",
       "file_type": "rationale",
       "source_file": "scripts/gemini_web_automation.py",
       "source_location": "L657",
-      "id": "gemini_web_automation_rationale_657",
       "community": 1,
-      "norm_label": "open/switch to the tab that will own this prompt."
+      "norm_label": "open/switch to the tab that will own this prompt.",
+      "id": "gemini_web_automation_rationale_657"
     },
     {
       "label": "Small diagnostic report used before upload/send.",
@@ -3581,171 +3581,171 @@
       "file_type": "rationale",
       "source_file": "scripts/gemini_web_automation.py",
       "source_location": "L694",
-      "id": "gemini_web_automation_rationale_694",
       "community": 1,
-      "norm_label": "navigate to a fresh gemini chat using url stability locks to defeat spa race con"
+      "norm_label": "navigate to a fresh gemini chat using url stability locks to defeat spa race con",
+      "id": "gemini_web_automation_rationale_694"
     },
     {
       "label": "Insert text without synthesizing Enter key presses.      keyboard.type() is unsa",
       "file_type": "rationale",
       "source_file": "scripts/gemini_web_automation.py",
       "source_location": "L1035",
-      "id": "gemini_web_automation_rationale_1035",
       "community": 5,
-      "norm_label": "insert text without synthesizing enter key presses.      keyboard.type() is unsa"
+      "norm_label": "insert text without synthesizing enter key presses.      keyboard.type() is unsa",
+      "id": "gemini_web_automation_rationale_1035"
     },
     {
       "label": "Return visible signs that Gemini accepted the prompt.      Gemini often clears t",
       "file_type": "rationale",
       "source_file": "scripts/gemini_web_automation.py",
       "source_location": "L1374",
-      "id": "gemini_web_automation_rationale_1374",
       "community": 5,
-      "norm_label": "return visible signs that gemini accepted the prompt.      gemini often clears t"
+      "norm_label": "return visible signs that gemini accepted the prompt.      gemini often clears t",
+      "id": "gemini_web_automation_rationale_1374"
     },
     {
       "label": "Return stable prompt snippets used to confirm the prompt left composer.",
       "file_type": "rationale",
       "source_file": "scripts/gemini_web_automation.py",
       "source_location": "L1429",
-      "id": "gemini_web_automation_rationale_1429",
       "community": 5,
-      "norm_label": "return stable prompt snippets used to confirm the prompt left composer."
+      "norm_label": "return stable prompt snippets used to confirm the prompt left composer.",
+      "id": "gemini_web_automation_rationale_1429"
     },
     {
       "label": "Find an existing file input. Hidden inputs are OK for set_input_files().",
       "file_type": "rationale",
       "source_file": "scripts/gemini_web_automation.py",
       "source_location": "L1719",
-      "id": "gemini_web_automation_rationale_1719",
       "community": 1,
-      "norm_label": "find an existing file input. hidden inputs are ok for set_input_files()."
+      "norm_label": "find an existing file input. hidden inputs are ok for set_input_files().",
+      "id": "gemini_web_automation_rationale_1719"
     },
     {
       "label": "Click the visible attachment/add-files control closest to the composer.",
       "file_type": "rationale",
       "source_file": "scripts/gemini_web_automation.py",
       "source_location": "L1741",
-      "id": "gemini_web_automation_rationale_1741",
       "community": 1,
-      "norm_label": "click the visible attachment/add-files control closest to the composer."
+      "norm_label": "click the visible attachment/add-files control closest to the composer.",
+      "id": "gemini_web_automation_rationale_1741"
     },
     {
       "label": "Click the Upload files item inside Gemini's opened attach menu.",
       "file_type": "rationale",
       "source_file": "scripts/gemini_web_automation.py",
       "source_location": "L1797",
-      "id": "gemini_web_automation_rationale_1797",
       "community": 1,
-      "norm_label": "click the upload files item inside gemini's opened attach menu."
+      "norm_label": "click the upload files item inside gemini's opened attach menu.",
+      "id": "gemini_web_automation_rationale_1797"
     },
     {
       "label": "Click only the composer + / Add files button, never the Upload files menu item.",
       "file_type": "rationale",
       "source_file": "scripts/gemini_web_automation.py",
       "source_location": "L1842",
-      "id": "gemini_web_automation_rationale_1842",
       "community": 1,
-      "norm_label": "click only the composer + / add files button, never the upload files menu item."
+      "norm_label": "click only the composer + / add files button, never the upload files menu item.",
+      "id": "gemini_web_automation_rationale_1842"
     },
     {
       "label": "Open the + / attachment menu only.      Important: do NOT click the \"Upload file",
       "file_type": "rationale",
       "source_file": "scripts/gemini_web_automation.py",
       "source_location": "L1880",
-      "id": "gemini_web_automation_rationale_1880",
       "community": 1,
-      "norm_label": "open the + / attachment menu only.      important: do not click the \"upload file"
+      "norm_label": "open the + / attachment menu only.      important: do not click the \"upload file",
+      "id": "gemini_web_automation_rationale_1880"
     },
     {
       "label": "Assign files to an existing Gemini file input through CDP.      Gemini usually c",
       "file_type": "rationale",
       "source_file": "scripts/gemini_web_automation.py",
       "source_location": "L2003",
-      "id": "gemini_web_automation_rationale_2003",
       "community": 1,
-      "norm_label": "assign files to an existing gemini file input through cdp.      gemini usually c"
+      "norm_label": "assign files to an existing gemini file input through cdp.      gemini usually c",
+      "id": "gemini_web_automation_rationale_2003"
     },
     {
       "label": "Assign files to any existing file input using Playwright, without opening OS dia",
       "file_type": "rationale",
       "source_file": "scripts/gemini_web_automation.py",
       "source_location": "L2050",
-      "id": "gemini_web_automation_rationale_2050",
       "community": 1,
-      "norm_label": "assign files to any existing file input using playwright, without opening os dia"
+      "norm_label": "assign files to any existing file input using playwright, without opening os dia",
+      "id": "gemini_web_automation_rationale_2050"
     },
     {
       "label": "Drive the Linux Open Files dialog with xdotool when Playwright misses it.      T",
       "file_type": "rationale",
       "source_file": "scripts/gemini_web_automation.py",
       "source_location": "L2089",
-      "id": "gemini_web_automation_rationale_2089",
       "community": 1,
-      "norm_label": "drive the linux open files dialog with xdotool when playwright misses it.      t"
+      "norm_label": "drive the linux open files dialog with xdotool when playwright misses it.      t",
+      "id": "gemini_web_automation_rationale_2089"
     },
     {
       "label": "Open Gemini's Upload files chooser.      Returns a Playwright FileChooser when t",
       "file_type": "rationale",
       "source_file": "scripts/gemini_web_automation.py",
       "source_location": "L2126",
-      "id": "gemini_web_automation_rationale_2126",
       "community": 1,
-      "norm_label": "open gemini's upload files chooser.      returns a playwright filechooser when t"
+      "norm_label": "open gemini's upload files chooser.      returns a playwright filechooser when t",
+      "id": "gemini_web_automation_rationale_2126"
     },
     {
       "label": "Upload files one at a time through Gemini's Upload files menu.      This avoids",
       "file_type": "rationale",
       "source_file": "scripts/gemini_web_automation.py",
       "source_location": "L2218",
-      "id": "gemini_web_automation_rationale_2218",
       "community": 1,
-      "norm_label": "upload files one at a time through gemini's upload files menu.      this avoids"
+      "norm_label": "upload files one at a time through gemini's upload files menu.      this avoids",
+      "id": "gemini_web_automation_rationale_2218"
     },
     {
       "label": "Return visible generated-image candidates.      Use an arrow function for Playwr",
       "file_type": "rationale",
       "source_file": "scripts/gemini_web_automation.py",
       "source_location": "L2403",
-      "id": "gemini_web_automation_rationale_2403",
       "community": 1,
-      "norm_label": "return visible generated-image candidates.      use an arrow function for playwr"
+      "norm_label": "return visible generated-image candidates.      use an arrow function for playwr",
+      "id": "gemini_web_automation_rationale_2403"
     },
     {
       "label": "Mark the best visible output image with a data attribute and return its src.",
       "file_type": "rationale",
       "source_file": "scripts/gemini_web_automation.py",
       "source_location": "L2481",
-      "id": "gemini_web_automation_rationale_2481",
       "community": 1,
-      "norm_label": "mark the best visible output image with a data attribute and return its src."
+      "norm_label": "mark the best visible output image with a data attribute and return its src.",
+      "id": "gemini_web_automation_rationale_2481"
     },
     {
       "label": "Save the actual visible/generated image resource, not a screenshot.      This is",
       "file_type": "rationale",
       "source_file": "scripts/gemini_web_automation.py",
       "source_location": "L2649",
-      "id": "gemini_web_automation_rationale_2649",
       "community": 1,
-      "norm_label": "save the actual visible/generated image resource, not a screenshot.      this is"
+      "norm_label": "save the actual visible/generated image resource, not a screenshot.      this is",
+      "id": "gemini_web_automation_rationale_2649"
     },
     {
       "label": "Return likely places Chrome may save files during CDP-attached sessions.",
       "file_type": "rationale",
       "source_file": "scripts/gemini_web_automation.py",
       "source_location": "L2765",
-      "id": "gemini_web_automation_rationale_2765",
       "community": 1,
-      "norm_label": "return likely places chrome may save files during cdp-attached sessions."
+      "norm_label": "return likely places chrome may save files during cdp-attached sessions.",
+      "id": "gemini_web_automation_rationale_2765"
     },
     {
       "label": "Poll multiple download dirs.      Chrome sometimes shows a valid 6MB file in its",
       "file_type": "rationale",
       "source_file": "scripts/gemini_web_automation.py",
       "source_location": "L2797",
-      "id": "gemini_web_automation_rationale_2797",
       "community": 1,
-      "norm_label": "poll multiple download dirs.      chrome sometimes shows a valid 6mb file in its"
+      "norm_label": "poll multiple download dirs.      chrome sometimes shows a valid 6mb file in its",
+      "id": "gemini_web_automation_rationale_2797"
     },
     {
       "label": "generate_ads.py",
@@ -4333,11 +4333,83 @@
       "norm_label": "main()"
     },
     {
+      "label": "Launch a visible Chrome instance with CDP enabled so the user can log in     bef",
+      "file_type": "rationale",
+      "source_file": "dashboard/backend/app.py",
+      "source_location": "L4487",
+      "community": 20,
+      "norm_label": "launch a visible chrome instance with cdp enabled so the user can log in     bef",
+      "id": "app_rationale_4487"
+    },
+    {
+      "label": "Kill the Chrome process started by launch-visible-browser and stop any running a",
+      "file_type": "rationale",
+      "source_file": "dashboard/backend/app.py",
+      "source_location": "L4529",
+      "community": 21,
+      "norm_label": "kill the chrome process started by launch-visible-browser and stop any running a",
+      "id": "app_rationale_4529"
+    },
+    {
+      "label": "Edit a prompt file in-place, replacing only the EXACT ON-IMAGE COPY block.",
+      "file_type": "rationale",
+      "source_file": "dashboard/backend/app.py",
+      "source_location": "L4560",
+      "community": 22,
+      "norm_label": "edit a prompt file in-place, replacing only the exact on-image copy block.",
+      "id": "app_rationale_4560"
+    },
+    {
+      "label": "Delete a prompt file and remove it from the run manifest.",
+      "file_type": "rationale",
+      "source_file": "dashboard/backend/app.py",
+      "source_location": "L4580",
+      "community": 23,
+      "norm_label": "delete a prompt file and remove it from the run manifest.",
+      "id": "app_rationale_4580"
+    },
+    {
+      "label": "Delete a generated image and its metadata JSON.",
+      "file_type": "rationale",
+      "source_file": "dashboard/backend/app.py",
+      "source_location": "L4600",
+      "community": 24,
+      "norm_label": "delete a generated image and its metadata json.",
+      "id": "app_rationale_4600"
+    },
+    {
+      "label": "Extract format, persona, language from an image's companion JSON metadata     an",
+      "file_type": "rationale",
+      "source_file": "dashboard/backend/app.py",
+      "source_location": "L4625",
+      "community": 25,
+      "norm_label": "extract format, persona, language from an image's companion json metadata     an",
+      "id": "app_rationale_4625"
+    },
+    {
+      "label": "Return a zip containing the image file and its metadata JSON.",
+      "file_type": "rationale",
+      "source_file": "dashboard/backend/app.py",
+      "source_location": "L4670",
+      "community": 26,
+      "norm_label": "return a zip containing the image file and its metadata json.",
+      "id": "app_rationale_4670"
+    },
+    {
+      "label": "Return a zip containing all images in a run with their metadata.",
+      "file_type": "rationale",
+      "source_file": "dashboard/backend/app.py",
+      "source_location": "L4698",
+      "community": 27,
+      "norm_label": "return a zip containing all images in a run with their metadata.",
+      "id": "app_rationale_4698"
+    },
+    {
       "label": "Classify a headline opening pattern for hypothesis sanity checks.      The class",
       "file_type": "rationale",
       "source_file": "dashboard/backend/app.py",
       "source_location": "L127",
-      "community": 20,
+      "community": 28,
       "norm_label": "classify a headline opening pattern for hypothesis sanity checks.      the class",
       "id": "app_rationale_127"
     },
@@ -4346,7 +4418,7 @@
       "file_type": "rationale",
       "source_file": "dashboard/backend/app.py",
       "source_location": "L2339",
-      "community": 21,
+      "community": 29,
       "norm_label": "collect generated image paths for a specific aspect ratio.      searches both le",
       "id": "app_rationale_2339"
     },
@@ -4355,7 +4427,7 @@
       "file_type": "rationale",
       "source_file": "dashboard/backend/app.py",
       "source_location": "L2358",
-      "community": 22,
+      "community": 30,
       "norm_label": "write generation_metadata.json alongside generated images with persona,     form",
       "id": "app_rationale_2358"
     },
@@ -4364,7 +4436,7 @@
       "file_type": "rationale",
       "source_file": "dashboard/backend/app.py",
       "source_location": "L2473",
-      "community": 23,
+      "community": 31,
       "norm_label": "legacy-ish extractor used by the dashboard editor.      it does not preserve exa",
       "id": "app_rationale_2473"
     },
@@ -4373,7 +4445,7 @@
       "file_type": "rationale",
       "source_file": "dashboard/backend/app.py",
       "source_location": "L2500",
-      "community": 24,
+      "community": 32,
       "norm_label": "task 5: extract only the content inside:       exact on-image copy - do not alte",
       "id": "app_rationale_2500"
     },
@@ -4382,7 +4454,7 @@
       "file_type": "rationale",
       "source_file": "dashboard/backend/app.py",
       "source_location": "L2713",
-      "community": 25,
+      "community": 33,
       "norm_label": "expand ad plan to include hypothesis style.      when a hypothesis is active, ge",
       "id": "app_rationale_2713"
     },
@@ -4391,7 +4463,7 @@
       "file_type": "rationale",
       "source_file": "dashboard/backend/app.py",
       "source_location": "L3072",
-      "community": 26,
+      "community": 34,
       "norm_label": "preserve exact headline value text as written in the exact block.      we intent",
       "id": "app_rationale_3072"
     },
@@ -4400,7 +4472,7 @@
       "file_type": "rationale",
       "source_file": "dashboard/backend/app.py",
       "source_location": "L3813",
-      "community": 27,
+      "community": 35,
       "norm_label": "for a single run, build the list of {prompt_96, image_sources} entries for 9:16",
       "id": "app_rationale_3813"
     },
@@ -4409,7 +4481,7 @@
       "file_type": "rationale",
       "source_file": "dashboard/backend/app.py",
       "source_location": "L4299",
-      "community": 28,
+      "community": 36,
       "norm_label": "launch a visible chrome instance with cdp enabled so the user can log in     bef",
       "id": "app_rationale_4299"
     },
@@ -4418,7 +4490,7 @@
       "file_type": "rationale",
       "source_file": "dashboard/backend/app.py",
       "source_location": "L4341",
-      "community": 29,
+      "community": 37,
       "norm_label": "kill the chrome process started by launch-visible-browser and stop any running a",
       "id": "app_rationale_4341"
     },
@@ -4427,7 +4499,7 @@
       "file_type": "rationale",
       "source_file": "dashboard/backend/app.py",
       "source_location": "L4372",
-      "community": 30,
+      "community": 38,
       "norm_label": "edit a prompt file in-place, replacing only the exact on-image copy block.",
       "id": "app_rationale_4372"
     },
@@ -4436,7 +4508,7 @@
       "file_type": "rationale",
       "source_file": "dashboard/backend/app.py",
       "source_location": "L4392",
-      "community": 31,
+      "community": 39,
       "norm_label": "delete a prompt file and remove it from the run manifest.",
       "id": "app_rationale_4392"
     },
@@ -4445,7 +4517,7 @@
       "file_type": "rationale",
       "source_file": "dashboard/backend/app.py",
       "source_location": "L4412",
-      "community": 32,
+      "community": 40,
       "norm_label": "delete a generated image and its metadata json.",
       "id": "app_rationale_4412"
     },
@@ -4454,7 +4526,7 @@
       "file_type": "rationale",
       "source_file": "dashboard/backend/app.py",
       "source_location": "L4437",
-      "community": 33,
+      "community": 41,
       "norm_label": "extract format, persona, language from an image's companion json metadata     an",
       "id": "app_rationale_4437"
     },
@@ -4463,7 +4535,7 @@
       "file_type": "rationale",
       "source_file": "dashboard/backend/app.py",
       "source_location": "L4482",
-      "community": 34,
+      "community": 42,
       "norm_label": "return a zip containing the image file and its metadata json.",
       "id": "app_rationale_4482"
     },
@@ -4472,7 +4544,7 @@
       "file_type": "rationale",
       "source_file": "dashboard/backend/app.py",
       "source_location": "L4510",
-      "community": 35,
+      "community": 43,
       "norm_label": "return a zip containing all images in a run with their metadata.",
       "id": "app_rationale_4510"
     },
@@ -4481,7 +4553,7 @@
       "file_type": "rationale",
       "source_file": "scripts/kie_nano_batch.py",
       "source_location": "L419",
-      "community": 36,
+      "community": 44,
       "norm_label": "# important: logo placement instructions removed.",
       "id": "kie_nano_batch_rationale_419"
     },
@@ -4490,7 +4562,7 @@
       "file_type": "rationale",
       "source_file": "scripts/extract_product_context.py",
       "source_location": "L20",
-      "community": 37,
+      "community": 45,
       "norm_label": "single source of truth mode:     - do not merge from legacy product files.     -",
       "id": "extract_product_context_rationale_20"
     },
@@ -4499,7 +4571,7 @@
       "file_type": "rationale",
       "source_file": "scripts/extract_product_context.py",
       "source_location": "L109",
-      "community": 38,
+      "community": 46,
       "norm_label": "extract an explicit priority block only when the master doc defines one.",
       "id": "extract_product_context_rationale_109"
     },
@@ -4508,7 +4580,7 @@
       "file_type": "rationale",
       "source_file": "scripts/extract_product_context.py",
       "source_location": "L124",
-      "community": 39,
+      "community": 47,
       "norm_label": "preserve explicit interpretation rules from the master doc. do not synthesize st",
       "id": "extract_product_context_rationale_124"
     },
@@ -4517,7 +4589,7 @@
       "file_type": "rationale",
       "source_file": "scripts/extract_product_context.py",
       "source_location": "L142",
-      "community": 40,
+      "community": 48,
       "norm_label": "preserve explicit theme/reference lines from the master doc. do not synthesize l",
       "id": "extract_product_context_rationale_142"
     },
@@ -4526,7 +4598,7 @@
       "file_type": "rationale",
       "source_file": "scripts/extract_product_context.py",
       "source_location": "L166",
-      "community": 41,
+      "community": 49,
       "norm_label": "return only source lines containing explicit rule/strategy language.",
       "id": "extract_product_context_rationale_166"
     },
@@ -4535,7 +4607,7 @@
       "file_type": "rationale",
       "source_file": "scripts/extract_product_context.py",
       "source_location": "L182",
-      "community": 42,
+      "community": 50,
       "norm_label": "extract source sections exactly as written in the master doc.",
       "id": "extract_product_context_rationale_182"
     },
@@ -4544,7 +4616,7 @@
       "file_type": "rationale",
       "source_file": "scripts/gemini_web_automation.py",
       "source_location": "L394",
-      "community": 43,
+      "community": 51,
       "norm_label": "best-effort permissions needed for clipboard paste in cdp/visible chrome.",
       "id": "gemini_web_automation_rationale_394"
     },
@@ -4553,7 +4625,7 @@
       "file_type": "rationale",
       "source_file": "scripts/gemini_web_automation.py",
       "source_location": "L454",
-      "community": 44,
+      "community": 52,
       "norm_label": "best-effort configure chrome's download directory.      this matters when attach",
       "id": "gemini_web_automation_rationale_454"
     },
@@ -4562,7 +4634,7 @@
       "file_type": "rationale",
       "source_file": "scripts/gemini_web_automation.py",
       "source_location": "L630",
-      "community": 45,
+      "community": 53,
       "norm_label": "open/switch to the tab that will own this prompt.",
       "id": "gemini_web_automation_rationale_630"
     },
@@ -4571,7 +4643,7 @@
       "file_type": "rationale",
       "source_file": "scripts/gemini_web_automation.py",
       "source_location": "L651",
-      "community": 46,
+      "community": 54,
       "norm_label": "navigate to gemini without failing only because the spa never fires full load.",
       "id": "gemini_web_automation_rationale_651"
     },
@@ -4580,7 +4652,7 @@
       "file_type": "rationale",
       "source_file": "scripts/gemini_web_automation.py",
       "source_location": "L667",
-      "community": 47,
+      "community": 55,
       "norm_label": "navigate to a fresh gemini chat using url stability locks to defeat spa race con",
       "id": "gemini_web_automation_rationale_667"
     },
@@ -4589,7 +4661,7 @@
       "file_type": "rationale",
       "source_file": "scripts/gemini_web_automation.py",
       "source_location": "L1008",
-      "community": 48,
+      "community": 56,
       "norm_label": "insert text without synthesizing enter key presses.      keyboard.type() is unsa",
       "id": "gemini_web_automation_rationale_1008"
     },
@@ -4598,7 +4670,7 @@
       "file_type": "rationale",
       "source_file": "scripts/gemini_web_automation.py",
       "source_location": "L1347",
-      "community": 49,
+      "community": 57,
       "norm_label": "return visible signs that gemini accepted the prompt.      gemini often clears t",
       "id": "gemini_web_automation_rationale_1347"
     },
@@ -4607,7 +4679,7 @@
       "file_type": "rationale",
       "source_file": "scripts/gemini_web_automation.py",
       "source_location": "L1402",
-      "community": 50,
+      "community": 58,
       "norm_label": "return stable prompt snippets used to confirm the prompt left composer.",
       "id": "gemini_web_automation_rationale_1402"
     },
@@ -4616,7 +4688,7 @@
       "file_type": "rationale",
       "source_file": "scripts/gemini_web_automation.py",
       "source_location": "L1692",
-      "community": 51,
+      "community": 59,
       "norm_label": "find an existing file input. hidden inputs are ok for set_input_files().",
       "id": "gemini_web_automation_rationale_1692"
     },
@@ -4625,7 +4697,7 @@
       "file_type": "rationale",
       "source_file": "scripts/gemini_web_automation.py",
       "source_location": "L1714",
-      "community": 52,
+      "community": 60,
       "norm_label": "click the visible attachment/add-files control closest to the composer.",
       "id": "gemini_web_automation_rationale_1714"
     },
@@ -4634,7 +4706,7 @@
       "file_type": "rationale",
       "source_file": "scripts/gemini_web_automation.py",
       "source_location": "L1770",
-      "community": 53,
+      "community": 61,
       "norm_label": "click the upload files item inside gemini's opened attach menu.",
       "id": "gemini_web_automation_rationale_1770"
     },
@@ -4643,7 +4715,7 @@
       "file_type": "rationale",
       "source_file": "scripts/gemini_web_automation.py",
       "source_location": "L1815",
-      "community": 54,
+      "community": 62,
       "norm_label": "click only the composer + / add files button, never the upload files menu item.",
       "id": "gemini_web_automation_rationale_1815"
     },
@@ -4652,7 +4724,7 @@
       "file_type": "rationale",
       "source_file": "scripts/gemini_web_automation.py",
       "source_location": "L1853",
-      "community": 55,
+      "community": 63,
       "norm_label": "open the + / attachment menu only.      important: do not click the \"upload file",
       "id": "gemini_web_automation_rationale_1853"
     },
@@ -4661,7 +4733,7 @@
       "file_type": "rationale",
       "source_file": "scripts/gemini_web_automation.py",
       "source_location": "L1976",
-      "community": 56,
+      "community": 64,
       "norm_label": "assign files to an existing gemini file input through cdp.      gemini usually c",
       "id": "gemini_web_automation_rationale_1976"
     },
@@ -4670,7 +4742,7 @@
       "file_type": "rationale",
       "source_file": "scripts/gemini_web_automation.py",
       "source_location": "L2023",
-      "community": 57,
+      "community": 65,
       "norm_label": "assign files to any existing file input using playwright, without opening os dia",
       "id": "gemini_web_automation_rationale_2023"
     },
@@ -4679,7 +4751,7 @@
       "file_type": "rationale",
       "source_file": "scripts/gemini_web_automation.py",
       "source_location": "L2062",
-      "community": 58,
+      "community": 66,
       "norm_label": "drive the linux open files dialog with xdotool when playwright misses it.      t",
       "id": "gemini_web_automation_rationale_2062"
     },
@@ -4688,7 +4760,7 @@
       "file_type": "rationale",
       "source_file": "scripts/gemini_web_automation.py",
       "source_location": "L2099",
-      "community": 59,
+      "community": 67,
       "norm_label": "open gemini's upload files chooser.      returns a playwright filechooser when t",
       "id": "gemini_web_automation_rationale_2099"
     },
@@ -4697,7 +4769,7 @@
       "file_type": "rationale",
       "source_file": "scripts/gemini_web_automation.py",
       "source_location": "L2191",
-      "community": 60,
+      "community": 68,
       "norm_label": "upload files one at a time through gemini's upload files menu.      this avoids",
       "id": "gemini_web_automation_rationale_2191"
     },
@@ -4706,7 +4778,7 @@
       "file_type": "rationale",
       "source_file": "scripts/gemini_web_automation.py",
       "source_location": "L2376",
-      "community": 61,
+      "community": 69,
       "norm_label": "return visible generated-image candidates.      use an arrow function for playwr",
       "id": "gemini_web_automation_rationale_2376"
     },
@@ -4715,7 +4787,7 @@
       "file_type": "rationale",
       "source_file": "scripts/gemini_web_automation.py",
       "source_location": "L2454",
-      "community": 62,
+      "community": 70,
       "norm_label": "mark the best visible output image with a data attribute and return its src.",
       "id": "gemini_web_automation_rationale_2454"
     },
@@ -4724,7 +4796,7 @@
       "file_type": "rationale",
       "source_file": "scripts/gemini_web_automation.py",
       "source_location": "L2622",
-      "community": 63,
+      "community": 71,
       "norm_label": "save the actual visible/generated image resource, not a screenshot.      this is",
       "id": "gemini_web_automation_rationale_2622"
     },
@@ -4733,7 +4805,7 @@
       "file_type": "rationale",
       "source_file": "scripts/gemini_web_automation.py",
       "source_location": "L2738",
-      "community": 64,
+      "community": 72,
       "norm_label": "return likely places chrome may save files during cdp-attached sessions.",
       "id": "gemini_web_automation_rationale_2738"
     },
@@ -4742,7 +4814,7 @@
       "file_type": "rationale",
       "source_file": "scripts/gemini_web_automation.py",
       "source_location": "L2770",
-      "community": 65,
+      "community": 73,
       "norm_label": "poll multiple download dirs.      chrome sometimes shows a valid 6mb file in its",
       "id": "gemini_web_automation_rationale_2770"
     },
@@ -4751,7 +4823,7 @@
       "file_type": "rationale",
       "source_file": "dashboard/backend/app.py",
       "source_location": "L142",
-      "community": 66,
+      "community": 74,
       "norm_label": "classify a headline opening pattern for hypothesis sanity checks.      the class",
       "id": "app_rationale_142"
     },
@@ -4760,7 +4832,7 @@
       "file_type": "rationale",
       "source_file": "dashboard/backend/app.py",
       "source_location": "L1957",
-      "community": 67,
+      "community": 75,
       "norm_label": "call blackbox server via http api",
       "id": "app_rationale_1957"
     },
@@ -4769,7 +4841,7 @@
       "file_type": "rationale",
       "source_file": "dashboard/backend/app.py",
       "source_location": "L2371",
-      "community": 68,
+      "community": 76,
       "norm_label": "collect generated image paths for a specific aspect ratio.      searches both le",
       "id": "app_rationale_2371"
     },
@@ -4778,7 +4850,7 @@
       "file_type": "rationale",
       "source_file": "dashboard/backend/app.py",
       "source_location": "L2390",
-      "community": 69,
+      "community": 77,
       "norm_label": "write generation_metadata.json alongside generated images with persona,     form",
       "id": "app_rationale_2390"
     },
@@ -4787,7 +4859,7 @@
       "file_type": "rationale",
       "source_file": "dashboard/backend/app.py",
       "source_location": "L2505",
-      "community": 70,
+      "community": 78,
       "norm_label": "legacy-ish extractor used by the dashboard editor.      it does not preserve exa",
       "id": "app_rationale_2505"
     },
@@ -4796,7 +4868,7 @@
       "file_type": "rationale",
       "source_file": "dashboard/backend/app.py",
       "source_location": "L2532",
-      "community": 71,
+      "community": 79,
       "norm_label": "task 5: extract only the content inside:       exact on-image copy - do not alte",
       "id": "app_rationale_2532"
     },
@@ -4805,7 +4877,7 @@
       "file_type": "rationale",
       "source_file": "dashboard/backend/app.py",
       "source_location": "L2745",
-      "community": 72,
+      "community": 80,
       "norm_label": "expand ad plan to include hypothesis style.      when a hypothesis is active, ge",
       "id": "app_rationale_2745"
     },
@@ -4814,7 +4886,7 @@
       "file_type": "rationale",
       "source_file": "dashboard/backend/app.py",
       "source_location": "L3111",
-      "community": 73,
+      "community": 81,
       "norm_label": "preserve exact headline value text as written in the exact block.      we intent",
       "id": "app_rationale_3111"
     },
@@ -4823,7 +4895,7 @@
       "file_type": "rationale",
       "source_file": "dashboard/backend/app.py",
       "source_location": "L3857",
-      "community": 74,
+      "community": 82,
       "norm_label": "for a single run, build the list of {prompt_96, image_sources} entries for 9:16",
       "id": "app_rationale_3857"
     },
@@ -4832,7 +4904,7 @@
       "file_type": "rationale",
       "source_file": "dashboard/backend/app.py",
       "source_location": "L4373",
-      "community": 75,
+      "community": 83,
       "norm_label": "launch a visible chrome instance with cdp enabled so the user can log in     bef",
       "id": "app_rationale_4373"
     },
@@ -4841,7 +4913,7 @@
       "file_type": "rationale",
       "source_file": "dashboard/backend/app.py",
       "source_location": "L4416",
-      "community": 76,
+      "community": 84,
       "norm_label": "kill the chrome process started by launch-visible-browser and stop any running a",
       "id": "app_rationale_4416"
     },
@@ -4850,7 +4922,7 @@
       "file_type": "rationale",
       "source_file": "dashboard/backend/app.py",
       "source_location": "L4448",
-      "community": 77,
+      "community": 85,
       "norm_label": "edit a prompt file in-place.",
       "id": "app_rationale_4448"
     },
@@ -4859,7 +4931,7 @@
       "file_type": "rationale",
       "source_file": "dashboard/backend/app.py",
       "source_location": "L4465",
-      "community": 78,
+      "community": 86,
       "norm_label": "delete a prompt file and remove it from the run manifest.",
       "id": "app_rationale_4465"
     },
@@ -4868,7 +4940,7 @@
       "file_type": "rationale",
       "source_file": "dashboard/backend/app.py",
       "source_location": "L4486",
-      "community": 79,
+      "community": 87,
       "norm_label": "delete a generated image and its metadata json.",
       "id": "app_rationale_4486"
     },
@@ -4877,7 +4949,7 @@
       "file_type": "rationale",
       "source_file": "scripts/gemini_web_automation.py",
       "source_location": "L395",
-      "community": 80,
+      "community": 88,
       "norm_label": "best-effort permissions needed for clipboard paste in cdp/visible chrome.",
       "id": "gemini_web_automation_rationale_395"
     },
@@ -4886,7 +4958,7 @@
       "file_type": "rationale",
       "source_file": "scripts/gemini_web_automation.py",
       "source_location": "L455",
-      "community": 81,
+      "community": 89,
       "norm_label": "best-effort configure chrome's download directory.      this matters when attach",
       "id": "gemini_web_automation_rationale_455"
     },
@@ -4895,7 +4967,7 @@
       "file_type": "rationale",
       "source_file": "scripts/gemini_web_automation.py",
       "source_location": "L631",
-      "community": 82,
+      "community": 90,
       "norm_label": "open/switch to the tab that will own this prompt.",
       "id": "gemini_web_automation_rationale_631"
     },
@@ -4904,7 +4976,7 @@
       "file_type": "rationale",
       "source_file": "scripts/gemini_web_automation.py",
       "source_location": "L652",
-      "community": 83,
+      "community": 91,
       "norm_label": "navigate to gemini without failing only because the spa never fires full load.",
       "id": "gemini_web_automation_rationale_652"
     },
@@ -4913,7 +4985,7 @@
       "file_type": "rationale",
       "source_file": "scripts/gemini_web_automation.py",
       "source_location": "L668",
-      "community": 84,
+      "community": 92,
       "norm_label": "navigate to a fresh gemini chat using url stability locks to defeat spa race con",
       "id": "gemini_web_automation_rationale_668"
     },
@@ -4922,7 +4994,7 @@
       "file_type": "rationale",
       "source_file": "scripts/gemini_web_automation.py",
       "source_location": "L1009",
-      "community": 85,
+      "community": 93,
       "norm_label": "insert text without synthesizing enter key presses.      keyboard.type() is unsa",
       "id": "gemini_web_automation_rationale_1009"
     },
@@ -4931,7 +5003,7 @@
       "file_type": "rationale",
       "source_file": "scripts/gemini_web_automation.py",
       "source_location": "L1348",
-      "community": 86,
+      "community": 94,
       "norm_label": "return visible signs that gemini accepted the prompt.      gemini often clears t",
       "id": "gemini_web_automation_rationale_1348"
     },
@@ -4940,7 +5012,7 @@
       "file_type": "rationale",
       "source_file": "scripts/gemini_web_automation.py",
       "source_location": "L1403",
-      "community": 87,
+      "community": 95,
       "norm_label": "return stable prompt snippets used to confirm the prompt left composer.",
       "id": "gemini_web_automation_rationale_1403"
     },
@@ -4949,7 +5021,7 @@
       "file_type": "rationale",
       "source_file": "scripts/gemini_web_automation.py",
       "source_location": "L1693",
-      "community": 88,
+      "community": 96,
       "norm_label": "find an existing file input. hidden inputs are ok for set_input_files().",
       "id": "gemini_web_automation_rationale_1693"
     },
@@ -4958,7 +5030,7 @@
       "file_type": "rationale",
       "source_file": "scripts/gemini_web_automation.py",
       "source_location": "L1715",
-      "community": 89,
+      "community": 97,
       "norm_label": "click the visible attachment/add-files control closest to the composer.",
       "id": "gemini_web_automation_rationale_1715"
     },
@@ -4967,7 +5039,7 @@
       "file_type": "rationale",
       "source_file": "scripts/gemini_web_automation.py",
       "source_location": "L1771",
-      "community": 90,
+      "community": 98,
       "norm_label": "click the upload files item inside gemini's opened attach menu.",
       "id": "gemini_web_automation_rationale_1771"
     },
@@ -4976,7 +5048,7 @@
       "file_type": "rationale",
       "source_file": "scripts/gemini_web_automation.py",
       "source_location": "L1816",
-      "community": 91,
+      "community": 99,
       "norm_label": "click only the composer + / add files button, never the upload files menu item.",
       "id": "gemini_web_automation_rationale_1816"
     },
@@ -4985,7 +5057,7 @@
       "file_type": "rationale",
       "source_file": "scripts/gemini_web_automation.py",
       "source_location": "L1854",
-      "community": 92,
+      "community": 100,
       "norm_label": "open the + / attachment menu only.      important: do not click the \"upload file",
       "id": "gemini_web_automation_rationale_1854"
     },
@@ -4994,7 +5066,7 @@
       "file_type": "rationale",
       "source_file": "scripts/gemini_web_automation.py",
       "source_location": "L1977",
-      "community": 93,
+      "community": 101,
       "norm_label": "assign files to an existing gemini file input through cdp.      gemini usually c",
       "id": "gemini_web_automation_rationale_1977"
     },
@@ -5003,7 +5075,7 @@
       "file_type": "rationale",
       "source_file": "scripts/gemini_web_automation.py",
       "source_location": "L2024",
-      "community": 94,
+      "community": 102,
       "norm_label": "assign files to any existing file input using playwright, without opening os dia",
       "id": "gemini_web_automation_rationale_2024"
     },
@@ -5012,7 +5084,7 @@
       "file_type": "rationale",
       "source_file": "scripts/gemini_web_automation.py",
       "source_location": "L2063",
-      "community": 95,
+      "community": 103,
       "norm_label": "drive the linux open files dialog with xdotool when playwright misses it.      t",
       "id": "gemini_web_automation_rationale_2063"
     },
@@ -5021,7 +5093,7 @@
       "file_type": "rationale",
       "source_file": "scripts/gemini_web_automation.py",
       "source_location": "L2100",
-      "community": 96,
+      "community": 104,
       "norm_label": "open gemini's upload files chooser.      returns a playwright filechooser when t",
       "id": "gemini_web_automation_rationale_2100"
     },
@@ -5030,7 +5102,7 @@
       "file_type": "rationale",
       "source_file": "scripts/gemini_web_automation.py",
       "source_location": "L2192",
-      "community": 97,
+      "community": 105,
       "norm_label": "upload files one at a time through gemini's upload files menu.      this avoids",
       "id": "gemini_web_automation_rationale_2192"
     },
@@ -5039,7 +5111,7 @@
       "file_type": "rationale",
       "source_file": "scripts/gemini_web_automation.py",
       "source_location": "L2377",
-      "community": 98,
+      "community": 106,
       "norm_label": "return visible generated-image candidates.      use an arrow function for playwr",
       "id": "gemini_web_automation_rationale_2377"
     },
@@ -5048,7 +5120,7 @@
       "file_type": "rationale",
       "source_file": "scripts/gemini_web_automation.py",
       "source_location": "L2455",
-      "community": 99,
+      "community": 107,
       "norm_label": "mark the best visible output image with a data attribute and return its src.",
       "id": "gemini_web_automation_rationale_2455"
     },
@@ -5057,7 +5129,7 @@
       "file_type": "rationale",
       "source_file": "scripts/gemini_web_automation.py",
       "source_location": "L2623",
-      "community": 100,
+      "community": 108,
       "norm_label": "save the actual visible/generated image resource, not a screenshot.      this is",
       "id": "gemini_web_automation_rationale_2623"
     },
@@ -5066,7 +5138,7 @@
       "file_type": "rationale",
       "source_file": "scripts/gemini_web_automation.py",
       "source_location": "L2739",
-      "community": 101,
+      "community": 109,
       "norm_label": "return likely places chrome may save files during cdp-attached sessions.",
       "id": "gemini_web_automation_rationale_2739"
     },
@@ -5075,7 +5147,7 @@
       "file_type": "rationale",
       "source_file": "scripts/gemini_web_automation.py",
       "source_location": "L2771",
-      "community": 102,
+      "community": 110,
       "norm_label": "poll multiple download dirs.      chrome sometimes shows a valid 6mb file in its",
       "id": "gemini_web_automation_rationale_2771"
     },
@@ -5084,7 +5156,7 @@
       "file_type": "rationale",
       "source_file": "dashboard/backend/app.py",
       "source_location": "L141",
-      "community": 103,
+      "community": 111,
       "norm_label": "classify a headline opening pattern for hypothesis sanity checks.      the class",
       "id": "app_rationale_141"
     },
@@ -5093,7 +5165,7 @@
       "file_type": "rationale",
       "source_file": "dashboard/backend/app.py",
       "source_location": "L1955",
-      "community": 104,
+      "community": 112,
       "norm_label": "call blackbox server via http api",
       "id": "app_rationale_1955"
     },
@@ -5102,7 +5174,7 @@
       "file_type": "rationale",
       "source_file": "dashboard/backend/app.py",
       "source_location": "L2451",
-      "community": 105,
+      "community": 113,
       "norm_label": "legacy-ish extractor used by the dashboard editor.      it does not preserve exa",
       "id": "app_rationale_2451"
     },
@@ -5111,7 +5183,7 @@
       "file_type": "rationale",
       "source_file": "dashboard/backend/app.py",
       "source_location": "L2478",
-      "community": 106,
+      "community": 114,
       "norm_label": "task 5: extract only the content inside:       exact on-image copy - do not alte",
       "id": "app_rationale_2478"
     },
@@ -5120,7 +5192,7 @@
       "file_type": "rationale",
       "source_file": "dashboard/backend/app.py",
       "source_location": "L2691",
-      "community": 107,
+      "community": 115,
       "norm_label": "expand ad plan to include hypothesis style.      when a hypothesis is active, ge",
       "id": "app_rationale_2691"
     },
@@ -5129,7 +5201,7 @@
       "file_type": "rationale",
       "source_file": "dashboard/backend/app.py",
       "source_location": "L3027",
-      "community": 108,
+      "community": 116,
       "norm_label": "preserve exact headline value text as written in the exact block.      we intent",
       "id": "app_rationale_3027"
     },
@@ -5138,7 +5210,7 @@
       "file_type": "rationale",
       "source_file": "scripts/gemini_web_automation.py",
       "source_location": "L585",
-      "community": 109,
+      "community": 117,
       "norm_label": "trigger gemini's ctrl+shift+o new-chat shortcut in the active tab.",
       "id": "gemini_web_automation_rationale_585"
     },
@@ -5147,7 +5219,7 @@
       "file_type": "rationale",
       "source_file": "scripts/gemini_web_automation.py",
       "source_location": "L625",
-      "community": 110,
+      "community": 118,
       "norm_label": "true when the page already contains visible prior-turn content.",
       "id": "gemini_web_automation_rationale_625"
     },
@@ -5156,7 +5228,7 @@
       "file_type": "rationale",
       "source_file": "scripts/gemini_web_automation.py",
       "source_location": "L704",
-      "community": 111,
+      "community": 119,
       "norm_label": "hard guard: no upload is allowed unless the current tab is a clean /app chat.",
       "id": "gemini_web_automation_rationale_704"
     },
@@ -5165,7 +5237,7 @@
       "file_type": "rationale",
       "source_file": "scripts/gemini_web_automation.py",
       "source_location": "L715",
-      "community": 112,
+      "community": 120,
       "norm_label": "open a new tab directly at /app and switch to it. previous tabs stay open.",
       "id": "gemini_web_automation_rationale_715"
     },
@@ -5174,7 +5246,7 @@
       "file_type": "rationale",
       "source_file": "scripts/gemini_web_automation.py",
       "source_location": "L732",
-      "community": 113,
+      "community": 121,
       "norm_label": "force the active tab to /app using browser navigation, not keyboard shortcuts.",
       "id": "gemini_web_automation_rationale_732"
     },
@@ -5183,7 +5255,7 @@
       "file_type": "rationale",
       "source_file": "scripts/gemini_web_automation.py",
       "source_location": "L757",
-      "community": 114,
+      "community": 122,
       "norm_label": "final guard before send: never submit unless the active tab url is exactly /app.",
       "id": "gemini_web_automation_rationale_757"
     },
@@ -5192,7 +5264,7 @@
       "file_type": "rationale",
       "source_file": "scripts/gemini_web_automation.py",
       "source_location": "L832",
-      "community": 115,
+      "community": 123,
       "norm_label": "click only a real new chat button/link. never click history rows or 3-dot menus.",
       "id": "gemini_web_automation_rationale_832"
     },
@@ -5201,7 +5273,7 @@
       "file_type": "rationale",
       "source_file": "scripts/gemini_web_automation.py",
       "source_location": "L869",
-      "community": 116,
+      "community": 124,
       "norm_label": "open/switch to the tab that will own this prompt.",
       "id": "gemini_web_automation_rationale_869"
     },
@@ -5210,7 +5282,7 @@
       "file_type": "rationale",
       "source_file": "scripts/gemini_web_automation.py",
       "source_location": "L893",
-      "community": 117,
+      "community": 125,
       "norm_label": "guarantee a clean fresh gemini chat before upload.      this intentionally does",
       "id": "gemini_web_automation_rationale_893"
     },
@@ -5219,7 +5291,7 @@
       "file_type": "rationale",
       "source_file": "scripts/gemini_web_automation.py",
       "source_location": "L1054",
-      "community": 118,
+      "community": 126,
       "norm_label": "read text from gemini's real composer, not old messages or upload chips.",
       "id": "gemini_web_automation_rationale_1054"
     },
@@ -5228,7 +5300,7 @@
       "file_type": "rationale",
       "source_file": "scripts/gemini_web_automation.py",
       "source_location": "L1215",
-      "community": 119,
+      "community": 127,
       "norm_label": "use chrome devtools input.inserttext so newlines are inserted as text, not enter",
       "id": "gemini_web_automation_rationale_1215"
     },
@@ -5237,7 +5309,7 @@
       "file_type": "rationale",
       "source_file": "scripts/gemini_web_automation.py",
       "source_location": "L1271",
-      "community": 120,
+      "community": 128,
       "norm_label": "paste through the browser clipboard; this updates gemini like a real user paste.",
       "id": "gemini_web_automation_rationale_1271"
     },
@@ -5246,7 +5318,7 @@
       "file_type": "rationale",
       "source_file": "scripts/gemini_web_automation.py",
       "source_location": "L1287",
-      "community": 121,
+      "community": 129,
       "norm_label": "last-resort dom insertion. it is verified strictly before send is allowed.",
       "id": "gemini_web_automation_rationale_1287"
     },
@@ -5255,7 +5327,7 @@
       "file_type": "rationale",
       "source_file": "scripts/gemini_web_automation.py",
       "source_location": "L1412",
-      "community": 122,
+      "community": 130,
       "norm_label": "return a short list of visible composer-area buttons for debugging.",
       "id": "gemini_web_automation_rationale_1412"
     },
@@ -5264,7 +5336,7 @@
       "file_type": "rationale",
       "source_file": "scripts/gemini_web_automation.py",
       "source_location": "L1445",
-      "community": 123,
+      "community": 131,
       "norm_label": "find gemini's actual composer send/submit control.      the earlier versions loo",
       "id": "gemini_web_automation_rationale_1445"
     },
@@ -5273,7 +5345,7 @@
       "file_type": "rationale",
       "source_file": "scripts/gemini_web_automation.py",
       "source_location": "L1603",
-      "community": 124,
+      "community": 132,
       "norm_label": "count text-node matches for the prompt outside the editable composer.",
       "id": "gemini_web_automation_rationale_1603"
     },
@@ -5282,7 +5354,7 @@
       "file_type": "rationale",
       "source_file": "scripts/gemini_web_automation.py",
       "source_location": "L1647",
-      "community": 125,
+      "community": 133,
       "norm_label": "confirm gemini accepted the prompt.      important: an empty composer alone is n",
       "id": "gemini_web_automation_rationale_1647"
     },
@@ -5291,7 +5363,7 @@
       "file_type": "rationale",
       "source_file": "scripts/gemini_web_automation.py",
       "source_location": "L1681",
-      "community": 126,
+      "community": 134,
       "norm_label": "focus gemini composer and perform a real selenium enter keypress.",
       "id": "gemini_web_automation_rationale_1681"
     },
@@ -5300,7 +5372,7 @@
       "file_type": "rationale",
       "source_file": "scripts/gemini_web_automation.py",
       "source_location": "L326",
-      "community": 127,
+      "community": 135,
       "norm_label": "return true if the url is a blank new-chat (no conversation id).      fresh chat",
       "id": "gemini_web_automation_rationale_326"
     },
@@ -5309,7 +5381,7 @@
       "file_type": "rationale",
       "source_file": "scripts/gemini_web_automation.py",
       "source_location": "L341",
-      "community": 128,
+      "community": 136,
       "norm_label": "open gemini in a new browser tab/window for each prompt, then ensure composer is",
       "id": "gemini_web_automation_rationale_341"
     },
@@ -5318,7 +5390,7 @@
       "file_type": "rationale",
       "source_file": "scripts/gemini_web_automation.py",
       "source_location": "L414",
-      "community": 129,
+      "community": 137,
       "norm_label": "send ctrl+shift+o to the page, with a js fallback.",
       "id": "gemini_web_automation_rationale_414"
     },
@@ -5327,7 +5399,7 @@
       "file_type": "rationale",
       "source_file": "scripts/gemini_web_automation.py",
       "source_location": "L872",
-      "community": 130,
+      "community": 138,
       "norm_label": "collect all candidate generated-image urls from the current tab.",
       "id": "gemini_web_automation_rationale_872"
     },
@@ -5336,7 +5408,7 @@
       "file_type": "rationale",
       "source_file": "scripts/gemini_web_automation.py",
       "source_location": "L899",
-      "community": 131,
+      "community": 139,
       "norm_label": "best-effort check that uploads have been attached in gemini ui.      we look for",
       "id": "gemini_web_automation_rationale_899"
     },
@@ -5345,7 +5417,7 @@
       "file_type": "rationale",
       "source_file": "scripts/gemini_web_automation.py",
       "source_location": "L947",
-      "community": 132,
+      "community": 140,
       "norm_label": "wait until a new image appears in the page that wasn't there before sending.",
       "id": "gemini_web_automation_rationale_947"
     },
@@ -5354,7 +5426,7 @@
       "file_type": "rationale",
       "source_file": "scripts/gemini_web_automation.py",
       "source_location": "L977",
-      "community": 133,
+      "community": 141,
       "norm_label": "save the generated image to out_path_no_ext + inferred extension.      strategy",
       "id": "gemini_web_automation_rationale_977"
     }
@@ -7188,7 +7260,7 @@
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "dashboard/backend/app.py",
-      "source_location": "L4486",
+      "source_location": "L4499",
       "weight": 1.0,
       "_src": "dashboard_backend_app_py",
       "_tgt": "app_api_launch_visible_browser",
@@ -7200,7 +7272,7 @@
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "dashboard/backend/app.py",
-      "source_location": "L4528",
+      "source_location": "L4541",
       "weight": 1.0,
       "_src": "dashboard_backend_app_py",
       "_tgt": "app_api_kill_chrome",
@@ -7212,7 +7284,7 @@
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "dashboard/backend/app.py",
-      "source_location": "L4559",
+      "source_location": "L4572",
       "weight": 1.0,
       "_src": "dashboard_backend_app_py",
       "_tgt": "app_api_edit_prompt",
@@ -7224,7 +7296,7 @@
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "dashboard/backend/app.py",
-      "source_location": "L4579",
+      "source_location": "L4592",
       "weight": 1.0,
       "_src": "dashboard_backend_app_py",
       "_tgt": "app_api_delete_prompt",
@@ -7236,7 +7308,7 @@
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "dashboard/backend/app.py",
-      "source_location": "L4599",
+      "source_location": "L4612",
       "weight": 1.0,
       "_src": "dashboard_backend_app_py",
       "_tgt": "app_api_delete_image",
@@ -7248,7 +7320,7 @@
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "dashboard/backend/app.py",
-      "source_location": "L4624",
+      "source_location": "L4637",
       "weight": 1.0,
       "_src": "dashboard_backend_app_py",
       "_tgt": "app_parse_image_naming",
@@ -7260,7 +7332,7 @@
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "dashboard/backend/app.py",
-      "source_location": "L4669",
+      "source_location": "L4682",
       "weight": 1.0,
       "_src": "dashboard_backend_app_py",
       "_tgt": "app_api_download_single_image",
@@ -7272,7 +7344,7 @@
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "dashboard/backend/app.py",
-      "source_location": "L4697",
+      "source_location": "L4710",
       "weight": 1.0,
       "_src": "dashboard_backend_app_py",
       "_tgt": "app_api_download_batch_images",
@@ -7452,7 +7524,7 @@
       "relation": "calls",
       "confidence": "EXTRACTED",
       "source_file": "dashboard/backend/app.py",
-      "source_location": "L4435",
+      "source_location": "L4448",
       "weight": 1.0,
       "_src": "app_api_run_execute",
       "_tgt": "app_assembler_language_mode",
@@ -7764,7 +7836,7 @@
       "relation": "calls",
       "confidence": "EXTRACTED",
       "source_file": "dashboard/backend/app.py",
-      "source_location": "L4417",
+      "source_location": "L4430",
       "weight": 1.0,
       "_src": "app_api_run_execute",
       "_tgt": "app_validate_generated_copy_payload",
@@ -8688,7 +8760,7 @@
       "relation": "calls",
       "confidence": "EXTRACTED",
       "source_file": "dashboard/backend/app.py",
-      "source_location": "L4414",
+      "source_location": "L4427",
       "weight": 1.0,
       "_src": "app_api_run_execute",
       "_tgt": "app_strip_internal_markers_from_payload",
@@ -8724,7 +8796,7 @@
       "relation": "calls",
       "confidence": "EXTRACTED",
       "source_file": "dashboard/backend/app.py",
-      "source_location": "L4415",
+      "source_location": "L4428",
       "weight": 1.0,
       "_src": "app_api_run_execute",
       "_tgt": "app_enforce_unique_ctas",
@@ -8736,7 +8808,7 @@
       "relation": "calls",
       "confidence": "EXTRACTED",
       "source_file": "dashboard/backend/app.py",
-      "source_location": "L4416",
+      "source_location": "L4429",
       "weight": 1.0,
       "_src": "app_api_run_execute",
       "_tgt": "app_scrub_on_image_copy",
@@ -8940,7 +9012,7 @@
       "relation": "calls",
       "confidence": "EXTRACTED",
       "source_file": "dashboard/backend/app.py",
-      "source_location": "L4413",
+      "source_location": "L4426",
       "weight": 1.0,
       "_src": "app_api_run_execute",
       "_tgt": "app_normalize_generated_copy",
@@ -9000,7 +9072,7 @@
       "relation": "calls",
       "confidence": "EXTRACTED",
       "source_file": "dashboard/backend/app.py",
-      "source_location": "L4402",
+      "source_location": "L4415",
       "weight": 1.0,
       "_src": "app_api_run_execute",
       "_tgt": "app_build_template_copy",
@@ -9012,7 +9084,7 @@
       "relation": "calls",
       "confidence": "EXTRACTED",
       "source_file": "dashboard/backend/app.py",
-      "source_location": "L4393",
+      "source_location": "L4406",
       "weight": 1.0,
       "_src": "app_api_run_execute",
       "_tgt": "app_call_opencode_compatible",
@@ -9120,7 +9192,7 @@
       "relation": "calls",
       "confidence": "EXTRACTED",
       "source_file": "dashboard/backend/app.py",
-      "source_location": "L4451",
+      "source_location": "L4464",
       "weight": 1.0,
       "_src": "app_api_run_execute",
       "_tgt": "app_collect_run_result",
@@ -9420,7 +9492,7 @@
       "relation": "calls",
       "confidence": "EXTRACTED",
       "source_file": "dashboard/backend/app.py",
-      "source_location": "L4639",
+      "source_location": "L4652",
       "weight": 1.0,
       "_src": "app_parse_image_naming",
       "_tgt": "app_parse_prompt_filename",
@@ -10152,7 +10224,7 @@
       "relation": "calls",
       "confidence": "EXTRACTED",
       "source_file": "dashboard/backend/app.py",
-      "source_location": "L4572",
+      "source_location": "L4585",
       "weight": 1.0,
       "_src": "app_api_edit_prompt",
       "_tgt": "app_replace_exact_copy_block",
@@ -10440,12 +10512,12 @@
       "relation": "rationale_for",
       "confidence": "EXTRACTED",
       "source_file": "dashboard/backend/app.py",
-      "source_location": "L4487",
+      "source_location": "L4500",
       "weight": 1.0,
-      "_src": "app_rationale_4487",
+      "_src": "app_rationale_4500",
       "_tgt": "app_api_launch_visible_browser",
       "source": "app_api_launch_visible_browser",
-      "target": "app_rationale_4487",
+      "target": "app_rationale_4500",
       "confidence_score": 1.0
     },
     {
@@ -10464,12 +10536,12 @@
       "relation": "rationale_for",
       "confidence": "EXTRACTED",
       "source_file": "dashboard/backend/app.py",
-      "source_location": "L4529",
+      "source_location": "L4542",
       "weight": 1.0,
-      "_src": "app_rationale_4529",
+      "_src": "app_rationale_4542",
       "_tgt": "app_api_kill_chrome",
       "source": "app_api_kill_chrome",
-      "target": "app_rationale_4529",
+      "target": "app_rationale_4542",
       "confidence_score": 1.0
     },
     {
@@ -10488,12 +10560,12 @@
       "relation": "rationale_for",
       "confidence": "EXTRACTED",
       "source_file": "dashboard/backend/app.py",
-      "source_location": "L4560",
+      "source_location": "L4573",
       "weight": 1.0,
-      "_src": "app_rationale_4560",
+      "_src": "app_rationale_4573",
       "_tgt": "app_api_edit_prompt",
       "source": "app_api_edit_prompt",
-      "target": "app_rationale_4560",
+      "target": "app_rationale_4573",
       "confidence_score": 1.0
     },
     {
@@ -10512,12 +10584,12 @@
       "relation": "rationale_for",
       "confidence": "EXTRACTED",
       "source_file": "dashboard/backend/app.py",
-      "source_location": "L4580",
+      "source_location": "L4593",
       "weight": 1.0,
-      "_src": "app_rationale_4580",
+      "_src": "app_rationale_4593",
       "_tgt": "app_api_delete_prompt",
       "source": "app_api_delete_prompt",
-      "target": "app_rationale_4580",
+      "target": "app_rationale_4593",
       "confidence_score": 1.0
     },
     {
@@ -10536,12 +10608,12 @@
       "relation": "rationale_for",
       "confidence": "EXTRACTED",
       "source_file": "dashboard/backend/app.py",
-      "source_location": "L4600",
+      "source_location": "L4613",
       "weight": 1.0,
-      "_src": "app_rationale_4600",
+      "_src": "app_rationale_4613",
       "_tgt": "app_api_delete_image",
       "source": "app_api_delete_image",
-      "target": "app_rationale_4600",
+      "target": "app_rationale_4613",
       "confidence_score": 1.0
     },
     {
@@ -10560,7 +10632,7 @@
       "relation": "calls",
       "confidence": "EXTRACTED",
       "source_file": "dashboard/backend/app.py",
-      "source_location": "L4676",
+      "source_location": "L4689",
       "weight": 1.0,
       "_src": "app_api_download_single_image",
       "_tgt": "app_parse_image_naming",
@@ -10572,7 +10644,7 @@
       "relation": "calls",
       "confidence": "EXTRACTED",
       "source_file": "dashboard/backend/app.py",
-      "source_location": "L4716",
+      "source_location": "L4729",
       "weight": 1.0,
       "_src": "app_api_download_batch_images",
       "_tgt": "app_parse_image_naming",
@@ -10584,24 +10656,24 @@
       "relation": "rationale_for",
       "confidence": "EXTRACTED",
       "source_file": "dashboard/backend/app.py",
-      "source_location": "L4625",
+      "source_location": "L4638",
       "weight": 1.0,
-      "_src": "app_rationale_4625",
+      "_src": "app_rationale_4638",
       "_tgt": "app_parse_image_naming",
       "source": "app_parse_image_naming",
-      "target": "app_rationale_4625",
+      "target": "app_rationale_4638",
       "confidence_score": 1.0
     },
     {
       "relation": "rationale_for",
       "confidence": "EXTRACTED",
       "source_file": "dashboard/backend/app.py",
-      "source_location": "L4670",
+      "source_location": "L4683",
       "weight": 1.0,
-      "_src": "app_rationale_4670",
+      "_src": "app_rationale_4683",
       "_tgt": "app_api_download_single_image",
       "source": "app_api_download_single_image",
-      "target": "app_rationale_4670",
+      "target": "app_rationale_4683",
       "confidence_score": 1.0
     },
     {
@@ -10620,12 +10692,12 @@
       "relation": "rationale_for",
       "confidence": "EXTRACTED",
       "source_file": "dashboard/backend/app.py",
-      "source_location": "L4698",
+      "source_location": "L4711",
       "weight": 1.0,
-      "_src": "app_rationale_4698",
+      "_src": "app_rationale_4711",
       "_tgt": "app_api_download_batch_images",
       "source": "app_api_download_batch_images",
-      "target": "app_rationale_4698",
+      "target": "app_rationale_4711",
       "confidence_score": 1.0
     },
     {
@@ -16947,8 +17019,8 @@
       "source_file": "scripts/extract_format_rules.py",
       "source_location": "L36",
       "weight": 1.0,
-      "_src": "extract_format_rules_main",
-      "_tgt": "registry_banlist_parse_args",
+      "_src": "registry_banlist_parse_args",
+      "_tgt": "extract_format_rules_main",
       "source": "registry_banlist_parse_args",
       "target": "extract_format_rules_main"
     },

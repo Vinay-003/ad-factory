@@ -88,9 +88,9 @@ Never add unsupported medical claims, disease cures, or made-up mechanisms.
 ## 3) Product Fidelity Lock (Mandatory — applies to every single output)
 
 Image source:
-- Primary production path: pass product reference image URLs from `input/activeimages.txt` into Kie Nano Banana API (`image_input`).
+- Product reference images are stored in `input/images/` (PNG/JPG/WebP). Uploaded via Dashboard or placed manually.
+- Images are uploaded to Gemini as visual truth references before every generation run.
 - Prompt requirement (always include): "Use the uploaded Obesity Killer product packshot images as absolute visual truth."
-- Optional manual path (prompt-only workflow): if user runs prompts directly in Gemini/Web tools, use the same 6 reference packshots as visual truth.
 - Never ask the user to re-describe products — the images are the reference.
 
 Product dimensions (use for correct relative sizing in every image):
@@ -903,8 +903,8 @@ Section 9 — Typography Sharpness Block: minimum 6 bullets
   - Hindi output must be fully Hindi in Devanagari script.
   - Do not mix scripts in one line unless explicitly requested.
 - Image-generation default rule:
-  - Send only EN prompt to Nano Banana API by default.
-  - Do not submit HI prompt unless user explicitly asks.
+  - Generate EN images by default.
+  - Do not generate HI images unless user explicitly asks.
 
 ### Text clarity and sharpness rule (mandatory):
 - Prioritize crisp typography over decorative styling.
@@ -1191,22 +1191,17 @@ Step 5.5 — Prompt assembly for API
 - Never merge multiple format prompts into one API call.
 - Traceability: save the *composed* prompt (startingprompt + generated prompt) under `generated_image/vN/<format>-<language>/prompt_task_<taskId>.txt`.
 
-Step 5.6 — API execution (Nano Banana 2 via Kie)
-- Endpoint: `POST https://api.kie.ai/api/v1/jobs/createTask`
-- Auth: `Authorization: Bearer <KIE_API_KEY>`
-- API key source priority:
-  - First read `KIE_API_KEY` from shell environment.
-  - If not present, load it from root `.env.dashboard`.
-  - Expected format in `.env.dashboard`: `KIE_API_KEY=your_key_here`
-- Model: `nano-banana-2`
-- Images source for API: read URLs from `input/activeimages.txt` (one URL per line, max 14)
-- Keep `input/passiveimage.txt` for fallback inventory only (do not use by default)
-- Default generation settings: `resolution=2K`, `aspect_ratio=4:5`, `output_format=png`
-- Submit one job per prompt file (EN by default).
-- Poll task state via `GET /api/v1/jobs/recordInfo?taskId=...` until `success` or `fail`.
-- Mandatory script execution note:
-  - If running image generation, execute the configured pipeline for real and rely on actual API/web responses.
-  - Never claim submission/poll/download success without task IDs and saved file paths from command output.
+Step 5.6 — Image generation (Gemini Web automation)
+- Triggered from Dashboard:
+  - `/api/runs/{id}/generate-images-45` — generates 4:5 images in Gemini.
+  - `/api/runs/{id}/generate-images-916-from-45` — generates 9:16 from 4:5 references.
+- Images are generated via `scripts/gemini_web_automation.py` using Playwright + Gemini Web.
+- Reference images are uploaded from `input/images/` to each Gemini chat session.
+- For 9:16 conversion, the 4:5 output image is used as the single visual reference.
+- Prompt integrity is verified (98%+ character match) before sending.
+- Generated images are saved under `generated_images/v{N}/GEMINI_4_5/` and `generated_images/v{N}/GEMINI_9_16/`.
+- Mandatory execution note:
+  - Never claim generation success without confirmed saved file paths from the automation run.
 
 Step 5.7 — Generated image storage
 - Save results in `generated_image/vN/<format>-<language>/`
@@ -1456,7 +1451,7 @@ When I ask for ad creation with no specific inputs, generate the default starter
 4. Start with: "Create ad."
 5. If no inputs are provided, generate default starter batch immediately.
 6. If partial/specific inputs are provided, apply them and fill missing fields from defaults.
-7. Save generated prompts in `output/vN/` and run API jobs (EN by default) using links from `input/activeimages.txt`.
+7. Run Gemini image generation via Dashboard for 4:5 and/or 9:16 outputs.
 8. Store generated images in `generated_image/vN/<format>-en/` (or `-hi` only when requested).
 9. Use repair commands (Section 16) if quality fails.
 10. In production (`mode.write_enabled: true`), append each generation to `entries` and update indexes.

@@ -41,7 +41,7 @@ export function renderGlobalFormats() {
     applyBtn.onclick = () => {
     const selectedPersonas = state.selectedPersonas;
     if (!selectedPersonas.size) {
-      import("./ui.js").then((m) => m.setStatus("Select at least one persona to apply global formats."));
+      import("./ui.js").then((m) => m.appendLog("Select at least one persona to apply global formats."));
       return;
     }
     for (const persona of state.defaultData.personas) {

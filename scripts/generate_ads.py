@@ -35,7 +35,7 @@ BACKGROUNDS_PATH = ROOT / "background_variant.json"
 OUTPUT_DIR = ROOT / "output"
 
 SUPPORTED_FORMATS = {"HERO", "BA", "TEST", "FEAT", "UGC"}
-SUPPORTED_LANGS = {"EN", "HI"}
+SUPPORTED_LANGS = {"EN", "HI", "HINGLISH"}
 SUPPORTED_AWARENESS_STAGES = {"unaware", "problem_aware", "solution_aware", "product_aware"}
 SUPPORTED_CONCEPT_ANGLES = {
     "pain_point",
@@ -362,7 +362,7 @@ def parse_args() -> argparse.Namespace:
     parser.add_argument("--copy-file", required=True, help="Path to copy batch JSON (produced by your LLM/operator step)")
     parser.add_argument("--batch", help="Output batch folder name like v8 (default: next available)")
     parser.add_argument("--seed", type=int, help="Deterministic seed for background rotation order + background sentence sampling")
-    parser.add_argument("--language-mode", choices=["BOTH", "EN", "HI"], default="BOTH", help="Which prompt languages to assemble")
+    parser.add_argument("--language-mode", choices=["BOTH", "EN", "HI", "HINGLISH"], default="BOTH", help="Which prompt languages to assemble")
     parser.add_argument("--no-registry-write", action="store_true", help="Skip writing AD_GENERATION_REGISTRY.JSON updates")
     parser.add_argument("--skip-uniqueness-check", action="store_true", help="Allow duplicate copy values against registry")
     parser.add_argument("--dry-run", action="store_true", help="Validate and print plan without writing files")
@@ -884,6 +884,13 @@ def render_prompt(
         friction = require_str(persona, "friction_en", "ads[].persona")
         proof = require_str(persona, "proof_needed_en", "ads[].persona")
         tone = require_str(persona, "tone_cue_en", "ads[].persona")
+    elif lang == "HINGLISH":
+        persona_name = require_str(persona, "name", "ads[].persona")
+        pain = str(persona.get("pain_hinglish") or persona.get("pain_hi") or "")
+        desire = str(persona.get("desire_hinglish") or persona.get("desire_hi") or "")
+        friction = str(persona.get("friction_hinglish") or persona.get("friction_hi") or "")
+        proof = str(persona.get("proof_needed_hinglish") or persona.get("proof_needed_hi") or "")
+        tone = str(persona.get("tone_cue_hinglish") or persona.get("tone_cue_hi") or "")
     else:
         persona_name = require_str(persona, "name", "ads[].persona")
         pain = require_str(persona, "pain_hi", "ads[].persona")
@@ -1263,7 +1270,7 @@ def main() -> int:
     seed = args.seed if args.seed is not None else random.SystemRandom().randint(10_000_000, 2_147_483_647)
     used = registry_used_text(registry)
     all_used = registry_all_used_text(used)
-    render_langs = ["EN", "HI"] if args.language_mode == "BOTH" else [args.language_mode]
+    render_langs = ["EN", "HI", "HINGLISH"] if args.language_mode == "BOTH" else [args.language_mode]
 
     # Validate copy payload + uniqueness against registry BEFORE consuming background slots.
     collisions: list[str] = []
@@ -1294,7 +1301,7 @@ def main() -> int:
 
         copy = ad.get("copy")
         if not isinstance(copy, dict):
-            raise RuntimeError(f"{ctx}.copy must be an object with EN/HI blocks")
+            raise RuntimeError(f"{ctx}.copy must be an object with language blocks")
         for lang in render_langs:
             if lang not in copy or not isinstance(copy[lang], dict):
                 raise RuntimeError(f"{ctx}.copy must include {lang} object")

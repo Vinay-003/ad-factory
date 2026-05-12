@@ -1,4 +1,4 @@
-import { setStatus } from "./ui.js";
+import { appendLog } from "./ui.js";
 import { state } from "./state.js";
 import { fetchJSON, invalidateRuns } from "./api.js";
 
@@ -44,10 +44,10 @@ export function buildPromptEditor(run, container) {
         exportCopyBtn.onclick = async () => {
           exportCopyBtn.disabled = true;
           try {
-            setStatus(`Exporting EXACT ON-IMAGE COPY to XLSX for ${run.run_id}...`);
+            appendLog(`Exporting EXACT ON-IMAGE COPY to XLSX for ${run.run_id}...`);
             const res = await fetch(`/api/runs/${run.run_id}/export-on-image-copy`);
             if (!res.ok) {
-              setStatus(`Export failed: ${await res.text() || res.statusText}`);
+              appendLog(`Export failed: ${await res.text() || res.statusText}`);
               return;
             }
             const blob = await res.blob();
@@ -61,9 +61,9 @@ export function buildPromptEditor(run, container) {
             a.click();
             a.remove();
             URL.revokeObjectURL(url);
-            setStatus(`Export ready: ${run.run_id}`);
+            appendLog(`Export ready: ${run.run_id}`);
           } catch (err) {
-            setStatus(String(err));
+            appendLog(String(err));
           } finally {
             exportCopyBtn.disabled = false;
           }
@@ -78,7 +78,7 @@ export function buildPromptEditor(run, container) {
           previewEl.style.marginTop = "10px";
           importCopyBtn.disabled = true;
           try {
-            setStatus("Importing XLSX and generating preview...");
+            appendLog("Importing XLSX and generating preview...");
             const fd = new FormData();
             fd.append("file", file);
             fd.append("confirm", "false");
@@ -86,7 +86,7 @@ export function buildPromptEditor(run, container) {
             let data = null;
             try { data = await res.json(); } catch { data = { detail: await res.text() }; }
             if (!res.ok) {
-              setStatus("Import validation failed");
+              appendLog("Import validation failed");
               previewEl.textContent = JSON.stringify(data.detail || data, null, 2);
               container.appendChild(previewEl);
               return;
@@ -97,10 +97,10 @@ export function buildPromptEditor(run, container) {
               ((data.items || []).length > 30 ? `\n... (${(data.items || []).length - 30} more)` : "");
             container.appendChild(previewEl);
             if (!window.confirm(`Preview generated.\nApply changes for ${data.changed_rows_count} rows?`)) {
-              setStatus("Import canceled (no overwrite applied).");
+              appendLog("Import canceled (no overwrite applied).");
               return;
             }
-            setStatus("Applying XLSX changes (exact-block overwrite only)...");
+            appendLog("Applying XLSX changes (exact-block overwrite only)...");
             const fd2 = new FormData();
             fd2.append("file", file);
             fd2.append("confirm", "true");
@@ -108,14 +108,14 @@ export function buildPromptEditor(run, container) {
             let data2 = null;
             try { data2 = await res2.json(); } catch { data2 = { detail: await res2.text() }; }
             if (!res2.ok) {
-              setStatus("Import apply failed.");
+              appendLog("Import apply failed.");
               previewEl.textContent = JSON.stringify(data2.detail || data2, null, 2);
               return;
             }
-            setStatus(`Import applied. Updated ${data2.changed_rows_count} rows. Skipped ${data2.skipped_rows}.`);
+            appendLog(`Import applied. Updated ${data2.changed_rows_count} rows. Skipped ${data2.skipped_rows}.`);
             import("./runs.js").then((m) => m.loadRuns());
           } catch (err) {
-            setStatus(String(err));
+            appendLog(String(err));
           } finally {
             importCopyBtn.disabled = false;
             importFileEl.value = "";
@@ -140,9 +140,9 @@ export function buildPromptEditor(run, container) {
 
         generate45Btn.onclick = async () => {
           const selected = items.filter((it) => it.checkbox.checked).map((it) => it.promptFile);
-          if (!selected.length) { setStatus("Select at least one prompt."); return; }
+          if (!selected.length) { appendLog("Select at least one prompt."); return; }
           generate45Btn.disabled = true;
-          setStatus(`Generating 4:5 images in Gemini for ${selected.length} selected prompt(s) from ${run.run_id}...`);
+          appendLog(`Generating 4:5 images in Gemini for ${selected.length} selected prompt(s) from ${run.run_id}...`);
           try {
             const data = await fetchJSON(`/api/runs/${run.run_id}/generate-images-45`, {
               method: "POST",
@@ -153,10 +153,10 @@ export function buildPromptEditor(run, container) {
             if (batchKey && state.headlessModeEnabled) {
               import("./chrome.js").then((m) => m.startProgressPolling(batchKey));
             }
-            setStatus(`Done. Generated 4:5 in Gemini for selected prompts: ${selected.length}`);
+            appendLog(`Done. Generated 4:5 in Gemini for selected prompts: ${selected.length}`);
             import("./runs.js").then((m) => m.loadRuns());
           } catch (err) {
-            setStatus(String(err));
+            appendLog(String(err));
           } finally {
             generate45Btn.disabled = false;
           }
@@ -164,9 +164,9 @@ export function buildPromptEditor(run, container) {
 
         generate916Btn.onclick = async () => {
           const selected = items.filter((it) => it.checkbox.checked).map((it) => it.promptFile);
-          if (!selected.length) { setStatus("Select at least one prompt."); return; }
+          if (!selected.length) { appendLog("Select at least one prompt."); return; }
           generate916Btn.disabled = true;
-          setStatus(`Generating 9:16 in Gemini from selected 4:5 image references for ${selected.length} prompt(s)...`);
+          appendLog(`Generating 9:16 in Gemini from selected 4:5 image references for ${selected.length} prompt(s)...`);
           try {
             const data = await fetchJSON(`/api/runs/${run.run_id}/generate-images-916-from-45`, {
               method: "POST",
@@ -177,10 +177,10 @@ export function buildPromptEditor(run, container) {
             if (batchKey && state.headlessModeEnabled) {
               import("./chrome.js").then((m) => m.startProgressPolling(batchKey));
             }
-            setStatus(`Done. Generated 9:16 in Gemini from selected 4:5 refs`);
+            appendLog(`Done. Generated 9:16 in Gemini from selected 4:5 refs`);
             import("./runs.js").then((m) => m.loadRuns());
           } catch (err) {
-            setStatus(String(err));
+            appendLog(String(err));
           } finally {
             generate916Btn.disabled = false;
           }
@@ -311,11 +311,11 @@ function buildPromptCard(prompt, run, items) {
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ prompt_file: prompt.prompt_file }),
       });
-      setStatus(`Deleted prompt: ${prompt.prompt_file}`);
+      appendLog(`Deleted prompt: ${prompt.prompt_file}`);
       card.remove();
       invalidateRuns();
     } catch (err) {
-      setStatus(`Delete error: ${String(err)}`);
+      appendLog(`Delete error: ${String(err)}`);
       deleteBtn.disabled = false;
     }
   };
@@ -327,7 +327,7 @@ function buildPromptCard(prompt, run, items) {
       const value = row.querySelector("textarea").value;
       return `- ${label}: ${value}`;
     }).join("\n");
-    if (!newText.trim()) { setStatus("Prompt text cannot be empty."); return; }
+    if (!newText.trim()) { appendLog("Prompt text cannot be empty."); return; }
     saveBtn.disabled = true;
     try {
       await fetchJSON(`/api/runs/${run.run_id}/edit-prompt`, {
@@ -335,7 +335,7 @@ function buildPromptCard(prompt, run, items) {
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ prompt_file: prompt.prompt_file, text: newText }),
       });
-      setStatus(`Saved edits to: ${prompt.prompt_file}`);
+      appendLog(`Saved edits to: ${prompt.prompt_file}`);
       editing = false;
       linesDisplay.style.display = "";
       editForm.style.display = "none";
@@ -348,7 +348,7 @@ function buildPromptCard(prompt, run, items) {
       });
       invalidateRuns();
     } catch (err) {
-      setStatus(`Edit error: ${String(err)}`);
+      appendLog(`Edit error: ${String(err)}`);
       saveBtn.disabled = false;
     }
   };
