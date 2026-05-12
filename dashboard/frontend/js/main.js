@@ -74,7 +74,9 @@ async function runPipeline() {
     ["image_source_file", document.getElementById("imageSourcesFile")],
   ];
   uploads.forEach(([name, input]) => {
-    if (input.files && input.files[0]) form.append(name, input.files[0]);
+    if (input instanceof HTMLInputElement && input.files && input.files[0]) {
+      form.append(name, input.files[0]);
+    }
   });
 
   const inputImageFilesEl = document.getElementById("inputImageFiles");
