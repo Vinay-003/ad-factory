@@ -38,6 +38,36 @@ DEFAULT_IMAGE_SOURCES_FILE = ROOT / "input" / "image_sources.txt"
 LEGACY_ACTIVE_IMAGES_FILE = ROOT / "input" / "activeimages.txt"
 INPUT_IMAGES_DIR = ROOT / "input" / "images"
 GENERATED_IMAGES_ROOT = ROOT / "generated_images"
+CONVERT_916_TEMPLATE_PATH = ROOT / "input" / "prompt_916_from_45.txt"
+
+DEFAULT_916_CONVERSION_PROMPT = """Convert the attached 4:5 ad creative into a 9:16 version for the same campaign.
+
+Critical fidelity rules:
+- Treat the attached 4:5 creative as the single source of truth.
+- Product images are locked: preserve the exact same product packshots, label text, logos, illustrations, caps, and colors as the 4:5 reference.
+- Allowed product changes are limited to orientation, placement, and scale needed for 9:16 composition.
+- Do NOT redraw, reconstruct, relabel, retouch, or restyle any product.
+- If any product differs from the source (text distortion, shape change, label change, color shift, missing/extra product), reject and regenerate automatically.
+- Do NOT rewrite copy, do NOT invent new claims, do NOT add new offers, and do NOT add new objects.
+- Do NOT perform a simple resize/crop/stretch of the original image.
+
+Composition rules for 9:16:
+- Extend canvas vertically to 9:16 by outpainting above/below the original composition.
+- Keep the original 4:5 core composition stable in the center region.
+- Add natural background continuation only where needed to fit 9:16.
+
+Meta 9:16 safe-zone rules (for mobile feed/reels overlays):
+- Canvas is 1080x1920 (9:16).
+- Keep all critical content (all product packshots, headline, support text, CTA, key logos) inside the central safe zone from y=270 to y=1650.
+- That means reserve top 14% (0-269 px) and bottom 14% (1651-1919 px) as restricted zones for overlays/UI.
+- Keep important text away from left/right edges with at least 5% horizontal padding on both sides.
+- If any critical element crosses a restricted zone, reject and regenerate automatically.
+
+Quality bar:
+- Final output must look like the same ad creative adapted to 9:16, not a new redesign.
+- Maintain photoreal quality, product fidelity, and clean typography edges.
+- If fidelity or safe-zone compliance fails, regenerate until all rules pass.
+"""
 
 
 FORMATS = ["HERO", "BA", "TEST", "FEAT", "UGC"]
@@ -952,6 +982,122 @@ def generated_image_roots() -> list[Path]:
     return [GENERATED_IMAGES_ROOT]
 
 
+def ensure_916_conversion_template() -> Path:
+    CONVERT_916_TEMPLATE_PATH.parent.mkdir(parents=True, exist_ok=True)
+    if not CONVERT_916_TEMPLATE_PATH.exists():
+        CONVERT_916_TEMPLATE_PATH.write_text(DEFAULT_916_CONVERSION_PROMPT, encoding="utf-8")
+    return CONVERT_916_TEMPLATE_PATH
+
+
+def build_916_conversion_prompt_job(fmt: str, persona_num: int, lang: str, index: int) -> str:
+    fmt_clean = (fmt or "HERO").strip().upper() or "HERO"
+    lang_clean = (lang or "EN").strip().upper() or "EN"
+    persona_safe = max(0, int(persona_num or 0))
+    if persona_safe > 0:
+        return f"OUTPUT_{fmt_clean}_P{persona_safe:02d}_{lang_clean}.txt"
+    return f"OUTPUT_{fmt_clean}_P{index:02d}_{lang_clean}.txt"
+
+
+def collect_45_reference_jobs_for_batch(batch: str) -> list[dict[str, Any]]:
+    summary = load_batch_image_summary(batch)
+    jobs: list[dict[str, Any]] = []
+    seen_keys: set[tuple[str, int, str]] = set()
+
+    for entry in summary:
+        prompt_file = str(entry.get("prompt_file") or "").strip().replace("\\", "/")
+        saved_files = entry.get("saved_files") if isinstance(entry.get("saved_files"), list) else []
+        if not prompt_file or not saved_files:
+            continue
+
+        parsed = parse_prompt_filename(prompt_file)
+        if not parsed:
+            continue
+        fmt, lang, persona_num = parsed
+        if persona_num is None:
+            continue
+
+        image_rel = ""
+        for candidate in saved_files:
+            c = str(candidate or "").strip().replace("\\", "/")
+            if not c:
+                continue
+            image_rel = c
+            break
+        if not image_rel:
+            continue
+
+        image_abs = (ROOT / image_rel).resolve()
+        if not image_abs.exists() or not image_abs.is_file():
+            continue
+
+        key = (fmt.upper(), int(persona_num), lang.upper())
+        if key in seen_keys:
+            continue
+        seen_keys.add(key)
+        jobs.append(
+            {
+                "format": fmt.upper(),
+                "persona_number": int(persona_num),
+                "language": lang.upper(),
+                "image_rel": image_rel,
+                "image_abs": str(image_abs),
+            }
+        )
+
+    if jobs:
+        return jobs
+
+    # Fallback: derive from prompt files + filesystem scan under GEMINI_4_5
+    prompt_files = scan_prompt_files_for_batch(batch)
+    for prompt_file in prompt_files:
+        if "/45/" not in str(prompt_file):
+            continue
+        parsed = parse_prompt_filename(prompt_file)
+        if not parsed:
+            continue
+        fmt, lang, persona_num = parsed
+        if persona_num is None:
+            continue
+        key = (fmt.upper(), int(persona_num), lang.upper())
+        if key in seen_keys:
+            continue
+
+        gemini_name = f"gemini-{fmt.lower()}-p{persona_num:02d}"
+        found_rel = ""
+        for img_root in generated_image_roots():
+            gemini_dir = img_root / batch / "GEMINI_4_5"
+            if not gemini_dir.exists():
+                continue
+            for ext in ("png", "jpg", "jpeg", "webp"):
+                for f in sorted(gemini_dir.glob(f"**/{gemini_name}*.{ext}")):
+                    found_rel = str(f.relative_to(ROOT)).replace("\\", "/")
+                    break
+                if found_rel:
+                    break
+            if found_rel:
+                break
+
+        if not found_rel:
+            continue
+
+        image_abs = (ROOT / found_rel).resolve()
+        if not image_abs.exists() or not image_abs.is_file():
+            continue
+
+        seen_keys.add(key)
+        jobs.append(
+            {
+                "format": fmt.upper(),
+                "persona_number": int(persona_num),
+                "language": lang.upper(),
+                "image_rel": found_rel,
+                "image_abs": str(image_abs),
+            }
+        )
+
+    return jobs
+
+
 def image_static_route_for_path(path: str) -> str:
     normalized = path.replace("\\", "/")
     if normalized.startswith("generated_images/"):
@@ -996,13 +1142,16 @@ def run_gemini_generation(
     prompt_reference_map: Path | None = None,
     headless: bool = False,
     run_dir: Path | None = None,
+    prepend_starting_prompt: bool = True,
 ) -> subprocess.CompletedProcess[str]:
     aspect_folder = "9_16" if aspect_ratio == "9:16" else "4_5"
     prompt_work_dir = RUNTIME_ROOT / "gemini_selected_prompts" / f"{batch}_{aspect_folder}_{int(time.time())}_{uuid.uuid4().hex[:8]}"
     prompt_work_dir.mkdir(parents=True, exist_ok=True)
 
-    starting_prompt_path = ROOT / "input" / "startingprompt.txt"
-    starting_prompt = starting_prompt_path.read_text(encoding="utf-8").strip() if starting_prompt_path.exists() else ""
+    starting_prompt = ""
+    if prepend_starting_prompt:
+        starting_prompt_path = ROOT / "input" / "startingprompt.txt"
+        starting_prompt = starting_prompt_path.read_text(encoding="utf-8").strip() if starting_prompt_path.exists() else ""
     for prompt_file in prompt_files:
         source = Path(prompt_file)
         if not source.is_absolute():
@@ -2807,6 +2956,54 @@ def api_opencode_catalog() -> dict[str, Any]:
     return build_opencode_catalog()
 
 
+def _extract_backfill_batch(run_id: str) -> str | None:
+    match = re.match(r"^batch_(v\d+)$", str(run_id or "").strip(), flags=re.IGNORECASE)
+    if not match:
+        return None
+    return match.group(1)
+
+
+def _build_backfill_manifest(run_id: str, batch: str) -> dict[str, Any]:
+    prompt_files = scan_prompt_files_for_batch(batch)
+    if not prompt_files:
+        raise HTTPException(status_code=404, detail=f"No prompt files found in output/{batch}")
+    image_files = scan_image_files_for_batch(batch)
+    batch_dir = ROOT / "output" / batch
+    updated_at = now_iso()
+    if batch_dir.exists():
+        updated_at = datetime.fromtimestamp(batch_dir.stat().st_mtime, tz=timezone.utc).replace(microsecond=0).isoformat().replace("+00:00", "Z")
+    return {
+        "run_id": run_id,
+        "batch": batch,
+        "prompt_files": prompt_files,
+        "image_files": image_files,
+        "image_generated": bool(image_files),
+        "updated_at": updated_at,
+        "source": "output_backfill",
+    }
+
+
+def load_manifest_for_run(run_id: str) -> tuple[Path | None, dict[str, Any], bool]:
+    run_dir = RUNS_ROOT / run_id
+    manifest_path = run_dir / "manifest.json"
+    if manifest_path.exists():
+        manifest = json.loads(manifest_path.read_text(encoding="utf-8"))
+        refreshed = refresh_manifest_file_state(run_dir, manifest)
+        return run_dir, refreshed, True
+
+    backfill_batch = _extract_backfill_batch(run_id)
+    if backfill_batch:
+        return None, _build_backfill_manifest(run_id, backfill_batch), False
+
+    raise HTTPException(status_code=404, detail="Run not found")
+
+
+def collect_backfill_result(run_id: str, batch: str) -> dict[str, Any]:
+    manifest = _build_backfill_manifest(run_id, batch)
+    manifest["generated_variant"] = "4:5"
+    return manifest
+
+
 def api_runs() -> dict[str, Any]:
     ensure_dirs()
     runs: list[dict[str, Any]] = []
@@ -2871,21 +3068,12 @@ def api_runs() -> dict[str, Any]:
 
 
 def api_run(run_id: str) -> dict[str, Any]:
-    run_dir = RUNS_ROOT / run_id
-    manifest = run_dir / "manifest.json"
-    if not manifest.exists():
-        raise HTTPException(status_code=404, detail="Run not found")
-    payload = json.loads(manifest.read_text(encoding="utf-8"))
-    return refresh_manifest_file_state(run_dir, payload)
+    _run_dir, manifest, _has_storage_manifest = load_manifest_for_run(run_id)
+    return manifest
 
 
 def api_run_prompt_copies(run_id: str) -> dict[str, Any]:
-    run_dir = RUNS_ROOT / run_id
-    manifest_path = run_dir / "manifest.json"
-    if not manifest_path.exists():
-        raise HTTPException(status_code=404, detail="Run not found")
-
-    manifest = json.loads(manifest_path.read_text(encoding="utf-8"))
+    _run_dir, manifest, _has_storage_manifest = load_manifest_for_run(run_id)
     prompt_files_all = manifest.get("prompt_files") or []
     prompt_files = [path for path in prompt_files_all if "/45/" in str(path)] or prompt_files_all
     records: list[dict[str, Any]] = []
@@ -3120,11 +3308,7 @@ def _replace_exact_copy_block(prompt_text: str, new_block_text: str) -> str | No
 
 
 def _load_run_prompt_files(run_id: str, aspect_ratios: list[str] | None = None) -> list[str]:
-    run_dir = RUNS_ROOT / run_id
-    manifest_path = run_dir / "manifest.json"
-    if not manifest_path.exists():
-        raise HTTPException(status_code=404, detail="Run not found")
-    manifest = json.loads(manifest_path.read_text(encoding="utf-8"))
+    _run_dir, manifest, _has_storage_manifest = load_manifest_for_run(run_id)
     prompt_files_all = manifest.get("prompt_files") or []
     if not aspect_ratios:
         return prompt_files_all
@@ -3211,18 +3395,13 @@ def api_export_on_image_copy(run_id: str) -> StreamingResponse:
     from openpyxl import Workbook
     import io
 
-    run_dir = RUNS_ROOT / run_id
-    manifest_path = run_dir / "manifest.json"
-    if not manifest_path.exists():
-        raise HTTPException(status_code=404, detail="Run not found")
+    run_dir, manifest, has_storage_manifest = load_manifest_for_run(run_id)
 
-    manifest = json.loads(manifest_path.read_text(encoding="utf-8"))
-
-    copy_path = run_dir / "context" / "copy_batch.json"
-    if not copy_path.exists():
-        raise HTTPException(status_code=404, detail="copy_batch.json not found for run")
-
-    copy_batch = json.loads(copy_path.read_text(encoding="utf-8"))
+    copy_batch: dict[str, Any] = {"ads": []}
+    if has_storage_manifest and run_dir is not None:
+        copy_path = run_dir / "context" / "copy_batch.json"
+        if copy_path.exists():
+            copy_batch = json.loads(copy_path.read_text(encoding="utf-8"))
 
     prompt_files = _load_run_prompt_files(run_id)
 
@@ -3260,7 +3439,8 @@ def api_export_on_image_copy(run_id: str) -> StreamingResponse:
     wb.save(buf)
     buf.seek(0)
 
-    _append_audit_log(run_dir, "export_on_image_copy", {"run_id": run_id, "prompt_rows": len(prompt_files)})
+    if run_dir is not None:
+        _append_audit_log(run_dir, "export_on_image_copy", {"run_id": run_id, "prompt_rows": len(prompt_files)})
 
     if vn_suffix:
         filename = f"on-image-copy-{vn_suffix}.xlsx"
@@ -3281,14 +3461,7 @@ async def api_import_on_image_copy(
 ) -> dict[str, Any]:
     from openpyxl import load_workbook
 
-    run_dir = RUNS_ROOT / run_id
-    manifest_path = run_dir / "manifest.json"
-    if not manifest_path.exists():
-        raise HTTPException(status_code=404, detail="Run not found")
-
-    copy_path = run_dir / "context" / "copy_batch.json"
-    if not copy_path.exists():
-        raise HTTPException(status_code=404, detail="copy_batch.json not found for run")
+    run_dir, manifest, has_storage_manifest = load_manifest_for_run(run_id)
 
     # Parse xlsx (no prompt regeneration; only exact-block replacement)
     if not file.filename:
@@ -3298,7 +3471,8 @@ async def api_import_on_image_copy(
     if not content:
         raise HTTPException(status_code=400, detail="Empty upload")
 
-    tmp_path = run_dir / "imports" / f"upload-{int(time.time())}-{file.filename}"
+    import_root = (run_dir / "imports") if run_dir is not None else (RUNTIME_ROOT / "imports")
+    tmp_path = import_root / f"upload-{int(time.time())}-{file.filename}"
     tmp_path.parent.mkdir(parents=True, exist_ok=True)
     tmp_path.write_bytes(content)
 
@@ -3347,7 +3521,8 @@ async def api_import_on_image_copy(
         if not p.exists() or not p.is_file():
             errors.append({"prompt_id": r["prompt_id"], "error": "prompt_id_not_found"})
     if errors:
-        _append_audit_log(run_dir, "import_on_image_copy_validation_failed", {"run_id": run_id, "errors": errors, "confirm": confirm})
+        if run_dir is not None:
+            _append_audit_log(run_dir, "import_on_image_copy_validation_failed", {"run_id": run_id, "errors": errors, "confirm": confirm})
         raise HTTPException(status_code=400, detail={"validation_errors": errors})
 
     # Preview diffs
@@ -3412,11 +3587,12 @@ async def api_import_on_image_copy(
             prompt_path.write_text(updated_text, encoding="utf-8")
             applied_count += 1
 
-    _append_audit_log(
-        run_dir,
-        "import_on_image_copy",
-        {"run_id": run_id, "confirm": confirm, "rows": len(rows), "applied": applied_count, "skipped": skipped_count},
-    )
+    if run_dir is not None:
+        _append_audit_log(
+            run_dir,
+            "import_on_image_copy",
+            {"run_id": run_id, "confirm": confirm, "rows": len(rows), "applied": applied_count, "skipped": skipped_count},
+        )
 
     if not confirm:
         return {
@@ -3431,11 +3607,17 @@ async def api_import_on_image_copy(
     # Re-assemble prompts side-effects: since we directly edited prompt text,
     # we do not mutate copy_batch.json metadata (per requirements).
     # However, manifest/prompt_files state should be refreshed.
-    manifest = json.loads((run_dir / "manifest.json").read_text(encoding="utf-8"))
-    batch = (manifest.get("batch") or "").strip()
-    refreshed = collect_run_result(run_dir, batch, bool(manifest.get("image_generated", False)))
-    refreshed["on_image_copy_import_applied"] = applied_count
-    merged = merge_manifest(run_dir, manifest, refreshed)
+    merged: dict[str, Any] | None = None
+    if run_dir is not None and has_storage_manifest:
+        manifest = json.loads((run_dir / "manifest.json").read_text(encoding="utf-8"))
+        batch = (manifest.get("batch") or "").strip()
+        refreshed = collect_run_result(run_dir, batch, bool(manifest.get("image_generated", False)))
+        refreshed["on_image_copy_import_applied"] = applied_count
+        merged = merge_manifest(run_dir, manifest, refreshed)
+    else:
+        batch = str(manifest.get("batch") or "")
+        merged = collect_backfill_result(run_id, batch) if batch else manifest
+        merged["on_image_copy_import_applied"] = applied_count
 
     return {
         "run_id": run_id,
@@ -3449,25 +3631,19 @@ async def api_import_on_image_copy(
 
 
 def api_run_generate_916(run_id: str) -> dict[str, Any]:
-    run_dir = RUNS_ROOT / run_id
-    manifest_path = run_dir / "manifest.json"
-
-    if not manifest_path.exists():
-        raise HTTPException(status_code=404, detail="Run not found")
-    manifest = json.loads(manifest_path.read_text(encoding="utf-8"))
+    run_dir, manifest, has_storage_manifest = load_manifest_for_run(run_id)
+    if not has_storage_manifest or run_dir is None:
+        raise HTTPException(status_code=400, detail="This endpoint requires run context in dashboard_storage. Use generate-images-916-from-45 for output-only batches.")
     return generate_916_for_run(run_dir, manifest)
 
 
 def api_run_generate_916_selected(run_id: str, payload: dict[str, Any] = Body(...)) -> dict[str, Any]:
-    run_dir = RUNS_ROOT / run_id
-    manifest_path = run_dir / "manifest.json"
+    run_dir, manifest, has_storage_manifest = load_manifest_for_run(run_id)
+    if not has_storage_manifest or run_dir is None:
+        raise HTTPException(status_code=400, detail="This endpoint requires run context in dashboard_storage for copy_batch filtering.")
     copy_path = run_dir / "context" / "copy_batch.json"
-    if not manifest_path.exists():
-        raise HTTPException(status_code=404, detail="Run not found")
     if not copy_path.exists():
         raise HTTPException(status_code=404, detail="copy_batch.json not found for run")
-
-    manifest = json.loads(manifest_path.read_text(encoding="utf-8"))
     batch = str(manifest.get("batch") or "").strip()
     if not batch:
         raise HTTPException(status_code=400, detail="Run has no batch folder")
@@ -3583,11 +3759,7 @@ def filter_copy_json_for_selected_ads(copy_json: dict[str, Any], selected_keys: 
 
 
 def api_run_generate_images_45(run_id: str, payload: dict[str, Any] = Body(...)) -> dict[str, Any]:
-    run_dir = RUNS_ROOT / run_id
-    manifest_path = run_dir / "manifest.json"
-    if not manifest_path.exists():
-        raise HTTPException(status_code=404, detail=f"Run not found: {run_id}")
-    manifest = json.loads(manifest_path.read_text(encoding="utf-8"))
+    run_dir, manifest, has_storage_manifest = load_manifest_for_run(run_id)
     batch = str(manifest.get("batch") or "").strip()
     if not batch:
         raise HTTPException(status_code=400, detail="Run has no batch folder")
@@ -3615,14 +3787,19 @@ def api_run_generate_images_45(run_id: str, payload: dict[str, Any] = Body(...))
     if result.returncode != 0:
         error_text = result.stderr or result.stdout
         log_path = RUNTIME_ROOT / "generation_logs" / f"gen_{batch}_4_5.log"
-        (run_dir / "logs" / "image_generation_45_error.txt").write_text(error_text, encoding="utf-8")
+        if run_dir is not None:
+            (run_dir / "logs" / "image_generation_45_error.txt").write_text(error_text, encoding="utf-8")
         short_error = "\n".join([line for line in error_text.splitlines() if line.strip()][-6:])
         raise HTTPException(status_code=500, detail=f"Gemini image generation failed (4:5). Log: {log_path}\n{short_error}")
+
+    if not has_storage_manifest or run_dir is None:
+        refreshed = collect_backfill_result(run_id, batch)
+        refreshed["generated_images_for_prompts_45"] = selected_45
+        return refreshed
 
     refreshed = collect_run_result(run_dir, batch, True)
     refreshed["generated_images_for_prompts_45"] = selected_45
     merged = merge_manifest(run_dir, manifest, refreshed)
-    # Write generation metadata for 4:5 images
     try:
         _write_generation_metadata(run_dir, batch, "4:5", merged)
     except Exception:
@@ -3631,11 +3808,7 @@ def api_run_generate_images_45(run_id: str, payload: dict[str, Any] = Body(...))
 
 
 def api_run_generate_images_916_from_45(run_id: str, payload: dict[str, Any] = Body(...)) -> dict[str, Any]:
-    run_dir = RUNS_ROOT / run_id
-    manifest_path = run_dir / "manifest.json"
-    if not manifest_path.exists():
-        raise HTTPException(status_code=404, detail=f"Run not found: {run_id}")
-    manifest = json.loads(manifest_path.read_text(encoding="utf-8"))
+    run_dir, manifest, has_storage_manifest = load_manifest_for_run(run_id)
     batch = str(manifest.get("batch") or "").strip()
     if not batch:
         raise HTTPException(status_code=400, detail="Run has no batch folder")
@@ -3648,91 +3821,31 @@ def api_run_generate_images_916_from_45(run_id: str, payload: dict[str, Any] = B
     if not selected_45:
         raise HTTPException(status_code=400, detail="No valid 4:5 prompt files for 9:16 generation")
 
-    # Use image summary to map 4:5 prompt files to their generated image paths
-    image_summary = load_batch_image_summary(batch)
-    prompt_to_images: dict[str, list[str]] = {}
-    for entry in image_summary:
-        pf = entry.get("prompt_file") or ""
-        saved = entry.get("saved_files") or []
-        if pf and saved:
-            prompt_to_images[pf] = saved
-
-    # Build mapping: 9:16 prompt path -> [reference image paths]
-    prompt_reference_map: dict[str, list[str]] = {}
-    for pf in selected_45:
-        rel_45 = str(pf).replace("\\", "/")
-
-        # Parse format and persona number from the 4:5 prompt filename
-        parsed = parse_prompt_filename(rel_45)
-        if not parsed:
-            continue
-        fmt, lang, persona_num = parsed
-
-        # Find existing 9:16 prompt file created by generate_ads.py (via generate-916 endpoint).
-        # It lives at output/{batch}/96/OUTPUT_{FMT}_P{persona}_{lang}.txt
-        pf_filename = f"OUTPUT_{fmt}_P{persona_num:02d}_{lang}.txt"
-        prompt_96 = f"output/{batch}/96/{pf_filename}"
-        prompt_96_path = ROOT / prompt_96
-        if not prompt_96_path.exists():
-            continue
-
-        # Find the 4:5 generated image(s) for this prompt via image summary
-        image_sources = prompt_to_images.get(rel_45, [])
-        if not image_sources:
-            # Fallback: search recursively in both image roots under GEMINI_4_5
-            gemini_name = f"gemini-{fmt.lower()}-p{persona_num:02d}"
-            for img_root in generated_image_roots():
-                gemini_dir = img_root / batch / "GEMINI_4_5"
-                if not gemini_dir.exists():
-                    continue
-                for ext in ("*.png", "*.jpg", "*.jpeg", "*.webp"):
-                    for f in sorted(gemini_dir.glob(f"**/{gemini_name}*.{ext.lstrip('*')}")):
-                        rel = str(f.relative_to(ROOT))
-                        if rel not in image_sources:
-                            image_sources.append(rel)
-                        break
-                    if image_sources:
-                        break
-                if image_sources:
-                    break
-
-        if not image_sources:
-            continue
-
-        # Resolve to absolute paths for the reference map
-        prompt_reference_map[prompt_96] = [str(ROOT / img) for img in image_sources]
-
-    if not prompt_reference_map:
-        raise HTTPException(status_code=400, detail="Could not build 9:16 reference images from selected 4:5 outputs")
-
-    map_path = run_dir / "context" / "prompt_reference_map_916.json"
-    map_path.write_text(json.dumps(prompt_reference_map, ensure_ascii=False, indent=2) + "\n", encoding="utf-8")
+    selected_keys = extract_selected_ad_keys_from_45_prompts(selected_45)
+    all_jobs = collect_45_reference_jobs_for_batch(batch)
+    selected_jobs = [
+        job
+        for job in all_jobs
+        if (job["format"], int(job["persona_number"])) in selected_keys or (job["format"], None) in selected_keys
+    ]
+    if not selected_jobs:
+        raise HTTPException(status_code=400, detail="No usable 4:5 reference images matched selected prompts")
 
     headless = bool(payload.get("headless", False))
-    try:
-        result = run_gemini_generation(
-            batch=batch,
-            prompt_files=sorted(prompt_reference_map.keys()),
-            aspect_ratio="9:16",
-            image_sources_file=None,
-            prompt_reference_map=map_path,
-            headless=headless,
-            run_dir=run_dir,
-        )
-    except RuntimeError as exc:
-        raise HTTPException(status_code=400, detail=str(exc)) from exc
-    if result.returncode != 0:
-        error_text = result.stderr or result.stdout
-        log_path = RUNTIME_ROOT / "generation_logs" / f"gen_{batch}_9_16.log"
-        (run_dir / "logs" / "image_generation_916_from_45_error.txt").write_text(error_text, encoding="utf-8")
-        short_error = "\n".join([line for line in error_text.splitlines() if line.strip()][-6:])
-        raise HTTPException(status_code=500, detail=f"Gemini image generation failed (9:16 from 4:5 refs). Log: {log_path}\n{short_error}")
+    result = run_916_conversion_from_45_for_batch(batch=batch, headless=headless, run_dir=run_dir, jobs=selected_jobs)
+
+    if not has_storage_manifest or run_dir is None:
+        refreshed = collect_backfill_result(run_id, batch)
+        refreshed["generated_images_for_prompts_916"] = result.get("prompt_files_used", [])
+        refreshed["generated_variant"] = "9:16"
+        refreshed["conversion_failures"] = result.get("failures", [])
+        return refreshed
 
     refreshed = collect_run_result(run_dir, batch, True)
-    refreshed["generated_images_for_prompts_916"] = sorted(prompt_reference_map.keys())
-    refreshed["reference_images_916"] = prompt_reference_map
+    refreshed["generated_images_for_prompts_916"] = result.get("prompt_files_used", [])
+    refreshed["generated_variant"] = "9:16"
+    refreshed["conversion_failures"] = result.get("failures", [])
     merged = merge_manifest(run_dir, manifest, refreshed)
-    # Write generation metadata for 9:16 images
     try:
         _write_generation_metadata(run_dir, batch, "9:16", merged)
     except Exception:
@@ -3748,12 +3861,12 @@ def api_batch_generate_images_45(payload: dict[str, Any] = Body(...)) -> dict[st
     all_prompt_files: list[str] = []
     run_info: list[dict[str, Any]] = []
 
+    primary_run_dir: Path | None = None
     for run_id in run_ids:
-        run_dir = RUNS_ROOT / run_id
-        manifest_path = run_dir / "manifest.json"
-        if not manifest_path.exists():
+        try:
+            run_dir, manifest, has_storage_manifest = load_manifest_for_run(run_id)
+        except HTTPException:
             continue
-        manifest = json.loads(manifest_path.read_text(encoding="utf-8"))
         batch = str(manifest.get("batch") or "").strip()
         if not batch:
             continue
@@ -3762,6 +3875,8 @@ def api_batch_generate_images_45(payload: dict[str, Any] = Body(...)) -> dict[st
         if not prompt_files_45:
             continue
         all_prompt_files.extend(prompt_files_45)
+        if has_storage_manifest and run_dir is not None and primary_run_dir is None:
+            primary_run_dir = run_dir
         run_info.append({
             "run_id": run_id,
             "batch": batch,
@@ -3818,11 +3933,12 @@ def api_batch_generate_images_45(payload: dict[str, Any] = Body(...)) -> dict[st
     result = run_cmd(cmd, cwd=ROOT)
     if result.returncode != 0:
         error_text = result.stderr or result.stdout
-        raise HTTPException(status_code=500, detail=f"Batch 4:5 generation failed: {error_text[:500]}")
+        short_error = "\n".join([line for line in error_text.splitlines() if line.strip()][-30:])
+        raise HTTPException(status_code=500, detail=f"Batch 4:5 generation failed:\n{short_error}")
 
     try:
         _write_generation_metadata(
-            RUNS_ROOT / run_ids[0] if run_ids else RUNTIME_ROOT,
+            primary_run_dir if primary_run_dir is not None else RUNTIME_ROOT,
             batch_name, "4:5", {"batch": batch_name, "prompt_count": len(prompt_files_created)}
         )
     except Exception:
@@ -3959,73 +4075,140 @@ def _resolve_916_generation_for_run(run_dir: Path, manifest: dict[str, Any]) -> 
     return entries
 
 
+def run_916_conversion_from_45_for_batch(
+    *,
+    batch: str,
+    headless: bool,
+    run_dir: Path | None,
+    jobs: list[dict[str, Any]] | None = None,
+) -> dict[str, Any]:
+    resolved_jobs = jobs if isinstance(jobs, list) else collect_45_reference_jobs_for_batch(batch)
+    if not resolved_jobs:
+        raise HTTPException(status_code=400, detail=f"No usable 4:5 reference images found for batch {batch}")
+
+    template_path = ensure_916_conversion_template()
+    template_text = template_path.read_text(encoding="utf-8").strip()
+    prompt_root = RUNTIME_ROOT / "conversion_916_prompts" / f"{batch}_{int(time.time())}_{uuid.uuid4().hex[:8]}"
+    prompt_root.mkdir(parents=True, exist_ok=True)
+
+    failures: list[str] = []
+    completed = 0
+    prompt_files_used: list[str] = []
+
+    for index, job in enumerate(resolved_jobs, start=1):
+        prompt_name = build_916_conversion_prompt_job(job["format"], int(job["persona_number"]), job["language"], index)
+        prompt_path = prompt_root / prompt_name
+        prompt_path.write_text(template_text + "\n", encoding="utf-8")
+
+        source_file = prompt_root / f"{prompt_path.stem}.images.txt"
+        source_file.write_text(str(job["image_abs"]) + "\n", encoding="utf-8")
+
+        result = run_gemini_generation(
+            batch=batch,
+            prompt_files=[str(prompt_path)],
+            aspect_ratio="9:16",
+            image_sources_file=str(source_file),
+            headless=headless,
+            run_dir=run_dir,
+            prepend_starting_prompt=False,
+        )
+
+        if result.returncode != 0:
+            failures.append(f"{prompt_name}: {(result.stderr or result.stdout or '').strip()[:300]}")
+            continue
+
+        completed += 1
+        prompt_files_used.append(str(prompt_path))
+
+    if completed == 0:
+        short = "\n".join(failures[:3])
+        raise HTTPException(status_code=500, detail=f"9:16 conversion failed for batch {batch}. {short}")
+
+    return {
+        "batch": batch,
+        "completed": completed,
+        "attempted": len(resolved_jobs),
+        "failures": failures,
+        "prompt_files_used": prompt_files_used,
+    }
+
+
 def api_batch_generate_images_916(payload: dict[str, Any] = Body(...)) -> dict[str, Any]:
     run_ids = payload.get("run_ids")
     if not isinstance(run_ids, list) or not run_ids:
         raise HTTPException(status_code=400, detail="run_ids must be a non-empty array")
 
     headless = bool(payload.get("headless", False))
-    all_entries: list[dict[str, Any]] = []
-    run_count = 0
-
+    batch_to_run_dir: dict[str, Path | None] = {}
     for run_id in run_ids:
-        run_dir = RUNS_ROOT / run_id
-        manifest_path = run_dir / "manifest.json"
-        if not manifest_path.exists():
+        try:
+            run_dir, manifest, has_storage_manifest = load_manifest_for_run(run_id)
+        except HTTPException:
             continue
-        manifest = json.loads(manifest_path.read_text(encoding="utf-8"))
-
-        entries = _resolve_916_generation_for_run(run_dir, manifest)
-        if not entries:
-            continue
-
         batch = str(manifest.get("batch") or "").strip()
-        prompt_reference_map: dict[str, list[str]] = {}
-        for e in entries:
-            prompt_reference_map[e["prompt_96"]] = e["image_sources"]
+        if not batch:
+            continue
+        if has_storage_manifest and run_dir is not None:
+            batch_to_run_dir[batch] = run_dir
+        elif batch not in batch_to_run_dir:
+            batch_to_run_dir[batch] = None
 
-        map_path = run_dir / "context" / "prompt_reference_map_916.json"
-        map_path.write_text(json.dumps(prompt_reference_map, ensure_ascii=False, indent=2) + "\n", encoding="utf-8")
+    if not batch_to_run_dir:
+        raise HTTPException(status_code=400, detail="No valid batches found for selected runs")
+
+    total_attempted = 0
+    total_completed = 0
+    processed_batches: list[str] = []
+    batch_errors: list[str] = []
+
+    for batch, run_dir in sorted(batch_to_run_dir.items()):
+        try:
+            result = run_916_conversion_from_45_for_batch(batch=batch, headless=headless, run_dir=run_dir)
+        except HTTPException as exc:
+            batch_errors.append(f"{batch}: {exc.detail}")
+            continue
+
+        processed_batches.append(batch)
+        total_attempted += int(result.get("attempted") or 0)
+        total_completed += int(result.get("completed") or 0)
+
+        if run_dir is not None:
+            manifest_path = run_dir / "manifest.json"
+            if manifest_path.exists():
+                manifest = json.loads(manifest_path.read_text(encoding="utf-8"))
+                refreshed = collect_run_result(run_dir, batch, True)
+                refreshed["generated_variant"] = "9:16"
+                refreshed["generated_images_for_prompts_916"] = result.get("prompt_files_used", [])
+                merge_manifest(run_dir, manifest, refreshed)
 
         try:
-            result = run_gemini_generation(
-                batch=batch,
-                prompt_files=sorted(prompt_reference_map.keys()),
-                aspect_ratio="9:16",
-                image_sources_file=None,
-                prompt_reference_map=map_path,
-                headless=headless,
-                run_dir=run_dir,
+            _write_generation_metadata(
+                run_dir if run_dir is not None else RUNTIME_ROOT,
+                batch,
+                "9:16",
+                {
+                    "batch": batch,
+                    "attempted": result.get("attempted", 0),
+                    "completed": result.get("completed", 0),
+                    "failures": result.get("failures", []),
+                },
             )
-            if result.returncode != 0:
-                error_text = result.stderr or result.stdout
-                log_path = RUNTIME_ROOT / "generation_logs" / f"gen_{batch}_9_16.log"
-                (run_dir / "logs" / "image_generation_916_error.txt").write_text(f"Log: {log_path}\n{error_text}", encoding="utf-8")
-                # Continue to next run instead of failing everything
-                continue
-
-            refreshed = collect_run_result(run_dir, batch, True)
-            refreshed["generated_images_for_prompts_916"] = sorted(prompt_reference_map.keys())
-            refreshed["reference_images_916"] = prompt_reference_map
-            merge_manifest(run_dir, manifest, refreshed)
-            run_count += 1
-            # Write generation metadata for this run's 9:16 images
-            try:
-                _write_generation_metadata(run_dir, batch, "9:16", refreshed)
-            except Exception:
-                pass
         except Exception:
-            continue
+            pass
 
-        all_entries.extend(entries)
-
-    if not all_entries:
-        raise HTTPException(status_code=400, detail="No 9:16 images could be generated for any run")
+    if total_completed == 0:
+        detail = "No 9:16 conversions succeeded"
+        if batch_errors:
+            detail += ": " + " | ".join(batch_errors[:3])
+        raise HTTPException(status_code=400, detail=detail)
 
     return {
         "status": "completed",
-        "total_prompts": len(all_entries),
-        "run_count": run_count,
+        "batch_key": ",".join(processed_batches),
+        "total_prompts": total_completed,
+        "attempted_prompts": total_attempted,
+        "run_count": len(processed_batches),
+        "errors": batch_errors,
     }
 
 

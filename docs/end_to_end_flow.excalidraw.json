@@ -44,7 +44,6 @@
       "roundness": null,
       "boundText": null
     },
-
     {
       "id": "box-api-entry",
       "type": "rectangle",
@@ -81,7 +80,6 @@
       "seed": 201,
       "version": 1
     },
-
     {
       "id": "arrow-ui-entry",
       "type": "arrow",
@@ -97,11 +95,16 @@
       "seed": 300,
       "version": 1,
       "points": [
-        [480, 150],
-        [520, 170]
+        [
+          480,
+          150
+        ],
+        [
+          520,
+          170
+        ]
       ]
     },
-
     {
       "id": "box-plan",
       "type": "rectangle",
@@ -138,7 +141,6 @@
       "seed": 401,
       "version": 1
     },
-
     {
       "id": "arrow-entry-plan",
       "type": "arrow",
@@ -154,11 +156,16 @@
       "seed": 301,
       "version": 1,
       "points": [
-        [980, 190],
-        [1020, 170]
+        [
+          980,
+          190
+        ],
+        [
+          1020,
+          170
+        ]
       ]
     },
-
     {
       "id": "box-context-extract",
       "type": "rectangle",
@@ -183,7 +190,7 @@
       "y": 380,
       "width": 500,
       "height": 350,
-      "text": "Build product context (SINGLE SOURCE)\n1) Canonical attempt:\n  scripts/build_canonical_context.py\n  Called with:\n  python3 scripts/build_canonical_context.py \\\n    --product \"<product_file>\" \\\n    --output runtime/context_canonical.json \\\n    --api-url <opencode_api_url> \\\n    --model <extractor_model>\n\n  Output parsed:\n  - reads runtime/context_canonical.json\n  - product_context = generation_context\n  - context source = \"canonical_llm\"\n\n2) Fallback attempt (if canonical fails):\n  scripts/extract_product_context.py\n  Called with:\n  python3 scripts/extract_product_context.py \\\n    --product \"<product_file>\" \\\n    --json\n\nPayload files stored:\n- context/context_canonical.json (if canonical succeeded)\n- context/run_context.json always",
+      "text": "Build product context (SINGLE SOURCE)\n1) Product master doc is used directly by backend context assembly.\n2) Backend combines product doc + persona payload + format rules + hypothesis config.\n3) Output context is written into run storage and used for copy generation.\n\nPayload files stored:\n- context/run_context.json\n- context/copy_batch.json",
       "fontFamily": 1,
       "fontSize": 14,
       "textAlign": "left",
@@ -195,7 +202,6 @@
       "seed": 501,
       "version": 1
     },
-
     {
       "id": "arrow-plan-context",
       "type": "arrow",
@@ -211,11 +217,16 @@
       "seed": 302,
       "version": 1,
       "points": [
-        [1240, 340],
-        [400, 360]
+        [
+          1240,
+          340
+        ],
+        [
+          400,
+          360
+        ]
       ]
     },
-
     {
       "id": "box-ads-context",
       "type": "rectangle",
@@ -252,7 +263,6 @@
       "seed": 601,
       "version": 1
     },
-
     {
       "id": "arrow-context-ads",
       "type": "arrow",
@@ -268,11 +278,16 @@
       "seed": 303,
       "version": 1,
       "points": [
-        [660, 520],
-        [700, 520]
+        [
+          660,
+          520
+        ],
+        [
+          700,
+          520
+        ]
       ]
     },
-
     {
       "id": "box-llm-generate",
       "type": "rectangle",
@@ -309,7 +324,6 @@
       "seed": 701,
       "version": 1
     },
-
     {
       "id": "arrow-context-llm",
       "type": "arrow",
@@ -325,11 +339,16 @@
       "seed": 304,
       "version": 1,
       "points": [
-        [980, 740],
-        [520, 780]
+        [
+          980,
+          740
+        ],
+        [
+          520,
+          780
+        ]
       ]
     },
-
     {
       "id": "box-assembler",
       "type": "rectangle",
@@ -366,7 +385,6 @@
       "seed": 801,
       "version": 1
     },
-
     {
       "id": "box-manifest",
       "type": "rectangle",
@@ -403,7 +421,6 @@
       "seed": 901,
       "version": 1
     },
-
     {
       "id": "arrow-llm-assembler",
       "type": "arrow",
@@ -419,8 +436,14 @@
       "seed": 305,
       "version": 1,
       "points": [
-        [660, 1190],
-        [210, 1220]
+        [
+          660,
+          1190
+        ],
+        [
+          210,
+          1220
+        ]
       ]
     },
     {
@@ -438,8 +461,14 @@
       "seed": 306,
       "version": 1,
       "points": [
-        [840, 1360],
-        [900, 1360]
+        [
+          840,
+          1360
+        ],
+        [
+          900,
+          1360
+        ]
       ]
     }
   ],

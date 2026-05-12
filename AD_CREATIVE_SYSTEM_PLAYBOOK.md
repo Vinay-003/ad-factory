@@ -386,8 +386,7 @@ Fresh caption rule: generate fresh each run, keep meaning stable, vary phrasing 
 Goal: Every ad generation session must use a distinctly different background/scene setting so no two outputs look the same.
 
 Background files and purpose:
-- `BACKGROUND_VARIANTS.JSON` = master slot catalog (ID, title, format eligibility)
-- `background_variant.json` = safe-zone enriched structured descriptors used for seeded scene sentence generation
+- `background_variant.json` = structured background catalog (ID, title, format eligibility + safe-zone descriptors) used for seeded scene sentence generation
 
 Background hygiene rule (mandatory):
 - Avoid workstation-heavy props by default (keyboard, laptop, monitor, mouse, dense office clutter), unless user explicitly requests office-device context.
@@ -398,9 +397,9 @@ Background hygiene rule (mandatory):
 
 Before generating any prompt, the assistant must:
 1. Check `AD_GENERATION_REGISTRY.JSON` slot usage for the selected format.
-2. Build allowed catalog pool from `BACKGROUND_VARIANTS.JSON` where `formats` contains the selected format.
+2. Build allowed catalog pool from `background_variant.json` where `formats` contains the selected format.
 3. Select only from slots not yet used in current cycle for that format (`indexes.slot_exhaustion_tracker.<FORMAT>.remaining_slots_current_cycle`).
-4. Generate a seeded scene sentence with `scripts/upgrade_safezone_backgrounds.py` using the same slot ID.
+4. Generate seeded scene sentence via the in-pipeline background sentence builder using the same slot ID and seed.
 5. Include both slot ID and seeded sentence in Section 8 (VISUAL DIRECTION BLOCK), then log slot + seed in registry.
 6. When remaining pool becomes empty, reset cycle for that format and continue.
 
@@ -412,14 +411,10 @@ Before generating any prompt, the assistant must:
 
 ### Background selection algorithm (mandatory)
 
-- Use catalog-first selection from `BACKGROUND_VARIANTS.JSON` and enforce exhaustive rotation using `indexes.slot_exhaustion_tracker`.
+- Use catalog-first selection from `background_variant.json` and enforce exhaustive rotation using `indexes.slot_exhaustion_tracker`.
 - Select from `remaining_slots_current_cycle`, then move selected slot to `used_slots_current_cycle`.
 - If `remaining_slots_current_cycle` is empty, increment cycle number and repopulate from current allowed pool.
-- Safe-zone sentence generation must use:
-  - `python3 scripts/upgrade_safezone_backgrounds.py --prompt-only --id BG-XXX --format 4:5 --seed <SEED>`
-- Mandatory script execution note:
-  - Do not simulate this command. Run it and use the real stdout sentence.
-  - If command fails, stop prompt finalization, surface stderr, and retry only after fixing the failure.
+- Safe-zone sentence generation must be deterministic from slot + seed and produced by the active prompt assembly pipeline.
 - SEED rule: `SEED = (BATCH_NUMBER * 1000) + (PERSONA_NUMBER * 10) + VARIATION`
 - Include in Section 8:
   - `Background slot: BG-XXX`
@@ -1065,7 +1060,7 @@ Decision policy (mandatory):
 - Do not narrate internal workflow steps (for example: "reading files", "extracting sections", "checking patterns"). Return only final outputs and blockers.
 
 Read-scope rule for `create ads` (mandatory):
-- Read only required sources: this playbook, `product master doc.txt`, `BACKGROUND_VARIANTS.JSON`, `background_variant.json`, `AD_GENERATION_REGISTRY.JSON`.
+- Read only required sources: this playbook, `product master doc.txt`, `background_variant.json`, `AD_GENERATION_REGISTRY.JSON`.
 - Do not mine old `output/v*` prompt files for style or structure unless user explicitly asks to replicate a specific past batch.
 - Historical checks must use registry indexes first; do not crawl old output folders by default.
 - Forbidden sources for normal create-ad runs: `generated_image/v*/prompt_task_*.txt`, `generated_image/v*/task_*.json`, `generated_image/v*/batch_run_summary.json`.
@@ -1098,7 +1093,7 @@ Step 4 — Background slot selection
 
 Step 4.25 — Safe-zone enforcement (mandatory)
 - Every background must be treated as a *safe-zone controlled* scene: keep key subject and all important copy away from edge risk bands.
-- Use the structured background catalog in `background_variant.json` (not `BACKGROUND_VARIANTS.JSON`) because it includes safe-zone control fields:
+- Use the structured background catalog in `background_variant.json` because it includes safe-zone control fields:
   - `composition`, `layout_intent`, `cta_safe_space`, `crop_safety`
 - When you pick a background slot `BG-XXX`, generate a *seeded* background prompt so the safe-zone phrasing is deterministic per batch.
   - Selection order (mandatory):
@@ -1106,13 +1101,10 @@ Step 4.25 — Safe-zone enforcement (mandatory)
     2) If that list is empty/missing, pick a slot not in `indexes.backgrounds_by_format.<FORMAT>` recent window; if still not possible, fall back to any valid slot but state it explicitly.
   - Seed rule (mandatory, deterministic): `SEED = (BATCH_NUMBER * 1000) + (PERSONA_NUMBER * 10) + VARIATION`
     - Example: batch `v7`, persona `7`, variation `1` → seed `7071`
-  - Use: `python3 scripts/upgrade_safezone_backgrounds.py --prompt-only --id BG-XXX --format 4:5 --seed <SEED>`
-  - Mandatory script execution note:
-    - Do not simulate this command. Run it and paste the real stdout sentence.
-    - If the script errors, stop and fix; never continue with guessed seed text.
+  - Use the active prompt assembly pipeline to build the seeded background sentence from slot + seed.
   - Paste the resulting *seeded* sentence into Section 8 (VISUAL DIRECTION BLOCK) and keep the selected `BG-XXX`.
   - Add a line in Section 8: `Seed: <SEED>` so reviewers can verify deterministic seeding was applied.
-  - MANDATORY CHECKPOINT: Section 8 must contain the full OUTPUT of upgrade_safezone_backgrounds.py (seeded sentence), not just the seed number. If your prompt only says "Seed: <SEED>" without the seeded background sentence, it is INVALID — regenerate immediately.
+  - MANDATORY CHECKPOINT: Section 8 must contain the full seeded background sentence, not just the seed number. If your prompt only says "Seed: <SEED>" without the seeded background sentence, it is INVALID — regenerate immediately.
   - ALSO: Extract and include these 4 safe-zone fields from background_variant.json into Section 8: composition, layout_intent, cta_safe_space, crop_safety. All 4 must be present in the final prompt.
   - Store both `BG-XXX` and `<SEED>` in the registry notes (or dedicated fields) so the background prompt can be reproduced later.
 - Never “fix safe-zones after the fact” by rewriting the prompt mid-run; safe-zone rules must be present in the prompt *before* the API call.
@@ -1213,7 +1205,7 @@ Step 5.6 — API execution (Nano Banana 2 via Kie)
 - Submit one job per prompt file (EN by default).
 - Poll task state via `GET /api/v1/jobs/recordInfo?taskId=...` until `success` or `fail`.
 - Mandatory script execution note:
-  - If running `scripts/kie_nano_batch.py`, execute it for real and rely on actual API responses.
+  - If running image generation, execute the configured pipeline for real and rely on actual API/web responses.
   - Never claim submission/poll/download success without task IDs and saved file paths from command output.
 
 Step 5.7 — Generated image storage

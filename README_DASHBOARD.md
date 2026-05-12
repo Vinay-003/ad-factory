@@ -67,9 +67,7 @@ Bootstrap does all of this:
    - `input/activeimages.txt`
 
 2. Retrieval scripts extract only required slices:
-   - `scripts/build_canonical_context.py` (LLM reconciliation, primary)
    - `scripts/extract_format_rules.py`
-   - `scripts/extract_product_context.py` (fallback only if canonical build fails)
 
 3. Backend builds compact context JSON and tries OpenCode-compatible chat API (optional).
 
@@ -78,8 +76,7 @@ Bootstrap does all of this:
 5. Assembler creates prompts via:
    - `scripts/generate_ads.py`
 
-6. Optional image generation via:
-   - `scripts/kie_nano_batch.py`
+6. Optional image generation via Gemini web automation from the dashboard endpoints.
 
 ## Provider + model dropdown
 
@@ -94,10 +91,8 @@ Bootstrap does all of this:
 The dashboard does deterministic retrieval first, then generation.
 
 1. User selects persona + format in UI.
-2. Backend runs context-building scripts:
-   - `scripts/build_canonical_context.py` (single-source product extraction)
-    - `scripts/extract_format_rules.py` from `AD_CREATIVE_SYSTEM_PLAYBOOK.md`
-    - `scripts/extract_product_context.py` as fallback
+2. Backend builds context directly from uploaded/default product master doc and format rules:
+   - `scripts/extract_format_rules.py` from `AD_CREATIVE_SYSTEM_PLAYBOOK.md`
 3. Backend builds compact `run_context.json` in run storage.
 4. OpenCode generates copy JSON only, including the selected `awareness_stage`, `concept_angle`, and `concept_structure` from the concept framework.
 5. Backend normalizes schema, carries concept IDs forward, and trims long copy lines.

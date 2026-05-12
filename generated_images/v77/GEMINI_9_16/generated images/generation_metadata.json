@@ -1,0 +1,19 @@
+{
+  "batch": "v77",
+  "aspect_ratio": "9:16",
+  "run_id": "run_1778572425_4710",
+  "personas": [
+    "output/v77/45/OUTPUT_BA_P22_EN.txt",
+    "output/v77/45/OUTPUT_HERO_P02_EN.txt",
+    "output/v77/45/OUTPUT_HERO_P22_EN.txt"
+  ],
+  "hypothesis": {
+    "type": "awareness_stage",
+    "variant": "problem_aware"
+  },
+  "image_files": [
+    "generated_images/v77/GEMINI_9_16/.browser_downloads/Gemini_Generated_Image_juisdejuisdejuis.png",
+    "generated_images/v77/GEMINI_9_16/generated images/gemini-ba-p22-en.png"
+  ],
+  "generated_at": "2026-05-12T08:04:03Z"
+}

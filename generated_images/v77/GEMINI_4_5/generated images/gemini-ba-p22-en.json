@@ -1,0 +1,17 @@
+{
+  "status": "success",
+  "prompt_file": "/home/mylappy/myspace/info/runtime/gemini_selected_prompts/v77_4_5_1778572642_c9e661e9/OUTPUT_BA_P22_EN.txt",
+  "format_id": "BA",
+  "persona_id": "P22",
+  "lang_id": "EN",
+  "job_key": "BA_P22_EN",
+  "generated_image_src": "blob:https://gemini.google.com/4a34940c-96e0-4210-90dc-73f7ec689d4b",
+  "saved_file": "/home/mylappy/myspace/info/generated_images/v77/GEMINI_4_5/generated images/gemini-ba-p22-en.png",
+  "saved_size": 6777293,
+  "saved_ext": ".png",
+  "output_dir": "/home/mylappy/myspace/info/generated_images/v77/GEMINI_4_5/generated images",
+  "metadata_file": "/home/mylappy/myspace/info/generated_images/v77/GEMINI_4_5/generated images/gemini-ba-p22-en.json",
+  "timestamp": 1778572845,
+  "hypothesis_type": "awareness_stage",
+  "hypothesis_variant": "problem_aware"
+}

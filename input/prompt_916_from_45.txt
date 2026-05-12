@@ -1,0 +1,27 @@
+Convert the attached 4:5 ad creative into a 9:16 version for the same campaign.
+
+Critical fidelity rules:
+- Treat the attached 4:5 creative as the single source of truth.
+- Product images are locked: preserve the exact same product packshots, label text, logos, illustrations, caps, and colors as the 4:5 reference.
+- Allowed product changes are limited to orientation, placement, and scale needed for 9:16 composition.
+- Do NOT redraw, reconstruct, relabel, retouch, or restyle any product.
+- If any product differs from the source (text distortion, shape change, label change, color shift, missing/extra product), reject and regenerate automatically.
+- Do NOT rewrite copy, do NOT invent new claims, do NOT add new offers, and do NOT add new objects.
+- Do NOT perform a simple resize/crop/stretch of the original image.
+
+Composition rules for 9:16:
+- Extend canvas vertically to 9:16 by outpainting above and below the original composition.
+- Keep the original 4:5 core composition stable in the center region.
+- Add natural background continuation only where needed to fit 9:16.
+
+Meta 9:16 safe-zone rules (for mobile feed/reels overlays):
+- Canvas is 1080x1920 (9:16).
+- Keep all critical content (all product packshots, headline, support text, CTA, key logos) inside the central safe zone from y=270 to y=1650.
+- That means reserve top 14% (0-269 px) and bottom 14% (1651-1919 px) as restricted zones for overlays/UI.
+- Keep important text away from left/right edges with at least 5% horizontal padding on both sides.
+- If any critical element crosses a restricted zone, reject and regenerate automatically.
+
+Quality bar:
+- Final output must look like the same ad creative adapted to 9:16, not a new redesign.
+- Maintain photoreal quality, product fidelity, and clean typography edges.
+- If fidelity or safe-zone compliance fails, regenerate until all rules pass.

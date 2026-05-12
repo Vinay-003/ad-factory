@@ -57,9 +57,12 @@ if (killChromeBtn) {
 }
 
 let currentPollingInterval = null;
+let progressEntries = [];
 
 export function startProgressPolling(batchKey) {
   if (currentPollingInterval) clearInterval(currentPollingInterval);
+  progressEntries = [];
+  let lastCount = 0;
   currentPollingInterval = setInterval(async () => {
     try {
       const res = await fetch(`/api/progress/${encodeURIComponent(batchKey)}`);
@@ -68,10 +71,18 @@ export function startProgressPolling(batchKey) {
         return;
       }
       const data = await res.json();
-      const step = data.step || "";
-      const msg = data.message || "";
-      const time = data.time ? new Date(data.time * 1000).toLocaleTimeString() : "";
-      setChromeStatus(`[${time}] [${step}] ${msg}\n`);
+      const entries = data.entries || [];
+      if (entries.length > lastCount) {
+        for (let i = lastCount; i < entries.length; i++) {
+          const e = entries[i];
+          const step = e.step || "";
+          const msg = e.message || "";
+          const time = e.time ? new Date(e.time * 1000).toLocaleTimeString() : "";
+          progressEntries.push(`[${time}] [${step}] ${msg}`);
+        }
+        lastCount = entries.length;
+        setChromeStatus(progressEntries.join("\n"));
+      }
     } catch (_) {}
   }, 3000);
 }
