@@ -6,17 +6,14 @@ import json
 import os
 import random
 import re
-import signal
 import subprocess
 import sys
-import tempfile
 import time
 import urllib.request
 import fcntl
 import hashlib
 import mimetypes
 import uuid
-import urllib.request
 import psutil
 from contextlib import contextmanager
 from datetime import datetime, timezone
@@ -442,12 +439,6 @@ PERSONA_SEED_INPUTS: dict[int, dict[str, str]] = {
     25: {"pain": "Wants a natural path and avoids harsh methods.", "desire": "Natural weight-loss support that still feels effective.", "friction": "Worries natural options may be vague or weak.", "proof": "Needs clear Ayurvedic, no-synthetic trust cues.", "tone": "clear and trust-led"},
     26: {"pain": "Past quick losses came back too fast.", "desire": "A more sustainable path without bounce-back anxiety.", "friction": "Short-term fixes feel temporary and hard to maintain.", "proof": "Needs non-dependency and maintainability framing.", "tone": "steady and realistic"},
 }
-
-
-# Feature lanes removed: headline/support must be derived freely by the LLM from `product master doc.txt`.
-
-
-# Format feature rotation removed with feature lanes.
 
 
 def _framework_item(group: str, item_id: str) -> dict[str, str]:
@@ -1071,10 +1062,7 @@ def run_gemini_generation(
     log_dir.mkdir(parents=True, exist_ok=True)
     log_path = log_dir / f"gen_{batch}_{aspect_folder}.log"
 
-    env = dict(os.environ)
-    playwright_path = "/home/mylappy/.local/lib/python3.12/site-packages"
-    if playwright_path not in env.get("PYTHONPATH", ""):
-        env["PYTHONPATH"] = playwright_path + ((":" + env["PYTHONPATH"]) if env.get("PYTHONPATH") else "")
+    env = dashboard_subprocess_env()
 
     with open(log_path, "w") as log_file:
         result = subprocess.run(cmd, cwd=str(ROOT), text=True, stdout=log_file, stderr=subprocess.STDOUT, check=False, env=env)
@@ -1783,12 +1771,6 @@ def concept_ids_from_requirements(copy_req: dict[str, Any]) -> dict[str, str]:
     }
 
 
-# Feature template copy removed. Deterministic fallback should not hardcode headline/support “lanes”.
-
-
-# Deterministic template helpers removed with feature template copy.
-
-
 def ensure_testimonial_headline(headline: str, lang: str, persona: dict[str, Any]) -> str:
     clean = shorten_copy_line(headline)
     if lang == "EN":
@@ -2481,6 +2463,12 @@ def parse_persona_number_from_prompt(prompt_text: str) -> int | None:
     return int(match.group(1))
 
 
+EXACT_COPY_BLOCK_RE = re.compile(
+    r"EXACT ON-IMAGE COPY - DO NOT ALTER ANYTHING\s*\n(?P<block>.+?)\n\s*Render every character exactly as written",
+    flags=re.DOTALL,
+)
+
+
 def extract_on_image_copy_lines(prompt_text: str) -> list[dict[str, str]]:
     """
     Legacy-ish extractor used by the dashboard editor.
@@ -2488,16 +2476,12 @@ def extract_on_image_copy_lines(prompt_text: str) -> list[dict[str, str]]:
     It DOES NOT preserve exact spacing/linebreaks; it trims lines into {label,value}.
     Keep this for backward compatibility.
     """
-    block = re.search(
-        r"EXACT ON-IMAGE COPY - DO NOT ALTER ANYTHING\s*\n(.+?)\n\s*Render every character exactly as written",
-        prompt_text,
-        flags=re.DOTALL,
-    )
+    block = EXACT_COPY_BLOCK_RE.search(prompt_text)
     if not block:
         return []
 
     out: list[dict[str, str]] = []
-    for line in block.group(1).splitlines():
+    for line in block.group("block").splitlines():
         raw = line.strip()
         if not raw:
             continue
@@ -2757,10 +2741,10 @@ app = FastAPI(title="Ad Dashboard API", version="1.0.0")
 
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["*"],
-    allow_credentials=True,
-    allow_methods=["*"],
-    allow_headers=["*"],
+    allow_origins=["http://127.0.0.1:4090", "http://localhost:4090"],
+    allow_credentials=False,
+    allow_methods=["GET", "POST"],
+    allow_headers=["Content-Type", "Authorization"],
 )
 
 
@@ -3094,12 +3078,6 @@ EXACT_COPY_SHEET_COLUMNS = [
     "created_at",
 ]
 
-EXACT_COPY_BLOCK_FULL_RE = re.compile(
-    r"EXACT ON-IMAGE COPY - DO NOT ALTER ANYTHING\s*\n(?P<block>.+?)\n\s*Render every character exactly as written",
-    flags=re.DOTALL,
-)
-
-
 def _extract_vn_from_prompt_rel_path(prompt_rel_path: str) -> str:
     # Expected pattern: output/v{N}/...
     # Keep backward compatible: if not found, return empty string.
@@ -3133,7 +3111,7 @@ def _parse_exact_block_headline_value(block_text: str) -> str | None:
 
 
 def _replace_exact_copy_block(prompt_text: str, new_block_text: str) -> str | None:
-    m = EXACT_COPY_BLOCK_FULL_RE.search(prompt_text or "")
+    m = EXACT_COPY_BLOCK_RE.search(prompt_text or "")
     if not m:
         return None
     start_idx = m.start("block")
@@ -4287,30 +4265,7 @@ async def api_run_execute(
         raise HTTPException(status_code=500, detail="Could not parse batch from assembler output")
     batch = batch_match.group(1)
 
-    generate_images = False
-    image_generated = False
-    if generate_images:
-        kie_api_key = (cfg.get("kie_api_key") or "").strip()
-        if not kie_api_key:
-            (run_dir / "logs" / "image_blocker.txt").write_text(
-                "generate_images was true but kie_api_key is missing", encoding="utf-8"
-            )
-        else:
-            image_result = run_cmd(
-                [
-                    "python3",
-                    "scripts/kie_nano_batch.py",
-                    "--batch",
-                    batch,
-                ],
-                cwd=ROOT,
-            )
-            (run_dir / "logs" / "image_generation.log").write_text(
-                (image_result.stdout or "") + "\n" + (image_result.stderr or ""), encoding="utf-8"
-            )
-            image_generated = image_result.returncode == 0
-
-    manifest = collect_run_result(run_dir, batch, image_generated)
+    manifest = collect_run_result(run_dir, batch, image_generated=False)
     manifest["llm_mode"] = llm_mode
     if llm_mode == "fallback_template":
         manifest["copy_source"] = "deterministic fallback template"
@@ -4412,7 +4367,7 @@ def api_kill_chrome() -> dict[str, Any]:
             if any("gemini_web_automation" in c for c in cmdline):
                 proc.kill()
                 gemini_killed += 1
-        except Exception:
+        except (psutil.NoSuchProcess, psutil.AccessDenied):
             continue
 
     return {"status": "killed", "chrome": killed, "gemini_processes": gemini_killed}

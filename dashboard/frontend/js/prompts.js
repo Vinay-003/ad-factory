@@ -342,6 +342,7 @@ function buildPromptCard(prompt, run, items) {
       editActions.style.display = "none";
       top.classList.remove("editing");
       const displayValues = linesDisplay.querySelectorAll(".prompt-line-value");
+      const editTextareas = editForm.querySelectorAll("textarea");
       editTextareas.forEach((ta, i) => {
         if (displayValues[i]) displayValues[i].textContent = ta.value || "(empty)";
       });
