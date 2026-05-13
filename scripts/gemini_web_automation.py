@@ -72,6 +72,7 @@ class PromptJob:
     format_id: str
     persona_id: str
     lang_id: str
+    variant_id: str
     job_key: str
     output_stem: str
 
@@ -208,12 +209,12 @@ def _format_sort_key(fmt: str) -> tuple[int, str]:
     return (999, fmt_up)
 
 
-def _parse_prompt_name(path: Path) -> tuple[str, str, str]:
+def _parse_prompt_name(path: Path) -> tuple[str, str, str, str]:
     stem = path.stem
     patterns = [
-        r"^(?:FINAL|OUTPUT)_(?P<fmt>[A-Za-z0-9]+)_P(?P<num>\d+)_(?P<lang>[A-Za-z0-9]+)$",
+        r"^(?:FINAL|OUTPUT)_(?P<fmt>[A-Za-z0-9]+)_P(?P<num>\d+)_(?P<lang>[A-Za-z0-9]+)(?:_(?P<variant>[AV]\d+))?$",
         r"^(?:FINAL|OUTPUT)_(?P<fmt>[A-Za-z0-9]+)_P(?P<num>\d+)$",
-        r"^(?P<fmt>[A-Za-z0-9]+)_P(?P<num>\d+)_(?P<lang>[A-Za-z0-9]+)$",
+        r"^(?P<fmt>[A-Za-z0-9]+)_P(?P<num>\d+)_(?P<lang>[A-Za-z0-9]+)(?:_(?P<variant>[AV]\d+))?$",
         r"^(?P<fmt>[A-Za-z0-9]+)_P(?P<num>\d+)$",
     ]
     for pat in patterns:
@@ -222,7 +223,8 @@ def _parse_prompt_name(path: Path) -> tuple[str, str, str]:
             fmt = m.group("fmt").upper()
             persona = f"P{int(m.group('num')):02d}"
             lang = m.group("lang").upper() if "lang" in m.groupdict() and m.group("lang") else "XX"
-            return fmt, persona, lang
+            variant = m.group("variant").upper() if "variant" in m.groupdict() and m.group("variant") else ""
+            return fmt, persona, lang, variant
 
     # Defensive fallback: find a known format token anywhere before Pxx.
     m_persona = re.search(r"(?:^|_)P(?P<num>\d+)(?:_|$)", stem, flags=re.IGNORECASE)
@@ -231,10 +233,10 @@ def _parse_prompt_name(path: Path) -> tuple[str, str, str]:
     known_formats = ["BA", "FEAT", "HERO", "TEST", "UGC"]
     for token in tokens:
         if token in known_formats:
-            return token, persona_id, "XX"
+            return token, persona_id, "XX", ""
 
     fmt = next((t for t in tokens if t not in {"FINAL", "OUTPUT", persona_id}), "PROMPT")
-    return fmt, persona_id, "XX"
+    return fmt, persona_id, "XX", ""
 
 
 def discover_prompt_jobs(prompt_dir: Path, pattern: str, allow_duplicates: bool) -> tuple[list[PromptJob], list[PromptJob]]:
@@ -244,15 +246,17 @@ def discover_prompt_jobs(prompt_dir: Path, pattern: str, allow_duplicates: bool)
 
     raw_jobs: list[PromptJob] = []
     for path in raw_paths:
-        fmt, persona, lang = _parse_prompt_name(path)
-        key = f"{fmt}_{persona}_{lang}"
-        safe_stem = f"gemini-{fmt.lower()}-{persona.lower()}-{lang.lower()}"
+        fmt, persona, lang, variant = _parse_prompt_name(path)
+        variant_suffix = f"_{variant}" if variant else ""
+        key = f"{fmt}_{persona}_{lang}{variant_suffix}"
+        safe_stem = f"gemini-{fmt.lower()}-{persona.lower()}-{lang.lower()}{('-' + variant.lower()) if variant else ''}"
         raw_jobs.append(
             PromptJob(
                 prompt_path=path.resolve(),
                 format_id=fmt,
                 persona_id=persona,
                 lang_id=lang,
+                variant_id=variant,
                 job_key=key,
                 output_stem=safe_stem,
             )
@@ -309,6 +313,30 @@ def validate_expected_formats(jobs: list[PromptJob], expected_csv: str, strict: 
         if strict:
             raise RuntimeError(msg)
         print("\nWARNING: " + msg)
+
+
+def load_prompt_metadata(prompt_path: Path, prompt_text: str) -> dict[str, Any]:
+    sidecar = prompt_path.with_suffix(".json")
+    if sidecar.exists():
+        try:
+            data = json.loads(sidecar.read_text(encoding="utf-8"))
+            if isinstance(data, dict):
+                return data
+        except Exception as exc:
+            print(f"Warning: could not read prompt metadata {sidecar.name}: {exc}")
+
+    def field(label: str) -> str:
+        match = re.search(rf"^-\s*{re.escape(label)}\s*:\s*(.+)$", prompt_text, flags=re.MULTILINE | re.IGNORECASE)
+        return match.group(1).strip() if match else ""
+
+    return {
+        "background": {
+            "slot": field("Background slot").split(" - ", 1)[0].strip(),
+            "seed": int(field("Background seed")) if field("Background seed").isdigit() else "",
+            "seeded_direction": field("Seeded background direction (single sentence, exact)"),
+        },
+        "visual_archetype": {"id": field("Selected visual archetype").split(" - ", 1)[0].strip()},
+    }
 
 
 def load_starting_prompt(path_value: str) -> str:
@@ -3436,6 +3464,9 @@ def run() -> None:
                 print("=" * 72)
                 log_progress("job_start", f"Starting job {idx}/{len(jobs)}: {job.job_key}")
                 prompt_body = job.prompt_path.read_text(encoding="utf-8")
+                prompt_metadata = load_prompt_metadata(job.prompt_path, prompt_body)
+                prompt_hypothesis = prompt_metadata.get("hypothesis") if isinstance(prompt_metadata.get("hypothesis"), dict) else {}
+                effective_hypothesis = prompt_hypothesis if prompt_hypothesis else hypothesis_config
                 prompt_text = prepend_starting_prompt(starting_prompt, prompt_body)
                 out_base = generated_images_dir / job.output_stem
                 if prompt_text == prompt_body:
@@ -3526,8 +3557,14 @@ def run() -> None:
                             "job_key": job.job_key,
                             "prompt_file": job.prompt_path.name,
                             "saved_file": str(saved_path),
-                            "hypothesis_type": hypothesis_config.get("type", "") if hypothesis_config else "",
-                            "hypothesis_variant": hypothesis_config.get("variant", "") if hypothesis_config else "",
+                            "hypothesis_type": effective_hypothesis.get("type", "") if effective_hypothesis else "",
+                            "hypothesis_variant": effective_hypothesis.get("variant", "") if effective_hypothesis else "",
+                            "hypothesis": effective_hypothesis,
+                            "creative_index": prompt_metadata.get("creative_index", 1),
+                            "creative_total": prompt_metadata.get("creative_total", 1),
+                            "background": prompt_metadata.get("background", {}),
+                            "visual_archetype": prompt_metadata.get("visual_archetype", {}),
+                            "background_decisions": prompt_metadata.get("background_decisions", {}),
                             "timestamp": int(time.time()),
                         }
                         out_base.with_suffix(".json").write_text(json.dumps(metadata, indent=2), encoding="utf-8")
@@ -3573,8 +3610,14 @@ def run() -> None:
                     "persona": job.persona_id,
                     "prompt_file": job.prompt_path.name,
                     "error": str(last_exc),
-                    "hypothesis_type": hypothesis_config.get("type", "") if hypothesis_config else "",
-                    "hypothesis_variant": hypothesis_config.get("variant", "") if hypothesis_config else "",
+                    "hypothesis_type": effective_hypothesis.get("type", "") if effective_hypothesis else "",
+                    "hypothesis_variant": effective_hypothesis.get("variant", "") if effective_hypothesis else "",
+                    "hypothesis": effective_hypothesis,
+                    "creative_index": prompt_metadata.get("creative_index", 1),
+                    "creative_total": prompt_metadata.get("creative_total", 1),
+                    "background": prompt_metadata.get("background", {}),
+                    "visual_archetype": prompt_metadata.get("visual_archetype", {}),
+                    "background_decisions": prompt_metadata.get("background_decisions", {}),
                     "timestamp": int(time.time()),
                     **diag,
                 }

@@ -259,6 +259,12 @@ body {
   background-position: center;
 }
 
+.execution-toggle {
+  width: 100%;
+  justify-content: flex-start;
+  margin: 0 0 14px;
+}
+
 /* ── Batch Dropdown ───────────────────────────────────────────────────────── */
 .batch-dropdown { position: relative; }
 
@@ -415,7 +421,7 @@ label {
 
 #languageModes { margin-bottom: 12px; }
 
-textarea, input[type="text"], input[type="password"], select, input[type="file"] {
+textarea, input[type="text"], input[type="password"], input[type="number"], select, input[type="file"] {
   width: 100%;
   margin-top: 6px;
   margin-bottom: 14px;
@@ -557,6 +563,34 @@ textarea { min-height: 190px; line-height: 1.35; }
 body[data-theme="dark"] .chip.active { color: #121821; }
 
 .format-chip-group { gap: 6px; }
+
+.format-patterns {
+  margin-top: 14px;
+  padding-top: 14px;
+  border-top: 1px solid color-mix(in srgb, var(--line) 70%, transparent);
+}
+
+.format-pattern-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(230px, 1fr));
+  gap: 10px;
+}
+
+.format-pattern-block {
+  border: 1px solid color-mix(in srgb, var(--line) 70%, transparent);
+  border-radius: 12px;
+  padding: 10px;
+  background: color-mix(in srgb, var(--surface) 78%, var(--surface-2));
+}
+
+.format-pattern-title {
+  font-size: 12px;
+  font-weight: 800;
+  letter-spacing: 0.04em;
+  margin-bottom: 6px;
+}
+
+.format-pattern-block select { margin-bottom: 0; }
 
 .chip-format {
   display: inline-flex;

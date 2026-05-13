@@ -1139,8 +1139,9 @@ def aspect_ratio_folder(aspect_ratio: str) -> str:
     return "96" if aspect_ratio == "9:16" else "45"
 
 
-def prompt_filename(fmt: str, persona_number: int, lang: str) -> str:
-    return f"OUTPUT_{fmt}_P{persona_number:02d}_{lang}.txt"
+def prompt_filename(fmt: str, persona_number: int, lang: str, creative_index: int = 1, creative_total: int = 1) -> str:
+    suffix = f"_A{creative_index:02d}" if creative_total > 1 else ""
+    return f"OUTPUT_{fmt}_P{persona_number:02d}_{lang}{suffix}.txt"
 
 
 def classify_hook_structure(headline: str) -> str:
@@ -1368,6 +1369,7 @@ def main() -> int:
     batch_dir.mkdir(parents=True, exist_ok=True)
     timestamp = now_utc_iso()
     run_archetype_usage: dict[str, set[str]] = {}
+    background_group_cache: dict[str, dict[str, Any]] = {}
 
     for i, ad in enumerate(ads):
         fmt = str(ad["format"]).upper()
@@ -1376,27 +1378,36 @@ def main() -> int:
         ratio_dir.mkdir(parents=True, exist_ok=True)
         persona = ad["persona"]
         persona_number = int(persona["number"])
+        creative_index = int(ad.get("creative_index") or 1)
+        creative_total = int(ad.get("creative_total") or 1)
         angle = (ad.get("headline_angle") or "").strip()
         concept = resolve_concept_fields(ad, fmt, persona)
 
-        for stale_lang in ["EN", "HI"]:
+        for stale_lang in ["EN", "HI", "HINGLISH"]:
             if stale_lang in render_langs:
                 continue
-            stale_path = ratio_dir / prompt_filename(fmt, persona_number, stale_lang)
-            if stale_path.exists():
+            for stale_path in ratio_dir.glob(f"OUTPUT_{fmt}_P{persona_number:02d}_{stale_lang}*.txt"):
                 stale_path.unlink()
 
-        forced_bg = ad.get("background_slot") or ad.get("background_slot_id")
-        if isinstance(forced_bg, str) and forced_bg.strip():
-            bg = get_background_by_id(backgrounds, fmt, forced_bg)
+        background_group_key = str(ad.get("background_group_key") or "").strip()
+        cached_background = background_group_cache.get(background_group_key) if background_group_key else None
+        if cached_background:
+            bg = cached_background["background"]
+            bg_seed = cached_background["background_seed"]
         else:
-            bg = pick_background_slot(registry, backgrounds, fmt, seed)
+            forced_bg = ad.get("background_slot") or ad.get("background_slot_id")
+            if isinstance(forced_bg, str) and forced_bg.strip():
+                bg = get_background_by_id(backgrounds, fmt, forced_bg)
+            else:
+                bg = pick_background_slot(registry, backgrounds, fmt, seed)
 
-        forced_seed = ad.get("background_seed")
-        if isinstance(forced_seed, int) and forced_seed > 0:
-            bg_seed = forced_seed
-        else:
-            bg_seed = random.Random(seed + i * 101).randint(1, 2_147_483_647)
+            forced_seed = ad.get("background_seed")
+            if isinstance(forced_seed, int) and forced_seed > 0:
+                bg_seed = forced_seed
+            else:
+                bg_seed = random.Random(seed + i * 101).randint(1, 2_147_483_647)
+            if background_group_key:
+                background_group_cache[background_group_key] = {"background": bg, "background_seed": bg_seed}
         visual_lock = ad.get("visual_lock") if isinstance(ad.get("visual_lock"), dict) else {}
         seeded_sentence = build_seeded_background_sentence(bg, bg_seed, aspect_ratio)
         if isinstance(visual_lock.get("seeded_background_direction"), str) and visual_lock.get("seeded_background_direction").strip():
@@ -1438,9 +1449,45 @@ def main() -> int:
                 visual_archetype,
                 visual_lock=visual_lock,
             )
-            out_path = ratio_dir / prompt_filename(fmt, persona_number, lang)
+            out_path = ratio_dir / prompt_filename(fmt, persona_number, lang, creative_index, creative_total)
             validate_prompt_text(out_text, out_path)
             out_path.write_text(out_text, encoding="utf-8")
+            prompt_meta = {
+                "type": "ad_prompt",
+                "format": fmt,
+                "persona": f"P{persona_number:02d}",
+                "persona_number": persona_number,
+                "language": lang,
+                "creative_index": creative_index,
+                "creative_total": creative_total,
+                "background_group_key": background_group_key,
+                "hypothesis": ad.get("hypothesis") if isinstance(ad.get("hypothesis"), dict) else {},
+                "background": {
+                    "slot": bg["id"],
+                    "name": bg.get("title", ""),
+                    "source": "catalog",
+                    "seed": bg_seed,
+                    "seeded_direction": seeded_sentence,
+                    "scene_category": get_background_scene_category(bg),
+                    "base": bg.get("base", ""),
+                    "formats": bg.get("formats", []),
+                },
+                "visual_archetype": {
+                    "id": visual_archetype["id"],
+                    "label": visual_archetype["label"],
+                    "forced": bool(forced_archetype),
+                },
+                "background_decisions": {
+                    "forced_background": bool(ad.get("background_slot") or ad.get("background_slot_id")),
+                    "forced_seed": isinstance(ad.get("background_seed"), int) and ad.get("background_seed") > 0,
+                    "shared_by_multiplier": creative_total > 1 and bool(background_group_key),
+                    "shared_across_personas": bool(ad.get("share_background_across_personas")),
+                    "visual_lock_applied": bool(visual_lock),
+                    "aspect_ratio": aspect_ratio,
+                    "assembler_seed": seed,
+                },
+            }
+            out_path.with_suffix(".json").write_text(json.dumps(prompt_meta, ensure_ascii=False, indent=2) + "\n", encoding="utf-8")
             rendered[lang] = out_text
 
         if args.no_registry_write:

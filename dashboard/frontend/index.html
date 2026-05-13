@@ -29,6 +29,7 @@
           <div id="personaList" class="grid"></div>
           <label>Apply these formats to selected personas only</label>
           <div id="globalFormats" class="chips"></div>
+          <div id="formatPatterns" class="format-patterns"></div>
         </section>
 
         <section class="card card-images">
@@ -67,6 +68,13 @@
           <select id="opencodeProvider"></select>
           <label>Model</label>
           <select id="opencodeModel"></select>
+          <label>Ad multiplier per selected persona/format</label>
+          <input id="adMultiplier" type="number" min="1" max="20" value="1" />
+          <p class="hint">Use this to create multiple ads for the same persona, format, and hypothesis. The selected background stays locked across those multiplied ads.</p>
+          <label class="toggle-label execution-toggle" title="Use the same background for the same selected format across all selected personas in this run.">
+            <input id="shareBackgroundAcrossPersonas" type="checkbox" />
+            <span>Keep same background across personas for each format</span>
+          </label>
 
           <p class="hint">Image and Cloudinary credentials are loaded from root <code>.env.dashboard</code>.</p>
 

@@ -1,6 +1,6 @@
 import { state, getPersonaSelection, getFormatsByPersona, getHypothesisConfig, loadDefaults } from "./state.js";
 import { setStatus, setSelectOptions } from "./ui.js";
-import { renderPersonas, showPersonaSkeletons, renderGlobalFormats, renderLanguageModes } from "./personas.js";
+import { renderPersonas, showPersonaSkeletons, renderGlobalFormats, renderLanguageModes, renderFormatPatterns } from "./personas.js";
 import { renderHypothesisUI } from "./hypothesis.js";
 import { loadRuns as loadAndRenderRuns, showRunsSkeletons } from "./runs.js";
 import { stopProgressPolling } from "./chrome.js";
@@ -24,6 +24,7 @@ async function initDefaults() {
     renderPersonas();
     renderGlobalFormats();
     renderLanguageModes();
+    renderFormatPatterns();
     renderHypothesisUI();
 
     const imageCount = (data.input_images || []).length;
@@ -58,6 +59,9 @@ async function runPipeline() {
     language_mode: state.selectedLanguageMode,
     global_formats: [...state.selectedGlobalFormats],
     formats_by_persona: getFormatsByPersona(),
+    visual_archetypes_by_format: state.selectedVisualArchetypesByFormat,
+    multiplier: Math.max(1, Math.min(20, Number.parseInt(document.getElementById("adMultiplier")?.value || "1", 10) || 1)),
+    share_background_across_personas: Boolean(document.getElementById("shareBackgroundAcrossPersonas")?.checked),
     generate_images: false,
     server_type: state.currentServerType,
     opencode_api_url: document.getElementById("opencodeApiUrl").value.trim(),

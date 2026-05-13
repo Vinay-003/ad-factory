@@ -9,6 +9,7 @@ export const state = {
   selectedLanguageMode: "EN",
   selectedPersonas: new Set(),
   personaFormatsByNumber: new Map(),
+  selectedVisualArchetypesByFormat: {},
   modelsByProvider: {},
   runsData: [],
   currentRunIndex: 0,
@@ -35,9 +36,23 @@ export function getFormatsByPersona() {
   return map;
 }
 
+export function getSelectedFormatsForSelectedPersonas() {
+  const selected = new Set();
+  if (!state.defaultData?.personas) return [];
+  for (const persona of state.defaultData.personas) {
+    if (!state.selectedPersonas.has(persona.number)) continue;
+    const formatSet = state.personaFormatsByNumber.get(persona.number) || new Set();
+    for (const fmt of FORMATS) {
+      if (formatSet.has(fmt)) selected.add(fmt);
+    }
+  }
+  return FORMATS.filter((fmt) => selected.has(fmt));
+}
+
 export function initPersonaState(personas = []) {
   state.selectedPersonas = new Set();
   state.personaFormatsByNumber = new Map();
+  state.selectedVisualArchetypesByFormat = {};
   personas.forEach((persona) => {
     state.personaFormatsByNumber.set(persona.number, new Set());
   });

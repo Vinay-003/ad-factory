@@ -12,6 +12,7 @@ import time
 import urllib.request
 import fcntl
 import hashlib
+import importlib.util
 import mimetypes
 import uuid
 import psutil
@@ -75,6 +76,28 @@ DEFAULT_OPENCODE_API_URL = os.getenv("OPENCODE_API_URL", "http://127.0.0.1:4090"
 OPENCODE_MAX_CONCURRENT = 2
 OPENCODE_QUEUE_DIR = RUNTIME_ROOT / "opencode_queue"
 OPENCODE_QUEUE_LOG = OPENCODE_QUEUE_DIR / "queue.log"
+
+
+def load_format_visual_archetypes() -> dict[str, list[dict[str, str]]]:
+    script_path = ROOT / "scripts" / "generate_ads.py"
+    spec = importlib.util.spec_from_file_location("dashboard_generate_ads_patterns", script_path)
+    if spec is None or spec.loader is None:
+        return {}
+    module = importlib.util.module_from_spec(spec)
+    sys.modules[spec.name] = module
+    spec.loader.exec_module(module)
+    raw = getattr(module, "FORMAT_VISUAL_ARCHETYPES", {})
+    out: dict[str, list[dict[str, str]]] = {}
+    if not isinstance(raw, dict):
+        return out
+    for fmt in FORMATS:
+        items = raw.get(fmt) or []
+        out[fmt] = [
+            {"id": str(item.get("id") or ""), "label": str(item.get("label") or item.get("id") or "")}
+            for item in items
+            if isinstance(item, dict) and str(item.get("id") or "").strip()
+        ]
+    return out
 
 HEADLINE_CONCEPT_FRAMEWORK = {
     "audience_stage": [
@@ -1165,6 +1188,9 @@ def run_gemini_generation(
         prompt_text = source.read_text(encoding="utf-8")
         combined = f"{starting_prompt}\n\n{prompt_text.strip()}\n" if starting_prompt else prompt_text
         (prompt_work_dir / source.name).write_text(combined, encoding="utf-8")
+        sidecar = source.with_suffix(".json")
+        if sidecar.exists():
+            (prompt_work_dir / sidecar.name).write_text(sidecar.read_text(encoding="utf-8"), encoding="utf-8")
 
     out_dir = GENERATED_IMAGES_ROOT / batch / f"GEMINI_{aspect_folder}"
     image_source_arg = image_sources_file
@@ -2262,6 +2288,9 @@ def build_template_copy(context: dict[str, Any], run_id: str) -> dict[str, Any]:
         hypothesis = item.get("hypothesis") if isinstance(item.get("hypothesis"), dict) else None
         if hypothesis:
             ad_payload["hypothesis"] = hypothesis
+        for key in ["visual_archetype", "creative_index", "creative_total", "background_group_key"]:
+            if key in item:
+                ad_payload[key] = item[key]
         ads.append(ad_payload)
 
     return {"default_aspect_ratio": "4:5", "ads": ads}
@@ -2604,12 +2633,17 @@ def parse_background_lock_from_prompt(prompt_text: str) -> tuple[str, int] | Non
 
 def parse_prompt_filename(prompt_path: str) -> tuple[str, str, int | None] | None:
     name = Path(prompt_path).name
-    match = re.match(r"^OUTPUT_([A-Z]+)(?:_P(\d+))?_(EN|HI)(?:_V\d+)?\.txt$", name)
+    match = re.match(r"^OUTPUT_([A-Z]+)(?:_P(\d+))?_(EN|HI|HINGLISH)(?:_(?:V|A)\d+)?\.txt$", name)
     if not match:
         return None
     persona_raw = match.group(2)
     persona_number = int(persona_raw) if persona_raw else None
     return (match.group(1), match.group(3), persona_number)
+
+
+def parse_prompt_creative_index(prompt_path: str) -> int:
+    match = re.search(r"_A(\d+)\.txt$", Path(prompt_path).name, flags=re.IGNORECASE)
+    return int(match.group(1)) if match else 1
 
 
 def parse_persona_number_from_prompt(prompt_text: str) -> int | None:
@@ -2848,6 +2882,12 @@ def resolve_format_plan(config: dict[str, Any]) -> list[dict[str, Any]]:
 
     all_formats = [fmt for fmt in (config.get("global_formats") or []) if fmt in FORMATS]
     format_map = config.get("formats_by_persona") or {}
+    archetype_map = config.get("visual_archetypes_by_format") or {}
+    share_bg_across_personas = bool(config.get("share_background_across_personas"))
+    try:
+        multiplier = max(1, min(20, int(config.get("multiplier") or 1)))
+    except (TypeError, ValueError):
+        multiplier = 1
 
     out: list[dict[str, Any]] = []
     for raw_persona in personas:
@@ -2857,7 +2897,20 @@ def resolve_format_plan(config: dict[str, Any]) -> list[dict[str, Any]]:
         if not formats:
             formats = ["HERO"]
         for fmt in formats:
-            out.append({"persona": persona_num, "format": fmt})
+            forced_archetype = str(archetype_map.get(fmt) or "").strip()
+            background_group_key = fmt if share_bg_across_personas else f"{fmt}::P{persona_num:02d}"
+            for creative_index in range(1, multiplier + 1):
+                item = {
+                    "persona": persona_num,
+                    "format": fmt,
+                    "creative_index": creative_index,
+                    "creative_total": multiplier,
+                    "background_group_key": background_group_key,
+                    "share_background_across_personas": share_bg_across_personas,
+                }
+                if forced_archetype:
+                    item["visual_archetype"] = forced_archetype
+                out.append(item)
     return out
 
 
@@ -2889,6 +2942,8 @@ def expand_plan_with_hypothesis(plan: list[dict[str, Any]], hypothesis_cfg: dict
             "variant": variant_to_use,
             "hypothesis_id": f"{hyp_type}-{variant_to_use}",
         }
+        base_group_key = str(entry.get("background_group_key") or f"{entry.get('format')}::P{int(entry.get('persona')):02d}")
+        entry["background_group_key"] = f"{base_group_key}::{hyp_type}::{variant_to_use}"
         out.append(entry)
     return out
 
@@ -2916,6 +2971,7 @@ def api_defaults() -> dict[str, Any]:
     return {
         "personas": personas,
         "formats": FORMATS,
+        "format_patterns": load_format_visual_archetypes(),
         "image_sources": read_active_images(default_image_sources_file()),
         "input_images": list_input_images(),
         "default_files": {
@@ -3361,6 +3417,7 @@ def _extract_prompt_row_metadata(run_id: str, copy_batch: dict[str, Any], prompt
     parsed = parse_prompt_filename(prompt_rel_path)
     fmt = parsed[0] if parsed else ""
     persona_number = parsed[2] if parsed else None
+    creative_index = parse_prompt_creative_index(prompt_rel_path)
     if persona_number is None:
         persona_number = parse_persona_number_from_prompt(text)
 
@@ -3379,6 +3436,8 @@ def _extract_prompt_row_metadata(run_id: str, copy_batch: dict[str, Any], prompt
             persona_obj = ad.get("persona")
             if isinstance(persona_obj, dict):
                 if isinstance(persona_obj.get("number"), int) and int(persona_obj.get("number")) == persona_number:
+                    if int(ad.get("creative_index") or 1) != creative_index:
+                        continue
                     persona = str(persona_obj.get("persona_name") or persona_obj.get("name") or f"Persona {persona_number}")
             if persona:
                 angle = str(ad.get("headline_angle") or ad.get("concept_angle") or "")
@@ -4388,6 +4447,11 @@ async def api_run_execute(
                 "format": fmt,
                 "copy_requirements": copy_req,
                 "hypothesis": hyp_meta,
+                "visual_archetype": item.get("visual_archetype"),
+                "creative_index": item.get("creative_index", 1),
+                "creative_total": item.get("creative_total", 1),
+                "background_group_key": item.get("background_group_key"),
+                "share_background_across_personas": item.get("share_background_across_personas", False),
             }
         )
 
@@ -4659,6 +4723,7 @@ def _parse_image_naming(image_path_str: str, run_dir: Path | None) -> dict[str, 
     full_path = ROOT / image_path_str
     meta_path = full_path.with_suffix(".json")
     base = {"format": "UNKNOWN", "persona": "00", "lang": "EN", "stem": "image"}
+    hyp_label = ""
 
     if meta_path.exists():
         try:
@@ -4674,9 +4739,21 @@ def _parse_image_naming(image_path_str: str, run_dir: Path | None) -> dict[str, 
             base["format"] = fmt
             base["persona"] = f"P{persona_num:02d}" if persona_num else "P00"
             base["lang"] = lang
+        creative_total = int(meta.get("creative_total") or 1) if str(meta.get("creative_total") or "1").isdigit() else 1
+        creative_index = int(meta.get("creative_index") or 1) if str(meta.get("creative_index") or "1").isdigit() else 1
+        if creative_total > 1:
+            base["creative_suffix"] = f"_A{creative_index:02d}"
+
+        if not hyp_label:
+            htype = str(meta.get("hypothesis_type") or "")
+            hvar = str(meta.get("hypothesis_variant") or "")
+            if htype and htype != "none":
+                parts = [htype]
+                if hvar:
+                    parts.append(hvar)
+                hyp_label = "_" + "_".join(parts)
 
     # Try hypothesis
-    hyp_label = ""
     if run_dir is not None:
         hyp_path = run_dir / "context" / "hypothesis_config.json"
         if hyp_path.exists():
@@ -4693,7 +4770,7 @@ def _parse_image_naming(image_path_str: str, run_dir: Path | None) -> dict[str, 
                 pass
 
     ext = Path(image_path_str).suffix
-    stem = f"{base['format']}_{base['persona']}_{base['lang']}{hyp_label}"
+    stem = f"{base['format']}_{base['persona']}_{base['lang']}{base.get('creative_suffix', '')}{hyp_label}"
     base["stem"] = stem
     base["ext"] = ext
     return base
