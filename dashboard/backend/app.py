@@ -33,7 +33,7 @@ RUNS_ROOT = STORAGE_ROOT / "runs"
 RUNTIME_ROOT = ROOT / "runtime"
 ENV_PATH = ROOT / ".env.dashboard"
 
-DEFAULT_PRODUCT_MASTER = ROOT / "product master doc.txt"
+DEFAULT_PRODUCT_MASTER = ROOT / "input" / "docs" / "product master doc.txt"
 DEFAULT_PLAYBOOK = ROOT / "AD_CREATIVE_SYSTEM_PLAYBOOK.md"
 DEFAULT_IMAGE_SOURCES_FILE = ROOT / "input" / "image_sources.txt"
 LEGACY_ACTIVE_IMAGES_FILE = ROOT / "input" / "activeimages.txt"
@@ -913,6 +913,15 @@ def list_input_images() -> list[str]:
     return [str(p.relative_to(ROOT)).replace("\\", "/") for p in items]
 
 
+def default_product_doc_info() -> dict[str, Any]:
+    return {
+        "path": str(DEFAULT_PRODUCT_MASTER.relative_to(ROOT)).replace("\\", "/"),
+        "name": DEFAULT_PRODUCT_MASTER.name,
+        "exists": DEFAULT_PRODUCT_MASTER.exists(),
+        "size_bytes": DEFAULT_PRODUCT_MASTER.stat().st_size if DEFAULT_PRODUCT_MASTER.exists() else 0,
+    }
+
+
 def store_uploaded_input_images(files: list[UploadFile], clear_existing: bool) -> list[str]:
     ensure_dirs()
     if clear_existing and INPUT_IMAGES_DIR.exists():
@@ -938,6 +947,33 @@ def store_uploaded_input_images(files: list[UploadFile], clear_existing: bool) -
         target.write_bytes(data)
         saved.append(str(target.relative_to(ROOT)).replace("\\", "/"))
     return saved
+
+
+def api_delete_input_image(payload: dict[str, Any] = Body(...)) -> dict[str, Any]:
+    rel_path = str(payload.get("path") or "").strip().replace("\\", "/")
+    if not rel_path.startswith("input/images/"):
+        raise HTTPException(status_code=400, detail="path must be under input/images")
+    target = (ROOT / rel_path).resolve()
+    images_root = INPUT_IMAGES_DIR.resolve()
+    if images_root not in target.parents:
+        raise HTTPException(status_code=400, detail="Invalid image path")
+    if not target.exists() or not target.is_file():
+        raise HTTPException(status_code=404, detail="Input image not found")
+    target.unlink()
+    return {"status": "deleted", "path": rel_path}
+
+
+def api_product_doc() -> dict[str, Any]:
+    info = default_product_doc_info()
+    content = DEFAULT_PRODUCT_MASTER.read_text(encoding="utf-8", errors="ignore") if DEFAULT_PRODUCT_MASTER.exists() else ""
+    return {**info, "content": content}
+
+
+def api_save_product_doc(payload: dict[str, Any] = Body(...)) -> dict[str, Any]:
+    content = str(payload.get("content") or "")
+    DEFAULT_PRODUCT_MASTER.parent.mkdir(parents=True, exist_ok=True)
+    DEFAULT_PRODUCT_MASTER.write_text(content, encoding="utf-8")
+    return {"status": "saved", **default_product_doc_info()}
 
 
 def _is_opencode_run_cmd(cmd: list[str]) -> bool:
@@ -3078,6 +3114,7 @@ def api_defaults() -> dict[str, Any]:
         "format_patterns": load_format_visual_archetypes(),
         "image_sources": read_active_images(default_image_sources_file()),
         "input_images": list_input_images(),
+        "product_doc": default_product_doc_info(),
         "default_files": {
             "product_info": str(DEFAULT_PRODUCT_MASTER.relative_to(ROOT)),
             "playbook": str(DEFAULT_PLAYBOOK.relative_to(ROOT)),
@@ -5110,6 +5147,7 @@ app.include_router(chrome.router)
 
 app.mount("/storage", StaticFiles(directory=str(STORAGE_ROOT)), name="storage")
 app.mount("/output", StaticFiles(directory=str(ROOT / "output")), name="output")
+app.mount("/input", StaticFiles(directory=str(ROOT / "input")), name="input")
 GENERATED_IMAGES_ROOT.mkdir(parents=True, exist_ok=True)
 app.mount("/generated_images", StaticFiles(directory=str(GENERATED_IMAGES_ROOT)), name="generated_images")
 app.mount("/", StaticFiles(directory=str(ROOT / "dashboard" / "frontend"), html=True), name="frontend")

@@ -157,9 +157,9 @@ export async function loadRuns() {
     grid.className = "batch-grid";
     const batchList = Array.from(batches).sort().reverse();
     const num = batchList.length;
-    const rows = num <= 1 ? 1 : 2;
-    const cols = rows === 1 ? 1 : Math.ceil(num / 2);
-    grid.style.gridTemplateColumns = `repeat(${cols}, minmax(170px, 1fr))`;
+    const cols = Math.max(1, Math.ceil(Math.sqrt(num)));
+    const rows = Math.max(1, Math.ceil(num / cols));
+    grid.style.gridTemplateColumns = `repeat(${cols}, minmax(140px, 1fr))`;
     grid.style.gridAutoRows = "auto";
     grid.style.gridTemplateRows = `repeat(${rows}, auto)`;
 

@@ -12,6 +12,125 @@ const providerSelectEl = document.getElementById("opencodeProvider");
 const modelSelectEl = document.getElementById("opencodeModel");
 const defaultsInfoEl = document.getElementById("defaultsInfo");
 
+function renderInputImages(images = []) {
+  const gallery = document.getElementById("inputImageGallery");
+  if (!gallery) return;
+  gallery.innerHTML = "";
+  if (!images.length) {
+    const empty = document.createElement("p");
+    empty.className = "hint";
+    empty.textContent = "No stored input images yet.";
+    gallery.appendChild(empty);
+    return;
+  }
+  images.forEach((path) => {
+    const card = document.createElement("div");
+    card.className = "image-card input-image-card";
+    card.dataset.aspect = "INPUT_IMAGE";
+
+    const cleanPath = path.replace(/^input\//, "");
+    const url = `/input/${cleanPath}`;
+    const imgWrap = document.createElement("div");
+    imgWrap.className = "image-wrap";
+
+    const img = document.createElement("img");
+    img.className = "gallery-thumb";
+    img.src = url;
+    img.alt = path.split("/").pop() || "input image";
+    img.loading = "lazy";
+    imgWrap.appendChild(img);
+
+    const deleteBtn = document.createElement("button");
+    deleteBtn.type = "button";
+    deleteBtn.className = "image-delete-btn";
+    deleteBtn.textContent = "✕";
+    deleteBtn.title = "Delete this input image";
+    imgWrap.appendChild(deleteBtn);
+
+    const downloadBtn = document.createElement("button");
+    downloadBtn.type = "button";
+    downloadBtn.className = "image-download-btn";
+    downloadBtn.textContent = "⬇";
+    downloadBtn.title = "Download input image";
+    imgWrap.appendChild(downloadBtn);
+
+    card.appendChild(imgWrap);
+
+    const fname = document.createElement("div");
+    fname.className = "image-filename";
+    fname.textContent = path.split("/").pop() || path;
+    card.appendChild(fname);
+
+    card.addEventListener("click", (event) => {
+      if (event.target.closest(".image-delete-btn") || event.target.closest(".image-download-btn")) return;
+      window.open(url, "_blank");
+    });
+
+    downloadBtn.addEventListener("click", (event) => {
+      event.stopPropagation();
+      const a = document.createElement("a");
+      a.href = url;
+      a.download = path.split("/").pop() || "input-image";
+      document.body.appendChild(a);
+      a.click();
+      a.remove();
+    });
+
+    deleteBtn.addEventListener("click", async (event) => {
+      event.stopPropagation();
+      if (!confirm(`Delete input image "${path.split("/").pop()}"?`)) return;
+      deleteBtn.disabled = true;
+      try {
+        await fetchJSON("/api/input-images", {
+          method: "DELETE",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ path }),
+        });
+        card.remove();
+      } catch (err) {
+        setStatus(`Failed to delete input image: ${String(err)}`);
+        deleteBtn.disabled = false;
+      }
+    });
+
+    gallery.appendChild(card);
+  });
+}
+
+function renderProductDocInfo(productDoc) {
+  const el = document.getElementById("productDocInfo");
+  if (!el) return;
+  const doc = productDoc || {};
+  const size = Number(doc.size_bytes || 0);
+  el.innerHTML = `
+    <div class="product-doc-card">
+      <strong>Product doc in use</strong>
+      <span>${doc.name || "product master doc.txt"}</span>
+      <code>${doc.path || "input/docs/product master doc.txt"}</code>
+      <small>${doc.exists ? `${(size / 1024).toFixed(1)} KB` : "Missing"}</small>
+      <div class="product-doc-actions">
+        <button id="openProductDoc" class="ghost-btn" type="button">Open</button>
+        <button id="editProductDoc" class="ghost-btn" type="button">Edit</button>
+        <a class="ghost-btn product-doc-download" href="/${doc.path || "input/docs/product master doc.txt"}" download>Download</a>
+      </div>
+    </div>
+  `;
+  document.getElementById("openProductDoc")?.addEventListener("click", () => {
+    window.open(`/${doc.path || "input/docs/product master doc.txt"}`, "_blank");
+  });
+  document.getElementById("editProductDoc")?.addEventListener("click", openProductDocEditor);
+}
+
+async function openProductDocEditor() {
+  const editor = document.getElementById("productDocEditor");
+  const textarea = document.getElementById("productDocText");
+  if (!editor || !textarea) return;
+  const doc = await fetchJSON("/api/product-doc");
+  textarea.value = doc.content || "";
+  editor.classList.remove("hidden");
+  textarea.focus();
+}
+
 function renderModelOptions(provider, preferredModel = "") {
   const models = state.modelsByProvider[provider] || [];
   const selected = preferredModel && models.includes(preferredModel) ? preferredModel : (models[0] || "");
@@ -27,6 +146,8 @@ async function initDefaults() {
     renderLanguageModes();
     renderFormatPatterns();
     renderHypothesisUI();
+    renderInputImages(data.input_images || []);
+    renderProductDocInfo(data.product_doc);
 
     const imageCount = (data.input_images || []).length;
     defaultsInfoEl.textContent = `Using defaults: product=${data.default_files.product_info}, mechanism=${data.default_files.playbook}, input/images=${imageCount} file(s)`;
@@ -116,6 +237,9 @@ async function runPipeline() {
       ? `\nNotes:\n${data.copy_generation_notes.map((note) => `- ${note}`).join("\n")}`
       : "";
     setStatus(`Done\nRun: ${data.run_id}\nBatch: ${data.batch}\nLLM mode: ${data.llm_mode}\nCopy source: ${data.copy_source || data.llm_mode}${fallbackLine}${warningLine}${sessionLine}${noteLine}\nPrompts: ${data.prompt_files.length}\nImages: ${data.image_files.length}`);
+    fetchJSON("/api/defaults")
+      .then((freshDefaults) => renderInputImages(freshDefaults.input_images || []))
+      .catch(() => {});
     invalidateRuns();
     await loadAndRenderRuns();
   } catch (err) {
@@ -137,6 +261,30 @@ document.getElementById("serverType")?.addEventListener("change", () => {
 
 document.getElementById("runBtn")?.addEventListener("click", () => {
   runPipeline().catch((err) => setStatus(String(err)));
+});
+
+document.getElementById("closeProductDoc")?.addEventListener("click", () => {
+  document.getElementById("productDocEditor")?.classList.add("hidden");
+});
+
+document.getElementById("saveProductDoc")?.addEventListener("click", async () => {
+  const textarea = document.getElementById("productDocText");
+  const saveBtn = document.getElementById("saveProductDoc");
+  if (!textarea) return;
+  if (saveBtn) saveBtn.disabled = true;
+  try {
+    const saved = await fetchJSON("/api/product-doc", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ content: textarea.value }),
+    });
+    renderProductDocInfo(saved);
+    setStatus("Product doc saved.");
+  } catch (err) {
+    setStatus(`Failed to save product doc: ${String(err)}`);
+  } finally {
+    if (saveBtn) saveBtn.disabled = false;
+  }
 });
 
 document.getElementById("reuseBackgrounds")?.addEventListener("change", (event) => {

@@ -339,6 +339,42 @@ def load_prompt_metadata(prompt_path: Path, prompt_text: str) -> dict[str, Any]:
     }
 
 
+def build_test_variables(job: PromptJob, prompt_metadata: dict[str, Any], effective_hypothesis: dict[str, Any]) -> dict[str, Any]:
+    visual_pattern = prompt_metadata.get("visual_pattern") if isinstance(prompt_metadata.get("visual_pattern"), dict) else {}
+    visual_archetype = prompt_metadata.get("visual_archetype") if isinstance(prompt_metadata.get("visual_archetype"), dict) else {}
+    if not visual_pattern and visual_archetype:
+        visual_pattern = {
+            "id": visual_archetype.get("id", ""),
+            "label": visual_archetype.get("label", ""),
+            "selected_by_user": bool(visual_archetype.get("forced")),
+            "selection_mode": "manual" if visual_archetype.get("forced") else "auto_rotate",
+        }
+
+    return {
+        "persona": prompt_metadata.get("persona", job.persona_id),
+        "persona_number": prompt_metadata.get("persona_number", ""),
+        "persona_name": prompt_metadata.get("persona_name", ""),
+        "format": prompt_metadata.get("format", job.format_id),
+        "language": prompt_metadata.get("language", job.lang_id),
+        "aspect_ratio": prompt_metadata.get("aspect_ratio", ""),
+        "hypothesis": effective_hypothesis,
+        "hypothesis_type": effective_hypothesis.get("type", "") if effective_hypothesis else "",
+        "hypothesis_variant": effective_hypothesis.get("variant", "") if effective_hypothesis else "",
+        "headline_angle": prompt_metadata.get("headline_angle", ""),
+        "awareness_stage": prompt_metadata.get("awareness_stage", ""),
+        "concept_angle": prompt_metadata.get("concept_angle", ""),
+        "concept_structure": prompt_metadata.get("concept_structure", ""),
+        "visual_pattern": visual_pattern,
+        "visual_archetype": visual_archetype,
+        "background": prompt_metadata.get("background", {}),
+        "background_group_key": prompt_metadata.get("background_group_key", ""),
+        "background_decisions": prompt_metadata.get("background_decisions", {}),
+        "creative_index": prompt_metadata.get("creative_index", 1),
+        "creative_total": prompt_metadata.get("creative_total", 1),
+        "multiplier": prompt_metadata.get("multiplier", prompt_metadata.get("creative_total", 1)),
+    }
+
+
 def load_starting_prompt(path_value: str) -> str:
     if not path_value.strip():
         return ""
@@ -3467,6 +3503,7 @@ def run() -> None:
                 prompt_metadata = load_prompt_metadata(job.prompt_path, prompt_body)
                 prompt_hypothesis = prompt_metadata.get("hypothesis") if isinstance(prompt_metadata.get("hypothesis"), dict) else {}
                 effective_hypothesis = prompt_hypothesis if prompt_hypothesis else hypothesis_config
+                test_variables = build_test_variables(job, prompt_metadata, effective_hypothesis)
                 prompt_text = prepend_starting_prompt(starting_prompt, prompt_body)
                 out_base = generated_images_dir / job.output_stem
                 if prompt_text == prompt_body:
@@ -3560,11 +3597,23 @@ def run() -> None:
                             "hypothesis_type": effective_hypothesis.get("type", "") if effective_hypothesis else "",
                             "hypothesis_variant": effective_hypothesis.get("variant", "") if effective_hypothesis else "",
                             "hypothesis": effective_hypothesis,
+                            "persona_number": test_variables.get("persona_number", ""),
+                            "persona_name": test_variables.get("persona_name", ""),
+                            "aspect_ratio": test_variables.get("aspect_ratio", ""),
+                            "headline_angle": test_variables.get("headline_angle", ""),
+                            "awareness_stage": test_variables.get("awareness_stage", ""),
+                            "concept_angle": test_variables.get("concept_angle", ""),
+                            "concept_structure": test_variables.get("concept_structure", ""),
                             "creative_index": prompt_metadata.get("creative_index", 1),
                             "creative_total": prompt_metadata.get("creative_total", 1),
+                            "multiplier": test_variables.get("multiplier", prompt_metadata.get("creative_total", 1)),
+                            "background_group_key": test_variables.get("background_group_key", ""),
                             "background": prompt_metadata.get("background", {}),
                             "visual_archetype": prompt_metadata.get("visual_archetype", {}),
+                            "visual_pattern": test_variables.get("visual_pattern", {}),
                             "background_decisions": prompt_metadata.get("background_decisions", {}),
+                            "test_variables": test_variables,
+                            "prompt_metadata": prompt_metadata,
                             "timestamp": int(time.time()),
                         }
                         out_base.with_suffix(".json").write_text(json.dumps(metadata, indent=2), encoding="utf-8")
@@ -3613,11 +3662,23 @@ def run() -> None:
                     "hypothesis_type": effective_hypothesis.get("type", "") if effective_hypothesis else "",
                     "hypothesis_variant": effective_hypothesis.get("variant", "") if effective_hypothesis else "",
                     "hypothesis": effective_hypothesis,
+                    "persona_number": test_variables.get("persona_number", ""),
+                    "persona_name": test_variables.get("persona_name", ""),
+                    "aspect_ratio": test_variables.get("aspect_ratio", ""),
+                    "headline_angle": test_variables.get("headline_angle", ""),
+                    "awareness_stage": test_variables.get("awareness_stage", ""),
+                    "concept_angle": test_variables.get("concept_angle", ""),
+                    "concept_structure": test_variables.get("concept_structure", ""),
                     "creative_index": prompt_metadata.get("creative_index", 1),
                     "creative_total": prompt_metadata.get("creative_total", 1),
+                    "multiplier": test_variables.get("multiplier", prompt_metadata.get("creative_total", 1)),
+                    "background_group_key": test_variables.get("background_group_key", ""),
                     "background": prompt_metadata.get("background", {}),
                     "visual_archetype": prompt_metadata.get("visual_archetype", {}),
+                    "visual_pattern": test_variables.get("visual_pattern", {}),
                     "background_decisions": prompt_metadata.get("background_decisions", {}),
+                    "test_variables": test_variables,
+                    "prompt_metadata": prompt_metadata,
                     "timestamp": int(time.time()),
                     **diag,
                 }

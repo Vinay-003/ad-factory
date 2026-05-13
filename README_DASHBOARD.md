@@ -63,7 +63,7 @@ Bootstrap does all of this:
 ## How it works
 
 1. Dashboard loads defaults from:
-   - `product master doc.txt`
+   - `input/docs/product master doc.txt`
    - `input/activeimages.txt`
 
 2. Retrieval scripts extract only required slices:

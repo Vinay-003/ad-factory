@@ -100,6 +100,7 @@ Keep same:
 persona
 format
 visual pattern
+hypothesis
 background, by using Reuse backgrounds from previous run
 multiplier
 audience

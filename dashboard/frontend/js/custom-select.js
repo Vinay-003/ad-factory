@@ -25,6 +25,12 @@ function sync(selectEl) {
   btn.textContent = optionLabel(selectEl.selectedOptions[0]) || "Select";
   grid.innerHTML = "";
 
+  const num = selectEl.options.length;
+  const rootWidth = Math.max(220, root.getBoundingClientRect().width || 0);
+  const maxColsForWidth = Math.max(1, Math.floor(rootWidth / 150));
+  const cols = Math.max(1, Math.min(num, maxColsForWidth, Math.ceil(Math.sqrt(num))));
+  grid.style.gridTemplateColumns = `repeat(${cols}, 1fr)`;
+
   Array.from(selectEl.options).forEach((option) => {
     const item = document.createElement("button");
     item.type = "button";

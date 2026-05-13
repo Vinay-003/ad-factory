@@ -38,6 +38,7 @@
           <input id="inputImageFiles" type="file" multiple accept="image/*" />
           <label><input id="clearInputImages" type="checkbox" /> Clear previously stored images before adding these</label>
           <p class="hint">By default, uploaded images are added to existing images in input/images and all are used for Gemini uploads.</p>
+          <div id="inputImageGallery" class="input-image-gallery"></div>
         </section>
       </div>
 
@@ -91,7 +92,18 @@
           <h2>5) Optional File Uploads</h2>
           <div class="uploads">
             <label>Product Master Doc <input id="productFile" type="file" /></label>
-            
+             
+          </div>
+          <div id="productDocInfo" class="product-doc-info"></div>
+          <div id="productDocEditor" class="product-doc-editor hidden">
+            <div class="product-doc-editor-top">
+              <strong>Edit Product Doc</strong>
+              <div class="product-doc-editor-actions">
+                <button id="saveProductDoc" class="ghost-btn" type="button">Save</button>
+                <button id="closeProductDoc" class="ghost-btn" type="button">Close</button>
+              </div>
+            </div>
+            <textarea id="productDocText" spellcheck="false"></textarea>
           </div>
           <div id="defaultsInfo" class="hint"></div>
         </section>
