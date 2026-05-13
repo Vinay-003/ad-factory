@@ -2482,7 +2482,8 @@ def call_opencode_compatible(config: dict[str, Any], context: dict[str, Any], ru
                 candidate, last_stdout, last_stderr, last_code = run_opencode(retry_prompt, force_file=session_fallback_used and not session_id)
 
             mismatch = hypothesis_mismatch(candidate, ad_item) if candidate else None
-            if mismatch:
+            should_retry_hypothesis = bool(config.get("retry_hypothesis_mismatch"))
+            if mismatch and should_retry_hypothesis:
                 retry_prompt = (
                     f"{cli_prompt}\n\n"
                     f"REVISION_REQUIRED: {mismatch}\n"
@@ -2492,6 +2493,8 @@ def call_opencode_compatible(config: dict[str, Any], context: dict[str, Any], ru
                 mismatch_after = hypothesis_mismatch(candidate, ad_item) if candidate else None
                 if mismatch_after:
                     warnings.append(f"Ad {index}: hypothesis retry mismatch persisted; accepting generated copy: {mismatch_after}\nSTDOUT:\n{last_stdout}\nSTDERR:\n{last_stderr}")
+            elif mismatch:
+                warnings.append(f"Ad {index}: hypothesis mismatch accepted without retry to avoid extra LLM token spend: {mismatch}")
 
             if not candidate:
                 errors.append(f"Ad {index}: returned no usable ad JSON; return code {last_code}\nSTDOUT:\n{last_stdout}\nSTDERR:\n{last_stderr}")
