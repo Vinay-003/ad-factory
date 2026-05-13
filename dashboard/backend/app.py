@@ -1296,7 +1296,8 @@ def load_batch_image_summary(batch: str) -> list[dict[str, Any]]:
                     continue
                 if not isinstance(payload, dict):
                     continue
-                if str(payload.get("record_type") or "").strip() != "generated_image":
+                rec_type = str(payload.get("type") or payload.get("record_type") or "").strip()
+                if rec_type not in ("ad_image", "generated_image"):
                     continue
 
                 prompt_file = str(payload.get("prompt_file_relative") or payload.get("prompt_file") or "").strip().replace("\\", "/")
@@ -1306,11 +1307,13 @@ def load_batch_image_summary(batch: str) -> list[dict[str, Any]]:
 
                 existing = jobs_by_prompt.get(prompt_file)
                 if not existing:
+                    fmt = payload.get("format") or payload.get("format_id") or ""
+                    lang = payload.get("language") or payload.get("lang_id") or ""
                     existing = {
                         "prompt_file": prompt_file,
                         "saved_files": [],
-                        "format": payload.get("format"),
-                        "language": payload.get("language"),
+                        "format": fmt,
+                        "language": lang,
                         "variation": payload.get("variation"),
                         "task_id": payload.get("task_id"),
                         "prompt_metadata": payload.get("prompt_metadata") or {},
@@ -4696,6 +4699,70 @@ def _parse_image_naming(image_path_str: str, run_dir: Path | None) -> dict[str, 
     return base
 
 
+def _build_persona_name_map(run_dir: Path) -> dict[str, str]:
+    """Map persona number (P01) to persona name from run's copy_batch.json."""
+    copy_path = run_dir / "context" / "copy_batch.json"
+    if not copy_path.exists():
+        return {}
+    try:
+        data = json.loads(copy_path.read_text(encoding="utf-8"))
+        ads = data.get("ads") if isinstance(data, dict) else []
+        if not isinstance(ads, list):
+            return {}
+        mapping: dict[str, str] = {}
+        for ad in ads:
+            p = ad.get("persona") if isinstance(ad, dict) else {}
+            if not isinstance(p, dict):
+                continue
+            num = p.get("number")
+            name = p.get("name") or p.get("persona_name") or ""
+            if isinstance(num, int) and name:
+                mapping[f"P{num:02d}"] = str(name)
+        return mapping
+    except Exception:
+        return {}
+
+
+def _clean_metadata_for_download(meta: dict[str, Any], img_path: str, run_dir: Path | None) -> dict[str, Any]:
+    """Strip excessive internal keys from image metadata and enrich with
+    hypothesis info, persona name, and clean format labels for download ZIP."""
+    clean = dict(meta)
+
+    # Strip internal plumbing
+    for key in ("generated_image_src", "saved_ext", "output_dir", "metadata_file", "type"):
+        clean.pop(key, None)
+
+    # Normalise key names
+    if "format" not in clean and "format_id" in clean:
+        clean["format"] = clean.pop("format_id")
+    if clean.get("format_id"):
+        clean.pop("format_id", None)
+    if "persona" not in clean and "persona_id" in clean:
+        clean["persona"] = clean.pop("persona_id")
+    if clean.get("persona_id"):
+        clean.pop("persona_id", None)
+    if "language" not in clean and "lang_id" in clean:
+        clean["language"] = clean.pop("lang_id")
+    if clean.get("lang_id"):
+        clean.pop("lang_id", None)
+
+    # Ensure hypothesis keys are always present
+    hyp_type = clean.get("hypothesis_type") or ""
+    hyp_var = clean.get("hypothesis_variant") or ""
+    clean["hypothesis_type"] = hyp_type
+    clean["hypothesis_variant"] = hyp_var
+
+    # Enrich with persona name if we have a run_dir
+    if run_dir is not None:
+        persona_val = clean.get("persona", "")
+        if persona_val:
+            mapping = _build_persona_name_map(run_dir)
+            if persona_val in mapping:
+                clean["persona_name"] = mapping[persona_val]
+
+    return clean
+
+
 def api_download_single_image(run_id: str, image_file: str):
     """Return a zip containing the image file and its metadata JSON."""
     run_dir = RUNS_ROOT / run_id
@@ -4716,6 +4783,7 @@ def api_download_single_image(run_id: str, image_file: str):
                 meta_content = json.loads(meta_path.read_text(encoding="utf-8"))
             except Exception:
                 pass
+        meta_content = _clean_metadata_for_download(meta_content, image_file, run_dir)
         meta_content["_download_name"] = naming["stem"]
         zf.writestr(f"{naming['stem']}_metadata.json", json.dumps(meta_content, ensure_ascii=False, indent=2))
 
@@ -4764,6 +4832,7 @@ def api_download_batch_images(run_id: str):
                     meta_content = json.loads(meta_path.read_text(encoding="utf-8"))
                 except Exception:
                     pass
+            meta_content = _clean_metadata_for_download(meta_content, img_path, run_dir)
             meta_content["_download_name"] = naming["stem"]
             zf.writestr(f"{folder}/{naming['stem']}_metadata.json",
                         json.dumps(meta_content, ensure_ascii=False, indent=2))
@@ -4806,6 +4875,7 @@ def api_download_batches(batch_names: list[str]):
                         meta_content = json.loads(meta_path.read_text(encoding="utf-8"))
                     except Exception:
                         pass
+                meta_content = _clean_metadata_for_download(meta_content, img_path, None)
                 meta_content["_download_name"] = naming["stem"]
                 zf.writestr(f"{folder}/{naming['stem']}_metadata.json",
                             json.dumps(meta_content, ensure_ascii=False, indent=2))

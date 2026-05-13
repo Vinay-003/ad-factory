@@ -3483,6 +3483,8 @@ def run() -> None:
                         )
                         time.sleep(0.5)
 
+                        select_model_and_tool_if_requested(page, args)
+
                         baseline_srcs = get_all_image_srcs(page)
                         print(f"  Baseline image src count before Send: {len(baseline_srcs)}")
 
@@ -3516,23 +3518,18 @@ def run() -> None:
                             raise RuntimeError(f"Saved file is missing or too small: {saved_path}")
 
                         metadata = {
+                            "type": "ad_image",
                             "status": "success",
-                            "prompt_file": str(job.prompt_path),
-                            "format_id": job.format_id,
-                            "persona_id": job.persona_id,
-                            "lang_id": job.lang_id,
+                            "format": job.format_id,
+                            "persona": job.persona_id,
+                            "language": job.lang_id,
                             "job_key": job.job_key,
-                            "generated_image_src": image_src,
+                            "prompt_file": job.prompt_path.name,
                             "saved_file": str(saved_path),
-                            "saved_size": saved_path.stat().st_size,
-                            "saved_ext": saved_path.suffix,
-                            "output_dir": str(saved_path.parent),
-                            "metadata_file": str(out_base.with_suffix(".json")),
+                            "hypothesis_type": hypothesis_config.get("type", "") if hypothesis_config else "",
+                            "hypothesis_variant": hypothesis_config.get("variant", "") if hypothesis_config else "",
                             "timestamp": int(time.time()),
                         }
-                        if hypothesis_config:
-                            metadata["hypothesis_type"] = hypothesis_config.get("type", "")
-                            metadata["hypothesis_variant"] = hypothesis_config.get("variant", "")
                         out_base.with_suffix(".json").write_text(json.dumps(metadata, indent=2), encoding="utf-8")
                         log_progress("done", f"Job {idx} SUCCESS: {saved_path} ({saved_path.stat().st_size} bytes)")
                         print(f"  SUCCESS: saved {saved_path} ({saved_path.stat().st_size} bytes)")
@@ -3570,18 +3567,17 @@ def run() -> None:
 
                 diag = save_debug_snapshot(page, out_base, "error")
                 metadata = {
+                    "type": "ad_image",
                     "status": "error",
-                    "prompt_file": str(job.prompt_path),
-                    "format_id": job.format_id,
-                    "persona_id": job.persona_id,
-                    "job_key": job.job_key,
+                    "format": job.format_id,
+                    "persona": job.persona_id,
+                    "prompt_file": job.prompt_path.name,
                     "error": str(last_exc),
+                    "hypothesis_type": hypothesis_config.get("type", "") if hypothesis_config else "",
+                    "hypothesis_variant": hypothesis_config.get("variant", "") if hypothesis_config else "",
                     "timestamp": int(time.time()),
                     **diag,
                 }
-                if hypothesis_config:
-                    metadata["hypothesis_type"] = hypothesis_config.get("type", "")
-                    metadata["hypothesis_variant"] = hypothesis_config.get("variant", "")
                 out_base.with_suffix(".json").write_text(json.dumps(metadata, indent=2), encoding="utf-8")
                 results.append({"job": job.job_key, "status": "error", "error": str(last_exc)})
                 log_progress("failed", f"Job {idx} FAILED: {last_exc}")
