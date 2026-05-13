@@ -17,3 +17,6 @@ runtime/*
 runtime
 .sixth
 .opencode
+output/*
+
+scripts/__pycache__/

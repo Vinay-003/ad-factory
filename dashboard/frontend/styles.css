@@ -69,18 +69,28 @@ body[data-theme="dark"] {
 /* ── Reset & Base ────────────────────────────────────────────────────────── */
 *, *::before, *::after { box-sizing: border-box; }
 
-html, body { margin: 0; padding: 0; }
+html, body { margin: 0; padding: 0; overflow-x: hidden; background: #0f131c; }
 
 body {
   font-family: var(--font-body);
   color: var(--ink);
+  background: transparent;
+  min-height: 100vh;
+  width: 100%;
+}
+
+body::before {
+  content: "";
+  position: fixed;
+  inset: 0;
+  z-index: -1;
+  pointer-events: none;
   background:
     radial-gradient(900px 520px at 0% 2%, color-mix(in srgb, #f0bf68 28%, transparent), transparent 70%),
     radial-gradient(980px 560px at 100% 0%, color-mix(in srgb, var(--primary) 13%, transparent), transparent 74%),
     radial-gradient(800px 520px at 100% 100%, color-mix(in srgb, #e7aa53 20%, transparent), transparent 76%),
     radial-gradient(880px 530px at 0% 100%, color-mix(in srgb, var(--surface-2) 80%, transparent), transparent 76%),
     linear-gradient(180deg, var(--bg), var(--bg-deep));
-  min-height: 100vh;
 }
 
 @media (prefers-reduced-motion: reduce) {
@@ -96,6 +106,7 @@ body {
   max-width: 1580px;
   margin: 0 auto;
   padding: 36px 28px 66px;
+  position: relative;
 }
 
 .hero {
@@ -176,7 +187,7 @@ body {
 }
 
 .card:hover {
-  transform: translateY(-2px);
+  transform: none;
   box-shadow: 0 22px 48px rgba(44, 42, 55, 0.15);
 }
 
@@ -189,6 +200,7 @@ body {
 
 .card-personas, .card-runs { position: relative; }
 .card-runs { overflow: hidden; }
+.card-images { overflow: hidden; }
 
 .card-personas::after, .card-runs::after {
   content: "";
@@ -548,7 +560,12 @@ textarea, input[type="text"], input[type="password"], input[type="number"], sele
   border-color: var(--primary);
 }
 
-textarea { min-height: 190px; line-height: 1.35; }
+textarea {
+  min-height: 190px;
+  line-height: 1.35;
+  max-width: 100%;
+  resize: vertical;
+}
 
 [placeholder]:focus {
   outline: none;
@@ -593,7 +610,7 @@ textarea { min-height: 190px; line-height: 1.35; }
 }
 
 .persona:hover {
-  transform: translateY(-2px);
+  transform: none;
   border-color: color-mix(in srgb, var(--accent-violet) 34%, var(--line));
   box-shadow: 0 10px 24px color-mix(in srgb, var(--accent-violet) 16%, transparent);
 }
@@ -662,7 +679,7 @@ textarea { min-height: 190px; line-height: 1.35; }
 }
 
 .chip:hover {
-  transform: translateY(-1px);
+  transform: none;
   border-color: color-mix(in srgb, var(--primary) 55%, var(--line));
   background: linear-gradient(135deg, color-mix(in srgb, var(--accent-amber) 16%, var(--surface)), color-mix(in srgb, var(--primary) 12%, var(--surface)));
   box-shadow: 0 8px 18px color-mix(in srgb, var(--primary) 18%, transparent);
@@ -756,7 +773,7 @@ button {
   transition: transform var(--transition-base), filter var(--transition-base), box-shadow var(--transition-base);
 }
 
-button:hover { transform: translateY(-2px); filter: brightness(1.04); box-shadow: 0 10px 22px color-mix(in srgb, var(--primary) 28%, transparent); }
+button:hover { transform: none; filter: brightness(1.04); box-shadow: 0 10px 22px color-mix(in srgb, var(--primary) 28%, transparent); }
 button:disabled { opacity: 0.5; cursor: not-allowed; transform: none; filter: none; box-shadow: none; }
 button.is-loading {
   position: relative;
@@ -800,9 +817,27 @@ button.is-loading::after {
   grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
   gap: 10px;
   margin-top: 12px;
+  overflow-x: hidden;
 }
 
-.input-image-card .image-wrap { aspect-ratio: 1; }
+.input-image-card {
+  min-width: 0;
+}
+
+.input-image-card .image-wrap {
+  height: 140px;
+  aspect-ratio: auto;
+  position: relative;
+  overflow: hidden;
+}
+
+.input-image-card .gallery-thumb {
+  width: 100%;
+  height: 100%;
+  max-width: 100%;
+  max-height: 100%;
+  object-fit: cover;
+}
 
 .product-doc-info { margin-top: 10px; }
 
@@ -856,9 +891,12 @@ button.is-loading::after {
 
 #productDocText {
   min-height: 360px;
+  width: 100%;
+  max-width: 100%;
   margin-bottom: 0;
   font-family: "JetBrains Mono", "Consolas", monospace;
   font-size: 12px;
+  resize: vertical;
 }
 
 /* ── Hypothesis ───────────────────────────────────────────────────────────── */
@@ -1069,7 +1107,7 @@ button.is-loading::after {
 }
 
 .image-card:hover {
-  transform: translateY(-2px);
+  transform: none;
   box-shadow: 0 8px 20px color-mix(in srgb, var(--primary) 12%, transparent);
   border-color: color-mix(in srgb, var(--primary) 35%, var(--line));
 }
@@ -1090,7 +1128,7 @@ button.is-loading::after {
   transition: transform 0.25s ease;
 }
 
-.image-card:hover .gallery-thumb { transform: scale(1.04); }
+.image-card:hover .gallery-thumb { transform: none; }
 
 .aspect-badge {
   position: absolute;
