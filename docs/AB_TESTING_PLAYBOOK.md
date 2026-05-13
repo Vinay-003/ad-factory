@@ -11,6 +11,7 @@ Use this dashboard to test one thing at a time. If persona, format, hypothesis, 
 5. `Visual Pattern`: layout/archetype for the selected format.
 6. `Multiplier`: multiple creative executions for the same test cell.
 7. `Keep same background across personas for each format`: optional background lock across personas.
+8. `Reuse backgrounds from previous run`: reuse background slot and seed from an earlier run.
 
 ## What A Test Cell Means
 
@@ -63,6 +64,8 @@ Different formats still get different backgrounds.
 
 Use the checkbox when testing personas and you want background noise removed. Leave it off when you want each persona to get its own visual environment.
 
+For hypothesis tests across separate runs, enable `Reuse backgrounds from previous run` and select the baseline run. This keeps background slot and seed fixed while changing only the hypothesis variant.
+
 ## Metadata To Check
 
 Before launching ads, check image metadata for:
@@ -97,6 +100,7 @@ Keep same:
 persona
 format
 visual pattern
+background, by using Reuse backgrounds from previous run
 multiplier
 audience
 budget
@@ -114,6 +118,13 @@ Example:
 ```text
 Cell A: P02 + HERO + proof_style + authority_anchor + hero_left_copy_right_product + multiplier 5
 Cell B: P02 + HERO + proof_style + social_proof + hero_left_copy_right_product + multiplier 5
+```
+
+Recommended flow:
+
+```text
+Run Cell A normally.
+Run Cell B with Reuse backgrounds from previous run = Cell A run.
 ```
 
 ## How To Test Formats

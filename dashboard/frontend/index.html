@@ -75,6 +75,11 @@
             <input id="shareBackgroundAcrossPersonas" type="checkbox" />
             <span>Keep same background across personas for each format</span>
           </label>
+          <label class="toggle-label execution-toggle" title="Reuse background slot and seed from a previous run so hypothesis/variant tests keep background constant.">
+            <input id="reuseBackgrounds" type="checkbox" />
+            <span>Reuse backgrounds from previous run</span>
+          </label>
+          <select id="backgroundReuseRun" disabled></select>
 
           <p class="hint">Image and Cloudinary credentials are loaded from root <code>.env.dashboard</code>.</p>
 

@@ -1,5 +1,6 @@
 import { state, FORMATS, getSelectedFormatsForSelectedPersonas } from "./state.js";
 import { chip, skeletonPersonaCard } from "./ui.js";
+import { enhanceSelect } from "./custom-select.js";
 
 const personaListEl = document.getElementById("personaList");
 const globalFormatsEl = document.getElementById("globalFormats");
@@ -107,6 +108,7 @@ export function renderFormatPatterns() {
     });
 
     block.append(name, select);
+    enhanceSelect(select);
     grid.appendChild(block);
   });
   formatPatternsEl.appendChild(grid);

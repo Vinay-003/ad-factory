@@ -1480,6 +1480,8 @@ def main() -> int:
                 "background_decisions": {
                     "forced_background": bool(ad.get("background_slot") or ad.get("background_slot_id")),
                     "forced_seed": isinstance(ad.get("background_seed"), int) and ad.get("background_seed") > 0,
+                    "reused_from_run_id": ad.get("background_reused_from_run_id") or "",
+                    "reuse_key": ad.get("background_reuse_key") or "",
                     "shared_by_multiplier": creative_total > 1 and bool(background_group_key),
                     "shared_across_personas": bool(ad.get("share_background_across_personas")),
                     "visual_lock_applied": bool(visual_lock),

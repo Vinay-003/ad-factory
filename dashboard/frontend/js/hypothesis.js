@@ -1,4 +1,5 @@
 import { state } from "./state.js";
+import { refreshSelect } from "./custom-select.js";
 
 const hypothesisTypeEl = document.getElementById("hypothesisType");
 const hypothesisVariantEl = document.getElementById("hypothesisVariant");
@@ -19,6 +20,7 @@ export function renderHypothesisUI() {
   });
 
   updateHypothesisVariantOptions();
+  refreshSelect(hypothesisTypeEl);
   updateHypothesisSummary();
 }
 
@@ -30,6 +32,7 @@ export function updateHypothesisVariantOptions() {
 
   if (!defn || !defn.options || defn.options.length === 0) {
     hypothesisVariantRowEl?.classList.add("hidden");
+    refreshSelect(hypothesisVariantEl);
     return;
   }
 
@@ -42,6 +45,7 @@ export function updateHypothesisVariantOptions() {
     if (state.hypothesisConfig.variant === opt.id) option.selected = true;
     hypothesisVariantEl.appendChild(option);
   });
+  refreshSelect(hypothesisVariantEl);
 }
 
 export function updateHypothesisSummary() {

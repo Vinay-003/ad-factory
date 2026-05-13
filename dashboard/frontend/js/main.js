@@ -6,6 +6,7 @@ import { loadRuns as loadAndRenderRuns, showRunsSkeletons } from "./runs.js";
 import { stopProgressPolling } from "./chrome.js";
 import { initTheme } from "./theme.js";
 import { fetchJSON, invalidateRuns } from "./api.js";
+import { enhanceAllSelects, refreshSelect } from "./custom-select.js";
 
 const providerSelectEl = document.getElementById("opencodeProvider");
 const modelSelectEl = document.getElementById("opencodeModel");
@@ -53,6 +54,10 @@ async function runPipeline() {
     setStatus("Select at least one persona.");
     return;
   }
+  if (document.getElementById("reuseBackgrounds")?.checked && !document.getElementById("backgroundReuseRun")?.value) {
+    setStatus("Select a previous run to reuse backgrounds from.");
+    return;
+  }
 
   const cfg = {
     selected_personas: selectedPersonas,
@@ -62,6 +67,7 @@ async function runPipeline() {
     visual_archetypes_by_format: state.selectedVisualArchetypesByFormat,
     multiplier: Math.max(1, Math.min(20, Number.parseInt(document.getElementById("adMultiplier")?.value || "1", 10) || 1)),
     share_background_across_personas: Boolean(document.getElementById("shareBackgroundAcrossPersonas")?.checked),
+    reuse_backgrounds_from_run_id: document.getElementById("reuseBackgrounds")?.checked ? (document.getElementById("backgroundReuseRun")?.value || "") : "",
     generate_images: false,
     server_type: state.currentServerType,
     opencode_api_url: document.getElementById("opencodeApiUrl").value.trim(),
@@ -133,6 +139,12 @@ document.getElementById("runBtn")?.addEventListener("click", () => {
   runPipeline().catch((err) => setStatus(String(err)));
 });
 
+document.getElementById("reuseBackgrounds")?.addEventListener("change", (event) => {
+  const select = document.getElementById("backgroundReuseRun");
+  if (select) select.disabled = !event.target.checked;
+  refreshSelect(select);
+});
+
 if (providerSelectEl) {
   providerSelectEl.addEventListener("change", () => {
     renderModelOptions(providerSelectEl.value, "");
@@ -141,5 +153,6 @@ if (providerSelectEl) {
 
 // Init
 initTheme();
+enhanceAllSelects();
 showRunsSkeletons();
 Promise.all([initDefaults(), loadAndRenderRuns()]).catch((err) => setStatus(String(err)));

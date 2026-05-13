@@ -1,3 +1,5 @@
+import { refreshSelect } from "./custom-select.js";
+
 const statusEl = document.getElementById("status");
 const logStatusEl = document.getElementById("logStatus");
 
@@ -39,6 +41,7 @@ export function setSelectOptions(selectEl, values, selectedValue) {
     if (selectedValue && selectedValue === value) opt.selected = true;
     selectEl.appendChild(opt);
   });
+  refreshSelect(selectEl);
 }
 
 export function skeletonPersonaCard() {

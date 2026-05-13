@@ -2875,6 +2875,110 @@ def apply_visual_locks(copy_json: dict[str, Any], locks: dict[str, dict[str, Any
     return cloned
 
 
+def _background_reuse_keys(fmt: str, persona_no: int | None, visual_archetype: str, share_across_personas: bool) -> list[str]:
+    fmt = fmt.strip().upper()
+    persona = f"P{persona_no:02d}" if isinstance(persona_no, int) else ""
+    arch = visual_archetype.strip()
+    if share_across_personas:
+        return [key for key in [f"{fmt}::{arch}" if arch else "", fmt] if key]
+    return [key for key in [f"{fmt}::{persona}::{arch}" if persona and arch else "", f"{fmt}::{persona}" if persona else ""] if key]
+
+
+def collect_background_reuse_locks(source_run_id: str) -> dict[str, dict[str, Any]]:
+    source_run_id = str(source_run_id or "").strip()
+    if not source_run_id:
+        return {}
+    _source_dir, manifest, _has_storage_manifest = load_manifest_for_run(source_run_id)
+    locks: dict[str, dict[str, Any]] = {}
+    for rel_path in manifest.get("prompt_files") or []:
+        rel = str(rel_path).replace("\\", "/")
+        if "/916/" in rel or "/96/" in rel:
+            continue
+        parsed = parse_prompt_filename(rel)
+        if not parsed:
+            continue
+        fmt, _lang, persona_no = parsed
+        prompt_path = ROOT / rel
+        if not prompt_path.exists():
+            continue
+
+        slot = ""
+        seed: int | None = None
+        visual_archetype = ""
+        sidecar = prompt_path.with_suffix(".json")
+        if sidecar.exists():
+            try:
+                meta = json.loads(sidecar.read_text(encoding="utf-8"))
+            except Exception:
+                meta = {}
+            bg = meta.get("background") if isinstance(meta.get("background"), dict) else {}
+            slot = str(bg.get("slot") or "").strip()
+            raw_seed = bg.get("seed")
+            if isinstance(raw_seed, int):
+                seed = raw_seed
+            visual = meta.get("visual_archetype") if isinstance(meta.get("visual_archetype"), dict) else {}
+            visual_archetype = str(visual.get("id") or "").strip()
+
+        if not slot or not isinstance(seed, int):
+            text = prompt_path.read_text(encoding="utf-8", errors="ignore")
+            lock = parse_background_lock_from_prompt(text)
+            if lock:
+                slot, seed = lock
+            if not visual_archetype:
+                visual_archetype = _parse_prompt_field(text, "Selected visual archetype").split(" - ", 1)[0].strip()
+
+        if not slot or not isinstance(seed, int):
+            continue
+
+        lock_payload = {
+            "background_slot": slot,
+            "background_seed": seed,
+            "background_reused_from_run_id": source_run_id,
+        }
+        for key in _background_reuse_keys(fmt, persona_no, visual_archetype, False):
+            locks.setdefault(key, lock_payload)
+        for key in _background_reuse_keys(fmt, persona_no, visual_archetype, True):
+            locks.setdefault(key, lock_payload)
+    return locks
+
+
+def apply_background_reuse_locks(
+    copy_json: dict[str, Any],
+    locks: dict[str, dict[str, Any]],
+    *,
+    share_across_personas: bool,
+) -> tuple[dict[str, Any], int]:
+    cloned = json.loads(json.dumps(copy_json, ensure_ascii=False))
+    ads = cloned.get("ads")
+    if not isinstance(ads, list) or not locks:
+        return cloned, 0
+    applied = 0
+    for ad in ads:
+        if not isinstance(ad, dict):
+            continue
+        fmt = str(ad.get("format") or "").strip().upper()
+        persona_no = None
+        persona = ad.get("persona")
+        if isinstance(persona, dict) and isinstance(persona.get("number"), int):
+            persona_no = int(persona["number"])
+        visual_archetype = str(ad.get("visual_archetype") or "").strip()
+        lock = None
+        reuse_key = ""
+        for key in _background_reuse_keys(fmt, persona_no, visual_archetype, share_across_personas):
+            if key in locks:
+                lock = locks[key]
+                reuse_key = key
+                break
+        if not lock:
+            continue
+        ad["background_slot"] = lock["background_slot"]
+        ad["background_seed"] = lock["background_seed"]
+        ad["background_reused_from_run_id"] = lock.get("background_reused_from_run_id", "")
+        ad["background_reuse_key"] = reuse_key
+        applied += 1
+    return cloned, applied
+
+
 def resolve_format_plan(config: dict[str, Any]) -> list[dict[str, Any]]:
     personas = config.get("selected_personas") or []
     if not personas:
@@ -4510,6 +4614,28 @@ async def api_run_execute(
     copy_json = strip_internal_markers_from_payload(copy_json)
     copy_json = enforce_unique_ctas(copy_json, full_context)
     copy_json = scrub_on_image_copy(copy_json)
+    reuse_backgrounds_from_run_id = str(cfg.get("reuse_backgrounds_from_run_id") or "").strip()
+    if reuse_backgrounds_from_run_id:
+        locks = collect_background_reuse_locks(reuse_backgrounds_from_run_id)
+        copy_json, applied_locks = apply_background_reuse_locks(
+            copy_json,
+            locks,
+            share_across_personas=bool(cfg.get("share_background_across_personas")),
+        )
+        (run_dir / "context" / "background_reuse.json").write_text(
+            json.dumps(
+                {
+                    "source_run_id": reuse_backgrounds_from_run_id,
+                    "available_locks": len(locks),
+                    "applied_ads": applied_locks,
+                    "share_background_across_personas": bool(cfg.get("share_background_across_personas")),
+                },
+                ensure_ascii=False,
+                indent=2,
+            )
+            + "\n",
+            encoding="utf-8",
+        )
     generated_copy_error = validate_generated_copy_payload(copy_json, ads_context)
     if generated_copy_error:
         (run_dir / "logs" / "opencode_error.txt").write_text(
@@ -4571,6 +4697,8 @@ async def api_run_execute(
     manifest["image_sources_file"] = str(image_sources_file_path)
     manifest["input_images_dir"] = str(INPUT_IMAGES_DIR.relative_to(ROOT)).replace("\\", "/")
     manifest["input_images_uploaded"] = saved_input_images
+    if reuse_backgrounds_from_run_id:
+        manifest["background_reuse_from_run_id"] = reuse_backgrounds_from_run_id
     (run_dir / "manifest.json").write_text(json.dumps(manifest, ensure_ascii=False, indent=2) + "\n", encoding="utf-8")
     return manifest
 

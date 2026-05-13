@@ -3,6 +3,7 @@ import { appendLog, skeletonRunCard } from "./ui.js";
 import { fetchJSON, invalidateRuns } from "./api.js";
 import { buildImageGallery } from "./images.js";
 import { buildPromptEditor } from "./prompts.js";
+import { refreshSelect } from "./custom-select.js";
 
 const runsEl = document.getElementById("runs");
 const runPrevEl = document.getElementById("runPrev");
@@ -101,6 +102,28 @@ function updateBatchDropdownButtonLabel() {
   btn.textContent = count ? `${count} batch(es) selected` : "Select batch(es)";
 }
 
+function updateBackgroundReuseRunOptions() {
+  const select = document.getElementById("backgroundReuseRun");
+  if (!select) return;
+  const previous = select.value;
+  select.innerHTML = "";
+  const empty = document.createElement("option");
+  empty.value = "";
+  empty.textContent = "Select previous batch";
+  select.appendChild(empty);
+  state.runsData.forEach((run) => {
+    const label = run.batch || run.run_id;
+    const opt = document.createElement("option");
+    opt.value = run.run_id;
+    opt.textContent = label;
+    select.appendChild(opt);
+  });
+  if (previous && Array.from(select.options).some((opt) => opt.value === previous)) {
+    select.value = previous;
+  }
+  refreshSelect(select);
+}
+
 function closeBatchDropdown() {
   const menu = document.getElementById("batchDropdownMenu");
   const btn = document.getElementById("batchDropdownBtn");
@@ -122,6 +145,7 @@ export async function loadRuns() {
     const data = await fetchJSON("/api/runs");
     state.runsData = data.runs || [];
     state.currentRunIndex = 0;
+    updateBackgroundReuseRunOptions();
 
     const batchMenu = document.getElementById("batchDropdownMenu");
     batchMenu.innerHTML = "";
