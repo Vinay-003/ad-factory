@@ -1180,6 +1180,52 @@
       "test_group": "",
       "variant_variable": "concept_structure",
       "variant_value": "fab"
+    },
+    {
+      "id": "entry_025",
+      "timestamp": "2026-05-15T11:23:17Z",
+      "format": "HERO",
+      "persona_number": 6,
+      "persona_name": "Thyroid Weight-Gain Struggler (no cure claims)",
+      "headline_angle": "desired_outcome",
+      "awareness_stage": "solution_aware",
+      "concept_angle": "desired_outcome",
+      "concept_structure": "four_us",
+      "visual_archetype": "hero_close_crop_pedestal",
+      "headline_en": "Lose 3 to 5 kg in 15 days",
+      "headline_hi": "structured_system का desired_outcome सिस्टम जो Thyroid-linked weight gain feels stubborn and slow. को संभालने में मदद करता है।",
+      "support_line_en": "Doctor-formulated Ayurvedic system that reduces hunger and cravings so you can eat less without feeling weak. Works with regular homemade food, with daily tracker + coach support.",
+      "support_line_hi": "सरल कदम, जो structured_system और cravings_down पर आधारित हैं।",
+      "cta_en": "See The 15-Day Plan",
+      "cta_hi": "आज शुरू करें",
+      "disclaimer_en": "",
+      "disclaimer_hi": "",
+      "caption_en": "",
+      "caption_hi": "",
+      "bullets_en": [],
+      "bullets_hi": [],
+      "background_slot": "BG-092",
+      "background_name": "Minimal tile and wood",
+      "background_source": "catalog",
+      "fresh_background_signature": null,
+      "language": "BOTH",
+      "output_quality": "pending",
+      "notes": "assembled_from=copy_batch.json; batch=v6; aspect_ratio=4:5; seed=358758571; visual_archetype=hero_close_crop_pedestal",
+      "opening_pattern_4tok_en": "lose_to_kg_in",
+      "opening_pattern_4tok_hi": "structured_system_का_desired",
+      "copy_skeleton": "proof_time_cta",
+      "hook_structure_class": "proof_lead",
+      "proof_style_class": "authority_anchor",
+      "cta_voice_class": "challenge_action",
+      "headline_word_count": 8,
+      "support_line_word_count": 27,
+      "has_protocol_mechanics": false,
+      "has_social_proof_number": true,
+      "background_scene_category": "lifestyle",
+      "hypothesis_id": "proof_style-mechanism_explainer",
+      "test_group": "",
+      "variant_variable": "proof_style",
+      "variant_value": "mechanism_explainer"
     }
   ],
   "indexes": {
@@ -1189,10 +1235,10 @@
         "used": [
           "BG-038",
           "BG-294",
-          "BG-470"
+          "BG-470",
+          "BG-092"
         ],
         "remaining": [
-          "BG-092",
           "BG-227",
           "BG-169",
           "BG-162",
@@ -2256,6 +2302,12 @@
           "timestamp": "2026-05-15T10:08:06Z",
           "background_slot": "BG-470",
           "background_source": "catalog"
+        },
+        {
+          "entry_id": "entry_025",
+          "timestamp": "2026-05-15T11:23:17Z",
+          "background_slot": "BG-092",
+          "background_source": "catalog"
         }
       ],
       "BA": [
@@ -2592,6 +2644,15 @@
           "awareness_stage": "solution_aware",
           "concept_angle": "desired_outcome",
           "concept_structure": "fab"
+        },
+        {
+          "entry_id": "entry_025",
+          "timestamp": "2026-05-15T11:23:17Z",
+          "format": "HERO",
+          "persona_number": 6,
+          "awareness_stage": "solution_aware",
+          "concept_angle": "desired_outcome",
+          "concept_structure": "four_us"
         }
       ]
     },
@@ -2620,7 +2681,8 @@
         "Stress snacking ruining weight loss?",
         "Why does your weight loss hit a plateau?",
         "“Even with dieting, my weight was stuck.”",
-        "“Even with thyroid issues, I saw weight loss in 15 days.”"
+        "“Even with thyroid issues, I saw weight loss in 15 days.”",
+        "Lose 3 to 5 kg in 15 days"
       ],
       "cta_en": [
         "See If You’re Eligible",
@@ -2646,7 +2708,8 @@
         "Check If You’re Eligible",
         "Check Your 15-Day Plan",
         "See if Obesity Killer Kit fits you",
-        "Check eligibility and course rules."
+        "Check eligibility and course rules.",
+        "See The 15-Day Plan"
       ],
       "support_line_en": [
         "Obesity Killer Kit is a doctor-formulated Ayurvedic 15-day system designed for 3 to 5 kg loss, with a simple daily routine, homemade-food compatibility, and coach support via a daily tracker.",
@@ -2664,7 +2727,8 @@
         "Obesity Killer Kit is a doctor-formulated Ayurvedic 15-day system designed to help you lose 3 to 5 kg while reducing hunger and cravings, with a simple routine and guided coach support.",
         "Try a doctor-formulated Ayurvedic system: 15-day routine designed for 3 to 5 kg weight loss, less hunger and cravings, with daily tracker + trained coach guidance.",
         "I needed a clearer system, not stricter rules. The day-wise routine plus tracker sharing made weight loss feel doable again, without feeling hungry or weak.",
-        "Doctor-formulated, 70,000+ customers, 200 video testimonials, plus a guided tracker with coach support."
+        "Doctor-formulated, 70,000+ customers, 200 video testimonials, plus a guided tracker with coach support.",
+        "Doctor-formulated Ayurvedic system that reduces hunger and cravings so you can eat less without feeling weak. Works with regular homemade food, with daily tracker + coach support."
       ],
       "bullets_en": [
         "Strict diets: hunger, cravings, quitting again",

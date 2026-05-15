@@ -1315,7 +1315,9 @@ def run_chatgpt_generation(
         "--out-dir",
         str(out_dir),
         "--timeout",
-        str(int(os.getenv("CHATGPT_GENERATION_TIMEOUT_SECONDS") or "480")),
+        str(int(os.getenv("CHATGPT_GENERATION_TIMEOUT_SECONDS") or "420")),
+        "--download-timeout",
+        str(int(os.getenv("CHATGPT_DOWNLOAD_TIMEOUT_SECONDS") or "90")),
         "--manual-login-timeout",
         str(int(os.getenv("CHATGPT_MANUAL_LOGIN_TIMEOUT_SECONDS") or "180")),
         "--upload-dir",
@@ -2626,38 +2628,6 @@ def _collect_aspect_ratio_images(batch_name: str, aspect_ratio: str) -> list[str
                     continue
                 image_files.append(rel)
     return image_files
-
-
-def _write_generation_metadata(run_dir: Path, batch: str, aspect_ratio: str,
-                                manifest: dict[str, Any]) -> None:
-    """Write generation_metadata.json alongside generated images with persona,
-    format, hypothesis and run-level context."""
-    aspect_folder = "4_5" if aspect_ratio == "4:5" else "9_16"
-    meta_dir = GENERATED_IMAGES_ROOT / batch / aspect_folder / "generated images"
-    meta_dir.mkdir(parents=True, exist_ok=True)
-    meta_path = meta_dir / "generation_metadata.json"
-
-    hypothesis_cfg: dict[str, Any] = {}
-    hyp_path = run_dir / "context" / "hypothesis_config.json"
-    if hyp_path.exists():
-        try:
-            hypothesis_cfg = json.loads(hyp_path.read_text(encoding="utf-8"))
-        except Exception:
-            pass
-
-    metadata = {
-        "batch": batch,
-        "aspect_ratio": aspect_ratio,
-        "run_id": run_dir.name,
-        "personas": manifest.get("prompt_files", []),
-        "hypothesis": hypothesis_cfg,
-        "image_files": sorted(
-            p for p in manifest.get("image_files", [])
-            if f"/{aspect_folder}/" in p
-        ),
-        "generated_at": now_iso(),
-    }
-    meta_path.write_text(json.dumps(metadata, ensure_ascii=False, indent=2) + "\n", encoding="utf-8")
 
 
 def scan_prompt_files_for_batch(batch_name: str) -> list[str]:
@@ -4201,10 +4171,6 @@ def api_run_generate_images_45(run_id: str, payload: dict[str, Any] = Body(...))
     refreshed = collect_run_result(run_dir, batch, True)
     refreshed["generated_images_for_prompts_45"] = selected_45
     merged = merge_manifest(run_dir, manifest, refreshed)
-    try:
-        _write_generation_metadata(run_dir, batch, "4:5", merged)
-    except Exception:
-        pass
     return merged
 
 
@@ -4250,10 +4216,6 @@ def api_run_generate_images_916_from_45(run_id: str, payload: dict[str, Any] = B
     refreshed["generated_variant"] = "9:16"
     refreshed["conversion_failures"] = result.get("failures", [])
     merged = merge_manifest(run_dir, manifest, refreshed)
-    try:
-        _write_generation_metadata(run_dir, batch, "9:16", merged)
-    except Exception:
-        pass
     return merged
 
 
@@ -4332,7 +4294,9 @@ def api_batch_generate_images_45(payload: dict[str, Any] = Body(...)) -> dict[st
             "--out-dir",
             str(out_dir),
             "--timeout",
-            str(int(os.getenv("CHATGPT_GENERATION_TIMEOUT_SECONDS") or "480")),
+            str(int(os.getenv("CHATGPT_GENERATION_TIMEOUT_SECONDS") or "420")),
+            "--download-timeout",
+            str(int(os.getenv("CHATGPT_DOWNLOAD_TIMEOUT_SECONDS") or "90")),
             "--manual-login-timeout",
             str(int(os.getenv("CHATGPT_MANUAL_LOGIN_TIMEOUT_SECONDS") or "180")),
             "--upload-dir",
@@ -4363,14 +4327,6 @@ def api_batch_generate_images_45(payload: dict[str, Any] = Body(...)) -> dict[st
         error_text = result.stderr or result.stdout
         short_error = "\n".join([line for line in error_text.splitlines() if line.strip()][-30:])
         raise HTTPException(status_code=500, detail=f"Batch 4:5 generation failed ({engine_label}):\n{short_error}")
-
-    try:
-        _write_generation_metadata(
-            primary_run_dir if primary_run_dir is not None else RUNTIME_ROOT,
-            batch_name, "4:5", {"batch": batch_name, "prompt_count": len(prompt_files_created)}
-        )
-    except Exception:
-        pass
 
     return {
         "status": "completed",
@@ -4624,21 +4580,6 @@ def api_batch_generate_images_916(payload: dict[str, Any] = Body(...)) -> dict[s
                 refreshed["generated_variant"] = "9:16"
                 refreshed["generated_images_for_prompts_916"] = result.get("prompt_files_used", [])
                 merge_manifest(run_dir, manifest, refreshed)
-
-        try:
-            _write_generation_metadata(
-                run_dir if run_dir is not None else RUNTIME_ROOT,
-                batch,
-                "9:16",
-                {
-                    "batch": batch,
-                    "attempted": result.get("attempted", 0),
-                    "completed": result.get("completed", 0),
-                    "failures": result.get("failures", []),
-                },
-            )
-        except Exception:
-            pass
 
     if total_completed == 0:
         detail = "No 9:16 conversions succeeded"

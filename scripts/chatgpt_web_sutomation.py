@@ -110,8 +110,8 @@ def parse_args() -> argparse.Namespace:
         help="Optional directory of reference images to upload. If empty, no directory upload is used.",
     )
     parser.add_argument("--out-dir", required=True)
-    parser.add_argument("--timeout", type=int, default=480, help="Generation timeout per prompt")
-    parser.add_argument("--download-timeout", type=int, default=180)
+    parser.add_argument("--timeout", type=int, default=420, help="Generation timeout per prompt")
+    parser.add_argument("--download-timeout", type=int, default=90)
     parser.add_argument("--sleep-after-download", type=float, default=3.0)
     parser.add_argument("--min-image-bytes", type=int, default=20_000)
     parser.add_argument("--max-attempts", type=int, default=1)
@@ -467,6 +467,10 @@ def collect_upload_images(upload_dir_value: str, image_source_file_value: str, t
             source_file = Path.cwd() / source_file
         sources = parse_image_source_file(source_file)
         images.extend(build_local_image_paths(sources, temp_dir))
+        for p in images:
+            if p.suffix.lower() not in IMAGE_EXTS:
+                raise ValueError(f"Unsupported upload image extension: {p}")
+        return images
 
     if upload_dir_value.strip():
         upload_dir = Path(upload_dir_value).expanduser()
@@ -1541,6 +1545,74 @@ def _visible_uploaded_image_count(page: Page, before_srcs: set[str]) -> int:
         return 0
 
 
+def duplicate_upload_modal_present(page: Page) -> bool:
+    try:
+        return bool(page.evaluate("""
+            () => ((document.body && document.body.innerText) || '')
+                .toLowerCase()
+                .includes("you've already uploaded this file")
+        """))
+    except Exception:
+        return False
+
+
+def dismiss_duplicate_upload_modal(page: Page) -> bool:
+    script = """
+    () => {
+        const bodyText = ((document.body && document.body.innerText) || '').toLowerCase();
+        if (!bodyText.includes("you've already uploaded this file")) return false;
+        function visible(el) {
+            const r = el.getBoundingClientRect();
+            const s = getComputedStyle(el);
+            return r.width > 0 && r.height > 0 && s.display !== 'none' && s.visibility !== 'hidden';
+        }
+        const buttons = Array.from(document.querySelectorAll('button, [role="button"]')).filter(visible);
+        const ok = buttons.find(el => ((el.innerText || el.textContent || '').trim().toLowerCase() === 'ok'));
+        if (ok) {
+            ok.click();
+            return true;
+        }
+        return false;
+    }
+    """.strip()
+    try:
+        clicked = bool(page.evaluate(script))
+        if clicked:
+            time.sleep(0.5)
+        return clicked
+    except Exception:
+        return False
+
+
+def _composer_attachment_count(page: Page) -> int:
+    script = """
+    () => {
+        const composer = document.querySelector('form') || document.querySelector('[contenteditable="true"]')?.closest('div') || document.body;
+        function visible(el) {
+            const r = el.getBoundingClientRect();
+            const s = getComputedStyle(el);
+            return r.width >= 24 && r.height >= 24 && s.display !== 'none' && s.visibility !== 'hidden';
+        }
+        const seen = new Set();
+        let count = 0;
+        for (const img of composer.querySelectorAll('img')) {
+            if (!visible(img)) continue;
+            const src = img.currentSrc || img.src || '';
+            if (!src || seen.has(src)) continue;
+            const low = src.toLowerCase();
+            if (low.includes('avatar') || low.includes('profile') || low.includes('openai') || low.includes('logo')) continue;
+            seen.add(src);
+            count++;
+        }
+        return count;
+    }
+    """.strip()
+    try:
+        return int(page.evaluate(script) or 0)
+    except Exception:
+        return 0
+
+
 def wait_for_uploads_to_settle(page: Page, before_srcs: set[str], expected_count: int, timeout: int = 180) -> None:
     if expected_count <= 0:
         return
@@ -1550,13 +1622,19 @@ def wait_for_uploads_to_settle(page: Page, before_srcs: set[str], expected_count
     last_log = 0.0
     while time.time() < deadline:
         count = _visible_uploaded_image_count(page, before_srcs)
+        attachment_count = _composer_attachment_count(page)
+        if duplicate_upload_modal_present(page):
+            dismiss_duplicate_upload_modal(page)
+            if attachment_count >= expected_count:
+                print(f"  [upload] Duplicate upload modal dismissed; existing attachments={attachment_count}, expected={expected_count}")
+                return
         active = upload_activity_present(page)
         state = (count, active)
         if state != last_state:
             stable_since = time.time()
             last_state = state
-        if count >= expected_count and not active and stable_since is not None and time.time() - stable_since >= 4.0:
-            print(f"  [upload] Upload settled. visible_uploaded_images={count}, expected={expected_count}")
+        if (count >= expected_count or attachment_count >= expected_count) and not active and stable_since is not None and time.time() - stable_since >= 4.0:
+            print(f"  [upload] Upload settled. visible_uploaded_images={count}, attachments={attachment_count}, expected={expected_count}")
             return
         if time.time() - last_log > 6:
             print(f"  [upload] Waiting for upload settle... visible_uploaded_images={count}, expected={expected_count}, active={active}")
@@ -1586,6 +1664,9 @@ def upload_images(page: Page, image_paths: list[Path], timeout: int = 180) -> No
     time.sleep(0.2)
 
     for idx, file_path in enumerate(file_paths, start=1):
+        if _composer_attachment_count(page) >= idx:
+            print(f"  [upload] File {idx}/{len(file_paths)} already attached; skipping duplicate upload.")
+            continue
         print(f"  [upload] Uploading file {idx}/{len(file_paths)}: {Path(file_path).name}")
         uploaded = _upload_with_cdp_dom(page, [file_path])
         if not uploaded:
@@ -1641,11 +1722,17 @@ def _wait_for_uploaded_count_at_least(
     last_log = 0.0
     while time.time() < deadline:
         images_added, active, spinners = _upload_counts(page, before_srcs)
+        attachment_count = _composer_attachment_count(page)
+        if duplicate_upload_modal_present(page):
+            dismiss_duplicate_upload_modal(page)
+            if attachment_count >= target_count:
+                print(f"  [upload] Duplicate upload modal dismissed; existing attachments={attachment_count}, target={target_count}")
+                return
         state = (images_added, active, spinners)
         if state != last_state:
             stable_since = time.time()
             last_state = state
-        if images_added >= target_count and not active and spinners == 0 and stable_since is not None and time.time() - stable_since >= stable_seconds:
+        if (images_added >= target_count or attachment_count >= target_count) and not active and spinners == 0 and stable_since is not None and time.time() - stable_since >= stable_seconds:
             return
         if time.time() - last_log > 5:
             print(f"  [upload] Waiting for uploaded images... visible={images_added}, target={target_count}, active={active}, spinners={spinners}")
@@ -2351,7 +2438,7 @@ def _save_playwright_download(download, download_dir: Path, src: str = "") -> Pa
     return target
 
 
-def _capture_download_from_click(page: Page, download_dir: Path, src: str, min_bytes: int, click_timeout: int = 25) -> Path | None:
+def _capture_download_from_click(page: Page, download_dir: Path, src: str, min_bytes: int, click_timeout: int = 15) -> Path | None:
     if not _download_control_available(page):
         return None
 
@@ -2386,7 +2473,7 @@ def _capture_download_from_click(page: Page, download_dir: Path, src: str, min_b
         download_dirs=download_dirs,
         before_by_dir=before_by_dir,
         started_at=started_at,
-        timeout=min(60, click_timeout + 30),
+        timeout=min(30, click_timeout + 15),
         min_bytes=min_bytes,
     )
 
@@ -2517,7 +2604,7 @@ def download_generated_image(
     before_by_dir = snapshot_download_dirs(download_dirs)
     started_at = time.time()
     try:
-        downloaded = _capture_download_from_click(page, download_dir, src=src, min_bytes=min_bytes, click_timeout=min(30, max(10, download_timeout)))
+        downloaded = _capture_download_from_click(page, download_dir, src=src, min_bytes=min_bytes, click_timeout=min(15, max(8, download_timeout)))
         if downloaded:
             ext = downloaded.suffix if downloaded.suffix else ".png"
             out_path = out_path_no_ext.with_suffix(ext)
@@ -2527,7 +2614,7 @@ def download_generated_image(
 
         _open_marked_image_viewer(page, src)
         time.sleep(1.0)
-        downloaded = _capture_download_from_click(page, download_dir, src=src, min_bytes=min_bytes, click_timeout=min(30, max(10, download_timeout)))
+        downloaded = _capture_download_from_click(page, download_dir, src=src, min_bytes=min_bytes, click_timeout=min(15, max(8, download_timeout)))
         if downloaded:
             downloaded = wait_for_completed_download_any(
                 download_dirs=download_dirs,
