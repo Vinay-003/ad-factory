@@ -310,6 +310,105 @@ def prepend_starting_prompt(starting_prompt: str, prompt_text: str) -> str:
     return f"{starting_prompt}\n\n{body}\n"
 
 
+def load_prompt_metadata(prompt_path: Path, prompt_text: str) -> dict[str, Any]:
+    meta: dict[str, Any] = {}
+    sidecar = prompt_path.with_suffix(".json")
+    if sidecar.exists():
+        try:
+            meta = json.loads(sidecar.read_text(encoding="utf-8"))
+        except Exception as exc:
+            print(f"Warning: could not read prompt metadata {sidecar.name}: {exc}")
+    for label in (
+        "Headline angle", "Awareness stage", "Concept angle", "Concept structure",
+        "Proof style", "CTA voice", "Hook structure", "Lead angle", "Message structure",
+    ):
+        match = re.search(rf"^-\s*{re.escape(label)}\s*:\s*(.+)$", prompt_text, flags=re.MULTILINE | re.IGNORECASE)
+        if match:
+            meta[label.lower().replace(" ", "_")] = match.group(1).strip()
+    for key in ("persona", "persona_number", "persona_name", "format", "language", "aspect_ratio",
+                "visual_pattern", "visual_archetype", "background", "background_group_key",
+                "background_decisions", "creative_index", "creative_total", "multiplier", "hypothesis"):
+        if key not in meta:
+            match = re.search(rf"^-\s*{re.escape(key)}\s*:\s*(.+)$", prompt_text, flags=re.MULTILINE | re.IGNORECASE)
+            if match:
+                val = match.group(1).strip()
+                try:
+                    meta[key] = json.loads(val)
+                except Exception:
+                    meta[key] = val
+    return meta
+
+
+def build_test_variables(job: PromptJob, prompt_metadata: dict[str, Any], effective_hypothesis: dict[str, Any]) -> dict[str, Any]:
+    visual_pattern = prompt_metadata.get("visual_pattern") if isinstance(prompt_metadata.get("visual_pattern"), dict) else {}
+    visual_archetype = prompt_metadata.get("visual_archetype") if isinstance(prompt_metadata.get("visual_archetype"), dict) else {}
+    hyp_type = ""
+    hyp_variant = ""
+    if isinstance(effective_hypothesis, dict):
+        hyp_type = effective_hypothesis.get("type", "")
+        hyp_variant = effective_hypothesis.get("variant", "")
+    return {
+        "format": job.format_id,
+        "persona": job.persona_id,
+        "language": job.lang_id,
+        "variant": job.variant_id,
+        "visual_pattern": visual_pattern,
+        "visual_archetype": visual_archetype,
+        "hypothesis_type": hyp_type,
+        "hypothesis_variant": hyp_variant,
+        "persona": prompt_metadata.get("persona", job.persona_id),
+        "persona_number": prompt_metadata.get("persona_number", ""),
+        "persona_name": prompt_metadata.get("persona_name", ""),
+        "format": prompt_metadata.get("format", job.format_id),
+        "language": prompt_metadata.get("language", job.lang_id),
+        "aspect_ratio": prompt_metadata.get("aspect_ratio", ""),
+        "headline_angle": prompt_metadata.get("headline_angle", ""),
+        "awareness_stage": prompt_metadata.get("awareness_stage", ""),
+        "concept_angle": prompt_metadata.get("concept_angle", ""),
+        "concept_structure": prompt_metadata.get("concept_structure", ""),
+        "background": prompt_metadata.get("background", {}),
+        "background_group_key": prompt_metadata.get("background_group_key", ""),
+        "background_decisions": prompt_metadata.get("background_decisions", {}),
+        "creative_index": prompt_metadata.get("creative_index", 1),
+        "creative_total": prompt_metadata.get("creative_total", 1),
+        "multiplier": prompt_metadata.get("multiplier", prompt_metadata.get("creative_total", 1)),
+    }
+
+
+def build_image_metadata(
+    status: str,
+    job: PromptJob,
+    prompt_metadata: dict[str, Any],
+    effective_hypothesis: dict[str, Any],
+    test_variables: dict[str, Any],
+    saved_path: Path | None = None,
+    error: str = "",
+    diag: dict[str, Any] | None = None,
+) -> dict[str, Any]:
+    metadata: dict[str, Any] = {
+        "type": "chatgpt_ad_image",
+        "status": status,
+        "format": job.format_id,
+        "persona": job.persona_id,
+        "language": job.lang_id,
+        "job_key": job.job_key,
+        "prompt_file": job.prompt_path.name,
+        "hypothesis_type": test_variables.get("hypothesis_type", ""),
+        "hypothesis_variant": test_variables.get("hypothesis_variant", ""),
+        "creative_index": test_variables.get("creative_index", 1),
+        "creative_total": test_variables.get("creative_total", 1),
+        "test_variables": test_variables,
+        "timestamp": int(time.time()),
+    }
+    if saved_path is not None:
+        metadata["saved_file"] = str(saved_path)
+    if error:
+        metadata["error"] = error
+    if diag:
+        metadata.update(diag)
+    return metadata
+
+
 # ---------------------------------------------------------------------------
 # Optional image upload sources
 # ---------------------------------------------------------------------------
@@ -1480,30 +1579,111 @@ def upload_images(page: Page, image_paths: list[Path], timeout: int = 180) -> No
     before_srcs = get_all_image_srcs(page)
     print(f"  [upload] Uploading {len(file_paths)} image(s). Existing page images={len(before_srcs)}")
 
-    uploaded = _upload_with_cdp_dom(page, file_paths)
-    if not uploaded:
-        uploaded = _upload_with_playwright_input(page, file_paths)
+    try:
+        page.keyboard.press("Escape")
+    except Exception:
+        pass
+    time.sleep(0.2)
 
-    if not uploaded:
-        print("  [upload] No existing file input available; opening plus/upload menu.")
-        _click_plus_or_tools_near_composer(page)
-        time.sleep(0.5)
+    for idx, file_path in enumerate(file_paths, start=1):
+        print(f"  [upload] Uploading file {idx}/{len(file_paths)}: {Path(file_path).name}")
+        uploaded = _upload_with_cdp_dom(page, [file_path])
+        if not uploaded:
+            uploaded = _upload_with_playwright_input(page, [file_path])
+
+        if uploaded:
+            _wait_for_uploaded_count_at_least(page, before_srcs, target_count=idx, timeout=120)
+            continue
+
+        print("  [upload] No hidden input available; using upload menu for this file.")
         try:
-            with page.expect_file_chooser(timeout=8000) as chooser_info:
-                if not _click_upload_menu_item(page):
-                    safe_click_labels(page, ["upload", "add photos", "add files"], timeout=3)
-            chooser = chooser_info.value
-            chooser.set_files(file_paths, timeout=0)
-            uploaded = True
-            print("  [upload] File chooser accepted files.")
+            _upload_one_file_via_menu(page, file_path, before_srcs, target_count=idx)
         except Exception as exc:
-            print(f"  [upload] File chooser upload failed: {exc}")
-
-    if not uploaded:
-        raise PWTimeoutError("Could not upload images through ChatGPT")
+            raise PWTimeoutError(str(exc))
 
     wait_for_uploads_to_settle(page, before_srcs, expected_count=len(file_paths), timeout=timeout)
     dismiss_open_overlays(page)
+
+
+def _upload_one_by_one_via_menu(page: Page, file_paths: list[str], before_srcs: set[str]) -> bool:
+    for idx, file_path in enumerate(file_paths, start=1):
+        _upload_one_file_via_menu(page, file_path, before_srcs, target_count=idx)
+    return True
+
+
+def _upload_one_file_via_menu(page: Page, file_path: str, before_srcs: set[str], target_count: int) -> None:
+    print(f"  [upload] Uploading file {target_count}: {Path(file_path).name}")
+    _click_plus_or_tools_near_composer(page)
+    time.sleep(0.5)
+    try:
+        with page.expect_file_chooser(timeout=8000) as chooser_info:
+            if not _click_upload_menu_item(page):
+                safe_click_labels(page, ["upload", "add photos", "add files"], timeout=3)
+        chooser = chooser_info.value
+        chooser.set_files(file_path, timeout=0)
+        print("  [upload] File chooser accepted file.")
+    except Exception as exc:
+        print(f"  [upload] File chooser for single file failed: {exc}")
+        raise PWTimeoutError(f"Could not upload {file_path}: {exc}")
+    _wait_for_uploaded_count_at_least(page, before_srcs, target_count=target_count, timeout=120)
+
+
+def _wait_for_uploaded_count_at_least(
+    page: Page,
+    before_srcs: set[str],
+    target_count: int,
+    timeout: int = 90,
+    stable_seconds: float = 2.0,
+) -> None:
+    deadline = time.time() + timeout
+    stable_since: float | None = None
+    last_state: tuple[int, bool, int] | None = None
+    last_log = 0.0
+    while time.time() < deadline:
+        images_added, active, spinners = _upload_counts(page, before_srcs)
+        state = (images_added, active, spinners)
+        if state != last_state:
+            stable_since = time.time()
+            last_state = state
+        if images_added >= target_count and not active and spinners == 0 and stable_since is not None and time.time() - stable_since >= stable_seconds:
+            return
+        if time.time() - last_log > 5:
+            print(f"  [upload] Waiting for uploaded images... visible={images_added}, target={target_count}, active={active}, spinners={spinners}")
+            last_log = time.time()
+        time.sleep(0.6)
+    images_added, active, spinners = _upload_counts(page, before_srcs)
+    raise PWTimeoutError(f"Timed out waiting for uploaded image count {target_count}; visible={images_added}, active={active}, spinners={spinners}")
+
+
+def _upload_counts(page: Page, before_srcs: set[str]) -> tuple[int, bool, int]:
+    images_added = _visible_uploaded_image_count(page, before_srcs)
+    active = upload_activity_present(page)
+    spinners = _attachment_spinner_count(page)
+    return images_added, active, spinners
+
+
+def _attachment_spinner_count(page: Page) -> int:
+    script = """
+    () => {
+        const main = document.querySelector('main') || document.body;
+        function visible(el) {
+            const r = el.getBoundingClientRect();
+            const s = getComputedStyle(el);
+            return r.width > 0 && r.height > 0 && s.display !== 'none' && s.visibility !== 'hidden';
+        }
+        let count = 0;
+        for (const selector of ['[role="progressbar"]', '[class*="spinner" i]', '[class*="loading" i]', '[class*="progress" i]']) {
+            for (const el of main.querySelectorAll(selector)) {
+                if (visible(el)) count++;
+            }
+        }
+        return count;
+    }
+    """.strip()
+    try:
+        return int(page.evaluate(script) or 0)
+    except Exception:
+        return 0
 
 
 # ---------------------------------------------------------------------------
@@ -2104,39 +2284,111 @@ def _download_control_available(page: Page) -> bool:
         return False
 
 
-def _click_download_control_js(page: Page) -> bool:
+def _click_download_control_js(page: Page) -> str:
     try:
-        return bool(page.evaluate("""
+        return str(page.evaluate("""
             () => {
                 function visible(el) {
                     const r = el.getBoundingClientRect();
                     const s = getComputedStyle(el);
                     return r.width > 0 && r.height > 0 && s.display !== 'none' && s.visibility !== 'hidden';
                 }
+                function textOf(el) {
+                    const iconText = Array.from(el.querySelectorAll('svg title, [data-icon], .material-icons, .material-symbols-outlined'))
+                        .map(x => x.getAttribute('data-icon') || x.textContent || '').join(' ');
+                    return ((el.getAttribute('aria-label') || '') + ' ' +
+                            (el.getAttribute('title') || '') + ' ' +
+                            (el.getAttribute('data-testid') || '') + ' ' +
+                            (el.getAttribute('data-test-id') || '') + ' ' +
+                            (el.getAttribute('download') || '') + ' ' +
+                            (el.innerText || '') + ' ' + iconText).replace(/\\s+/g, ' ').trim().toLowerCase();
+                }
                 const candidates = [];
                 for (const el of document.querySelectorAll('button, [role="button"], a[href], a[download]')) {
                     if (!visible(el)) continue;
-                    const t = ((el.getAttribute('aria-label') || '') + ' ' +
-                               (el.getAttribute('title') || '') + ' ' +
-                               (el.getAttribute('download') || '') + ' ' +
-                               (el.innerText || '')).replace(/\\s+/g, ' ').trim().toLowerCase();
+                    const t = textOf(el);
                     let score = 0;
                     if (t === 'download') score += 400;
                     if (t.includes('download image')) score += 350;
                     if (t.includes('download')) score += 300;
+                    if (t.includes('arrow_down') || t.includes('download_for_offline')) score += 250;
                     const r = el.getBoundingClientRect();
                     if (r.top < 220) score += 30;
                     if (score > 0) candidates.push({el, score, top:r.top, left:r.left});
                 }
-                if (!candidates.length) return false;
+                if (!candidates.length) return '';
                 candidates.sort((a, b) => (b.score - a.score) || (a.top - b.top) || (b.left - a.left));
                 candidates[0].el.click();
-                return true;
+                return 'labelled-download';
             }
-        """))
+        """) or "")
     except Exception as exc:
         print(f"  [dl] Download control click failed: {exc}")
-        return False
+        return ""
+
+
+def _unique_download_target(download_dir: Path, suggested_filename: str, fallback_ext: str = ".png") -> Path:
+    safe = re.sub(r"[^A-Za-z0-9_. -]+", "_", suggested_filename or "")
+    safe = safe.strip(" .") or f"chatgpt-download{fallback_ext}"
+    base = download_dir / safe
+    if not base.suffix:
+        base = base.with_suffix(fallback_ext)
+    if not base.exists():
+        return base
+    stem = base.stem
+    suffix = base.suffix
+    for i in range(2, 10000):
+        candidate = base.with_name(f"{stem}-{i}{suffix}")
+        if not candidate.exists():
+            return candidate
+    return base.with_name(f"{stem}-{int(time.time())}{suffix}")
+
+
+def _save_playwright_download(download, download_dir: Path, src: str = "") -> Path:
+    ext = infer_ext_from_src(src) if src else ".png"
+    target = _unique_download_target(download_dir, getattr(download, "suggested_filename", "") or "", fallback_ext=ext)
+    download.save_as(str(target))
+    return target
+
+
+def _capture_download_from_click(page: Page, download_dir: Path, src: str, min_bytes: int, click_timeout: int = 25) -> Path | None:
+    if not _download_control_available(page):
+        return None
+
+    download_dirs = _default_download_dirs(download_dir)
+    before_by_dir = snapshot_download_dirs(download_dirs)
+    started_at = time.time()
+    method = ""
+
+    try:
+        with page.expect_download(timeout=click_timeout * 1000) as dl_info:
+            method = _click_download_control_js(page)
+            if not method:
+                raise RuntimeError("download control disappeared before click")
+        download = dl_info.value
+        saved = _save_playwright_download(download, download_dir, src=src)
+        size = saved.stat().st_size if saved.exists() else 0
+        print(f"  [dl] Browser download captured via Playwright ({method}): {saved} ({size} bytes)")
+        if size >= min_bytes:
+            return saved
+        print("  [dl] Playwright download was too small; checking Chrome download folders.")
+        try:
+            saved.unlink(missing_ok=True)
+        except Exception:
+            pass
+    except Exception as exc:
+        if method:
+            print(f"  [dl] Clicked download control ({method}) but Playwright did not capture download: {exc}")
+        else:
+            print(f"  [dl] Could not click/capture download control: {exc}")
+
+    return wait_for_completed_download_any(
+        download_dirs=download_dirs,
+        before_by_dir=before_by_dir,
+        started_at=started_at,
+        timeout=min(60, click_timeout + 30),
+        min_bytes=min_bytes,
+    )
 
 
 def _open_marked_image_viewer(page: Page, src: str | None = None) -> bool:
@@ -2255,27 +2507,17 @@ def download_generated_image(
     out_path_no_ext.parent.mkdir(parents=True, exist_ok=True)
     _configure_download_dir(context, download_dir)
 
-    src = mark_largest_generated_image(page, src) or src
+    marked_src = mark_largest_generated_image(page, src) or src
+    if marked_src and marked_src != src:
+        print("  [dl] Updated generated image src from marked visible image.")
+        src = marked_src
 
-    print("  [dl] Strategy 1: save actual visible generated image resource from DOM.")
-    saved = _save_visible_generated_image_via_dom(page, out_path_no_ext, min_bytes=min_bytes)
-    if saved:
-        return saved
-
-    print("  [dl] Strategy 2: open image viewer and click Download.")
+    print("  [dl] Strategy 1: open image viewer and click Download.")
     download_dirs = _default_download_dirs(download_dir)
     before_by_dir = snapshot_download_dirs(download_dirs)
     started_at = time.time()
-    _open_marked_image_viewer(page, src)
-    time.sleep(1.0)
-    if _download_control_available(page) and _click_download_control_js(page):
-        downloaded = wait_for_completed_download_any(
-            download_dirs=download_dirs,
-            before_by_dir=before_by_dir,
-            started_at=started_at,
-            timeout=download_timeout,
-            min_bytes=min_bytes,
-        )
+    try:
+        downloaded = _capture_download_from_click(page, download_dir, src=src, min_bytes=min_bytes, click_timeout=min(30, max(10, download_timeout)))
         if downloaded:
             ext = downloaded.suffix if downloaded.suffix else ".png"
             out_path = out_path_no_ext.with_suffix(ext)
@@ -2283,7 +2525,26 @@ def download_generated_image(
             print(f"  [dl] Saved browser download: {out_path} ({out_path.stat().st_size} bytes)")
             return out_path
 
-    print("  [dl] Strategy 3: direct fetch current image src.")
+        _open_marked_image_viewer(page, src)
+        time.sleep(1.0)
+        downloaded = _capture_download_from_click(page, download_dir, src=src, min_bytes=min_bytes, click_timeout=min(30, max(10, download_timeout)))
+        if downloaded:
+            downloaded = wait_for_completed_download_any(
+                download_dirs=download_dirs,
+                before_by_dir=before_by_dir,
+                started_at=started_at,
+                timeout=5,
+                min_bytes=min_bytes,
+            ) or downloaded
+            ext = downloaded.suffix if downloaded.suffix else ".png"
+            out_path = out_path_no_ext.with_suffix(ext)
+            shutil.copy2(downloaded, out_path)
+            print(f"  [dl] Saved browser download: {out_path} ({out_path.stat().st_size} bytes)")
+            return out_path
+    except Exception as exc:
+        print(f"  [dl] viewer/button strategy failed: {exc}")
+
+    print("  [dl] Strategy 2: direct fetch current image src.")
     src = mark_largest_generated_image(page) or src
     try:
         data_url = page.evaluate(
@@ -2305,6 +2566,11 @@ def download_generated_image(
             return saved
     except Exception as exc:
         print(f"  [dl] direct fetch failed: {exc}")
+
+    print("  [dl] Strategy 3: save visible generated image resource from DOM.")
+    saved = _save_visible_generated_image_via_dom(page, out_path_no_ext, min_bytes=min_bytes)
+    if saved:
+        return saved
 
     raise RuntimeError("Image was detected, but no valid image file could be saved.")
 
@@ -2341,6 +2607,9 @@ def save_debug_snapshot(page: Page, base: Path, label: str) -> dict[str, str | N
 def build_image_metadata(
     status: str,
     job: PromptJob,
+    prompt_metadata: dict[str, Any],
+    effective_hypothesis: dict[str, Any],
+    test_variables: dict[str, Any],
     saved_path: Path | None = None,
     error: str = "",
     diag: dict[str, Any] | None = None,
@@ -2351,9 +2620,13 @@ def build_image_metadata(
         "format": job.format_id,
         "persona": job.persona_id,
         "language": job.lang_id,
-        "variant": job.variant_id,
         "job_key": job.job_key,
         "prompt_file": job.prompt_path.name,
+        "hypothesis_type": test_variables.get("hypothesis_type", ""),
+        "hypothesis_variant": test_variables.get("hypothesis_variant", ""),
+        "creative_index": test_variables.get("creative_index", 1),
+        "creative_total": test_variables.get("creative_total", 1),
+        "test_variables": test_variables,
         "timestamp": int(time.time()),
     }
     if saved_path is not None:
@@ -2411,6 +2684,15 @@ def run() -> None:
             for index, job in enumerate(jobs, start=1):
                 print(f"\n=== [{index}/{len(jobs)}] {job.job_key} :: {job.prompt_path.name} ===")
 
+                prompt_body = job.prompt_path.read_text(encoding="utf-8")
+                prompt_metadata = load_prompt_metadata(job.prompt_path, prompt_body)
+                prompt_hypothesis = prompt_metadata.get("hypothesis") if isinstance(prompt_metadata.get("hypothesis"), dict) else {}
+                effective_hypothesis = prompt_hypothesis if prompt_hypothesis else {}
+                test_variables = build_test_variables(job, prompt_metadata, effective_hypothesis)
+                full_prompt = prepend_starting_prompt(starting_prompt, prompt_body)
+
+                print(f"  Prompt file stats: {len(full_prompt)} chars, {full_prompt.count(chr(10)) + 1} lines")
+
                 attempt = 1
                 while attempt <= max(1, args.max_attempts):
                     page_for_job: Page | None = None
@@ -2427,9 +2709,6 @@ def run() -> None:
 
                         if upload_images_for_all_jobs:
                             upload_images(page_for_job, upload_images_for_all_jobs, timeout=180)
-
-                        prompt_text = job.prompt_path.read_text(encoding="utf-8")
-                        full_prompt = prepend_starting_prompt(starting_prompt, prompt_text)
 
                         baseline_srcs = get_all_image_srcs(page_for_job)
                         debug_base = out_dir / "debug" / job.output_stem
@@ -2466,7 +2745,14 @@ def run() -> None:
                             download_timeout=args.download_timeout,
                         )
 
-                        metadata = build_image_metadata("success", job, saved_path=saved_path)
+                        metadata = build_image_metadata(
+                            status="success",
+                            job=job,
+                            prompt_metadata=prompt_metadata,
+                            effective_hypothesis=effective_hypothesis,
+                            test_variables=test_variables,
+                            saved_path=saved_path,
+                        )
                         (saved_path.with_suffix(saved_path.suffix + ".json")).write_text(
                             json.dumps(metadata, indent=2, ensure_ascii=False),
                             encoding="utf-8",
@@ -2483,7 +2769,15 @@ def run() -> None:
                                 diag = save_debug_snapshot(page_for_job, out_dir / "debug" / job.output_stem, f"attempt{attempt}-error")
                             except Exception:
                                 diag = {}
-                        metadata = build_image_metadata("error", job, error=str(exc), diag=diag)
+                        metadata = build_image_metadata(
+                            status="error",
+                            job=job,
+                            prompt_metadata=prompt_metadata,
+                            effective_hypothesis=effective_hypothesis,
+                            test_variables=test_variables,
+                            error=str(exc),
+                            diag=diag,
+                        )
                         (out_dir / "debug").mkdir(parents=True, exist_ok=True)
                         (out_dir / "debug" / f"{job.output_stem}.error.json").write_text(
                             json.dumps(metadata, indent=2, ensure_ascii=False),

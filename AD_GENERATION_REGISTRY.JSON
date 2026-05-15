@@ -1042,6 +1042,144 @@
       "test_group": "",
       "variant_variable": "hook_structure",
       "variant_value": "question_lead"
+    },
+    {
+      "id": "entry_022",
+      "timestamp": "2026-05-15T10:08:06Z",
+      "format": "HERO",
+      "persona_number": 4,
+      "persona_name": "Plateau Victim",
+      "headline_angle": "curiosity",
+      "awareness_stage": "solution_aware",
+      "concept_angle": "curiosity",
+      "concept_structure": "four_us",
+      "visual_archetype": "hero_left_copy_right_product",
+      "headline_en": "Why does your weight loss hit a plateau?",
+      "headline_hi": "structured_system का curiosity सिस्टम जो Weight loss plateaus despite repeated effort. को संभालने में मदद करता है।",
+      "support_line_en": "Try a doctor-formulated Ayurvedic system: 15-day routine designed for 3 to 5 kg weight loss, less hunger and cravings, with daily tracker + trained coach guidance.",
+      "support_line_hi": "सरल कदम, जो structured_system और cravings_down पर आधारित हैं।",
+      "cta_en": "Check Your 15-Day Plan",
+      "cta_hi": "आज शुरू करें",
+      "disclaimer_en": "",
+      "disclaimer_hi": "",
+      "caption_en": "",
+      "caption_hi": "",
+      "bullets_en": [],
+      "bullets_hi": [],
+      "background_slot": "BG-470",
+      "background_name": "Studio pale green sweep",
+      "background_source": "catalog",
+      "fresh_background_signature": null,
+      "language": "BOTH",
+      "output_quality": "pending",
+      "notes": "assembled_from=copy_batch.json; batch=v3; aspect_ratio=4:5; seed=1426216926; visual_archetype=hero_left_copy_right_product",
+      "opening_pattern_4tok_en": "why_does_your_weight",
+      "opening_pattern_4tok_hi": "structured_system_का_curiosity",
+      "copy_skeleton": "question_mechanism_cta",
+      "hook_structure_class": "question_lead",
+      "proof_style_class": "authority_anchor",
+      "cta_voice_class": "challenge_action",
+      "headline_word_count": 8,
+      "support_line_word_count": 26,
+      "has_protocol_mechanics": false,
+      "has_social_proof_number": true,
+      "background_scene_category": "studio",
+      "hypothesis_id": "concept_angle-curiosity",
+      "test_group": "",
+      "variant_variable": "concept_angle",
+      "variant_value": "curiosity"
+    },
+    {
+      "id": "entry_023",
+      "timestamp": "2026-05-15T10:35:28Z",
+      "format": "TEST",
+      "persona_number": 4,
+      "persona_name": "Plateau Victim",
+      "headline_angle": "quote_card_plateau_breakthrough",
+      "awareness_stage": "solution_aware",
+      "concept_angle": "comparison",
+      "concept_structure": "pas",
+      "visual_archetype": "test_portrait_overlay_card",
+      "headline_en": "“Even with dieting, my weight was stuck.”",
+      "headline_hi": "मैंने 15 दिन की किट पर भरोसा किया क्योंकि वजन-घटाने के कदम साफ लगे।",
+      "support_line_en": "I needed a clearer system, not stricter rules. The day-wise routine plus tracker sharing made weight loss feel doable again, without feeling hungry or weak.",
+      "support_line_hi": "सुबह-रात के स्पष्ट कदमों से वजन घटाने और मोटापा नियंत्रण का भरोसेमंद सपोर्ट।",
+      "cta_en": "See if Obesity Killer Kit fits you",
+      "cta_hi": "प्रमाण देखें",
+      "disclaimer_en": "",
+      "disclaimer_hi": "",
+      "caption_en": "",
+      "caption_hi": "",
+      "bullets_en": [],
+      "bullets_hi": [],
+      "background_slot": "BG-351",
+      "background_name": "Clean powder room shelf",
+      "background_source": "catalog",
+      "fresh_background_signature": null,
+      "language": "BOTH",
+      "output_quality": "pending",
+      "notes": "assembled_from=copy_batch.json; batch=v4; aspect_ratio=4:5; seed=1195523574; visual_archetype=test_portrait_overlay_card",
+      "opening_pattern_4tok_en": "even_with_dieting_my",
+      "opening_pattern_4tok_hi": "मैंने_दिन_की_किट",
+      "copy_skeleton": "problem_reframe_then_next_step",
+      "hook_structure_class": "contrast_loop",
+      "proof_style_class": "routine_clarity",
+      "cta_voice_class": "reassurance_start",
+      "headline_word_count": 7,
+      "support_line_word_count": 25,
+      "has_protocol_mechanics": false,
+      "has_social_proof_number": false,
+      "background_scene_category": "lifestyle",
+      "hypothesis_id": "awareness_stage-solution_aware",
+      "test_group": "",
+      "variant_variable": "awareness_stage",
+      "variant_value": "solution_aware"
+    },
+    {
+      "id": "entry_024",
+      "timestamp": "2026-05-15T10:55:33Z",
+      "format": "TEST",
+      "persona_number": 6,
+      "persona_name": "Thyroid Weight-Gain Struggler (no cure claims)",
+      "headline_angle": "desired_outcome",
+      "awareness_stage": "solution_aware",
+      "concept_angle": "desired_outcome",
+      "concept_structure": "fab",
+      "visual_archetype": "test_portrait_overlay_card",
+      "headline_en": "“Even with thyroid issues, I saw weight loss in 15 days.”",
+      "headline_hi": "मैंने 15 दिन की किट पर भरोसा किया क्योंकि वजन-घटाने के कदम साफ लगे।",
+      "support_line_en": "Doctor-formulated, 70,000+ customers, 200 video testimonials, plus a guided tracker with coach support.",
+      "support_line_hi": "सुबह-रात के स्पष्ट कदमों से वजन घटाने और मोटापा नियंत्रण का भरोसेमंद सपोर्ट।",
+      "cta_en": "Check eligibility and course rules.",
+      "cta_hi": "प्रमाण देखें",
+      "disclaimer_en": "",
+      "disclaimer_hi": "",
+      "caption_en": "",
+      "caption_hi": "",
+      "bullets_en": [],
+      "bullets_hi": [],
+      "background_slot": "BG-070",
+      "background_name": "Office notebook stack",
+      "background_source": "catalog",
+      "fresh_background_signature": null,
+      "language": "BOTH",
+      "output_quality": "pending",
+      "notes": "assembled_from=copy_batch.json; batch=v5; aspect_ratio=4:5; seed=994418384; visual_archetype=test_portrait_overlay_card",
+      "opening_pattern_4tok_en": "even_with_thyroid_issues",
+      "opening_pattern_4tok_hi": "मैंने_दिन_की_किट",
+      "copy_skeleton": "proof_time_cta",
+      "hook_structure_class": "contrast_loop",
+      "proof_style_class": "authority_anchor",
+      "cta_voice_class": "guided_next_step",
+      "headline_word_count": 11,
+      "support_line_word_count": 13,
+      "has_protocol_mechanics": false,
+      "has_social_proof_number": true,
+      "background_scene_category": "office",
+      "hypothesis_id": "concept_structure-fab",
+      "test_group": "",
+      "variant_variable": "concept_structure",
+      "variant_value": "fab"
     }
   ],
   "indexes": {
@@ -1050,10 +1188,10 @@
         "cycle_number": 1,
         "used": [
           "BG-038",
-          "BG-294"
+          "BG-294",
+          "BG-470"
         ],
         "remaining": [
-          "BG-470",
           "BG-092",
           "BG-227",
           "BG-169",
@@ -1467,11 +1605,11 @@
       "TEST": {
         "cycle_number": 1,
         "used": [
-          "BG-051"
+          "BG-051",
+          "BG-351",
+          "BG-070"
         ],
         "remaining": [
-          "BG-351",
-          "BG-070",
           "BG-107",
           "BG-142",
           "BG-449",
@@ -2112,6 +2250,12 @@
           "timestamp": "2026-05-15T08:34:59Z",
           "background_slot": "BG-294",
           "background_source": "catalog"
+        },
+        {
+          "entry_id": "entry_022",
+          "timestamp": "2026-05-15T10:08:06Z",
+          "background_slot": "BG-470",
+          "background_source": "catalog"
         }
       ],
       "BA": [
@@ -2163,6 +2307,18 @@
           "entry_id": "entry_012",
           "timestamp": "2026-05-13T17:45:36Z",
           "background_slot": "BG-051",
+          "background_source": "catalog"
+        },
+        {
+          "entry_id": "entry_023",
+          "timestamp": "2026-05-15T10:35:28Z",
+          "background_slot": "BG-351",
+          "background_source": "catalog"
+        },
+        {
+          "entry_id": "entry_024",
+          "timestamp": "2026-05-15T10:55:33Z",
+          "background_slot": "BG-070",
           "background_source": "catalog"
         }
       ],
@@ -2409,6 +2565,33 @@
           "awareness_stage": "problem_aware",
           "concept_angle": "pain_point",
           "concept_structure": "four_us"
+        },
+        {
+          "entry_id": "entry_022",
+          "timestamp": "2026-05-15T10:08:06Z",
+          "format": "HERO",
+          "persona_number": 4,
+          "awareness_stage": "solution_aware",
+          "concept_angle": "curiosity",
+          "concept_structure": "four_us"
+        },
+        {
+          "entry_id": "entry_023",
+          "timestamp": "2026-05-15T10:35:28Z",
+          "format": "TEST",
+          "persona_number": 4,
+          "awareness_stage": "solution_aware",
+          "concept_angle": "comparison",
+          "concept_structure": "pas"
+        },
+        {
+          "entry_id": "entry_024",
+          "timestamp": "2026-05-15T10:55:33Z",
+          "format": "TEST",
+          "persona_number": 6,
+          "awareness_stage": "solution_aware",
+          "concept_angle": "desired_outcome",
+          "concept_structure": "fab"
         }
       ]
     },
@@ -2434,7 +2617,10 @@
         "Want 15-day weight loss with no side effects?",
         "Want 15-day weight loss with proof?",
         "Want weight loss with a 7-day guarantee?",
-        "Stress snacking ruining weight loss?"
+        "Stress snacking ruining weight loss?",
+        "Why does your weight loss hit a plateau?",
+        "“Even with dieting, my weight was stuck.”",
+        "“Even with thyroid issues, I saw weight loss in 15 days.”"
       ],
       "cta_en": [
         "See If You’re Eligible",
@@ -2457,7 +2643,10 @@
         "See steps",
         "See proof",
         "See details",
-        "Check If You’re Eligible"
+        "Check If You’re Eligible",
+        "Check Your 15-Day Plan",
+        "See if Obesity Killer Kit fits you",
+        "Check eligibility and course rules."
       ],
       "support_line_en": [
         "Obesity Killer Kit is a doctor-formulated Ayurvedic 15-day system designed for 3 to 5 kg loss, with a simple daily routine, homemade-food compatibility, and coach support via a daily tracker.",
@@ -2472,7 +2661,10 @@
         "All-natural Ayurvedic kit; no preservatives.",
         "70,000+ customers and 200 video testimonials.",
         "Refund if no loss starts with tracker.",
-        "Obesity Killer Kit is a doctor-formulated Ayurvedic 15-day system designed to help you lose 3 to 5 kg while reducing hunger and cravings, with a simple routine and guided coach support."
+        "Obesity Killer Kit is a doctor-formulated Ayurvedic 15-day system designed to help you lose 3 to 5 kg while reducing hunger and cravings, with a simple routine and guided coach support.",
+        "Try a doctor-formulated Ayurvedic system: 15-day routine designed for 3 to 5 kg weight loss, less hunger and cravings, with daily tracker + trained coach guidance.",
+        "I needed a clearer system, not stricter rules. The day-wise routine plus tracker sharing made weight loss feel doable again, without feeling hungry or weak.",
+        "Doctor-formulated, 70,000+ customers, 200 video testimonials, plus a guided tracker with coach support."
       ],
       "bullets_en": [
         "Strict diets: hunger, cravings, quitting again",

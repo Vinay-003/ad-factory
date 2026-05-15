@@ -1118,7 +1118,7 @@ button.is-loading::after {
   background: color-mix(in srgb, var(--line) 12%, var(--surface));
 }
 
-.image-card[data-aspect="GEMINI_9_16"] .image-wrap { aspect-ratio: 9 / 16; }
+.image-card[data-aspect="9_16"] .image-wrap { aspect-ratio: 9 / 16; }
 
 .gallery-thumb {
   width: 100%;

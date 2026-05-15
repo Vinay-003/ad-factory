@@ -1105,7 +1105,7 @@ def collect_45_reference_jobs_for_batch(batch: str) -> list[dict[str, Any]]:
     if jobs:
         return jobs
 
-    # Fallback: derive from prompt files + filesystem scan under GEMINI_4_5
+    # Fallback: derive from prompt files + filesystem scan under 4_5
     prompt_files = scan_prompt_files_for_batch(batch)
     for prompt_file in prompt_files:
         if "/45/" not in str(prompt_file):
@@ -1116,13 +1116,13 @@ def collect_45_reference_jobs_for_batch(batch: str) -> list[dict[str, Any]]:
         fmt, lang, persona_num = parsed
         if persona_num is None:
             continue
-        gemini_name = f"gemini-{fmt.lower()}-p{persona_num:02d}"
+        base_name = f"p{persona_num:02d}"
         for img_root in generated_image_roots():
-            gemini_dir = img_root / batch / "GEMINI_4_5"
-            if not gemini_dir.exists():
+            ref_dir = img_root / batch / "4_5"
+            if not ref_dir.exists():
                 continue
             for ext in ("png", "jpg", "jpeg", "webp"):
-                for f in sorted(gemini_dir.glob(f"**/{gemini_name}*.{ext}")):
+                for f in sorted(ref_dir.glob(f"**/*{base_name}*.{ext}")):
                     found_rel = str(f.relative_to(ROOT)).replace("\\", "/")
                     if found_rel in seen_refs:
                         continue
@@ -1211,7 +1211,7 @@ def run_gemini_generation(
         if sidecar.exists():
             (prompt_work_dir / sidecar.name).write_text(sidecar.read_text(encoding="utf-8"), encoding="utf-8")
 
-    out_dir = GENERATED_IMAGES_ROOT / batch / f"GEMINI_{aspect_folder}"
+    out_dir = GENERATED_IMAGES_ROOT / batch / aspect_folder
     image_source_arg = image_sources_file
     if prompt_reference_map is not None:
         try:
@@ -1302,7 +1302,7 @@ def run_chatgpt_generation(
         if sidecar.exists():
             (prompt_work_dir / sidecar.name).write_text(sidecar.read_text(encoding="utf-8"), encoding="utf-8")
 
-    out_dir = GENERATED_IMAGES_ROOT / batch / f"CHATGPT_{aspect_folder}"
+    out_dir = GENERATED_IMAGES_ROOT / batch / aspect_folder
     out_dir.mkdir(parents=True, exist_ok=True)
 
     cmd = [
@@ -2611,9 +2611,9 @@ def _collect_aspect_ratio_images(batch_name: str, aspect_ratio: str) -> list[str
     """Collect generated image paths for a specific aspect ratio.
 
     Searches both legacy and new unified output roots, looking under
-    generated_images/{batch}/GEMINI_{aspect}/ for image files recursively.
+    generated_images/{batch}/{aspect}/ for image files recursively.
     """
-    aspect_folder = "GEMINI_4_5" if aspect_ratio == "4:5" else "GEMINI_9_16"
+    aspect_folder = "4_5" if aspect_ratio == "4:5" else "9_16"
     image_files: list[str] = []
     for generated_root in generated_image_roots():
         image_dir = generated_root / batch_name / aspect_folder
@@ -2621,7 +2621,10 @@ def _collect_aspect_ratio_images(batch_name: str, aspect_ratio: str) -> list[str
             continue
         for ext in ("*.png", "*.jpg", "*.jpeg", "*.webp"):
             for file in sorted(image_dir.glob(f"**/{ext}")):
-                image_files.append(str(file.relative_to(ROOT)))
+                rel = str(file.relative_to(ROOT)).replace("\\", "/")
+                if "/debug/" in rel or "/.browser_downloads/" in rel:
+                    continue
+                image_files.append(rel)
     return image_files
 
 
@@ -2629,12 +2632,11 @@ def _write_generation_metadata(run_dir: Path, batch: str, aspect_ratio: str,
                                 manifest: dict[str, Any]) -> None:
     """Write generation_metadata.json alongside generated images with persona,
     format, hypothesis and run-level context."""
-    aspect_folder = "GEMINI_4_5" if aspect_ratio == "4:5" else "GEMINI_9_16"
+    aspect_folder = "4_5" if aspect_ratio == "4:5" else "9_16"
     meta_dir = GENERATED_IMAGES_ROOT / batch / aspect_folder / "generated images"
     meta_dir.mkdir(parents=True, exist_ok=True)
     meta_path = meta_dir / "generation_metadata.json"
 
-    # Load hypothesis config if it exists
     hypothesis_cfg: dict[str, Any] = {}
     hyp_path = run_dir / "context" / "hypothesis_config.json"
     if hyp_path.exists():
@@ -2678,7 +2680,7 @@ def scan_image_files_for_batch(batch_name: str) -> list[str]:
         for ext in ("*.png", "*.jpg", "*.jpeg", "*.webp"):
             for file in sorted(image_dir.glob(f"**/{ext}")):
                 rel = str(file.relative_to(ROOT)).replace("\\", "/")
-                if "/.browser_downloads/" in rel:
+                if "/debug/" in rel or "/.browser_downloads/" in rel:
                     continue
                 if rel in seen:
                     continue
@@ -2694,13 +2696,36 @@ def refresh_manifest_file_state(run_dir: Path, manifest: dict[str, Any]) -> dict
 
     prompt_files = scan_prompt_files_for_batch(batch_name)
     image_files = scan_image_files_for_batch(batch_name)
+    image_generated = bool(image_files) or bool(manifest.get("image_generated", False))
+    previous_prompt_files = list(manifest.get("prompt_files") or [])
+    previous_image_files = list(manifest.get("image_files") or [])
+    if (
+        previous_prompt_files == prompt_files
+        and previous_image_files == image_files
+        and bool(manifest.get("image_generated", False)) == image_generated
+    ):
+        return manifest
+
+    newest_mtime = 0.0
+    for rel in prompt_files + image_files:
+        try:
+            path = ROOT / rel
+            if path.exists():
+                newest_mtime = max(newest_mtime, path.stat().st_mtime)
+        except Exception:
+            pass
+    updated_at = (
+        datetime.fromtimestamp(newest_mtime, tz=timezone.utc).replace(microsecond=0).isoformat().replace("+00:00", "Z")
+        if newest_mtime > 0
+        else now_iso()
+    )
     refreshed = {
         "run_id": run_dir.name,
         "batch": batch_name,
         "prompt_files": prompt_files,
         "image_files": image_files,
-        "image_generated": bool(image_files) or bool(manifest.get("image_generated", False)),
-        "updated_at": now_iso(),
+        "image_generated": image_generated,
+        "updated_at": updated_at,
     }
     merged = {**manifest, **refreshed}
     (run_dir / "manifest.json").write_text(json.dumps(merged, ensure_ascii=False, indent=2) + "\n", encoding="utf-8")
@@ -3629,8 +3654,8 @@ def _extract_vn_from_image_path(image_path: str) -> str:
 
 
 def _extract_aspect_from_image_path(image_path: str) -> str:
-    # Extract aspect folder e.g. GEMINI_4_5 from generated_images/v77/GEMINI_4_5/...
-    m = re.search(r"/(GEMINI_\d+_\d+)/", image_path.replace("\\", "/"))
+    # Extract aspect folder e.g. 4_5 or 9_16 from generated_images/v77/4_5/...
+    m = re.search(r"/(\d+_\d+)/", image_path.replace("\\", "/"))
     return m.group(1) if m else ""
 
 
@@ -4208,7 +4233,10 @@ def api_run_generate_images_916_from_45(run_id: str, payload: dict[str, Any] = B
         raise HTTPException(status_code=400, detail="No usable 4:5 reference images matched selected prompts")
 
     headless = bool(payload.get("headless", False))
-    result = run_916_conversion_from_45_for_batch(batch=batch, headless=headless, run_dir=run_dir, jobs=selected_jobs)
+    engine = str(payload.get("engine") or "gemini").strip().lower()
+    if engine not in {"gemini", "chatgpt"}:
+        raise HTTPException(status_code=400, detail="engine must be gemini or chatgpt")
+    result = run_916_conversion_from_45_for_batch(batch=batch, headless=headless, run_dir=run_dir, engine=engine, jobs=selected_jobs)
 
     if not has_storage_manifest or run_dir is None:
         refreshed = collect_backfill_result(run_id, batch)
@@ -4290,7 +4318,7 @@ def api_batch_generate_images_45(payload: dict[str, Any] = Body(...)) -> dict[st
             (prompt_work_dir / sidecar.name).write_text(sidecar.read_text(encoding="utf-8"), encoding="utf-8")
         prompt_files_created.append(str(dest))
     headless = bool(payload.get("headless", False))
-    out_dir = GENERATED_IMAGES_ROOT / batch_name / f"{engine_label.upper().replace(' ', '')}_4_5"
+    out_dir = GENERATED_IMAGES_ROOT / batch_name / "4_5"
     out_dir.mkdir(parents=True, exist_ok=True)
 
     if engine == "chatgpt":
@@ -4386,7 +4414,7 @@ def _resolve_916_generation_for_run(run_dir: Path, manifest: dict[str, Any]) -> 
             fmt, lang, persona_num = parsed
 
             # Look for 4:5 image by matching format+persona
-            gemini_name = f"gemini-{fmt.lower()}-p{persona_num:02d}"
+            base_name = f"p{persona_num:02d}"
             image_sources: list[str] = []
             for pf45, imgs in prompt_to_images.items():
                 if f"OUTPUT_{fmt}_P{persona_num:02d}" in str(pf45).upper():
@@ -4396,11 +4424,11 @@ def _resolve_916_generation_for_run(run_dir: Path, manifest: dict[str, Any]) -> 
             # Fallback: search image roots directly for the 4:5 image
             if not image_sources:
                 for img_root in generated_image_roots():
-                    gemini_dir = img_root / batch / "GEMINI_4_5"
-                    if not gemini_dir.exists():
+                    ref_dir = img_root / batch / "4_5"
+                    if not ref_dir.exists():
                         continue
                     for ext in ("png", "jpg", "jpeg", "webp"):
-                        for f in sorted(gemini_dir.glob(f"**/{gemini_name}*.{ext}")):
+                        for f in sorted(ref_dir.glob(f"**/*{base_name}*.{ext}")):
                             rel = str(f.relative_to(ROOT))
                             if rel not in image_sources:
                                 image_sources.append(rel)
@@ -4448,13 +4476,13 @@ def _resolve_916_generation_for_run(run_dir: Path, manifest: dict[str, Any]) -> 
 
         # Fallback: search image roots directly
         if not image_sources:
-            gemini_name = f"gemini-{fmt.lower()}-p{persona_num:02d}"
+            base_name = f"p{persona_num:02d}"
             for img_root in generated_image_roots():
-                gemini_dir = img_root / batch / "GEMINI_4_5"
-                if not gemini_dir.exists():
+                ref_dir = img_root / batch / "4_5"
+                if not ref_dir.exists():
                     continue
                 for ext in ("png", "jpg", "jpeg", "webp"):
-                    for f in sorted(gemini_dir.glob(f"**/{gemini_name}*.{ext}")):
+                    for f in sorted(ref_dir.glob(f"**/*{base_name}*.{ext}")):
                         rel = str(f.relative_to(ROOT))
                         if rel not in image_sources:
                             image_sources.append(rel)
@@ -4480,6 +4508,7 @@ def run_916_conversion_from_45_for_batch(
     batch: str,
     headless: bool,
     run_dir: Path | None,
+    engine: str = "gemini",
     jobs: list[dict[str, Any]] | None = None,
 ) -> dict[str, Any]:
     resolved_jobs = jobs if isinstance(jobs, list) else collect_45_reference_jobs_for_batch(batch)
@@ -4503,15 +4532,26 @@ def run_916_conversion_from_45_for_batch(
         source_file = prompt_root / f"{prompt_path.stem}.images.txt"
         source_file.write_text(str(job["image_abs"]) + "\n", encoding="utf-8")
 
-        result = run_gemini_generation(
-            batch=batch,
-            prompt_files=[str(prompt_path)],
-            aspect_ratio="9:16",
-            image_sources_file=str(source_file),
-            headless=headless,
-            run_dir=run_dir,
-            prepend_starting_prompt=False,
-        )
+        if engine == "chatgpt":
+            result = run_chatgpt_generation(
+                batch=batch,
+                prompt_files=[str(prompt_path)],
+                aspect_ratio="9:16",
+                image_sources_file=str(source_file),
+                headless=headless,
+                run_dir=run_dir,
+                prepend_starting_prompt=False,
+            )
+        else:
+            result = run_gemini_generation(
+                batch=batch,
+                prompt_files=[str(prompt_path)],
+                aspect_ratio="9:16",
+                image_sources_file=str(source_file),
+                headless=headless,
+                run_dir=run_dir,
+                prepend_starting_prompt=False,
+            )
 
         if result.returncode != 0:
             failures.append(f"{prompt_name}: {(result.stderr or result.stdout or '').strip()[:300]}")
@@ -4522,7 +4562,8 @@ def run_916_conversion_from_45_for_batch(
 
     if completed == 0:
         short = "\n".join(failures[:3])
-        raise HTTPException(status_code=500, detail=f"9:16 conversion failed for batch {batch}. {short}")
+        engine_label = "ChatGPT" if engine == "chatgpt" else "Gemini"
+        raise HTTPException(status_code=500, detail=f"9:16 conversion failed for batch {batch} ({engine_label}). {short}")
 
     return {
         "batch": batch,
@@ -4539,6 +4580,9 @@ def api_batch_generate_images_916(payload: dict[str, Any] = Body(...)) -> dict[s
         raise HTTPException(status_code=400, detail="run_ids must be a non-empty array")
 
     headless = bool(payload.get("headless", False))
+    engine = str(payload.get("engine") or "gemini").strip().lower()
+    if engine not in {"gemini", "chatgpt"}:
+        raise HTTPException(status_code=400, detail="engine must be gemini or chatgpt")
     batch_to_run_dir: dict[str, Path | None] = {}
     for run_id in run_ids:
         try:
@@ -4563,7 +4607,7 @@ def api_batch_generate_images_916(payload: dict[str, Any] = Body(...)) -> dict[s
 
     for batch, run_dir in sorted(batch_to_run_dir.items()):
         try:
-            result = run_916_conversion_from_45_for_batch(batch=batch, headless=headless, run_dir=run_dir)
+            result = run_916_conversion_from_45_for_batch(batch=batch, headless=headless, run_dir=run_dir, engine=engine)
         except HTTPException as exc:
             batch_errors.append(f"{batch}: {exc.detail}")
             continue

@@ -292,15 +292,15 @@ FORMAT_VISUAL_ARCHETYPES: dict[str, list[dict[str, Any]]] = {
     "UGC": [
         {
             "id": "ugc_selfie_hold",
-            "label": "Selfie hold-up frame",
+            "label": "Selfie beside-product frame",
             "layout_lines": [
-                "- Archetype: creator holds the kit closer to camera in a selfie-like composition while remaining believable and clean.",
+                "- Archetype: creator appears beside the kit in a selfie-like composition while products rest on a surface at correct scale.",
                 "- The frame should feel personal and immediate without losing product label readability.",
                 "- Text should stay compact and social-native, with clear protected space around the face and product.",
             ],
             "direction_lines": [
-                "- Archetype direction: near-camera hold-up shot with intimate creator energy and stable phone realism.",
-                "- Subject behavior: natural arm extension and easy facial expression, not staged influencer posing.",
+                "- Archetype direction: near-product selfie shot with intimate creator energy and stable phone realism, but products remain placed on a table/counter.",
+                "- Subject behavior: easy facial expression and optional open-palm gesture toward the product, never holding or gripping any package.",
             ],
         },
         {
@@ -333,12 +333,12 @@ FORMAT_VISUAL_ARCHETYPES: dict[str, list[dict[str, Any]]] = {
             "id": "ugc_unboxing_reaction",
             "label": "Soft unboxing / discovery moment",
             "layout_lines": [
-                "- Archetype: creator appears to be showing or opening the kit in a first-impression style frame.",
-                "- One product can be held closer while the rest remain grouped visibly as the full set.",
+                "- Archetype: creator appears near an already-opened kit in a first-impression style frame, with all products placed on the surface.",
+                "- No product is held closer to camera; the full set remains grouped visibly at real-world package scale.",
                 "- Preserve premium cleanliness so the ad feels authentic but not sloppy.",
             ],
             "direction_lines": [
-                "- Archetype direction: discovery moment with one-hand reveal and the rest of the pack arranged as supporting proof.",
+                "- Archetype direction: discovery moment with a pointing/open-palm reaction beside the arranged pack, not a hand-held reveal.",
                 "- Subject behavior: natural curiosity and calm approval, no exaggerated reaction faces.",
             ],
         },
@@ -953,7 +953,7 @@ def render_prompt(
         else:
             subject_line = "No human subject, products only."
     action_line = (
-        "Hold the kit box toward camera with one hand; the other products arranged on a clean surface in-frame."
+        "Products arranged on a clean table/counter at correct scale; creator may point or gesture near them but must not touch, hold, grab, lift, or open any product or box."
         if fmt == "UGC"
         else "Arrange all 5 products as a cohesive premium cluster; kit box acts as anchor."
     )
@@ -1041,6 +1041,7 @@ def render_prompt(
     ]
     if fmt == "UGC":
         negative.insert(8, "- Do not render unnatural or anatomically incorrect hands.")
+        negative.insert(9, "- Do not show the creator holding, grabbing, lifting, opening, pinching, or touching any product, bottle, packet, jar, or kit box; products must rest independently on the surface at correct scale.")
     if fmt == "BA":
         negative.append("- Do not render literal BEFORE:/AFTER: words anywhere on-image.")
     lines.extend(negative)

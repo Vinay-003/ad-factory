@@ -234,7 +234,7 @@ document.getElementById("batchGen45")?.addEventListener("click", async () => {
   const selectedBatches = getSelectedBatchValues();
   if (!selectedBatches.length) { appendLog("Select at least one batch."); return; }
 
-  const engine = await showEngineSelector();
+  const engine = await showEngineSelector("4:5");
   if (!engine) return;
 
   const runsForBatches = state.runsData.filter((r) => selectedBatches.includes(r.batch));
@@ -262,15 +262,19 @@ document.getElementById("batchGen45")?.addEventListener("click", async () => {
 document.getElementById("batchGen916")?.addEventListener("click", async () => {
   const selectedBatches = getSelectedBatchValues();
   if (!selectedBatches.length) { appendLog("Select at least one batch."); return; }
+  const engine = await showEngineSelector("9:16");
+  if (!engine) return;
+
   const runsForBatches = state.runsData.filter((r) => selectedBatches.includes(r.batch));
   if (!runsForBatches.length) { appendLog("No runs found for selected batch(es)."); return; }
   const runIds = runsForBatches.map((r) => r.run_id);
-  appendLog(`Batch generating 9:16 for ${runIds.length} run(s)...`);
+  const engineLabel = engine === "chatgpt" ? "ChatGPT" : "Gemini";
+  appendLog(`Batch generating 9:16 in ${engineLabel} for ${runIds.length} run(s)...`);
   try {
     const data = await fetchJSON("/api/batch/generate-images-916", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ run_ids: runIds, headless: state.headlessModeEnabled }),
+      body: JSON.stringify({ run_ids: runIds, headless: state.headlessModeEnabled, engine }),
     });
     const batchKey = data.batch_key || "";
     if (batchKey && state.headlessModeEnabled) {
@@ -314,14 +318,14 @@ document.getElementById("batchDownload")?.addEventListener("click", async () => 
   }
 });
 
-function showEngineSelector() {
+function showEngineSelector(aspectLabel = "4:5") {
   return new Promise((resolve) => {
     const overlay = document.createElement("div");
     overlay.className = "engine-selector-overlay";
     overlay.innerHTML = `
       <div class="engine-selector-modal">
         <h3>Select Image Generation Engine</h3>
-        <p>Choose which engine to use for generating 4:5 images:</p>
+        <p>Choose which engine to use for generating ${aspectLabel} images:</p>
         <div class="engine-options">
           <button class="engine-option-btn" data-engine="gemini">
             <span class="engine-name">Gemini</span>

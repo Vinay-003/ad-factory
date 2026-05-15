@@ -794,6 +794,7 @@ Variation operating mode:
 - Prompt-detail baseline:
   - Casual phone-captured feel with natural framing, not polished studio symmetry.
   - Product remains clearly visible and exactly matched to reference.
+  - Human subject must never hold, grab, lift, open, pinch, or touch any product/package; products stay independently arranged on a table/counter at correct scale.
   - Authentic setting aligned to persona (kitchen, desk, bedroom, commute, etc.).
   - Overlay text stays punchy and legible; avoid dense copy in UGC.
 - UGC variation lanes:
@@ -996,6 +997,7 @@ NEGATIVE CONSTRAINTS
 - Do not overcrowd the layout
 - Do not make medical cure claims of any kind
 - Do not render unnatural or anatomically incorrect hands (for UGC)
+- Do not show a human hand holding, grabbing, lifting, opening, pinching, or touching any product/package in UGC; use pointing/open-palm gestures near surface-placed products only.
 - Do not use ring light, studio flash, or overproduced lighting
 
 QUALITY BAR — verify before accepting output:
@@ -1013,7 +1015,7 @@ VISUAL DIRECTION BLOCK
 - Background slot: [BG-XXX — slot name] (selected from background variation engine using exhaustive format-wise rotation)
 - Scene: [describe scene based on selected slot]
 - Subject: [for UGC — Indian woman 27-35, natural unposed expression. For product-only formats — no subject]
-- Action: [holding product toward camera / products arranged on surface — specify]
+- Action: [for UGC — products arranged on surface while creator points/gestures nearby; never holding/grabbing product. For product-only formats — products arranged on surface]
 - Camera: [handheld close-medium / editorial medium / overhead — specify]
 - Lighting: [warm desk lamp + soft ambient fill / soft natural daylight from left / etc. — match slot]
 - Props: [per slot — minimal, non-competing, background zone only]

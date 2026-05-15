@@ -13,8 +13,8 @@ export function buildImageGallery(run) {
   gal.appendChild(galHeader);
 
   const allCount = run.image_files.length;
-  const ar45 = run.image_files.filter((f) => f.includes("/GEMINI_4_5/") || f.includes("/CHATGPT_4_5/")).length;
-  const ar916 = run.image_files.filter((f) => f.includes("/GEMINI_9_16/") || f.includes("/CHATGPT_9_16/")).length;
+  const ar45 = run.image_files.filter((f) => f.includes("/4_5/")).length;
+  const ar916 = run.image_files.filter((f) => f.includes("/9_16/")).length;
 
   if (ar45 > 0 && ar916 > 0) {
     const filterBar = document.createElement("div");
@@ -44,10 +44,9 @@ export function buildImageGallery(run) {
     const card = document.createElement("div");
     card.className = "image-card";
 
-    const is916 = path.includes("/GEMINI_9_16/") || path.includes("/CHATGPT_9_16/");
-    const isChatgpt = path.includes("/CHATGPT_");
+    const is916 = path.includes("/9_16/");
     const arLabel = is916 ? "9:16" : "4:5";
-    card.dataset.aspect = `${isChatgpt ? "CHATGPT" : "GEMINI"}_${is916 ? "9_16" : "4_5"}`;
+    card.dataset.aspect = is916 ? "9_16" : "4_5";
     card.dataset.aspectLabel = arLabel;
 
     const cleanPath = path.replace(/^generated_images\//, "");

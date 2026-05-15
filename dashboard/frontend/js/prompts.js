@@ -33,8 +33,8 @@ export function buildPromptEditor(run, container) {
         const clearBtn = mkBtn("Clear selection");
         const exportCopyBtn = mkBtn("EXPORT ON-IMAGE COPY");
         const importCopyBtn = mkBtn("IMPORT EXCEL & UPDATE PROMPTS");
-        const generate45Btn = mkBtn("Generate 4:5");
-        const generate916Btn = mkBtn("Generate 9:16 in Gemini from 4:5 images");
+        const generate45Btn = mkBtn("Generate 4:5 (Gemini/ChatGPT)");
+        const generate916Btn = mkBtn("Generate 9:16 (Gemini/ChatGPT) from 4:5 images");
 
         const importFileEl = document.createElement("input");
         importFileEl.type = "file";
@@ -142,7 +142,7 @@ export function buildPromptEditor(run, container) {
           const selected = items.filter((it) => it.checkbox.checked).map((it) => it.promptFile);
           if (!selected.length) { appendLog("Select at least one prompt."); return; }
 
-          const engine = await showEngineSelector();
+          const engine = await showEngineSelector("4:5");
           if (!engine) return;
 
           generate45Btn.disabled = true;
@@ -170,19 +170,23 @@ export function buildPromptEditor(run, container) {
         generate916Btn.onclick = async () => {
           const selected = items.filter((it) => it.checkbox.checked).map((it) => it.promptFile);
           if (!selected.length) { appendLog("Select at least one prompt."); return; }
+          const engine = await showEngineSelector("9:16");
+          if (!engine) return;
+
           generate916Btn.disabled = true;
-          appendLog(`Generating 9:16 in Gemini from selected 4:5 image references for ${selected.length} prompt(s)...`);
+          const engineLabel = engine === "chatgpt" ? "ChatGPT" : "Gemini";
+          appendLog(`Generating 9:16 in ${engineLabel} from selected 4:5 image references for ${selected.length} prompt(s)...`);
           try {
             const data = await fetchJSON(`/api/runs/${run.run_id}/generate-images-916-from-45`, {
               method: "POST",
               headers: { "Content-Type": "application/json" },
-              body: JSON.stringify({ prompt_files: selected, headless: state.headlessModeEnabled }),
+              body: JSON.stringify({ prompt_files: selected, headless: state.headlessModeEnabled, engine }),
             });
             const batchKey = data.batch || data.run_id || "";
             if (batchKey && state.headlessModeEnabled) {
               import("./chrome.js").then((m) => m.startProgressPolling(batchKey));
             }
-            appendLog(`Done. Generated 9:16 in Gemini from selected 4:5 refs`);
+            appendLog(`Done. Generated 9:16 in ${engineLabel} from selected 4:5 refs`);
             import("./runs.js").then((m) => m.loadRuns());
           } catch (err) {
             appendLog(String(err));
@@ -362,14 +366,14 @@ function buildPromptCard(prompt, run, items) {
   return card;
 }
 
-function showEngineSelector() {
+function showEngineSelector(aspectLabel = "4:5") {
   return new Promise((resolve) => {
     const overlay = document.createElement("div");
     overlay.className = "engine-selector-overlay";
     overlay.innerHTML = `
       <div class="engine-selector-modal">
         <h3>Select Image Generation Engine</h3>
-        <p>Choose which engine to use for generating 4:5 images:</p>
+        <p>Choose which engine to use for generating ${aspectLabel} images:</p>
         <div class="engine-options">
           <button class="engine-option-btn" data-engine="gemini">
             <span class="engine-name">Gemini</span>
