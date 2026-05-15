@@ -233,15 +233,20 @@ document.getElementById("refreshRuns")?.addEventListener("click", () => {
 document.getElementById("batchGen45")?.addEventListener("click", async () => {
   const selectedBatches = getSelectedBatchValues();
   if (!selectedBatches.length) { appendLog("Select at least one batch."); return; }
+
+  const engine = await showEngineSelector();
+  if (!engine) return;
+
   const runsForBatches = state.runsData.filter((r) => selectedBatches.includes(r.batch));
   if (!runsForBatches.length) { appendLog("No runs found for selected batch(es)."); return; }
   const runIds = runsForBatches.map((r) => r.run_id);
-  appendLog(`Batch generating 4:5 for ${runIds.length} run(s)...`);
+  const engineLabel = engine === "chatgpt" ? "ChatGPT" : "Gemini";
+  appendLog(`Batch generating 4:5 in ${engineLabel} for ${runIds.length} run(s)...`);
   try {
     const data = await fetchJSON("/api/batch/generate-images-45", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ run_ids: runIds, headless: state.headlessModeEnabled }),
+      body: JSON.stringify({ run_ids: runIds, headless: state.headlessModeEnabled, engine }),
     });
     const batchKey = data.batch_key || "";
     if (batchKey && state.headlessModeEnabled) {
@@ -308,3 +313,58 @@ document.getElementById("batchDownload")?.addEventListener("click", async () => 
     appendLog(`Download error: ${String(err)}`);
   }
 });
+
+function showEngineSelector() {
+  return new Promise((resolve) => {
+    const overlay = document.createElement("div");
+    overlay.className = "engine-selector-overlay";
+    overlay.innerHTML = `
+      <div class="engine-selector-modal">
+        <h3>Select Image Generation Engine</h3>
+        <p>Choose which engine to use for generating 4:5 images:</p>
+        <div class="engine-options">
+          <button class="engine-option-btn" data-engine="gemini">
+            <span class="engine-name">Gemini</span>
+            <span class="engine-desc">Google Gemini image generation</span>
+          </button>
+          <button class="engine-option-btn" data-engine="chatgpt">
+            <span class="engine-name">ChatGPT</span>
+            <span class="engine-desc">OpenAI ChatGPT image generation</span>
+          </button>
+        </div>
+        <button class="engine-cancel-btn">Cancel</button>
+      </div>
+    `;
+
+    document.body.appendChild(overlay);
+
+    const cleanup = () => overlay.remove();
+
+    overlay.querySelector(".engine-cancel-btn").onclick = () => {
+      cleanup();
+      resolve(null);
+    };
+
+    overlay.addEventListener("click", (e) => {
+      if (e.target === overlay) {
+        cleanup();
+        resolve(null);
+      }
+    });
+
+    overlay.querySelectorAll(".engine-option-btn").forEach((btn) => {
+      btn.onclick = () => {
+        cleanup();
+        resolve(btn.dataset.engine);
+      };
+    });
+
+    document.addEventListener("keydown", function handler(e) {
+      if (e.key === "Escape") {
+        document.removeEventListener("keydown", handler);
+        cleanup();
+        resolve(null);
+      }
+    });
+  });
+}

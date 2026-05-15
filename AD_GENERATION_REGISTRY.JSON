@@ -996,6 +996,52 @@
       "test_group": "",
       "variant_variable": "hook_structure",
       "variant_value": "question_lead"
+    },
+    {
+      "id": "entry_021",
+      "timestamp": "2026-05-15T08:34:59Z",
+      "format": "HERO",
+      "persona_number": 3,
+      "persona_name": "Emotional Eater / Stress Snacker",
+      "headline_angle": "pain_point",
+      "awareness_stage": "problem_aware",
+      "concept_angle": "pain_point",
+      "concept_structure": "four_us",
+      "visual_archetype": "hero_close_crop_pedestal",
+      "headline_en": "Stress snacking ruining weight loss?",
+      "headline_hi": "structured_system का pain_point सिस्टम जो Stress triggers emotional snacking at random times. को संभालने में मदद करता है।",
+      "support_line_en": "Obesity Killer Kit is a doctor-formulated Ayurvedic 15-day system designed to help you lose 3 to 5 kg while reducing hunger and cravings, with a simple routine and guided coach support.",
+      "support_line_hi": "सरल कदम, जो structured_system और cravings_down पर आधारित हैं।",
+      "cta_en": "Check If You’re Eligible",
+      "cta_hi": "आज शुरू करें",
+      "disclaimer_en": "",
+      "disclaimer_hi": "",
+      "caption_en": "",
+      "caption_hi": "",
+      "bullets_en": [],
+      "bullets_hi": [],
+      "background_slot": "BG-294",
+      "background_name": "Neutral wood grain macro",
+      "background_source": "catalog",
+      "fresh_background_signature": null,
+      "language": "BOTH",
+      "output_quality": "pending",
+      "notes": "assembled_from=copy_batch.json; batch=v2; aspect_ratio=4:5; seed=536749509; visual_archetype=hero_close_crop_pedestal",
+      "opening_pattern_4tok_en": "stress_snacking_ruining_weight",
+      "opening_pattern_4tok_hi": "structured_system_का_pain",
+      "copy_skeleton": "question_mechanism_cta",
+      "hook_structure_class": "proof_lead",
+      "proof_style_class": "authority_anchor",
+      "cta_voice_class": "guided_next_step",
+      "headline_word_count": 5,
+      "support_line_word_count": 31,
+      "has_protocol_mechanics": false,
+      "has_social_proof_number": true,
+      "background_scene_category": "lifestyle",
+      "hypothesis_id": "hook_structure-question_lead",
+      "test_group": "",
+      "variant_variable": "hook_structure",
+      "variant_value": "question_lead"
     }
   ],
   "indexes": {
@@ -1003,10 +1049,10 @@
       "HERO": {
         "cycle_number": 1,
         "used": [
-          "BG-038"
+          "BG-038",
+          "BG-294"
         ],
         "remaining": [
-          "BG-294",
           "BG-470",
           "BG-092",
           "BG-227",
@@ -2060,6 +2106,12 @@
           "timestamp": "2026-05-13T17:45:36Z",
           "background_slot": "BG-038",
           "background_source": "catalog"
+        },
+        {
+          "entry_id": "entry_021",
+          "timestamp": "2026-05-15T08:34:59Z",
+          "background_slot": "BG-294",
+          "background_source": "catalog"
         }
       ],
       "BA": [
@@ -2348,6 +2400,15 @@
           "awareness_stage": "solution_aware",
           "concept_angle": "desired_outcome",
           "concept_structure": "pas"
+        },
+        {
+          "entry_id": "entry_021",
+          "timestamp": "2026-05-15T08:34:59Z",
+          "format": "HERO",
+          "persona_number": 3,
+          "awareness_stage": "problem_aware",
+          "concept_angle": "pain_point",
+          "concept_structure": "four_us"
         }
       ]
     },
@@ -2372,7 +2433,8 @@
         "Want 15-day weight loss, but hate diets?",
         "Want 15-day weight loss with no side effects?",
         "Want 15-day weight loss with proof?",
-        "Want weight loss with a 7-day guarantee?"
+        "Want weight loss with a 7-day guarantee?",
+        "Stress snacking ruining weight loss?"
       ],
       "cta_en": [
         "See If You’re Eligible",
@@ -2394,7 +2456,8 @@
         "See routine",
         "See steps",
         "See proof",
-        "See details"
+        "See details",
+        "Check If You’re Eligible"
       ],
       "support_line_en": [
         "Obesity Killer Kit is a doctor-formulated Ayurvedic 15-day system designed for 3 to 5 kg loss, with a simple daily routine, homemade-food compatibility, and coach support via a daily tracker.",
@@ -2408,7 +2471,8 @@
         "Daily tracker + coach support kept me consistent.",
         "All-natural Ayurvedic kit; no preservatives.",
         "70,000+ customers and 200 video testimonials.",
-        "Refund if no loss starts with tracker."
+        "Refund if no loss starts with tracker.",
+        "Obesity Killer Kit is a doctor-formulated Ayurvedic 15-day system designed to help you lose 3 to 5 kg while reducing hunger and cravings, with a simple routine and guided coach support."
       ],
       "bullets_en": [
         "Strict diets: hunger, cravings, quitting again",

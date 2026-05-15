@@ -1270,6 +1270,77 @@ def run_gemini_generation(
     return result
 
 
+def run_chatgpt_generation(
+    *,
+    batch: str,
+    prompt_files: list[str],
+    aspect_ratio: str,
+    image_sources_file: str | None,
+    headless: bool = False,
+    run_dir: Path | None = None,
+    prepend_starting_prompt: bool = True,
+) -> subprocess.CompletedProcess[str]:
+    aspect_folder = "9_16" if aspect_ratio == "9:16" else "4_5"
+    prompt_work_dir = RUNTIME_ROOT / "chatgpt_selected_prompts" / f"{batch}_{aspect_folder}_{int(time.time())}_{uuid.uuid4().hex[:8]}"
+    prompt_work_dir.mkdir(parents=True, exist_ok=True)
+
+    starting_prompt = ""
+    if prepend_starting_prompt:
+        starting_prompt_path = ROOT / "input" / "startingprompt.txt"
+        starting_prompt = starting_prompt_path.read_text(encoding="utf-8").strip() if starting_prompt_path.exists() else ""
+    for prompt_file in prompt_files:
+        source = Path(prompt_file)
+        if not source.is_absolute():
+            source = ROOT / prompt_file
+        source = source.resolve()
+        if not source.exists():
+            raise RuntimeError(f"Prompt file not found: {source}")
+        prompt_text = source.read_text(encoding="utf-8")
+        combined = f"{starting_prompt}\n\n{prompt_text.strip()}\n" if starting_prompt else prompt_text
+        (prompt_work_dir / source.name).write_text(combined, encoding="utf-8")
+        sidecar = source.with_suffix(".json")
+        if sidecar.exists():
+            (prompt_work_dir / sidecar.name).write_text(sidecar.read_text(encoding="utf-8"), encoding="utf-8")
+
+    out_dir = GENERATED_IMAGES_ROOT / batch / f"CHATGPT_{aspect_folder}"
+    out_dir.mkdir(parents=True, exist_ok=True)
+
+    cmd = [
+        sys.executable,
+        "scripts/chatgpt_web_sutomation.py",
+        "--prompt-dir",
+        str(prompt_work_dir),
+        "--prompt-glob",
+        "*.txt",
+        "--out-dir",
+        str(out_dir),
+        "--timeout",
+        str(int(os.getenv("CHATGPT_GENERATION_TIMEOUT_SECONDS") or "480")),
+        "--manual-login-timeout",
+        str(int(os.getenv("CHATGPT_MANUAL_LOGIN_TIMEOUT_SECONDS") or "180")),
+        "--upload-dir",
+        str(INPUT_IMAGES_DIR),
+    ]
+    if headless:
+        cmd.append("--headless")
+    if image_sources_file:
+        cmd.extend(["--image-source-file", image_sources_file])
+
+    log_dir = RUNTIME_ROOT / "generation_logs"
+    log_dir.mkdir(parents=True, exist_ok=True)
+    log_path = log_dir / f"gen_{batch}_{aspect_folder}_chatgpt.log"
+
+    env = dashboard_subprocess_env()
+
+    with open(log_path, "w") as log_file:
+        result = subprocess.run(cmd, cwd=str(ROOT), text=True, stdout=log_file, stderr=subprocess.STDOUT, check=False, env=env)
+
+    full_output = log_path.read_text() if log_path.exists() else ""
+    result.stdout = full_output
+    result.stderr = ""
+    return result
+
+
 def build_multipart_form(fields: dict[str, str], file_field: str, file_path: Path) -> tuple[bytes, str]:
     boundary = f"----dashboard{uuid.uuid4().hex}"
     lines: list[bytes] = []
@@ -4066,24 +4137,36 @@ def api_run_generate_images_45(run_id: str, payload: dict[str, Any] = Body(...))
         raise HTTPException(status_code=400, detail="No valid 4:5 prompt files selected")
 
     headless = bool(payload.get("headless", False))
+    engine = str(payload.get("engine") or "gemini").strip().lower()
     try:
-        result = run_gemini_generation(
-            batch=batch,
-            prompt_files=selected_45,
-            aspect_ratio="4:5",
-            image_sources_file=None,
-            headless=headless,
-            run_dir=run_dir,
-        )
+        if engine == "chatgpt":
+            result = run_chatgpt_generation(
+                batch=batch,
+                prompt_files=selected_45,
+                aspect_ratio="4:5",
+                image_sources_file=None,
+                headless=headless,
+                run_dir=run_dir,
+            )
+        else:
+            result = run_gemini_generation(
+                batch=batch,
+                prompt_files=selected_45,
+                aspect_ratio="4:5",
+                image_sources_file=None,
+                headless=headless,
+                run_dir=run_dir,
+            )
     except RuntimeError as exc:
         raise HTTPException(status_code=400, detail=str(exc)) from exc
     if result.returncode != 0:
         error_text = result.stderr or result.stdout
-        log_path = RUNTIME_ROOT / "generation_logs" / f"gen_{batch}_4_5.log"
+        engine_label = "ChatGPT" if engine == "chatgpt" else "Gemini"
+        log_path = RUNTIME_ROOT / "generation_logs" / f"gen_{batch}_4_5{'_chatgpt' if engine == 'chatgpt' else ''}.log"
         if run_dir is not None:
-            (run_dir / "logs" / "image_generation_45_error.txt").write_text(error_text, encoding="utf-8")
+            (run_dir / "logs" / f"image_generation_45_error{'_chatgpt' if engine == 'chatgpt' else ''}.txt").write_text(error_text, encoding="utf-8")
         short_error = "\n".join([line for line in error_text.splitlines() if line.strip()][-6:])
-        raise HTTPException(status_code=500, detail=f"Gemini image generation failed (4:5). Log: {log_path}\n{short_error}")
+        raise HTTPException(status_code=500, detail=f"{engine_label} image generation failed (4:5). Log: {log_path}\n{short_error}")
 
     if not has_storage_manifest or run_dir is None:
         refreshed = collect_backfill_result(run_id, batch)
@@ -4182,7 +4265,9 @@ def api_batch_generate_images_45(payload: dict[str, Any] = Body(...)) -> dict[st
     batch_names = sorted({r["batch"] for r in run_info})
     batch_name = batch_names[0] if len(batch_names) == 1 else "_".join(batch_names)
     work_id = f"{int(time.time())}_{uuid.uuid4().hex[:8]}"
-    prompt_work_dir = RUNTIME_ROOT / "gemini_selected_prompts" / f"{batch_name}_{work_id}"
+    engine = str(payload.get("engine") or "gemini").strip().lower()
+    engine_label = "ChatGPT" if engine == "chatgpt" else "Gemini"
+    prompt_work_dir = RUNTIME_ROOT / f"{engine.lower()}_selected_prompts" / f"{batch_name}_{work_id}"
     prompt_work_dir.mkdir(parents=True, exist_ok=True)
     starting_prompt = ""
     starting_prompt_path = ROOT / "input" / "startingprompt.txt"
@@ -4205,24 +4290,43 @@ def api_batch_generate_images_45(payload: dict[str, Any] = Body(...)) -> dict[st
             (prompt_work_dir / sidecar.name).write_text(sidecar.read_text(encoding="utf-8"), encoding="utf-8")
         prompt_files_created.append(str(dest))
     headless = bool(payload.get("headless", False))
-    out_dir = GENERATED_IMAGES_ROOT / batch_name / "GEMINI_4_5"
+    out_dir = GENERATED_IMAGES_ROOT / batch_name / f"{engine_label.upper().replace(' ', '')}_4_5"
     out_dir.mkdir(parents=True, exist_ok=True)
-    cmd = [
-        sys.executable,
-        "scripts/gemini_web_automation.py",
-        "--prompt-dir",
-        str(prompt_work_dir),
-        "--prompt-glob",
-        "*.txt",
-        "--out-dir",
-        str(out_dir),
-        "--timeout",
-        str(int(os.getenv("GEMINI_GENERATION_TIMEOUT_SECONDS") or "420")),
-        "--manual-login-timeout",
-        str(int(os.getenv("GEMINI_MANUAL_LOGIN_TIMEOUT_SECONDS") or "180")),
-        "--upload-dir",
-        str(INPUT_IMAGES_DIR),
-    ]
+
+    if engine == "chatgpt":
+        cmd = [
+            sys.executable,
+            "scripts/chatgpt_web_sutomation.py",
+            "--prompt-dir",
+            str(prompt_work_dir),
+            "--prompt-glob",
+            "*.txt",
+            "--out-dir",
+            str(out_dir),
+            "--timeout",
+            str(int(os.getenv("CHATGPT_GENERATION_TIMEOUT_SECONDS") or "480")),
+            "--manual-login-timeout",
+            str(int(os.getenv("CHATGPT_MANUAL_LOGIN_TIMEOUT_SECONDS") or "180")),
+            "--upload-dir",
+            str(INPUT_IMAGES_DIR),
+        ]
+    else:
+        cmd = [
+            sys.executable,
+            "scripts/gemini_web_automation.py",
+            "--prompt-dir",
+            str(prompt_work_dir),
+            "--prompt-glob",
+            "*.txt",
+            "--out-dir",
+            str(out_dir),
+            "--timeout",
+            str(int(os.getenv("GEMINI_GENERATION_TIMEOUT_SECONDS") or "420")),
+            "--manual-login-timeout",
+            str(int(os.getenv("GEMINI_MANUAL_LOGIN_TIMEOUT_SECONDS") or "180")),
+            "--upload-dir",
+            str(INPUT_IMAGES_DIR),
+        ]
     if headless:
         cmd.append("--headless")
 
@@ -4230,7 +4334,7 @@ def api_batch_generate_images_45(payload: dict[str, Any] = Body(...)) -> dict[st
     if result.returncode != 0:
         error_text = result.stderr or result.stdout
         short_error = "\n".join([line for line in error_text.splitlines() if line.strip()][-30:])
-        raise HTTPException(status_code=500, detail=f"Batch 4:5 generation failed:\n{short_error}")
+        raise HTTPException(status_code=500, detail=f"Batch 4:5 generation failed ({engine_label}):\n{short_error}")
 
     try:
         _write_generation_metadata(
@@ -4917,7 +5021,18 @@ def api_kill_chrome() -> dict[str, Any]:
         except (psutil.NoSuchProcess, psutil.AccessDenied):
             continue
 
-    return {"status": "killed", "chrome": killed, "gemini_processes": gemini_killed}
+    # Also kill any running chatgpt automation processes
+    chatgpt_killed = 0
+    for proc in psutil.process_iter(["pid", "name", "cmdline"]):
+        try:
+            cmdline = proc.info.get("cmdline") or []
+            if any("chatgpt_web_sutomation" in c for c in cmdline):
+                proc.kill()
+                chatgpt_killed += 1
+        except (psutil.NoSuchProcess, psutil.AccessDenied):
+            continue
+
+    return {"status": "killed", "chrome": killed, "gemini_processes": gemini_killed, "chatgpt_processes": chatgpt_killed}
 
 
 def api_edit_prompt(run_id: str, payload: dict[str, Any] = Body(...)) -> dict[str, Any]:

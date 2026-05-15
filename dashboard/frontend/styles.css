@@ -1370,3 +1370,99 @@ button.is-loading::after {
 [data-theme="dark"] .image-download-btn:hover { background: color-mix(in srgb, var(--accent-teal) 70%, #00000088); color: #fff; }
 [data-theme="dark"] .image-wrap { background: color-mix(in srgb, var(--line) 18%, var(--surface-2)); }
 [data-theme="dark"] .skeleton-line, [data-theme="dark"] .skeleton-chip { background: color-mix(in srgb, var(--line) 25%, transparent); }
+
+/* ── Engine Selector Modal ───────────────────────────────────────────────── */
+.engine-selector-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 9999;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: color-mix(in srgb, var(--bg-deep) 75%, transparent);
+  backdrop-filter: blur(6px);
+  -webkit-backdrop-filter: blur(6px);
+}
+
+.engine-selector-modal {
+  background: var(--surface);
+  border: 1px solid color-mix(in srgb, var(--line) 80%, transparent);
+  border-radius: var(--radius-lg);
+  padding: 28px 32px;
+  box-shadow: var(--shadow), 0 0 0 1px color-mix(in srgb, var(--line) 20%, transparent);
+  max-width: 480px;
+  width: 90%;
+  text-align: center;
+}
+
+.engine-selector-modal h3 {
+  margin: 0 0 8px;
+  font-family: var(--font-head);
+  font-size: 20px;
+  letter-spacing: -0.01em;
+}
+
+.engine-selector-modal p {
+  margin: 0 0 20px;
+  font-size: 14px;
+  color: var(--muted);
+}
+
+.engine-options {
+  display: flex;
+  gap: 12px;
+  margin-bottom: 16px;
+}
+
+.engine-option-btn {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 6px;
+  padding: 16px 12px;
+  border: 1px solid var(--line);
+  border-radius: var(--radius-md);
+  background: color-mix(in srgb, var(--surface) 85%, var(--surface-2));
+  color: var(--ink);
+  cursor: pointer;
+  transition: all var(--transition-fast);
+}
+
+.engine-option-btn:hover {
+  border-color: var(--primary);
+  background: color-mix(in srgb, var(--primary) 10%, var(--surface));
+  box-shadow: 0 6px 16px color-mix(in srgb, var(--primary) 15%, transparent);
+}
+
+.engine-option-btn .engine-name {
+  font-size: 16px;
+  font-weight: 700;
+}
+
+.engine-option-btn .engine-desc {
+  font-size: 12px;
+  color: var(--muted);
+}
+
+.engine-cancel-btn {
+  background: transparent;
+  color: var(--muted);
+  border: 1px solid var(--line);
+  padding: 8px 20px;
+  border-radius: var(--radius-sm);
+  cursor: pointer;
+  font-weight: 600;
+  font-family: var(--font-body);
+  transition: all var(--transition-fast);
+}
+
+.engine-cancel-btn:hover {
+  border-color: var(--accent-coral);
+  color: var(--accent-coral);
+}
+
+@media (max-width: 480px) {
+  .engine-options { flex-direction: column; }
+  .engine-selector-modal { padding: 20px; }
+}

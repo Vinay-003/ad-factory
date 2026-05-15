@@ -33,7 +33,7 @@ export function buildPromptEditor(run, container) {
         const clearBtn = mkBtn("Clear selection");
         const exportCopyBtn = mkBtn("EXPORT ON-IMAGE COPY");
         const importCopyBtn = mkBtn("IMPORT EXCEL & UPDATE PROMPTS");
-        const generate45Btn = mkBtn("Generate 4:5 in Gemini");
+        const generate45Btn = mkBtn("Generate 4:5");
         const generate916Btn = mkBtn("Generate 9:16 in Gemini from 4:5 images");
 
         const importFileEl = document.createElement("input");
@@ -141,19 +141,24 @@ export function buildPromptEditor(run, container) {
         generate45Btn.onclick = async () => {
           const selected = items.filter((it) => it.checkbox.checked).map((it) => it.promptFile);
           if (!selected.length) { appendLog("Select at least one prompt."); return; }
+
+          const engine = await showEngineSelector();
+          if (!engine) return;
+
           generate45Btn.disabled = true;
-          appendLog(`Generating 4:5 images in Gemini for ${selected.length} selected prompt(s) from ${run.run_id}...`);
+          const engineLabel = engine === "chatgpt" ? "ChatGPT" : "Gemini";
+          appendLog(`Generating 4:5 images in ${engineLabel} for ${selected.length} selected prompt(s) from ${run.run_id}...`);
           try {
             const data = await fetchJSON(`/api/runs/${run.run_id}/generate-images-45`, {
               method: "POST",
               headers: { "Content-Type": "application/json" },
-              body: JSON.stringify({ prompt_files: selected, headless: state.headlessModeEnabled }),
+              body: JSON.stringify({ prompt_files: selected, headless: state.headlessModeEnabled, engine }),
             });
             const batchKey = data.batch || data.run_id || "";
             if (batchKey && state.headlessModeEnabled) {
               import("./chrome.js").then((m) => m.startProgressPolling(batchKey));
             }
-            appendLog(`Done. Generated 4:5 in Gemini for selected prompts: ${selected.length}`);
+            appendLog(`Done. Generated 4:5 in ${engineLabel} for selected prompts: ${selected.length}`);
             import("./runs.js").then((m) => m.loadRuns());
           } catch (err) {
             appendLog(String(err));
@@ -355,4 +360,59 @@ function buildPromptCard(prompt, run, items) {
 
   items.push({ promptFile: prompt.prompt_file, personaNumber: prompt.persona_number, checkbox });
   return card;
+}
+
+function showEngineSelector() {
+  return new Promise((resolve) => {
+    const overlay = document.createElement("div");
+    overlay.className = "engine-selector-overlay";
+    overlay.innerHTML = `
+      <div class="engine-selector-modal">
+        <h3>Select Image Generation Engine</h3>
+        <p>Choose which engine to use for generating 4:5 images:</p>
+        <div class="engine-options">
+          <button class="engine-option-btn" data-engine="gemini">
+            <span class="engine-name">Gemini</span>
+            <span class="engine-desc">Google Gemini image generation</span>
+          </button>
+          <button class="engine-option-btn" data-engine="chatgpt">
+            <span class="engine-name">ChatGPT</span>
+            <span class="engine-desc">OpenAI ChatGPT image generation</span>
+          </button>
+        </div>
+        <button class="engine-cancel-btn">Cancel</button>
+      </div>
+    `;
+
+    document.body.appendChild(overlay);
+
+    const cleanup = () => overlay.remove();
+
+    overlay.querySelector(".engine-cancel-btn").onclick = () => {
+      cleanup();
+      resolve(null);
+    };
+
+    overlay.addEventListener("click", (e) => {
+      if (e.target === overlay) {
+        cleanup();
+        resolve(null);
+      }
+    });
+
+    overlay.querySelectorAll(".engine-option-btn").forEach((btn) => {
+      btn.onclick = () => {
+        cleanup();
+        resolve(btn.dataset.engine);
+      };
+    });
+
+    document.addEventListener("keydown", function handler(e) {
+      if (e.key === "Escape") {
+        document.removeEventListener("keydown", handler);
+        cleanup();
+        resolve(null);
+      }
+    });
+  });
 }

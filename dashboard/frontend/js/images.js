@@ -13,13 +13,13 @@ export function buildImageGallery(run) {
   gal.appendChild(galHeader);
 
   const allCount = run.image_files.length;
-  const ar45 = run.image_files.filter((f) => f.includes("/GEMINI_4_5/")).length;
-  const ar916 = run.image_files.filter((f) => f.includes("/GEMINI_9_16/")).length;
+  const ar45 = run.image_files.filter((f) => f.includes("/GEMINI_4_5/") || f.includes("/CHATGPT_4_5/")).length;
+  const ar916 = run.image_files.filter((f) => f.includes("/GEMINI_9_16/") || f.includes("/CHATGPT_9_16/")).length;
 
   if (ar45 > 0 && ar916 > 0) {
     const filterBar = document.createElement("div");
     filterBar.className = "gallery-filters";
-    [{ label: `All (${allCount})`, value: "" }, { label: `4:5 (${ar45})`, value: "GEMINI_4_5" }, { label: `9:16 (${ar916})`, value: "GEMINI_9_16" }].forEach((f) => {
+    [{ label: `All (${allCount})`, value: "" }, { label: `4:5 (${ar45})`, value: "4_5" }, { label: `9:16 (${ar916})`, value: "9_16" }].forEach((f) => {
       const btn = document.createElement("button");
       btn.type = "button";
       btn.className = `gallery-filter ${f.value === "" ? "active" : ""}`;
@@ -29,7 +29,7 @@ export function buildImageGallery(run) {
         filterBar.querySelectorAll(".gallery-filter").forEach((b) => b.classList.remove("active"));
         btn.classList.add("active");
         gal.querySelectorAll(".image-card").forEach((c) => {
-          c.style.display = !f.value || c.dataset.aspect === f.value ? "" : "none";
+          c.style.display = !f.value || c.dataset.aspect.includes(f.value) ? "" : "none";
         });
       };
       filterBar.appendChild(btn);
@@ -44,9 +44,10 @@ export function buildImageGallery(run) {
     const card = document.createElement("div");
     card.className = "image-card";
 
-    const is916 = path.includes("/GEMINI_9_16/");
+    const is916 = path.includes("/GEMINI_9_16/") || path.includes("/CHATGPT_9_16/");
+    const isChatgpt = path.includes("/CHATGPT_");
     const arLabel = is916 ? "9:16" : "4:5";
-    card.dataset.aspect = is916 ? "GEMINI_9_16" : "GEMINI_4_5";
+    card.dataset.aspect = `${isChatgpt ? "CHATGPT" : "GEMINI"}_${is916 ? "9_16" : "4_5"}`;
     card.dataset.aspectLabel = arLabel;
 
     const cleanPath = path.replace(/^generated_images\//, "");
