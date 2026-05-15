@@ -1485,12 +1485,16 @@ def main() -> int:
                     "id": visual_archetype["id"],
                     "label": visual_archetype["label"],
                     "forced": bool(forced_archetype),
+                    "reused_from_run_id": ad.get("visual_pattern_reused_from_run_id") or "",
+                    "reuse_key": ad.get("visual_pattern_reuse_key") or "",
                 },
                 "visual_pattern": {
                     "id": visual_archetype["id"],
                     "label": visual_archetype["label"],
                     "selected_by_user": bool(forced_archetype),
-                    "selection_mode": "manual" if forced_archetype else "auto_rotate",
+                    "selection_mode": "reused" if ad.get("visual_pattern_reused_from_run_id") else ("manual" if forced_archetype else "auto_rotate"),
+                    "reused_from_run_id": ad.get("visual_pattern_reused_from_run_id") or "",
+                    "reuse_key": ad.get("visual_pattern_reuse_key") or "",
                 },
                 "background_decisions": {
                     "forced_background": bool(ad.get("background_slot") or ad.get("background_slot_id")),

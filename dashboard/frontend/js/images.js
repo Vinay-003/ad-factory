@@ -77,6 +77,19 @@ export function buildImageGallery(run) {
     imgDlBtn.title = "Download image with metadata";
     imgWrap.appendChild(imgDlBtn);
 
+    const imgReplaceBtn = document.createElement("button");
+    imgReplaceBtn.type = "button";
+    imgReplaceBtn.className = "image-replace-btn";
+    imgReplaceBtn.textContent = "↻";
+    imgReplaceBtn.title = "Replace this image";
+    imgWrap.appendChild(imgReplaceBtn);
+
+    const replaceInput = document.createElement("input");
+    replaceInput.type = "file";
+    replaceInput.accept = "image/png,image/jpeg,image/webp";
+    replaceInput.className = "hidden-file-input";
+    card.appendChild(replaceInput);
+
     const badge = document.createElement("span");
     badge.className = `aspect-badge ${is916 ? "ar-916" : "ar-45"}`;
     badge.textContent = arLabel;
@@ -89,7 +102,7 @@ export function buildImageGallery(run) {
     card.appendChild(fname);
 
     card.addEventListener("click", (event) => {
-      if (event.target.closest(".image-delete-btn")) return;
+      if (event.target.closest("button") || event.target.closest("input")) return;
       window.open(url, "_blank");
     });
 
@@ -121,6 +134,36 @@ export function buildImageGallery(run) {
       document.body.appendChild(a);
       a.click();
       a.remove();
+    });
+
+    imgReplaceBtn.addEventListener("pointerdown", (event) => {
+      event.stopPropagation();
+    });
+
+    imgReplaceBtn.addEventListener("click", (event) => {
+      event.stopPropagation();
+      event.preventDefault();
+      replaceInput.click();
+    });
+
+    replaceInput.addEventListener("change", async () => {
+      const file = replaceInput.files?.[0];
+      if (!file) return;
+      imgReplaceBtn.disabled = true;
+      try {
+        const form = new FormData();
+        form.append("image_file", path);
+        form.append("replacement_file", file);
+        await fetchJSON(`/api/runs/${run.run_id}/replace-image`, { method: "POST", body: form });
+        img.src = `${url}?t=${Date.now()}`;
+        appendLog(`Replaced image: ${path.split("/").pop()}`);
+        invalidateRuns();
+      } catch (err) {
+        appendLog(`Replace error: ${String(err)}`);
+      } finally {
+        replaceInput.value = "";
+        imgReplaceBtn.disabled = false;
+      }
     });
 
     grid.appendChild(card);

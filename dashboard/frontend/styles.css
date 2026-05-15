@@ -1202,6 +1202,31 @@ button.is-loading::after {
 .image-card:hover .image-download-btn { opacity: 1; }
 .image-download-btn:hover { background: color-mix(in srgb, var(--accent-teal) 70%, #00000088); color: #fff; }
 
+.image-replace-btn {
+  position: absolute;
+  top: 36px;
+  right: 6px;
+  width: 24px;
+  height: 24px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: none;
+  border-radius: 6px;
+  padding: 0;
+  font-size: 13px;
+  cursor: pointer;
+  background: color-mix(in srgb, var(--surface) 90%, #00000055);
+  color: var(--muted);
+  z-index: 3;
+  opacity: 0;
+  transition: opacity var(--transition-fast), background var(--transition-fast);
+}
+
+.image-card:hover .image-replace-btn { opacity: 1; }
+.image-replace-btn:hover { background: color-mix(in srgb, var(--accent-violet) 70%, #00000088); color: #fff; }
+.hidden-file-input { display: none; }
+
 /* ── Prompt Inline Controls ──────────────────────────────────────────────── */
 .prompt-inline-controls { display: inline-flex; gap: 4px; margin-left: auto; }
 

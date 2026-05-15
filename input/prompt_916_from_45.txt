@@ -16,10 +16,13 @@ Composition rules for 9:16:
 
 Meta 9:16 safe-zone rules (for mobile feed/reels overlays):
 - Canvas is 1080x1920 (9:16).
-- Keep all critical content (all product packshots, headline, support text, CTA, key logos) inside the central safe zone from y=270 to y=1650.
-- That means reserve top 14% (0-269 px) and bottom 14% (1651-1919 px) as restricted zones for overlays/UI.
-- Keep important text away from left/right edges with at least 5% horizontal padding on both sides.
-- If any critical element crosses a restricted zone, reject and regenerate automatically.
+- STRICT META/REELS SAFE FIELD: x=86 to x=994, y=270 to y=1248. All headline text, support text, CTA buttons, offer text, logos, badges, and readable product-label text must sit fully inside this field.
+- PRODUCT SAFE FIELD: all product packshots and human faces/hands must remain fully visible inside x=86 to x=994 and y=270 to y=1500. Do not cut off caps, labels, boxes, hands, or faces.
+- RESTRICTED TOP UI BAND: y=0 to y=269 must contain background only. No text, CTA, logos, faces, or product details.
+- RESTRICTED LOWER UI BAND: y=1249 to y=1919 must stay visually quiet for Meta/Reels overlays. No CTA, no headline/support copy, no logos, no badges, no readable product-label text, and no key product details in this area.
+- The CTA must NEVER be placed near the bottom. Place it inside the strict safe field, preferably around y=1050 to y=1200, or omit it if it cannot fit safely.
+- Keep all important content away from left/right edges with at least 8% horizontal padding on both sides.
+- Before finalizing, perform a coordinate check. If any critical element crosses these safe fields, reject and regenerate automatically until it passes.
 
 Quality bar:
 - Final output must look like the same ad creative adapted to 9:16, not a new redesign.

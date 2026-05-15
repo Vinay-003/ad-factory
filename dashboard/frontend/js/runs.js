@@ -109,7 +109,7 @@ function updateBackgroundReuseRunOptions() {
   select.innerHTML = "";
   const empty = document.createElement("option");
   empty.value = "";
-  empty.textContent = "Select previous batch";
+  empty.textContent = "Select previous batch/run";
   select.appendChild(empty);
   state.runsData.forEach((run) => {
     const label = run.batch || run.run_id;

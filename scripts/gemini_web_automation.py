@@ -375,6 +375,41 @@ def build_test_variables(job: PromptJob, prompt_metadata: dict[str, Any], effect
     }
 
 
+def build_image_metadata(
+    *,
+    status: str,
+    job: PromptJob,
+    prompt_metadata: dict[str, Any],
+    effective_hypothesis: dict[str, Any],
+    test_variables: dict[str, Any],
+    saved_path: Path | None = None,
+    error: str = "",
+    diag: dict[str, Any] | None = None,
+) -> dict[str, Any]:
+    metadata: dict[str, Any] = {
+        "type": "ad_image",
+        "status": status,
+        "format": job.format_id,
+        "persona": job.persona_id,
+        "language": job.lang_id,
+        "job_key": job.job_key,
+        "prompt_file": job.prompt_path.name,
+        "hypothesis_type": test_variables.get("hypothesis_type", ""),
+        "hypothesis_variant": test_variables.get("hypothesis_variant", ""),
+        "creative_index": test_variables.get("creative_index", 1),
+        "creative_total": test_variables.get("creative_total", 1),
+        "test_variables": test_variables,
+        "timestamp": int(time.time()),
+    }
+    if saved_path is not None:
+        metadata["saved_file"] = str(saved_path)
+    if error:
+        metadata["error"] = error
+    if diag:
+        metadata.update(diag)
+    return metadata
+
+
 def load_starting_prompt(path_value: str) -> str:
     if not path_value.strip():
         return ""
@@ -3585,37 +3620,14 @@ def run() -> None:
                         if not saved_path.exists() or saved_path.stat().st_size < args.min_image_bytes:
                             raise RuntimeError(f"Saved file is missing or too small: {saved_path}")
 
-                        metadata = {
-                            "type": "ad_image",
-                            "status": "success",
-                            "format": job.format_id,
-                            "persona": job.persona_id,
-                            "language": job.lang_id,
-                            "job_key": job.job_key,
-                            "prompt_file": job.prompt_path.name,
-                            "saved_file": str(saved_path),
-                            "hypothesis_type": effective_hypothesis.get("type", "") if effective_hypothesis else "",
-                            "hypothesis_variant": effective_hypothesis.get("variant", "") if effective_hypothesis else "",
-                            "hypothesis": effective_hypothesis,
-                            "persona_number": test_variables.get("persona_number", ""),
-                            "persona_name": test_variables.get("persona_name", ""),
-                            "aspect_ratio": test_variables.get("aspect_ratio", ""),
-                            "headline_angle": test_variables.get("headline_angle", ""),
-                            "awareness_stage": test_variables.get("awareness_stage", ""),
-                            "concept_angle": test_variables.get("concept_angle", ""),
-                            "concept_structure": test_variables.get("concept_structure", ""),
-                            "creative_index": prompt_metadata.get("creative_index", 1),
-                            "creative_total": prompt_metadata.get("creative_total", 1),
-                            "multiplier": test_variables.get("multiplier", prompt_metadata.get("creative_total", 1)),
-                            "background_group_key": test_variables.get("background_group_key", ""),
-                            "background": prompt_metadata.get("background", {}),
-                            "visual_archetype": prompt_metadata.get("visual_archetype", {}),
-                            "visual_pattern": test_variables.get("visual_pattern", {}),
-                            "background_decisions": prompt_metadata.get("background_decisions", {}),
-                            "test_variables": test_variables,
-                            "prompt_metadata": prompt_metadata,
-                            "timestamp": int(time.time()),
-                        }
+                        metadata = build_image_metadata(
+                            status="success",
+                            job=job,
+                            prompt_metadata=prompt_metadata,
+                            effective_hypothesis=effective_hypothesis,
+                            test_variables=test_variables,
+                            saved_path=saved_path,
+                        )
                         out_base.with_suffix(".json").write_text(json.dumps(metadata, indent=2), encoding="utf-8")
                         log_progress("done", f"Job {idx} SUCCESS: {saved_path} ({saved_path.stat().st_size} bytes)")
                         print(f"  SUCCESS: saved {saved_path} ({saved_path.stat().st_size} bytes)")
@@ -3652,36 +3664,15 @@ def run() -> None:
                     continue
 
                 diag = save_debug_snapshot(page, out_base, "error")
-                metadata = {
-                    "type": "ad_image",
-                    "status": "error",
-                    "format": job.format_id,
-                    "persona": job.persona_id,
-                    "prompt_file": job.prompt_path.name,
-                    "error": str(last_exc),
-                    "hypothesis_type": effective_hypothesis.get("type", "") if effective_hypothesis else "",
-                    "hypothesis_variant": effective_hypothesis.get("variant", "") if effective_hypothesis else "",
-                    "hypothesis": effective_hypothesis,
-                    "persona_number": test_variables.get("persona_number", ""),
-                    "persona_name": test_variables.get("persona_name", ""),
-                    "aspect_ratio": test_variables.get("aspect_ratio", ""),
-                    "headline_angle": test_variables.get("headline_angle", ""),
-                    "awareness_stage": test_variables.get("awareness_stage", ""),
-                    "concept_angle": test_variables.get("concept_angle", ""),
-                    "concept_structure": test_variables.get("concept_structure", ""),
-                    "creative_index": prompt_metadata.get("creative_index", 1),
-                    "creative_total": prompt_metadata.get("creative_total", 1),
-                    "multiplier": test_variables.get("multiplier", prompt_metadata.get("creative_total", 1)),
-                    "background_group_key": test_variables.get("background_group_key", ""),
-                    "background": prompt_metadata.get("background", {}),
-                    "visual_archetype": prompt_metadata.get("visual_archetype", {}),
-                    "visual_pattern": test_variables.get("visual_pattern", {}),
-                    "background_decisions": prompt_metadata.get("background_decisions", {}),
-                    "test_variables": test_variables,
-                    "prompt_metadata": prompt_metadata,
-                    "timestamp": int(time.time()),
-                    **diag,
-                }
+                metadata = build_image_metadata(
+                    status="error",
+                    job=job,
+                    prompt_metadata=prompt_metadata,
+                    effective_hypothesis=effective_hypothesis,
+                    test_variables=test_variables,
+                    error=str(last_exc),
+                    diag=diag,
+                )
                 out_base.with_suffix(".json").write_text(json.dumps(metadata, indent=2), encoding="utf-8")
                 results.append({"job": job.job_key, "status": "error", "error": str(last_exc)})
                 log_progress("failed", f"Job {idx} FAILED: {last_exc}")

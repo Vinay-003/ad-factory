@@ -175,8 +175,9 @@ async function runPipeline() {
     setStatus("Select at least one persona.");
     return;
   }
-  if (document.getElementById("reuseBackgrounds")?.checked && !document.getElementById("backgroundReuseRun")?.value) {
-    setStatus("Select a previous run to reuse backgrounds from.");
+  const reusingPreviousRun = document.getElementById("reuseBackgrounds")?.checked || document.getElementById("reuseVisualPatterns")?.checked;
+  if (reusingPreviousRun && !document.getElementById("backgroundReuseRun")?.value) {
+    setStatus("Select a previous run/batch to reuse from.");
     return;
   }
 
@@ -189,6 +190,7 @@ async function runPipeline() {
     multiplier: Math.max(1, Math.min(20, Number.parseInt(document.getElementById("adMultiplier")?.value || "1", 10) || 1)),
     share_background_across_personas: Boolean(document.getElementById("shareBackgroundAcrossPersonas")?.checked),
     reuse_backgrounds_from_run_id: document.getElementById("reuseBackgrounds")?.checked ? (document.getElementById("backgroundReuseRun")?.value || "") : "",
+    reuse_visual_patterns_from_run_id: document.getElementById("reuseVisualPatterns")?.checked ? (document.getElementById("backgroundReuseRun")?.value || "") : "",
     generate_images: false,
     server_type: state.currentServerType,
     opencode_api_url: document.getElementById("opencodeApiUrl").value.trim(),
@@ -289,7 +291,15 @@ document.getElementById("saveProductDoc")?.addEventListener("click", async () =>
 
 document.getElementById("reuseBackgrounds")?.addEventListener("change", (event) => {
   const select = document.getElementById("backgroundReuseRun");
-  if (select) select.disabled = !event.target.checked;
+  const shouldEnable = event.target.checked || Boolean(document.getElementById("reuseVisualPatterns")?.checked);
+  if (select) select.disabled = !shouldEnable;
+  refreshSelect(select);
+});
+
+document.getElementById("reuseVisualPatterns")?.addEventListener("change", (event) => {
+  const select = document.getElementById("backgroundReuseRun");
+  const shouldEnable = event.target.checked || Boolean(document.getElementById("reuseBackgrounds")?.checked);
+  if (select) select.disabled = !shouldEnable;
   refreshSelect(select);
 });
 

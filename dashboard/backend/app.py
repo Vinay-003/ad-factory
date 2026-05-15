@@ -59,10 +59,13 @@ Composition rules for 9:16:
 
 Meta 9:16 safe-zone rules (for mobile feed/reels overlays):
 - Canvas is 1080x1920 (9:16).
-- Keep all critical content (all product packshots, headline, support text, CTA, key logos) inside the central safe zone from y=270 to y=1650.
-- That means reserve top 14% (0-269 px) and bottom 14% (1651-1919 px) as restricted zones for overlays/UI.
-- Keep important text away from left/right edges with at least 5% horizontal padding on both sides.
-- If any critical element crosses a restricted zone, reject and regenerate automatically.
+- STRICT META/REELS SAFE FIELD: x=86 to x=994, y=270 to y=1248. All headline text, support text, CTA buttons, offer text, logos, badges, and readable product-label text must sit fully inside this field.
+- PRODUCT SAFE FIELD: all product packshots and human faces/hands must remain fully visible inside x=86 to x=994 and y=270 to y=1500. Do not cut off caps, labels, boxes, hands, or faces.
+- RESTRICTED TOP UI BAND: y=0 to y=269 must contain background only. No text, CTA, logos, faces, or product details.
+- RESTRICTED LOWER UI BAND: y=1249 to y=1919 must stay visually quiet for Meta/Reels overlays. No CTA, no headline/support copy, no logos, no badges, no readable product-label text, and no key product details in this area.
+- The CTA must NEVER be placed near the bottom. Place it inside the strict safe field, preferably around y=1050 to y=1200, or omit it if it cannot fit safely.
+- Keep all important content away from left/right edges with at least 8% horizontal padding on both sides.
+- Before finalizing, perform a coordinate check. If any critical element crosses these safe fields, reject and regenerate automatically until it passes.
 
 Quality bar:
 - Final output must look like the same ad creative adapted to 9:16, not a new redesign.
@@ -1056,14 +1059,14 @@ def build_916_conversion_prompt_job(fmt: str, persona_num: int, lang: str, index
     lang_clean = (lang or "EN").strip().upper() or "EN"
     persona_safe = max(0, int(persona_num or 0))
     if persona_safe > 0:
-        return f"OUTPUT_{fmt_clean}_P{persona_safe:02d}_{lang_clean}.txt"
+        return f"OUTPUT_{fmt_clean}_P{persona_safe:02d}_{lang_clean}_A{max(1, int(index)):02d}.txt"
     return f"OUTPUT_{fmt_clean}_P{index:02d}_{lang_clean}.txt"
 
 
 def collect_45_reference_jobs_for_batch(batch: str) -> list[dict[str, Any]]:
     summary = load_batch_image_summary(batch)
     jobs: list[dict[str, Any]] = []
-    seen_keys: set[tuple[str, int, str]] = set()
+    seen_refs: set[str] = set()
 
     for entry in summary:
         prompt_file = str(entry.get("prompt_file") or "").strip().replace("\\", "/")
@@ -1078,33 +1081,26 @@ def collect_45_reference_jobs_for_batch(batch: str) -> list[dict[str, Any]]:
         if persona_num is None:
             continue
 
-        image_rel = ""
         for candidate in saved_files:
             c = str(candidate or "").strip().replace("\\", "/")
             if not c:
                 continue
-            image_rel = c
-            break
-        if not image_rel:
-            continue
+            if c in seen_refs:
+                continue
+            image_abs = (ROOT / c).resolve()
+            if not image_abs.exists() or not image_abs.is_file():
+                continue
 
-        image_abs = (ROOT / image_rel).resolve()
-        if not image_abs.exists() or not image_abs.is_file():
-            continue
-
-        key = (fmt.upper(), int(persona_num), lang.upper())
-        if key in seen_keys:
-            continue
-        seen_keys.add(key)
-        jobs.append(
-            {
-                "format": fmt.upper(),
-                "persona_number": int(persona_num),
-                "language": lang.upper(),
-                "image_rel": image_rel,
-                "image_abs": str(image_abs),
-            }
-        )
+            seen_refs.add(c)
+            jobs.append(
+                {
+                    "format": fmt.upper(),
+                    "persona_number": int(persona_num),
+                    "language": lang.upper(),
+                    "image_rel": c,
+                    "image_abs": str(image_abs),
+                }
+            )
 
     if jobs:
         return jobs
@@ -1120,12 +1116,7 @@ def collect_45_reference_jobs_for_batch(batch: str) -> list[dict[str, Any]]:
         fmt, lang, persona_num = parsed
         if persona_num is None:
             continue
-        key = (fmt.upper(), int(persona_num), lang.upper())
-        if key in seen_keys:
-            continue
-
         gemini_name = f"gemini-{fmt.lower()}-p{persona_num:02d}"
-        found_rel = ""
         for img_root in generated_image_roots():
             gemini_dir = img_root / batch / "GEMINI_4_5"
             if not gemini_dir.exists():
@@ -1133,29 +1124,21 @@ def collect_45_reference_jobs_for_batch(batch: str) -> list[dict[str, Any]]:
             for ext in ("png", "jpg", "jpeg", "webp"):
                 for f in sorted(gemini_dir.glob(f"**/{gemini_name}*.{ext}")):
                     found_rel = str(f.relative_to(ROOT)).replace("\\", "/")
-                    break
-                if found_rel:
-                    break
-            if found_rel:
-                break
-
-        if not found_rel:
-            continue
-
-        image_abs = (ROOT / found_rel).resolve()
-        if not image_abs.exists() or not image_abs.is_file():
-            continue
-
-        seen_keys.add(key)
-        jobs.append(
-            {
-                "format": fmt.upper(),
-                "persona_number": int(persona_num),
-                "language": lang.upper(),
-                "image_rel": found_rel,
-                "image_abs": str(image_abs),
-            }
-        )
+                    if found_rel in seen_refs:
+                        continue
+                    image_abs = (ROOT / found_rel).resolve()
+                    if not image_abs.exists() or not image_abs.is_file():
+                        continue
+                    seen_refs.add(found_rel)
+                    jobs.append(
+                        {
+                            "format": fmt.upper(),
+                            "persona_number": int(persona_num),
+                            "language": lang.upper(),
+                            "image_rel": found_rel,
+                            "image_abs": str(image_abs),
+                        }
+                    )
 
     return jobs
 
@@ -2324,7 +2307,14 @@ def build_template_copy(context: dict[str, Any], run_id: str) -> dict[str, Any]:
         hypothesis = item.get("hypothesis") if isinstance(item.get("hypothesis"), dict) else None
         if hypothesis:
             ad_payload["hypothesis"] = hypothesis
-        for key in ["visual_archetype", "creative_index", "creative_total", "background_group_key"]:
+        for key in [
+            "visual_archetype",
+            "visual_pattern_reused_from_run_id",
+            "visual_pattern_reuse_key",
+            "creative_index",
+            "creative_total",
+            "background_group_key",
+        ]:
             if key in item:
                 ad_payload[key] = item[key]
         ads.append(ad_payload)
@@ -3016,6 +3006,87 @@ def apply_background_reuse_locks(
         ad["background_reuse_key"] = reuse_key
         applied += 1
     return cloned, applied
+
+
+def collect_visual_pattern_reuse_locks(source_run_id: str) -> dict[str, dict[str, Any]]:
+    source_run_id = str(source_run_id or "").strip()
+    if not source_run_id:
+        return {}
+    _source_dir, manifest, _has_storage_manifest = load_manifest_for_run(source_run_id)
+    locks: dict[str, dict[str, Any]] = {}
+    for rel_path in manifest.get("prompt_files") or []:
+        rel = str(rel_path).replace("\\", "/")
+        if "/916/" in rel or "/96/" in rel:
+            continue
+        parsed = parse_prompt_filename(rel)
+        if not parsed:
+            continue
+        fmt, _lang, persona_no = parsed
+        prompt_path = ROOT / rel
+        if not prompt_path.exists():
+            continue
+
+        visual_archetype = ""
+        sidecar = prompt_path.with_suffix(".json")
+        if sidecar.exists():
+            try:
+                meta = json.loads(sidecar.read_text(encoding="utf-8"))
+            except Exception:
+                meta = {}
+            visual = meta.get("visual_archetype") if isinstance(meta.get("visual_archetype"), dict) else {}
+            visual_archetype = str(visual.get("id") or "").strip()
+
+        if not visual_archetype:
+            text = prompt_path.read_text(encoding="utf-8", errors="ignore")
+            visual_archetype = _parse_prompt_field(text, "Selected visual archetype").split(" - ", 1)[0].strip()
+
+        if not visual_archetype:
+            continue
+
+        lock_payload = {
+            "visual_archetype": visual_archetype,
+            "visual_pattern_reused_from_run_id": source_run_id,
+        }
+        for key in _background_reuse_keys(fmt, persona_no, visual_archetype, False):
+            locks.setdefault(key, lock_payload)
+        for key in _background_reuse_keys(fmt, persona_no, visual_archetype, True):
+            locks.setdefault(key, lock_payload)
+    return locks
+
+
+def apply_visual_pattern_reuse_to_plan(
+    plan: list[dict[str, Any]],
+    locks: dict[str, dict[str, Any]],
+    *,
+    share_across_personas: bool,
+) -> tuple[list[dict[str, Any]], int]:
+    if not locks:
+        return plan, 0
+    out: list[dict[str, Any]] = []
+    applied = 0
+    for item in plan:
+        entry = dict(item)
+        fmt = str(entry.get("format") or "").strip().upper()
+        persona_no = int(entry.get("persona")) if entry.get("persona") is not None else None
+        lock = None
+        reuse_key = ""
+        keys = []
+        if share_across_personas:
+            keys.append(fmt)
+        else:
+            keys.append(f"{fmt}::P{persona_no:02d}" if isinstance(persona_no, int) else fmt)
+        for key in keys:
+            if key in locks:
+                lock = locks[key]
+                reuse_key = key
+                break
+        if lock:
+            entry["visual_archetype"] = lock["visual_archetype"]
+            entry["visual_pattern_reused_from_run_id"] = lock.get("visual_pattern_reused_from_run_id", "")
+            entry["visual_pattern_reuse_key"] = reuse_key
+            applied += 1
+        out.append(entry)
+    return out, applied
 
 
 def resolve_format_plan(config: dict[str, Any]) -> list[dict[str, Any]]:
@@ -4129,6 +4200,9 @@ def api_batch_generate_images_45(payload: dict[str, Any] = Body(...)) -> dict[st
         combined = f"{starting_prompt}\n\n{prompt_text.strip()}\n" if starting_prompt else prompt_text
         dest = prompt_work_dir / src.name
         dest.write_text(combined, encoding="utf-8")
+        sidecar = src.with_suffix(".json")
+        if sidecar.exists():
+            (prompt_work_dir / sidecar.name).write_text(sidecar.read_text(encoding="utf-8"), encoding="utf-8")
         prompt_files_created.append(str(dest))
     headless = bool(payload.get("headless", False))
     out_dir = GENERATED_IMAGES_ROOT / batch_name / "GEMINI_4_5"
@@ -4504,6 +4578,29 @@ async def api_run_execute(
     hypothesis_cfg = cfg.get("hypothesis") or {}
     plan = expand_plan_with_hypothesis(base_plan, hypothesis_cfg)
 
+    reuse_visual_patterns_from_run_id = str(cfg.get("reuse_visual_patterns_from_run_id") or "").strip()
+    if reuse_visual_patterns_from_run_id:
+        pattern_locks = collect_visual_pattern_reuse_locks(reuse_visual_patterns_from_run_id)
+        plan, applied_patterns = apply_visual_pattern_reuse_to_plan(
+            plan,
+            pattern_locks,
+            share_across_personas=bool(cfg.get("share_background_across_personas")),
+        )
+        (run_dir / "context" / "visual_pattern_reuse.json").write_text(
+            json.dumps(
+                {
+                    "source_run_id": reuse_visual_patterns_from_run_id,
+                    "available_locks": len(pattern_locks),
+                    "applied_ads": applied_patterns,
+                    "share_across_personas": bool(cfg.get("share_background_across_personas")),
+                },
+                ensure_ascii=False,
+                indent=2,
+            )
+            + "\n",
+            encoding="utf-8",
+        )
+
     # Save hypothesis config to run dir for reference
     if hypothesis_cfg:
         (run_dir / "context" / "hypothesis_config.json").write_text(
@@ -4592,6 +4689,8 @@ async def api_run_execute(
                 "copy_requirements": copy_req,
                 "hypothesis": hyp_meta,
                 "visual_archetype": item.get("visual_archetype"),
+                "visual_pattern_reused_from_run_id": item.get("visual_pattern_reused_from_run_id"),
+                "visual_pattern_reuse_key": item.get("visual_pattern_reuse_key"),
                 "creative_index": item.get("creative_index", 1),
                 "creative_total": item.get("creative_total", 1),
                 "background_group_key": item.get("background_group_key"),
@@ -4695,7 +4794,6 @@ async def api_run_execute(
             str(copy_file),
             "--language-mode",
             assembler_language_mode(cfg),
-            "--no-registry-write",
             "--skip-uniqueness-check",
         ],
         cwd=ROOT,
@@ -4739,6 +4837,8 @@ async def api_run_execute(
     manifest["input_images_uploaded"] = saved_input_images
     if reuse_backgrounds_from_run_id:
         manifest["background_reuse_from_run_id"] = reuse_backgrounds_from_run_id
+    if reuse_visual_patterns_from_run_id:
+        manifest["visual_pattern_reuse_from_run_id"] = reuse_visual_patterns_from_run_id
     (run_dir / "manifest.json").write_text(json.dumps(manifest, ensure_ascii=False, indent=2) + "\n", encoding="utf-8")
     return manifest
 
@@ -4883,6 +4983,61 @@ def api_delete_image(run_id: str, payload: dict[str, Any] = Body(...)) -> dict[s
         manifest_path.write_text(json.dumps(manifest, ensure_ascii=False, indent=2) + "\n", encoding="utf-8")
 
     return {"status": "deleted", "image_file": image_path}
+
+
+async def api_replace_image(run_id: str, image_file: str = Form(...), replacement_file: UploadFile = File(...)) -> dict[str, Any]:
+    run_dir = RUNS_ROOT / run_id
+    full_path = resolve_safe_path(image_file)
+    generated_root = GENERATED_IMAGES_ROOT.resolve()
+    if generated_root not in full_path.resolve().parents:
+        raise HTTPException(status_code=400, detail="image_file must be under generated_images")
+    if not full_path.exists() or not full_path.is_file():
+        raise HTTPException(status_code=404, detail="Generated image not found")
+
+    allowed = {".png", ".jpg", ".jpeg", ".webp"}
+    upload_name = Path(replacement_file.filename or "").name
+    upload_ext = Path(upload_name).suffix.lower()
+    if upload_ext not in allowed:
+        raise HTTPException(status_code=400, detail="Replacement must be png, jpg, jpeg, or webp")
+
+    data = await replacement_file.read()
+    if not data:
+        raise HTTPException(status_code=400, detail="Replacement file is empty")
+    full_path.write_bytes(data)
+
+    meta_path = full_path.with_suffix(".json")
+    if meta_path.exists():
+        try:
+            meta = json.loads(meta_path.read_text(encoding="utf-8"))
+        except Exception:
+            meta = {}
+    else:
+        meta = {"type": "ad_image", "status": "success", "saved_file": str(full_path)}
+    replacements = meta.setdefault("replacements", [])
+    if isinstance(replacements, list):
+        replacements.append(
+            {
+                "timestamp": int(time.time()),
+                "source_filename": upload_name,
+                "size_bytes": len(data),
+            }
+        )
+    meta["status"] = "success"
+    meta["saved_file"] = str(full_path)
+    meta["replaced"] = True
+    meta["replacement_timestamp"] = int(time.time())
+    meta["replacement_source_filename"] = upload_name
+    meta_path.write_text(json.dumps(meta, ensure_ascii=False, indent=2) + "\n", encoding="utf-8")
+
+    manifest_path = run_dir / "manifest.json"
+    if manifest_path.exists():
+        manifest = json.loads(manifest_path.read_text(encoding="utf-8"))
+        manifest.setdefault("image_files", [])
+        if image_file not in manifest["image_files"]:
+            manifest["image_files"].append(image_file)
+        manifest_path.write_text(json.dumps(manifest, ensure_ascii=False, indent=2) + "\n", encoding="utf-8")
+
+    return {"status": "replaced", "image_file": image_file, "size_bytes": len(data)}
 
 
 def _parse_image_naming(image_path_str: str, run_dir: Path | None) -> dict[str, str]:
