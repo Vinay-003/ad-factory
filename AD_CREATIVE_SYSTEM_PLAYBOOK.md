@@ -160,7 +160,7 @@ Every production ad must declare one reader awareness stage before copy is writt
 Persona answers who is being addressed. Awareness stage answers how much persuasion context they already have.
 
 Allowed awareness stages:
-- `unaware`: reader does not yet realize the hidden weight-management friction. Lead by naming an ignored cause such as random eating, hunger spikes, or routine breakdown.
+- `unaware`: reader does not yet realize the hidden weight-management friction. Open by naming an ignored cause such as random eating, hunger spikes, or routine breakdown.
 - `problem_aware`: reader knows the problem but not the fix. Validate the pain, then introduce the approved product mechanism.
 - `solution_aware`: reader knows fixes exist but not why this kit is different. Compare against stricter, messier, or less guided alternatives.
 - `product_aware`: reader already knows the kit or brand. Use proof, urgency, trust, guarantee terms, or simplicity to create the final push.
@@ -176,11 +176,11 @@ Awareness-stage writing map:
 - `unaware`: headline names the hidden issue; support line connects it to weight-management purpose.
 - `problem_aware`: headline validates the known pain; support line introduces the kit mechanism.
 - `solution_aware`: headline contrasts old fixes with this system; support line explains why the routine is easier, safer-feeling, or more guided.
-- `product_aware`: headline leads with proof, deadline, offer, or trust; support line reduces the final buying hesitation.
+- `product_aware`: headline opens with proof, deadline, offer, or trust; support line reduces the final buying hesitation.
 
 Concept path lock:
 - Each ad must choose exactly one concept path: `awareness_stage + concept_angle + concept_structure`.
-- Do not mix multiple awareness stages or multiple lead angles inside one headline.
+- Do not mix multiple awareness stages or multiple concept angles inside one headline.
 - The chosen concept path is direction only. Do not render framework labels on-image.
 
 ---
@@ -201,14 +201,14 @@ Headline construction sequence:
 5. Compose headline and support line as one hierarchy: headline earns attention, support line explains the product reason to believe.
 
 Concept angle menu:
-- `pain_point`: lead with the specific problem.
-- `desired_outcome`: lead with the result or felt outcome.
-- `social_proof`: lead with others' trust, user scale, or review logic.
-- `authority`: lead with doctor formulation, Ayurveda credibility, or expertise.
-- `story`: lead with a real-life routine moment or first-person situation.
-- `curiosity`: lead with an information gap or mechanism question.
-- `comparison`: lead by contrasting the kit with harder alternatives.
-- `offer`: lead with result window, guarantee terms, kit completeness, or practical reason to act.
+- `pain_point`: open with the specific problem.
+- `desired_outcome`: open with the result or felt outcome.
+- `social_proof`: open with others' trust, user scale, or review logic.
+- `authority`: open with doctor formulation, Ayurveda credibility, or expertise.
+- `story`: open with a real-life routine moment or first-person situation.
+- `curiosity`: open with an information gap or mechanism question.
+- `comparison`: open by contrasting the kit with harder alternatives.
+- `offer`: open with result window, guarantee terms, kit completeness, or practical reason to act.
 
 Concept structure menu:
 - `pas`: Problem -> Agitate -> Solve. Name the pain, sharpen why it keeps happening, then introduce approved kit mechanism.
@@ -240,7 +240,7 @@ Headline role:
 - Do not force the full mechanism into the headline. Move mechanism, proof, and timing details into the support line.
 - Prefer plain sentence rhythm over cleverness, slogans, or stacked keyword phrases.
 - Use sentence case by default. Title case is allowed only when it intentionally reads like a poster headline.
-- Do not lead with instructional verbs (Start, Begin, Kickstart, Follow). Headlines should read like statements or questions, not how-to steps.
+- Do not start with instructional verbs (Start, Begin, Kickstart, Follow). Headlines should read like statements or questions, not how-to steps.
 - Do not place AM/PM timing, 4-hour windows, or protocol mechanics in the headline. Those belong in support lines or bullets.
 - Do not put product component names (OK Liquid / OK Tablet / OK Powder / OKP) in headlines. Keep those in support lines or bullets.
 - Never surface internal persona notes, proof-needed notes, or any planning text as on-image copy.
@@ -465,7 +465,7 @@ In production mode:
 - fresh_background_signature: required when source is fresh, else null
 - opening_pattern_4tok_en/opening_pattern_4tok_hi: first 4-token normalized opening pattern of headline
 - copy_skeleton: high-level copy structure tag (for example: pain_mechanism_time)
-- hook_structure_class: hook composition class (question_lead / contrast_loop / command_lead / confession_lead / proof_lead)
+- hook_structure_class: hook composition class (question_led / contrast_loop / command_led / confession_led / proof_led)
 - proof_style_class: trust framing class (social_proof / mechanism_explainer / authority_anchor / routine_clarity / objection_flip)
 - cta_voice_class: CTA intent class (urgent_start / guided_next_step / reassurance_start / challenge_action / discovery_action)
 - language: EN / HI / BOTH
@@ -490,11 +490,11 @@ In production mode:
 Every ad must be tagged before finalization using these 4 axes and rotated intentionally across a batch.
 
 - hook_structure_class:
-  - `question_lead`
+  - `question_led`
   - `contrast_loop`
-  - `command_lead`
-  - `confession_lead`
-  - `proof_lead`
+  - `command_led`
+  - `confession_led`
+  - `proof_led`
 - proof_style_class:
   - `social_proof`
   - `mechanism_explainer`

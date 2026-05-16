@@ -45,39 +45,7 @@ CONVERT_916_TEMPLATE_PATH = ROOT / "input" / "prompt_916_from_45.txt"
 PERSONA_SEEDS_PATH = ROOT / "persona_seeds.json"
 COPY_ARCH_PATH = ROOT / "dashboard" / "backend" / "copy_architecture.json"
 COPY_PROMPTS_PATH = ROOT / "dashboard" / "backend" / "copy_prompt_templates.json"
-
-DEFAULT_916_CONVERSION_PROMPT = """Convert the attached 4:5 ad creative into a 9:16 version for the same campaign.
-
-Critical fidelity rules:
-- Treat the attached 4:5 creative as the single source of truth.
-- Product images are locked: preserve the exact same product packshots, label text, logos, illustrations, caps, and colors as the 4:5 reference.
-- Allowed product changes are limited to orientation, placement, and scale needed for 9:16 composition.
-- Do NOT redraw, reconstruct, relabel, retouch, or restyle any product.
-- If any product differs from the source (text distortion, shape change, label change, color shift, missing/extra product), reject and regenerate automatically.
-- Do NOT rewrite copy, do NOT invent new claims, do NOT add new offers, and do NOT add new objects.
-- Do NOT perform a simple resize/crop/stretch of the original image.
-
-Composition rules for 9:16:
-- Extend canvas vertically to 9:16 by outpainting above/below the original composition.
-- Keep the original 4:5 core composition stable in the center region.
-- Add natural background continuation only where needed to fit 9:16.
-
-Meta 9:16 safe-zone rules (for mobile feed/reels overlays):
-- Canvas is 1080x1920 (9:16).
-- STRICT META/REELS SAFE FIELD: x=86 to x=994, y=270 to y=1248. All headline text, support text, CTA buttons, offer text, logos, badges, and readable product-label text must sit fully inside this field.
-- PRODUCT SAFE FIELD: all product packshots and human faces/hands must remain fully visible inside x=86 to x=994 and y=270 to y=1500. Do not cut off caps, labels, boxes, hands, or faces.
-- RESTRICTED TOP UI BAND: y=0 to y=269 must contain background only. No text, CTA, logos, faces, or product details.
-- RESTRICTED LOWER UI BAND: y=1249 to y=1919 must stay visually quiet for Meta/Reels overlays. No CTA, no headline/support copy, no logos, no badges, no readable product-label text, and no key product details in this area.
-- The CTA must NEVER be placed near the bottom. Place it inside the strict safe field, preferably around y=1050 to y=1200, or omit it if it cannot fit safely.
-- Keep all important content away from left/right edges with at least 8% horizontal padding on both sides.
-- Before finalizing, perform a coordinate check. If any critical element crosses these safe fields, reject and regenerate automatically until it passes.
-
-Quality bar:
-- Final output must look like the same ad creative adapted to 9:16, not a new redesign.
-- Maintain photoreal quality, product fidelity, and clean typography edges.
-- If fidelity or safe-zone compliance fails, regenerate until all rules pass.
-"""
-
+STARTING_PROMPT_PATH = ROOT / "input" / "startingprompt.txt"
 
 FORMATS = ["HERO", "BA", "TEST", "FEAT", "UGC"]
 DEFAULT_OPENCODE_API_URL = os.getenv("OPENCODE_API_URL", "http://127.0.0.1:4090")
@@ -114,24 +82,24 @@ def classify_hook_structure(headline: str) -> str:
 
     The classifier only verifies whether a pattern is present.
     It does not prescribe which pattern should be used — that's the LLM's job.
-    A headline is a question_lead if it opens as a question or contains an
+    A headline is question-led if it opens as a question or contains an
     early question mark. Everything else is classified by visible pattern cues.
     """
     text = (headline or "").strip().lower().replace("’", "'")
     if not text:
-        return "proof_lead"
+        return "proof_led"
     if text.startswith(("why ", "what ", "how ", "when ", "can ", "could ", "will ", "want ", "need ", "tired ")) or "?" in text[:50]:
-        return "question_lead"
+        return "question_led"
     if text.startswith(("stop", "start", "try", "see", "check", "take")):
-        return "command_lead"
-    contrast_terms = ["before", "after", "without", "instead", " but ", " yet ", " still ", "doesn't have to", "even with"]
+        return "command_led"
+    contrast_terms = ["before", "after", "without", "instead", " but ", " yet ", " still ", "doesn't have to", "even with", " not ", ", not ", " vs ", " versus ", "rather than"]
     if any(term in f" {text} " for term in contrast_terms):
         return "contrast_loop"
     if text.startswith(("i ", "my ")) or "felt" in text or "struggled" in text:
-        return "confession_lead"
+        return "confession_led"
     if text.startswith(("finally", "trusted", "proven")) or "70,000" in text or "doctor" in text:
-        return "proof_lead"
-    return "proof_lead"
+        return "proof_led"
+    return "proof_led"
 
 
 def headline_for_candidate(candidate: dict[str, Any], lang: str = "EN") -> str:
@@ -443,7 +411,6 @@ CTA_VARIANTS = COPY_PROMPTS.get("cta_variants", {})
 def _headline_architecture_group(group: str) -> str:
     return {
         "audience_stage": "awareness_stage",
-        "lead_angle": "concept_angle",
         "message_structure": "concept_structure",
     }.get(group, group)
 
@@ -491,14 +458,14 @@ def _support_line_strategy_item(group: str, item_id: str) -> dict[str, Any]:
     return {"source": group, "variant": item_id, **strategy}
 
 
-def _build_support_line_strategy(audience_id: str, lead_angle: str, concept_structure_id: str) -> dict[str, Any]:
+def _build_support_line_strategy(audience_id: str, concept_angle: str, concept_structure_id: str) -> dict[str, Any]:
     support_arch = COPY_ARCH.get("support_line_architectures", {})
     return {
         "composition_rule": support_arch.get(
             "composition_rule",
             "Final support line = active support strategy meaning + assigned support_line_architecture sentence shape.",
         ),
-        "active": _support_line_strategy_item("by_concept_angle", lead_angle),
+        "active": _support_line_strategy_item("by_concept_angle", concept_angle),
         "concept_structure": _support_line_strategy_item("by_concept_structure", concept_structure_id),
         "awareness_stage": _support_line_strategy_item("by_awareness_stage", audience_id),
         "selection_note": "Use active as the main meaning strategy. Also satisfy concept_structure and awareness_stage when they add relevant constraints.",
@@ -554,7 +521,7 @@ def build_copy_requirements(persona_number: int, fmt: str, format_sequence_index
     structure_by_fmt = fmt_defaults.get("structure_by_fmt", {"HERO": "four_us"})
     concept_structure_id = structure_by_fmt.get(fmt, "four_us")
 
-    lead_angle = fmt_defaults.get("default_lead_angle", "desired_outcome")
+    concept_angle = fmt_defaults.get("default_concept_angle", "desired_outcome")
 
     headline_arch = _select_headline_architecture(persona_number, fmt, concept_structure_id)
     support_line_arch = _select_support_line_architecture(persona_number, fmt, format_sequence_index)
@@ -567,7 +534,7 @@ def build_copy_requirements(persona_number: int, fmt: str, format_sequence_index
         "variation_rule": prompts.get("variation_rule", "Do not reuse the same headline skeleton, support-line skeleton, or persuasion angle as other ads in the same format for this batch."),
         "concept_variation": {
             "audience_stage": _framework_item("audience_stage", audience_id),
-            "lead_angle": _framework_item("lead_angle", lead_angle),
+            "concept_angle": _framework_item("concept_angle", concept_angle),
             "message_structure": _framework_item("message_structure", concept_structure_id),
         },
         "hierarchy_rule": prompts.get("hierarchy_rule", "Use the assigned concept_structure flow to shape headline and support line. Do not output framework labels."),
@@ -583,7 +550,7 @@ def build_copy_requirements(persona_number: int, fmt: str, format_sequence_index
             "examples": support_line_arch.get("examples", []),
             "variant": support_line_arch.get("variant", ""),
         },
-        "support_line_strategy": _build_support_line_strategy(audience_id, lead_angle, concept_structure_id),
+        "support_line_strategy": _build_support_line_strategy(audience_id, concept_angle, concept_structure_id),
     }
 
 
@@ -957,6 +924,33 @@ def api_save_prompt_file_content(payload: dict[str, Any] = Body(...)) -> dict[st
     return {"status": "saved", "path": prompt_path}
 
 
+def api_input_prompt(prompt_type: str = "916_conversion") -> dict[str, Any]:
+    """Return the content of an input prompt file."""
+    path_map = {
+        "916_conversion": CONVERT_916_TEMPLATE_PATH,
+        "starting_prompt": STARTING_PROMPT_PATH,
+    }
+    p = path_map.get(prompt_type)
+    if not p or not p.exists():
+        raise HTTPException(status_code=404, detail=f"Input prompt not found: {prompt_type}")
+    return {"content": p.read_text(encoding="utf-8"), "path": str(p.relative_to(ROOT))}
+
+
+def api_save_input_prompt(payload: dict[str, Any] = Body(...)) -> dict[str, Any]:
+    """Save an input prompt file."""
+    prompt_type = str(payload.get("prompt_type") or "").strip()
+    content = str(payload.get("content") or "")
+    path_map = {
+        "916_conversion": CONVERT_916_TEMPLATE_PATH,
+        "starting_prompt": STARTING_PROMPT_PATH,
+    }
+    p = path_map.get(prompt_type)
+    if not p:
+        raise HTTPException(status_code=400, detail="prompt_type must be '916_conversion' or 'starting_prompt'")
+    p.write_text(content, encoding="utf-8")
+    return {"status": "saved", "path": str(p.relative_to(ROOT))}
+
+
 def _is_opencode_run_cmd(cmd: list[str]) -> bool:
     return bool(cmd) and Path(cmd[0]).name == "opencode" and len(cmd) > 1 and cmd[1] == "run"
 
@@ -1027,8 +1021,6 @@ def generated_image_roots() -> list[Path]:
 
 def ensure_916_conversion_template() -> Path:
     CONVERT_916_TEMPLATE_PATH.parent.mkdir(parents=True, exist_ok=True)
-    if not CONVERT_916_TEMPLATE_PATH.exists():
-        CONVERT_916_TEMPLATE_PATH.write_text(DEFAULT_916_CONVERSION_PROMPT, encoding="utf-8")
     return CONVERT_916_TEMPLATE_PATH
 
 
@@ -1997,7 +1989,7 @@ def concept_ids_from_requirements(copy_req: dict[str, Any]) -> dict[str, str]:
 
     return {
         "awareness_stage": nested_id("audience_stage", "problem_aware"),
-        "concept_angle": nested_id("lead_angle", "desired_outcome"),
+        "concept_angle": nested_id("concept_angle", "desired_outcome"),
         "concept_structure": nested_id("message_structure", "four_us"),
     }
 
@@ -2349,6 +2341,11 @@ def call_opencode_compatible(config: dict[str, Any], context: dict[str, Any], ru
     api_url = (config.get("opencode_api_url") or "").strip()
     api_key = (config.get("opencode_api_key") or "").strip() or os.getenv("OPENCODE_SERVER_PASSWORD", "").strip()
     model = sanitize_dashboard_model((config.get("opencode_model") or "").strip(), list_opencode_models())
+    config["opencode_model"] = model
+    provider = str(config.get("opencode_provider") or "").strip()
+    if not provider and "/" in model:
+        provider = model.split("/", 1)[0]
+    config["opencode_provider"] = provider
     if not api_url:
         return None
 
@@ -5082,6 +5079,12 @@ async def api_run_execute(
 
     product_ctx_source = "attached_product_master_doc"
     extractor_model = "none"
+    execution_model = sanitize_dashboard_model((cfg.get("opencode_model") or "").strip(), list_opencode_models())
+    execution_provider = str(cfg.get("opencode_provider") or "").strip()
+    if not execution_provider and "/" in execution_model:
+        execution_provider = execution_model.split("/", 1)[0]
+    cfg["opencode_model"] = execution_model
+    cfg["opencode_provider"] = execution_provider
     (run_dir / "context" / "product_doc_source.json").write_text(
         json.dumps(
             {
@@ -5138,7 +5141,7 @@ async def api_run_execute(
                 if guidance:
                     concept["awareness_stage_guidance"] = guidance
             elif hyp_type == "concept_angle" and variant:
-                concept["lead_angle"] = _framework_item("lead_angle", variant)
+                concept["concept_angle"] = _framework_item("concept_angle", variant)
                 _set_active_support_line_strategy(copy_req, "by_concept_angle", variant)
                 guidance = _hypothesis_guidance("concept_angle", variant)
                 if guidance:
@@ -5217,6 +5220,8 @@ async def api_run_execute(
         "language_mode": resolve_language_mode(cfg),
         "context_source": product_ctx_source,
         "context_extractor_model": extractor_model,
+        "opencode_provider": execution_provider,
+        "opencode_model": execution_model,
         "product_file_path": str(product_file),
         "ads": ads_context,
         "banlist": banlist_payload,
@@ -5229,6 +5234,8 @@ async def api_run_execute(
                 "language_mode": full_context["language_mode"],
                 "context_source": full_context["context_source"],
                 "context_extractor_model": full_context["context_extractor_model"],
+                "opencode_provider": full_context["opencode_provider"],
+                "opencode_model": full_context["opencode_model"],
                 "product_file_path": full_context["product_file_path"],
             },
             ensure_ascii=False,
@@ -5342,6 +5349,8 @@ async def api_run_execute(
         manifest["copy_session_log"] = str((run_dir / "logs" / "opencode_session.log").relative_to(ROOT))
     manifest["context_source"] = product_ctx_source
     manifest["context_extractor_model"] = extractor_model
+    manifest["opencode_provider"] = execution_provider
+    manifest["opencode_model"] = execution_model
     manifest["image_sources_file"] = str(image_sources_file_path)
     manifest["input_images_dir"] = str(INPUT_IMAGES_DIR.relative_to(ROOT)).replace("\\", "/")
     manifest["input_images_uploaded"] = saved_input_images

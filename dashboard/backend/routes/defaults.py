@@ -9,6 +9,8 @@ from dashboard.backend.app import (
     api_save_product_doc,
     api_prompt_file_content,
     api_save_prompt_file_content,
+    api_input_prompt,
+    api_save_input_prompt,
 )
 
 router = APIRouter()
@@ -40,3 +42,11 @@ def _prompt_file_content(prompt_path: str = "") -> dict[str, Any]:
 @router.post("/api/prompt-file-content")
 def _save_prompt_file_content(payload: dict[str, Any] = Body(...)) -> dict[str, Any]:
     return api_save_prompt_file_content(payload)
+
+@router.get("/api/input-prompt")
+def _input_prompt(prompt_type: str = "916_conversion") -> dict[str, Any]:
+    return api_input_prompt(prompt_type)
+
+@router.post("/api/input-prompt")
+def _save_input_prompt(payload: dict[str, Any] = Body(...)) -> dict[str, Any]:
+    return api_save_input_prompt(payload)

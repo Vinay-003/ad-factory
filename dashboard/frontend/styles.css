@@ -201,7 +201,8 @@ body::before {
   font-weight: 700;
 }
 
-.card-personas, .card-runs { position: relative; overflow: hidden; }
+.card-personas { position: relative; }
+.card-runs { position: relative; overflow: hidden; }
 
 .card-personas::after, .card-runs::after {
   content: "";
@@ -538,7 +539,10 @@ textarea, input[type="text"], input[type="password"], input[type="number"], sele
   border-radius: var(--radius-md);
   padding: 6px;
   box-shadow: var(--shadow-lg), 0 0 0 1px color-mix(in srgb, var(--line) 30%, transparent);
+  scrollbar-width: none;
 }
+
+.custom-select-menu::-webkit-scrollbar { display: none; }
 
 .custom-select-grid {
   display: grid;
@@ -1519,9 +1523,65 @@ button.is-loading::after {
   outline: none;
 }
 
-.prompt-fullscreen-textarea:focus {
-  box-shadow: none;
-  border: none;
+.input-prompts-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 8px;
+}
+
+.input-prompt-card {
+  display: grid;
+  gap: 2px;
+  min-width: 0;
+  padding: 10px 12px;
+  border: 1.5px solid color-mix(in srgb, var(--accent-violet) 30%, var(--line));
+  border-radius: 8px;
+  background: linear-gradient(135deg, color-mix(in srgb, var(--accent-violet) 10%, var(--surface)), color-mix(in srgb, var(--accent-violet) 5%, var(--surface-2)));
+  cursor: pointer;
+  transition: all var(--transition-fast);
+  box-shadow: 0 1px 3px color-mix(in srgb, var(--accent-violet) 6%, transparent);
+}
+
+.input-prompt-card:hover {
+  border-color: var(--accent-violet);
+  box-shadow: 0 4px 12px color-mix(in srgb, var(--accent-violet) 20%, transparent);
+  transform: translateY(-2px);
+}
+
+.input-prompt-card:active {
+  transform: translateY(0);
+  box-shadow: 0 1px 3px color-mix(in srgb, var(--accent-violet) 10%, transparent);
+}
+
+.input-prompt-card strong {
+  color: var(--accent-violet);
+  font-size: 13px;
+  font-weight: 700;
+}
+
+.input-prompt-card span {
+  color: var(--muted);
+  font-size: 11px;
+  font-weight: 600;
+}
+
+@media (max-width: 640px) {
+  .input-prompts-grid { grid-template-columns: 1fr 1fr; }
+  .input-prompt-card { padding: 8px 10px; }
+  .input-prompt-card strong { font-size: 12px; }
+  .input-prompt-card span { font-size: 10px; }
+}
+
+@media (max-width: 400px) {
+  .input-prompts-grid { grid-template-columns: 1fr; }
+}
+
+[data-theme="dark"] .input-prompt-card {
+  background: linear-gradient(135deg, color-mix(in srgb, var(--accent-violet) 16%, var(--surface)), color-mix(in srgb, var(--accent-violet) 8%, var(--surface-2)));
+  border-color: color-mix(in srgb, var(--accent-violet) 25%, var(--line));
+}
+[data-theme="dark"] .input-prompt-card:hover {
+  background: linear-gradient(135deg, color-mix(in srgb, var(--accent-violet) 24%, var(--surface)), color-mix(in srgb, var(--accent-violet) 16%, var(--surface-2)));
 }
 
 /* ── Regeneration Queue ──────────────────────────────────────────────────── */

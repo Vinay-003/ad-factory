@@ -6,16 +6,16 @@
     "Each ads item must include format, headline_angle, awareness_stage, concept_angle, concept_structure, persona, and copy fields. Provide copy.EN, copy.HI, and copy.HINGLISH blocks when constraints.language includes them.",
     "Use the attached/read product master doc as the single source of product truth; the JSON payload is only request metadata, format/persona guidance, concept selection, and schema control.",
     "Derive benefits, proof, mechanisms, differentiators, exclusions, and priority hierarchy from the product master doc, not from memory or invented claims.",
-    "Headline or paired support must ensure the copy is clearly about weight loss — directly or indirectly.",
+    "The headline itself must clearly signal weight loss directly or through an unmistakable proxy such as kg loss, fat loss, slimming, eating less, craving control for weight loss, or visible weight-loss progress. Support lines can add mechanism/proof, but cannot be the only place that makes the ad about weight loss.",
     "Never include price in on-image copy fields. Do not use currency symbols or words like INR, price, only, discount, off, or MRP.",
-    "copy_requirements.concept_variation contains 3 pre-selected execution axes: audience_stage (who the reader is), lead_angle (what to lead with in the headline), message_structure (how to shape the headline-support flow). Copy each .id into your response's awareness_stage, concept_angle, and concept_structure fields respectively. Use the .direction text of each to guide your copy approach.",
+    "copy_requirements.concept_variation contains 3 pre-selected execution axes: audience_stage (who the reader is), concept_angle (the headline angle to open with), message_structure (how to shape the headline-support flow). Copy each .id into your response's awareness_stage, concept_angle, and concept_structure fields respectively. Use the .direction text of each to guide your copy approach.",
     "If copy_requirements.hypothesis exists and type is not none, obey it as the controlled test.",
     "If concept_variation includes optional guidance fields (hook_structure_guidance, proof_style_guidance, cta_voice_guidance, concept_structure_guidance, awareness_stage_guidance, concept_angle_guidance), follow them. Otherwise derive naturally from the persona.",
-    "Write one clean, short, catchy headline that conveys the main meaning in one idea. Do not lead headlines with Start, Begin, Kickstart, or Follow.",
+    "Write one clean, short, catchy headline that reads like a finished human ad line, not a fragment, keyword list, or half-thought. Do not start headlines with Start, Begin, Kickstart, or Follow.",
     "Divide the payload: headline earns attention with the sharp promise, pain, proof, or contrast; support lines carry the mechanism, timing, product components, proof, routine details, and caveats.",
     "Keep AM/PM timing, protocol mechanics, and product component names out of the headline unless they are the single hook; put them in support lines or bullets when needed.",
     "Avoid AI-ad words such as unlock, transform your journey, revolutionary, holistic wellness, game-changing, effortlessly, and tailored solution.",
-    "Do a final editor pass: shorten the headline, remove generic phrasing, and ensure supporting copy follows the assigned concept_structure flow (four_us, pas, bab, fab) by completing the headline instead of repeating it.",
+    "Do a final editor pass: shorten the headline, remove generic phrasing, reject vague lines that could fit any wellness product, and ensure supporting copy follows the assigned concept_structure flow (four_us, pas, bab, fab) by completing the headline instead of repeating it.",
     "Prioritize fast visible weight loss, safer natural-feeling differentiation, real proof, and practical ease; do not let digestion or emotional benefits overshadow weight loss.",
     "Read copy_requirements.headline_architecture.template and .examples — the headline must follow that sentence structure, not just match the content angle. If the template asks for the full framework, compress it into one headline idea and move the rest to support.",
     "Read copy_requirements.support_line_architecture.template and .examples — the support line must follow that sentence architecture. It must add the missing reason/proof/mechanism behind the headline, not default to a generic feature-list pattern.",
@@ -53,15 +53,11 @@
     "lines": [
       "Return only valid JSON. No markdown. No extra text.",
       "Return one ad only. You may return either a single ad object or an object with default_aspect_ratio and a one-item ads array.",
-      "Before writing, rely on the product master doc already attached/read in this OpenCode session. Do not ask for the doc again and do not ignore it.",
-      "The current {fmt} ad must use a different persuasion angle in both the headline and the {support_target} from anything in the already_used_ads_DO_NOT_REUSE list.",
-      "already_used_ads_DO_NOT_REUSE is a BAN LIST. Do not copy, echo, paraphrase, or adapt any headline, support line, skeleton, or persuasion angle from it.",
-      "Obey the headline_architecture.template and support_line_architecture.template in copy_requirements. These override any default pattern.",
-      "Before writing, read copy_requirements.concept_variation: use audience_stage.direction to set the reader's awareness level, lead_angle.direction to choose the headline approach, and message_structure.direction to shape the headline-to-support flow.",
-      "Before writing the {support_target}, read copy_requirements.support_line_strategy.active.direction, .must_include, and .avoid. This is the active support strategy for the current headline hypothesis/variant.",
-      "The {support_target} must combine support_line_strategy.active meaning with support_line_architecture.template structure. If they conflict, preserve the strategy's meaning and adapt the sentence shape naturally.",
+      "Use the already-loaded product master doc as the source of truth.",
+      "Treat already_used_ads_DO_NOT_REUSE as a ban list for headline, {support_target}, skeleton, and persuasion angle.",
+      "Follow copy_requirements.concept_variation, headline_architecture, support_line_architecture, and support_line_strategy together; if guidance conflicts, preserve the controlled hypothesis and make the line sound natural.",
       "If hook_structure_override is present, the EN headline must visibly match it. For contrast_loop, use a clear but natural contrast word such as but, yet, still, without, before/after, or even with.",
-      "Final editor pass before JSON: rewrite the headline into a finished human ad line, usually 4-9 words, one central idea only. Move mechanism/proof/timing details into support line or bullets.",
+      "Final editor pass before JSON: rewrite the headline into a finished human ad sentence, usually 4-9 words, one central idea only, with clear weight-loss meaning inside the headline. Move mechanism/proof/timing details into support line or bullets.",
       "Use supporting copy to make the headline believable and complete: simple routine, 5-minute ease, doctor-formulated proof, 70,000+ users, 15-day progress, cravings/fullness, digestion support, or less sacrifice.",
       "Support line must add new payload after the headline. If it could sit under any headline, rewrite it with persona friction, mechanism, proof, or result detail from the master doc.",
       "Reject your own first draft if the headline reads like a generic AI slogan, a keyword list, or a paraphrase of supporting copy.",
@@ -83,11 +79,11 @@
     "default_fields": "headline, cta"
   },
   "copy_requirements": {
-    "must_mention": "Headline or paired support must ensure the copy is clearly about weight loss — directly or indirectly.",
+    "must_mention": "The headline itself must clearly signal weight loss directly or through an unmistakable proxy such as kg loss, fat loss, slimming, eating less, craving control for weight loss, or visible weight-loss progress. Support lines can add mechanism/proof, but cannot be the only place that makes the ad about weight loss.",
     "variation_rule": "Do not reuse the same headline skeleton, support-line skeleton, or persuasion angle as other ads in the same format for this batch.",
     "hierarchy_rule": "Use the assigned concept_structure flow (four_us, pas, bab, fab) across headline and support line, not inside the headline alone. Headline = short hook/meaning; support = missing proof/mechanism/context. Do not output framework labels. Derive actual headline/support from product master doc content.",
     "format_specific": {
-      "HERO": "Keep headline as one clean idea. Support line must follow the assigned support_line_architecture template and complete the headline with proof, mechanism, or practical ease.",
+      "HERO": "Keep headline as one clean, finished ad sentence with clear weight-loss meaning. Support line must follow the assigned support_line_architecture template and complete the headline with proof, mechanism, or practical ease.",
       "UGC": "Creator-like tone is allowed, but keep headline/support grounded in master-doc facts and compliance.",
       "BA": "Split copy: left bullets are struggle state; right bullets are progress/routine shift.",
       "TEST": "Quote-like representative headline; attribution + trust line must be role/source-based, non-personal, and must not imply a real verified testimonial.",
@@ -182,7 +178,7 @@
       "FEAT": "fab",
       "UGC": "pas"
     },
-    "default_lead_angle": "desired_outcome"
+    "default_concept_angle": "desired_outcome"
   },
   "persona_mapping": {
     "_description": "Maps persona_seeds.json fields → LLM payload fields. Each entry defines how a seed field is transformed into a payload field.",

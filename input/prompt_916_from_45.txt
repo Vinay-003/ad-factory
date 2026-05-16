@@ -10,7 +10,7 @@ Critical fidelity rules:
 - Do NOT perform a simple resize/crop/stretch of the original image.
 
 Composition rules for 9:16:
-- Extend canvas vertically to 9:16 by outpainting above and below the original composition.
+- Extend canvas vertically to 9:16 by outpainting above/below the original composition.
 - Keep the original 4:5 core composition stable in the center region.
 - Add natural background continuation only where needed to fit 9:16.
 

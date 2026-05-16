@@ -277,7 +277,7 @@ These are not the main promise, but they are still important parts of the experi
 ● reduced frustration because the process feels manageable
 BEN-8 Secondary Benefits
 Important, but lower in hierarchy
-These benefits support the experience, but should not lead the section:
+These benefits support the experience, but should not be the main focus of the section:
 ● less bloating
 ● less acidity
 ● less gas
@@ -325,7 +325,7 @@ AI Reference Notes
 ● BEN-8 = secondary digestive and detox-related benefits
 ● BEN-9 = lower-priority selective benefits
 Interpretation Rules for AI / Team Use
-1. Lead with BEN-1 in most product explanations.
+1. Open with BEN-1 in most product explanations.
 2. Use BEN-3 when the user is worried about safety or side effects.
 3. Use BEN-4 when the user is worried about meal prep, family food, or time burden.
 4. Use BEN-5 when the user feels confused or overwhelmed by weight-loss plans.
@@ -406,7 +406,7 @@ AI Reference Notes
 ● DIFF-9 = sustainable during journey
 ● DIFF-10 = non-dependent after journey
 Interpretation Rule
-Lead with DIFF-1 and DIFF-2 in most product explanations. Use DIFF-4 to DIFF-7 to
+Open with DIFF-1 and DIFF-2 in most product explanations. Use DIFF-4 to DIFF-7 to
 explain why the product feels easier to follow in real life. Use DIFF-8 when addressing
 users with existing conditions. Use DIFF-9 and DIFF-10 when addressing long-term
 sustainability and dependency concerns.
@@ -508,7 +508,7 @@ AI Reference Notes
 ● PRF-6 = tracker + trained coach support
 ● PRF-7 = coherent product and formulation logic
 Interpretation Rules for AI / Team Use
-1. Lead with PRF-1 in most persuasive consumer-facing contexts.
+1. Open with PRF-1 in most persuasive consumer-facing contexts.
 2. Use PRF-2 when the user is asking why they should trust the product.
 3. Use PRF-3 and PRF-4 as supporting social proof, not as the first line every time.
 4. Use PRF-5 when handling hesitation or purchase-risk objections.

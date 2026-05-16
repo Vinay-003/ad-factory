@@ -56,3 +56,5 @@ A7. QUALITY CHECK
 - Layout is calm, balanced, premium, and not overcrowded.
 - No forbidden elements are present.
 - If product count, product identity, label accuracy, or requested background fails, silently regenerate until the output passes. Only the final image output is acceptable.
+
+Important !! Dont fuck  PRODUCT DIMENSIONS AND COUNT , the big should not neither too big in height nor too small 

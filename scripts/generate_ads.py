@@ -1149,19 +1149,19 @@ def classify_hook_structure(headline: str) -> str:
     """Classify headline opening pattern into hook_structure_class."""
     text = (headline or "").strip().lower()
     if not text:
-        return "proof_lead"
+        return "proof_led"
     if text.startswith("why ") or text.startswith("what ") or text.startswith("how ") or text.startswith("when ") or "?" in text[:30]:
-        return "question_lead"
+        return "question_led"
     if text.startswith("finally") or text.startswith("trusted") or text.startswith("proven") or "70,000" in text or "doctor" in text:
-        return "proof_lead"
+        return "proof_led"
     contrast_terms = ["before", "after", "without", "instead", " but ", " yet ", " still ", "doesn’t have to", "doesn't have to", "even with"]
     if any(term in f" {text} " for term in contrast_terms):
         return "contrast_loop"
     if text.startswith("i ") or text.startswith("my ") or "felt" in text or "struggled" in text:
-        return "confession_lead"
+        return "confession_led"
     if text.startswith("stop") or text.startswith("start") or text.startswith("try") or text.startswith("see"):
-        return "command_lead"
-    return "proof_lead"
+        return "command_led"
+    return "proof_led"
 
 
 def classify_proof_style(headline: str, support_line: str) -> str:

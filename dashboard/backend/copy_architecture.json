@@ -5,7 +5,7 @@
   "headline_architectures": {
     "concept_structure": {
       "four_us": {
-        "template": "Structure: one short, catchy promise built from ONE payload piece: outcome, pain, proof, or contrast. Usually 4-8 words. Do not stack outcome + mechanism + proof + timing in the headline; move the extra payload into the support line. Must feel useful, unique, and specific without reading like a list.",
+        "template": "Structure: one short, catchy, finished ad line built from ONE payload piece: outcome, pain, proof, or contrast. Usually 4-8 words. The headline itself must clearly signal weight loss or an unmistakable weight-loss proxy. Do not stack outcome + mechanism + proof + timing in the headline; move the extra payload into the support line. Must feel useful, unique, and specific without reading like a list.",
         "examples": [
           "Lose Weight Without a Separate Diet",
           "A 15-Day Weight-Loss Reset",
@@ -18,10 +18,10 @@
         }
       },
       "pas": {
-        "template": "Structure: headline names only the sharp problem or tension. Do not complete the full PAS arc in the headline. Put consequence and solution in the support line so the headline stays punchy and human.",
+        "template": "Structure: headline names only the sharp weight-loss problem or tension as a finished ad line. Do not complete the full PAS arc in the headline. Put consequence and solution in the support line so the headline stays punchy and human.",
         "examples": [
-          "Cravings Keep Winning?",
-          "Diet Plans Keep Breaking?"
+          "Cravings Keep Blocking Weight Loss?",
+          "Diet Plans Keep Breaking Weight Loss?"
         ],
         "support_strategy": {
           "direction": "Add consequence and product-led solution after the headline names the problem.",
@@ -30,7 +30,7 @@
         }
       },
       "bab": {
-        "template": "Structure: headline shows the before/after contrast in the fewest words possible. Keep the bridge mechanism for the support line. Use a natural contrast word such as without, instead, still, or but.",
+        "template": "Structure: headline shows the before/after weight-loss contrast in the fewest words possible, as a complete ad line. Keep the bridge mechanism for the support line. Use a natural contrast word such as without, instead, still, or but.",
         "examples": [
           "Less Hunger, More Progress",
           "Lose Weight, Keep Homemade Food"
@@ -56,8 +56,8 @@
     },
 
     "hook_structure": {
-      "question_lead": {
-        "template": "Structure: Open with one question the persona would actually ask themselves. Keep it short and specific; do not answer the question inside the headline. The support line gives the answer.",
+      "question_led": {
+        "template": "Structure: Open with one weight-loss question the persona would actually ask themselves. Keep it short and specific; do not answer the question inside the headline. The support line gives the answer.",
         "examples": [
           "What If Weight Loss Didn't Mean Cooking Separately?",
           "Tired of Plans That Don't Survive Your Real Schedule?"
@@ -68,11 +68,11 @@
           "avoid": "Do not ask another question in the support line."
         }
       },
-      "proof_lead": {
-        "template": "Structure: Lead with one credibility marker, number, or trust anchor. Do not add every proof point. The support line explains why that proof matters for the persona's result.",
+      "proof_led": {
+        "template": "Structure: Open with one credibility marker, number, or trust anchor tied to weight loss. Do not add every proof point. The support line explains why that proof matters for the persona's result.",
         "examples": [
           "Doctor-Formulated Weight Loss",
-          "Trusted by 70,000+ People"
+          "70,000+ People Tried This Weight-Loss System"
         ],
         "support_strategy": {
           "direction": "Explain why the proof matters to the buyer and connect it to a practical result.",
@@ -81,7 +81,7 @@
         }
       },
       "contrast_loop": {
-        "template": "Structure: Use a natural contrast word (but, yet, still, without, instead, doesn't have to) to show the old friction versus the better path. Keep it compact; the support line carries the reason.",
+        "template": "Structure: Use a natural contrast word (but, yet, still, without, instead, doesn't have to) to show the old weight-loss friction versus the better path. Keep it compact and sentence-like; the support line carries the reason.",
         "examples": [
           "Lose Weight Without Losing Your Mind — Or Your Kitchen",
           "Weight Loss That Works on Hectic Days, Not Just Perfect Ones"
@@ -92,10 +92,10 @@
           "avoid": "Do not make the easier path sound effortless or magical."
         }
       },
-      "confession_lead": {
-        "template": "Structure: Open as a believable first-person-like admission or shared struggle. Keep only the admission in the headline; put the resolution in support. Grounded, not dramatic.",
+      "confession_led": {
+        "template": "Structure: Open as a believable first-person-like weight-loss admission or shared struggle. Keep only the admission in the headline; put the resolution in support. Grounded, not dramatic.",
         "examples": [
-          "I'd Tried Every Diet.",
+          "Every Weight-Loss Diet Felt Too Hard.",
           "Yes, You Can Lose Weight on Regular Homemade Food"
         ],
         "support_strategy": {
@@ -104,11 +104,11 @@
           "avoid": "Do not overdramatize or invent a personal medical story."
         }
       },
-      "command_lead": {
-        "template": "Structure: Direct instruction or invitation. Must sound like helpful guidance, not a pushy order. Keep the command short; the support line explains the benefit.",
+      "command_led": {
+        "template": "Structure: Direct instruction or invitation tied to weight loss. Must sound like helpful guidance, not a pushy order. Keep the command short; the support line explains the benefit.",
         "examples": [
-          "Try a 15-Day System",
-          "See the Weight-Loss Routine"
+          "Try a 15-Day Weight-Loss System",
+          "See the Routine That Supports Weight Loss"
         ],
         "support_strategy": {
           "direction": "Justify the action with mechanism, ease, and expected progress.",
@@ -120,7 +120,7 @@
 
     "concept_angle": {
       "pain_point": {
-        "template": "Structure: Lead with one specific, concrete friction. Name the exact struggle the persona feels in a short line. Do not explain the fix inside the headline.",
+        "template": "Structure: Open with one specific, concrete weight-loss friction. Name the exact struggle the persona feels in a short line. Do not explain the fix inside the headline.",
         "examples": [
           "Weight Loss Gets Harder When Cravings Control Your Day",
           "PCOD Can Slow Progress"
@@ -132,7 +132,7 @@
         }
       },
       "desired_outcome": {
-        "template": "Structure: Lead with the practical result or felt relief. Keep it believable, specific, and short. Use at most one concrete number in the headline.",
+        "template": "Structure: Open with the practical weight-loss result or felt relief. Keep it believable, specific, and short. Use at most one concrete number in the headline.",
         "examples": [
           "Lose 3 to 5 Kg",
           "Feel Lighter in 15 Days — With Regular Homemade Food"
@@ -144,10 +144,10 @@
         }
       },
       "social_proof": {
-        "template": "Structure: Lead with real crowd evidence from the product doc, such as user count, served-users proof, or trust numbers. Use one proof anchor only; support line connects it to the outcome. Do not invent testimonials as proof.",
+        "template": "Structure: Open with real crowd evidence from the product doc, such as user count, served-users proof, or trust numbers, tied to weight loss. Use one proof anchor only; support line connects it to the outcome. Do not invent testimonials as proof.",
         "examples": [
-          "Trusted by 70,000+ People",
-          "200+ Video Testimonials. One Doctor-Formulated System."
+          "70,000+ People Tried This Weight-Loss System",
+          "200+ Weight-Loss Videos. One Doctor-Formulated System."
         ],
         "support_strategy": {
           "direction": "Turn the proof into buyer relevance and connect it to result or mechanism.",
@@ -156,7 +156,7 @@
         }
       },
       "authority": {
-        "template": "Structure: Lead with doctor, Ayurveda, or institutional credibility. Keep only the authority hook in headline; support line connects it to weight loss.",
+        "template": "Structure: Open with doctor, Ayurveda, or institutional credibility. Keep only the authority hook in headline; support line connects it to weight loss.",
         "examples": [
           "Doctor-Formulated by Dr. Arun Tyagi",
           "Ayurvedic Weight Loss, Properly Formulated"
@@ -168,10 +168,10 @@
         }
       },
       "curiosity": {
-        "template": "Structure: Lead with a mechanism gap or question that makes the reader want the explanation. Ask or tease only one specific gap; support line gives the reveal.",
+        "template": "Structure: Open with a weight-loss mechanism gap or question that makes the reader want the explanation. Ask or tease only one specific gap; support line gives the reveal.",
         "examples": [
-          "Why Diets Break by Week Two",
-          "The 5-Minute Routine Gap"
+          "Why Weight Loss Breaks by Week Two",
+          "The 5-Minute Weight-Loss Routine Gap"
         ],
         "support_strategy": {
           "direction": "Answer the curiosity gap with a clear mechanism and weight-loss link.",
@@ -192,10 +192,10 @@
         }
       },
       "offer": {
-        "template": "Structure: Lead with one practical reason to act now: result window, kit completeness, guarantee logic, or risk reduction. Keep it concrete and time-aware. Never mention price.",
+        "template": "Structure: Open with one practical reason to act now: result window, kit completeness, guarantee logic, or risk reduction. Keep it concrete and time-aware. Never mention price.",
         "examples": [
           "15 Days to Visible Progress",
-          "A Complete Ayurvedic Kit"
+          "A Complete Ayurvedic Weight-Loss Kit"
         ],
         "support_strategy": {
           "direction": "Support the reason to act with result window, kit completeness, or risk reduction without price language.",
@@ -207,9 +207,9 @@
 
     "awareness_stage": {
       "unaware": {
-        "template": "Structure: Name one hidden daily friction the reader experiences but hasn't labeled as solvable. Do not assume they want this product. Support line introduces the better path.",
+        "template": "Structure: Name one hidden daily friction that blocks weight-loss progress but the reader hasn't labeled as solvable. Do not assume they want this product. Support line introduces the better path.",
         "examples": [
-          "Late-Day Cravings Steal Progress",
+          "Late-Day Cravings Steal Weight-Loss Progress",
           "Eating Less Still Feels Stuck?"
         ],
         "support_strategy": {
@@ -231,7 +231,7 @@
         }
       },
       "solution_aware": {
-        "template": "Structure: Assume the reader has tried fixes before. Headline names the failed-pattern tension; support line shows why this system is easier, safer, or more guided.",
+        "template": "Structure: Assume the reader has tried weight-loss fixes before. Headline names the failed-pattern tension; support line shows why this system is easier, safer, or more guided.",
         "examples": [
           "Tried Diets That Didn't Stick?",
           "Weight Loss, More Guided This Time"
@@ -243,10 +243,10 @@
         }
       },
       "product_aware": {
-        "template": "Structure: Assume the reader already knows about the kit. Headline gives one proof push, urgency cue, trust anchor, or simplicity reason to act now. Support line carries the specifics.",
+        "template": "Structure: Assume the reader already knows about the weight-loss kit. Headline gives one proof push, urgency cue, trust anchor, or simplicity reason to act now. Support line carries the specifics.",
         "examples": [
           "15-Day Weight Loss You Can Trust",
-          "Still Considering the Kit?"
+          "Still Considering the Weight-Loss Kit?"
         ],
         "support_strategy": {
           "direction": "Give the final push with proof, simplicity, result window, or risk reduction.",

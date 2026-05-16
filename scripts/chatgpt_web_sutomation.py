@@ -320,7 +320,7 @@ def load_prompt_metadata(prompt_path: Path, prompt_text: str) -> dict[str, Any]:
             print(f"Warning: could not read prompt metadata {sidecar.name}: {exc}")
     for label in (
         "Headline angle", "Awareness stage", "Concept angle", "Concept structure",
-        "Proof style", "CTA voice", "Hook structure", "Lead angle", "Message structure",
+        "Proof style", "CTA voice", "Hook structure", "Concept angle", "Message structure",
     ):
         match = re.search(rf"^-\s*{re.escape(label)}\s*:\s*(.+)$", prompt_text, flags=re.MULTILINE | re.IGNORECASE)
         if match:
