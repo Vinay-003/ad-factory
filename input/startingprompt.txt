@@ -25,7 +25,7 @@ A3. PRODUCT DIMENSIONS AND COUNT
 - Dried Amla Bottle: cylinder, diameter 3 cm, height 5 cm.
 - OK Liquid Sachet: vertical rectangle, width 10 cm, height 15.3 cm.
 - Every output must contain exactly these five distinct products: Kit Box, Dried Amla bottle, OK Tablets bottle, OKP bottle, and OK Liquid sachet.
-- Size products in correct relative proportion. Kit Box is the largest anchor/backdrop; bottles are notably smaller; sachet is tall and narrow.
+- Size products in correct relative proportion. Kit Box is the largest anchor/backdrop; bottles are notably smaller; sachet is more taller than wider.
 - Never duplicate OKP. Never omit Dried Amla. If two OKP bottles appear, Dried Amla is missing, or only four distinct products appear, reject and regenerate.
 
 A4. COLOR AND LIGHTING

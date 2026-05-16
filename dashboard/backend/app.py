@@ -40,6 +40,7 @@ LEGACY_ACTIVE_IMAGES_FILE = ROOT / "input" / "activeimages.txt"
 INPUT_IMAGES_DIR = ROOT / "input" / "images"
 GENERATED_IMAGES_ROOT = ROOT / "generated_images"
 CONVERT_916_TEMPLATE_PATH = ROOT / "input" / "prompt_916_from_45.txt"
+PERSONA_SEEDS_PATH = ROOT / "persona_seeds.json"
 
 DEFAULT_916_CONVERSION_PROMPT = """Convert the attached 4:5 ad creative into a 9:16 version for the same campaign.
 
@@ -456,47 +457,38 @@ def load_env_file(path: Path) -> None:
 
 
 def parse_persona_library(playbook_path: Path) -> list[dict[str, Any]]:
-    text = playbook_path.read_text(encoding="utf-8")
-    start = text.find("Persona library (select by number):")
-    if start < 0:
+    path = PERSONA_SEEDS_PATH
+    if not path.exists():
         return []
-    end = text.find("For each persona", start)
-    block = text[start:end if end > start else len(text)]
-    out: list[dict[str, Any]] = []
-    pattern = re.compile(r"^\s*(\d+)\.\s+(.+)$", re.MULTILINE)
-    for m in pattern.finditer(block):
-        out.append({"number": int(m.group(1)), "name": m.group(2).strip()})
-    return out
+    with open(path, encoding="utf-8") as f:
+        data = json.load(f)
+    return [{"number": int(e["persona_number"]), "name": str(e["persona_name"])} for e in data]
 
 
-PERSONA_SEED_INPUTS: dict[int, dict[str, str]] = {
-    1: {"pain": "Daily cravings break every weight plan.", "desire": "Steady appetite control without feeling deprived.", "friction": "Willpower-only plans collapse by evening.", "proof": "Needs visible early control over snack urges.", "tone": "practical and reassuring"},
-    2: {"pain": "Work schedule leaves no room for complex routines.", "desire": "Simple weight routine that fits packed days.", "friction": "Meal prep and long workouts are not sustainable.", "proof": "Needs a low-effort protocol that still shows progress.", "tone": "efficient and confidence-building"},
-    3: {"pain": "Stress triggers emotional snacking at random times.", "desire": "Calmer eating with fewer stress-led cravings.", "friction": "Plans fail during stressful moments.", "proof": "Needs believable support during emotional triggers.", "tone": "empathetic and non-judgmental"},
-    4: {"pain": "Weight loss plateaus despite repeated effort.", "desire": "Break stagnation with a clear daily system.", "friction": "Repeated plateaus kill motivation.", "proof": "Needs a trackable, structured restart path.", "tone": "direct and motivating"},
-    5: {"pain": "PCOD-related weight gain feels harder to reverse.", "desire": "Steadier weight progress with manageable routine.", "friction": "Fear of harsh or unsafe methods.", "proof": "Needs non-cure, compliant weight-support framing.", "tone": "careful and trust-led"},
-    6: {"pain": "Thyroid-linked weight gain feels stubborn and slow.", "desire": "Consistent progress without extreme restrictions.", "friction": "Low confidence after slow previous results.", "proof": "Needs realistic, compliant support expectations.", "tone": "measured and credible"},
-    7: {"pain": "Multiple failed diets created low confidence.", "desire": "A restart that actually feels doable.", "friction": "Past strict plans felt impossible to continue.", "proof": "Needs simple steps and visible early wins.", "tone": "encouraging and reset-focused"},
-    8: {"pain": "Wants weight loss but fears weakness and fatigue.", "desire": "Lighter body with stable daily energy.", "friction": "Skeptical of plans that feel draining.", "proof": "Needs assurance of practical energy support.", "tone": "calm and evidence-led"},
-    9: {"pain": "Parent schedule causes rushed meals and random snacking.", "desire": "A routine that works even on chaotic days.", "friction": "No time for rigid diets or long workouts.", "proof": "Needs a simple protocol that fits family life.", "tone": "real-life and practical"},
-    10: {"pain": "Self-care is postponed while handling household priorities.", "desire": "A manageable routine that can be sustained at home.", "friction": "Complex plans don't fit daily responsibilities.", "proof": "Needs a low-friction system for homemaker schedules.", "tone": "supportive and respectful"},
-    11: {"pain": "Tea-time office snacking derails daily intake control.", "desire": "Fewer impulse snacks during work breaks.", "friction": "Social snack cues are hard to resist.", "proof": "Needs practical control over recurring snack windows.", "tone": "conversational and specific"},
-    12: {"pain": "Late-night hunger leads to repeated overeating.", "desire": "Calmer nights with better eating control.", "friction": "Evening cravings undo daytime discipline.", "proof": "Needs night-routine support that feels realistic.", "tone": "steady and habit-focused"},
-    13: {"pain": "Weight rebounds after festivals and travel periods.", "desire": "Quick reset back to steady routine.", "friction": "Irregular days break consistency easily.", "proof": "Needs a restart protocol that works after disruptions.", "tone": "reset-oriented and practical"},
-    14: {"pain": "Worry that metabolism has slowed permanently.", "desire": "Believable progress through structured daily consistency.", "friction": "Confusion from too many conflicting theories.", "proof": "Needs clear mechanism logic without hype claims.", "tone": "clear and science-grounded"},
-    15: {"pain": "Digestive discomfort and weight concerns occur together.", "desire": "Lighter digestion with better intake control.", "friction": "Discomfort makes routines hard to follow.", "proof": "Needs digestion-support plus weight-management framing.", "tone": "gentle and practical"},
-    16: {"pain": "Budget concerns reduce trust in expensive plans.", "desire": "Reliable progress from a practical system.", "friction": "Fear of paying without results.", "proof": "Needs strong value and risk-reduction cues.", "tone": "transparent and outcome-focused"},
-    17: {"pain": "Event deadline creates pressure and urgency.", "desire": "Visible progress in a short, realistic window.", "friction": "Panic-driven plans often backfire.", "proof": "Needs structured short-term milestone framing.", "tone": "urgent but controlled"},
-    18: {"pain": "Low confidence from body discomfort and low energy.", "desire": "Feel lighter, sharper, and more confident daily.", "friction": "Inconsistent routines reduce momentum.", "proof": "Needs confidence-building early progress signals.", "tone": "uplifting and grounded"},
-    19: {"pain": "Only trusts doctor-backed, evidence-grounded solutions.", "desire": "Safe-feeling system with clear proof signals.", "friction": "Distrust of generic internet claims.", "proof": "Needs founder credibility and structured protocol proof.", "tone": "authoritative and factual"},
-    20: {"pain": "Struggles to stay consistent without accountability.", "desire": "Daily support that keeps follow-through high.", "friction": "Drops routines when guidance is missing.", "proof": "Needs tracker-led support and coach cues.", "tone": "coach-like and motivating"},
-    21: {"pain": "Hates complicated plans and too many rules.", "desire": "Simple steps with almost no guesswork.", "friction": "Complexity causes early drop-off.", "proof": "Needs a very clear, easy-to-follow structure.", "tone": "simple and direct"},
-    22: {"pain": "Progress feels slower after 35 despite effort.", "desire": "Steady sustainable progress without extreme routines.", "friction": "Frustration from slow visible change.", "proof": "Needs realistic milestones and consistency proof.", "tone": "reassuring and practical"},
-    23: {"pain": "Routine changed after childbirth and time is limited.", "desire": "A gentle return to steady progress that fits daily life.", "friction": "Harsh or complex plans feel unrealistic right now.", "proof": "Needs practical, supportive steps for a changed routine.", "tone": "gentle and encouraging"},
-    24: {"pain": "Weight feels harder to manage during menopause.", "desire": "Visible progress with a manageable, sustainable routine.", "friction": "Usual methods feel harsher and harder to continue.", "proof": "Needs doctor-led credibility and real-life usability.", "tone": "respectful and practical"},
-    25: {"pain": "Wants a natural path and avoids harsh methods.", "desire": "Natural weight-loss support that still feels effective.", "friction": "Worries natural options may be vague or weak.", "proof": "Needs clear Ayurvedic, no-synthetic trust cues.", "tone": "clear and trust-led"},
-    26: {"pain": "Past quick losses came back too fast.", "desire": "A more sustainable path without bounce-back anxiety.", "friction": "Short-term fixes feel temporary and hard to maintain.", "proof": "Needs non-dependency and maintainability framing.", "tone": "steady and realistic"},
-}
+def _load_persona_seeds() -> dict[int, dict[str, str]]:
+    path = PERSONA_SEEDS_PATH
+    if not path.exists():
+        print(f"WARNING: {path} not found. Using empty persona seeds.", file=sys.stderr)
+        return {}
+    with open(path, encoding="utf-8") as f:
+        data = json.load(f)
+    seeds: dict[int, dict[str, str]] = {}
+    for entry in data:
+        pn = int(entry.get("persona_number", 0))
+        if pn < 1:
+            continue
+        seeds[pn] = {
+            "pain": str(entry.get("pain", "")),
+            "desire": str(entry.get("desire", "")),
+            "friction": str(entry.get("friction", "")),
+            "proof": str(entry.get("proof", "")),
+            "tone": str(entry.get("tone", "")),
+            "awareness_stage": str(entry.get("awareness_stage", "unaware")),
+        }
+    return seeds
+
+
+PERSONA_SEED_INPUTS = _load_persona_seeds()
 
 
 def _framework_item(group: str, item_id: str) -> dict[str, str]:
@@ -512,15 +504,7 @@ def _framework_item(group: str, item_id: str) -> dict[str, str]:
 def build_copy_requirements(persona_number: int, fmt: str, format_sequence_index: int, variation_seed: str = "") -> dict[str, Any]:
     # Lanes removed: copy requirements should only enforce goal/structure constraints and let the LLM choose the product facts.
     persona_seed = PERSONA_SEED_INPUTS.get(persona_number, {})
-    persona_text = " ".join(str(v).lower() for v in persona_seed.values())
-    if any(term in persona_text for term in ["doctor", "trust", "proof", "safe", "natural"]):
-        audience_id = "product_aware"
-    elif any(term in persona_text for term in ["past", "failed", "plateau", "rebound", "stubborn"]):
-        audience_id = "solution_aware"
-    elif any(term in persona_text for term in ["cravings", "hunger", "snacking", "stress", "busy", "complicated", "schedule", "packed", "strict", "time"]):
-        audience_id = "problem_aware"
-    else:
-        audience_id = "unaware"
+    audience_id = persona_seed.get("awareness_stage", "unaware")
 
     # Choose a lightweight structure direction only; headline/support must still be selected freely by the LLM.
     # Keep format-appropriate default structure.
@@ -533,17 +517,8 @@ def build_copy_requirements(persona_number: int, fmt: str, format_sequence_index
     }
     concept_structure = structure_by_fmt.get(fmt, "four_us")
 
-    # Lead angle: derived from persona seed only (no feature-lanes).
-    if "cravings" in persona_text or "hunger" in persona_text or "snack" in persona_text:
-        lead_angle = "pain_point"
-    elif "work" in persona_text or "schedule" in persona_text or "simple" in persona_text or "routine" in persona_text:
-        lead_angle = "desired_outcome"
-    elif "failed" in persona_text or "doubt" in persona_text or "fear" in persona_text or "plateau" in persona_text:
-        lead_angle = "comparison"
-    elif "doctor" in persona_text or "trust" in persona_text or "proof" in persona_text:
-        lead_angle = "authority"
-    else:
-        lead_angle = "desired_outcome"
+    # Lead angle: always desired_outcome for all personas (no persona-aware selection).
+    lead_angle = "desired_outcome"
 
     return {
         "must_mention": "Headline or paired support copy must explicitly mention weight loss, obesity reduction, excess-weight reduction, or a 15-day weight outcome.",
@@ -5073,9 +5048,9 @@ def api_delete_image(run_id: str, payload: dict[str, Any] = Body(...)) -> dict[s
         full_path.unlink()
 
     # Also delete companion JSON metadata if it exists
-    json_path = full_path.with_suffix(".json")
-    if json_path.exists():
-        json_path.unlink()
+    for json_path in (full_path.with_suffix(".json"), full_path.with_suffix(full_path.suffix + ".json")):
+        if json_path.exists():
+            json_path.unlink()
 
     if manifest_path.exists():
         manifest = json.loads(manifest_path.read_text(encoding="utf-8"))
@@ -5145,14 +5120,27 @@ def _parse_image_naming(image_path_str: str, run_dir: Path | None) -> dict[str, 
     and build a human-readable stem for download naming."""
     full_path = ROOT / image_path_str
     meta_path = full_path.with_suffix(".json")
+    legacy_meta_path = full_path.with_suffix(full_path.suffix + ".json")
     base = {"format": "UNKNOWN", "persona": "00", "lang": "EN", "stem": "image"}
     hyp_label = ""
 
-    if meta_path.exists():
+    if meta_path.exists() or legacy_meta_path.exists():
         try:
+            if not meta_path.exists() and legacy_meta_path.exists():
+                meta_path = legacy_meta_path
             meta = json.loads(meta_path.read_text(encoding="utf-8"))
         except Exception:
             meta = {}
+        fmt_value = str(meta.get("format") or meta.get("format_id") or "").strip().upper()
+        persona_value = str(meta.get("persona") or meta.get("persona_id") or "").strip().upper()
+        lang_value = str(meta.get("language") or meta.get("lang") or meta.get("lang_id") or "").strip().upper()
+        if fmt_value:
+            base["format"] = fmt_value
+        persona_match = re.search(r"P?(\d+)", persona_value)
+        if persona_match:
+            base["persona"] = f"P{int(persona_match.group(1)):02d}"
+        if lang_value:
+            base["lang"] = lang_value
         prompt_file = str(meta.get("prompt_file_relative") or meta.get("prompt_file") or "").strip().replace("\\", "/")
         if not prompt_file:
             prompt_file = str(meta.get("prompt_file_relative") or meta.get("prompt_file") or "").strip().replace("\\", "/")
@@ -5175,6 +5163,16 @@ def _parse_image_naming(image_path_str: str, run_dir: Path | None) -> dict[str, 
                 if hvar:
                     parts.append(hvar)
                 hyp_label = "_" + "_".join(parts)
+
+    if base["format"] == "UNKNOWN" or base["persona"] in {"00", "P00"}:
+        name = Path(image_path_str).stem.lower()
+        match = re.search(r"(?:gemini|chatgpt)-(?P<fmt>[a-z0-9]+)-p(?P<num>\d+)-(?P<lang>[a-z0-9]+)(?:-a(?P<creative>\d+))?", name)
+        if match:
+            base["format"] = match.group("fmt").upper()
+            base["persona"] = f"P{int(match.group('num')):02d}"
+            base["lang"] = match.group("lang").upper()
+            if match.group("creative"):
+                base["creative_suffix"] = f"_A{int(match.group('creative')):02d}"
 
     # Try hypothesis
     if run_dir is not None:
@@ -5272,14 +5270,17 @@ def api_download_single_image(run_id: str, image_file: str):
 
     naming = _parse_image_naming(image_file, run_dir)
     meta_path = full_path.with_suffix(".json")
+    legacy_meta_path = full_path.with_suffix(full_path.suffix + ".json")
 
     import io, zipfile
     buf = io.BytesIO()
     with zipfile.ZipFile(buf, "w", zipfile.ZIP_DEFLATED) as zf:
         zf.write(full_path, f"{naming['stem']}{naming['ext']}")
         meta_content = {"source": image_file}
-        if meta_path.exists():
+        if meta_path.exists() or legacy_meta_path.exists():
             try:
+                if not meta_path.exists() and legacy_meta_path.exists():
+                    meta_path = legacy_meta_path
                 meta_content = json.loads(meta_path.read_text(encoding="utf-8"))
             except Exception:
                 pass
@@ -5322,13 +5323,16 @@ def api_download_batch_images(run_id: str):
             aspect = _extract_aspect_from_image_path(img_path)
             naming = _parse_image_naming(img_path, run_dir)
             meta_path = full_path.with_suffix(".json")
+            legacy_meta_path = full_path.with_suffix(full_path.suffix + ".json")
 
             folder = f"{vn}/{aspect}" if aspect else vn
             zf.write(full_path, f"{folder}/{naming['stem']}{naming['ext']}")
 
             meta_content = {"source": img_path}
-            if meta_path.exists():
+            if meta_path.exists() or legacy_meta_path.exists():
                 try:
+                    if not meta_path.exists() and legacy_meta_path.exists():
+                        meta_path = legacy_meta_path
                     meta_content = json.loads(meta_path.read_text(encoding="utf-8"))
                 except Exception:
                     pass
@@ -5367,11 +5371,14 @@ def api_download_batches(batch_names: list[str]):
                 naming = _parse_image_naming(img_path, None)
                 aspect = _extract_aspect_from_image_path(img_path)
                 meta_path = full_path.with_suffix(".json")
+                legacy_meta_path = full_path.with_suffix(full_path.suffix + ".json")
                 folder = f"{vn}/{aspect}" if aspect else vn
                 zf.write(full_path, f"{folder}/{naming['stem']}{naming['ext']}")
                 meta_content = {"source": img_path}
-                if meta_path.exists():
+                if meta_path.exists() or legacy_meta_path.exists():
                     try:
+                        if not meta_path.exists() and legacy_meta_path.exists():
+                            meta_path = legacy_meta_path
                         meta_content = json.loads(meta_path.read_text(encoding="utf-8"))
                     except Exception:
                         pass

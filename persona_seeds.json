@@ -1,0 +1,272 @@
+[
+  {
+    "persona_number": 1,
+    "persona_name": "Craving-Control Struggler",
+    "pain": "Food noise and trigger foods make them lose control after one bite, especially when cravings hit later in the day.",
+    "desire": "They want appetite control that feels calm and steady so they can eat less without constantly fighting themselves.",
+    "friction": "They have had cravings come back after a few days before, so they do not trust willpower-only solutions or short-lived appetite suppression.",
+    "proof": "They need believable proof that hunger and cravings stay lower long enough to create visible progress, backed by real user results and a structured daily routine.",
+    "tone": "direct and reassuring",
+    "awareness_stage": "problem_aware"
+  },
+  {
+    "persona_number": 2,
+    "persona_name": "Busy Professional",
+    "pain": "Meetings, travel, late lunches, and social workdays keep knocking them back to square one.",
+    "desire": "They want visible weight loss without planning their whole life around meal prep, gym slots, or a fragile routine.",
+    "friction": "Most plans feel too high-maintenance for an irregular schedule and fall apart the moment work gets hectic.",
+    "proof": "They need proof the system fits real life with a simple routine, normal-food compatibility, and no dependence on heavy workouts.",
+    "tone": "practical and efficient",
+    "awareness_stage": "problem_aware"
+  },
+  {
+    "persona_number": 3,
+    "persona_name": "Emotional Eater / Stress Snacker",
+    "pain": "Stress, loneliness, and burnout turn eating into relief for a few minutes and guilt for the rest of the night.",
+    "desire": "They want fewer stress-driven urges and a way to feel back in control without being harsh on themselves.",
+    "friction": "Shame-based plans make the rebound worse, and they worry a weight-loss product will ignore the emotional side of overeating.",
+    "proof": "They need proof that the routine feels supportive, reduces random snacking pressure, and helps them recover after bad days instead of spiraling.",
+    "tone": "empathetic and non-judgmental",
+    "awareness_stage": "problem_aware"
+  },
+  {
+    "persona_number": 4,
+    "persona_name": "Plateau Victim",
+    "pain": "They feel like they are doing the right things, but the scale has stopped moving and every week feels frustratingly flat.",
+    "desire": "They want the scale to move again without cutting harder, obsessing more, or living on a stricter plan forever.",
+    "friction": "They are tired of vague plateau advice and suspect something hidden is undoing their effort, but they do not know what.",
+    "proof": "They need a clear explanation of how hidden intake drift and inconsistent appetite control can stall progress, plus realistic stories of people who finally broke through.",
+    "tone": "calm and evidence-led",
+    "awareness_stage": "solution_aware"
+  },
+  {
+    "persona_number": 5,
+    "persona_name": "PCOD Support Seeker",
+    "pain": "They feel their body gains weight easily, craves more than it should, and does not respond like everyone else seems to.",
+    "desire": "They want believable weight-loss support that feels possible even with PCOD, without being sold a fake cure.",
+    "friction": "They are deeply skeptical of generic advice and hormonal miracle claims because they have heard both too many times.",
+    "proof": "They need doctor-led credibility, explicit no-cure positioning, and relatable results from women managing PCOD who still wanted visible weight loss.",
+    "tone": "empathetic and trust-led",
+    "awareness_stage": "solution_aware"
+  },
+  {
+    "persona_number": 6,
+    "persona_name": "Thyroid Weight-Gain Struggler",
+    "pain": "They feel tired, puffy, and stuck with weight that barely moves no matter how sincere the effort is.",
+    "desire": "They want visible progress and a lighter body without being fed false hope or thyroid cure language.",
+    "friction": "They believe their thyroid makes weight loss unusually hard and they distrust generic plans that act like effort is the only issue.",
+    "proof": "They need explicit no-cure boundaries, doctor credibility, and proof that a simpler guided routine can still support progress in harder cases.",
+    "tone": "respectful and trust-led",
+    "awareness_stage": "solution_aware"
+  },
+  {
+    "persona_number": 7,
+    "persona_name": "Post-Failure Re-starter",
+    "pain": "They have lost count of how many times they said this is day one and quit again after one rough week.",
+    "desire": "They want a restart that finally turns into momentum and rebuilds their confidence instead of ending in another relapse.",
+    "friction": "Repeated failure has damaged their self-belief, so they assume this will become the same old story.",
+    "proof": "They need to see relatable people who had also failed multiple times get early wins with a simple, restart-friendly system and real support.",
+    "tone": "hopeful and non-judgmental",
+    "awareness_stage": "solution_aware"
+  },
+  {
+    "persona_number": 8,
+    "persona_name": "No-Weakness Skeptic",
+    "pain": "Every past attempt to eat less made them feel weak, shaky, low-energy, or unable to function normally.",
+    "desire": "They want weight loss that does not leave them drained, foggy, or miserable through the workday.",
+    "friction": "They equate weight loss with weakness now, so any plan that feels crash-like gets rejected immediately.",
+    "proof": "They need proof that the approach supports fullness and daily energy, not starvation-style restriction, with users saying they did not feel weak.",
+    "tone": "direct and reassuring",
+    "awareness_stage": "solution_aware"
+  },
+  {
+    "persona_number": 9,
+    "persona_name": "Time-Starved Parent",
+    "pain": "Sleep loss, school runs, work, and childcare leave them eating on autopilot and pushing their own routine to the bottom of the list.",
+    "desire": "They want progress that survives chaotic days and does not require separate meals, long workouts, or perfect planning.",
+    "friction": "Most weight-loss plans assume free time, mental bandwidth, and energy they simply do not have.",
+    "proof": "They need proof the routine is lightweight, family-compatible, and easy to resume after messy days without guilt.",
+    "tone": "practical and compassionate",
+    "awareness_stage": "problem_aware"
+  },
+  {
+    "persona_number": 10,
+    "persona_name": "Homemaker, self-care deprioritized",
+    "pain": "They spend the day feeding everyone else, grazing in the kitchen, eating leftovers, and putting their own body last.",
+    "desire": "They want to feel lighter, cared for, and back in control without creating a separate life or separate food routine for themselves.",
+    "friction": "Guilt around prioritizing themselves and nonstop household demands make consistency feel selfish or unrealistic.",
+    "proof": "They need proof the system works with homemade food, requires no separate cooking, and still gives structure and support.",
+    "tone": "warm and respectful",
+    "awareness_stage": "problem_aware"
+  },
+  {
+    "persona_number": 11,
+    "persona_name": "Office Snacker",
+    "pain": "Tea-time biscuits, desk boredom, free treats, and polite work snacking quietly wreck their deficit every day.",
+    "desire": "They want to stop mindless office grazing and get through work hours without every snack tray becoming a test of willpower.",
+    "friction": "The problem feels cue-driven rather than hunger-driven, and saying no at work can feel awkward or rude.",
+    "proof": "They need proof that appetite and craving support can help during desk hours without making them feel flat, weak, or distracted.",
+    "tone": "relatable and practical",
+    "awareness_stage": "problem_aware"
+  },
+  {
+    "persona_number": 12,
+    "persona_name": "Late-Night Eater",
+    "pain": "They hold it together all day, then night becomes me-time eating and the kitchen raid undoes everything.",
+    "desire": "They want calmer evenings, less post-dinner snacking, and to wake up without regret or heaviness.",
+    "friction": "Fatigue, habit, and low self-control at night make normal diet tips feel useless when the urge actually hits.",
+    "proof": "They need proof that the routine can help with evening appetite pressure and next-morning heaviness, not just daytime discipline.",
+    "tone": "empathetic and specific",
+    "awareness_stage": "problem_aware"
+  },
+  {
+    "persona_number": 13,
+    "persona_name": "Festive/Travel Weight Regainer",
+    "pain": "Trips, weddings, family functions, and holiday eating leave them puffy, heavier, and struggling to restart afterward.",
+    "desire": "They want a quick reset that helps them feel back in control without punishing themselves for living normal life.",
+    "friction": "Social food pressure is hard to resist, and once travel breaks the routine they find it hard to get back into the swing of it.",
+    "proof": "They need proof that the system helps with post-event reset, appetite stabilization, and getting lighter again without extreme compensation.",
+    "tone": "practical and forgiving",
+    "awareness_stage": "problem_aware"
+  },
+  {
+    "persona_number": 14,
+    "persona_name": "Metabolism-Worry Buyer",
+    "pain": "They are convinced their metabolism is slow, damaged, or broken because normal advice no longer feels true in their body.",
+    "desire": "They want a clear, believable explanation for slow progress and a routine that feels body-compatible instead of punishing.",
+    "friction": "Conflicting advice has made them cynical, and fat-burner language instantly sounds fake to them.",
+    "proof": "They need simple mechanism logic that focuses on appetite, intake control, and consistency rather than pseudo-science or magic metabolism claims.",
+    "tone": "curious and educational",
+    "awareness_stage": "solution_aware"
+  },
+  {
+    "persona_number": 15,
+    "persona_name": "Digestion-Issue + Weight Combo Seeker",
+    "pain": "Bloating, acidity, constipation, and heaviness make them feel like their gut and their weight problem are tied together.",
+    "desire": "They want to feel lighter in the stomach and on the scale at the same time, not solve one while worsening the other.",
+    "friction": "Generic weight-loss products ignore gut comfort, and digestive discomfort makes it harder for them to stay consistent.",
+    "proof": "They need proof that the system supports digestion as well as appetite control, with believable user stories that mention less bloating and easier progress.",
+    "tone": "practical and symptom-aware",
+    "awareness_stage": "problem_aware"
+  },
+  {
+    "persona_number": 16,
+    "persona_name": "Budget-Conscious Result Seeker",
+    "pain": "They want results, but they are tired of paying for overhyped plans, upsells, and products that feel like expensive guesswork.",
+    "desire": "They want visible value fast enough to justify the spend and feel smart, not fooled, after buying.",
+    "friction": "Price matters because past coaching, apps, or supplements did not feel worth the money.",
+    "proof": "They need clear kit value, duration clarity, expected progress window, and a money-back guarantee that reduces the fear of wasting money.",
+    "tone": "transparent and value-focused",
+    "awareness_stage": "product_aware"
+  },
+  {
+    "persona_number": 17,
+    "persona_name": "Wedding/Event Deadline Persona",
+    "pain": "The outfit is close-fitting, the photos feel permanent, and the countdown makes every extra kilo feel louder.",
+    "desire": "They want to look visibly lighter and feel comfortable in their clothes without doing something reckless before the event.",
+    "friction": "They cannot afford a crash plan that makes them weak, stressed, or unpredictable right before the big day.",
+    "proof": "They need proof of visible early progress within a clear timeline, plus relatable deadline-driven transformations that still look realistic.",
+    "tone": "calm and motivating",
+    "awareness_stage": "product_aware"
+  },
+  {
+    "persona_number": 18,
+    "persona_name": "Confidence-First Persona",
+    "pain": "Photos, mirrors, tight clothes, and a heavy low-energy feeling keep chipping away at how they see themselves.",
+    "desire": "They want to feel lighter, look more like themselves again, and stop organizing life around body self-consciousness.",
+    "friction": "Aggressive weight-loss messaging makes them shut down because it worsens shame instead of building belief.",
+    "proof": "They need relatable transformations that talk about confidence, comfort, and feeling good in daily life, not just kilos lost.",
+    "tone": "uplifting and non-judgmental",
+    "awareness_stage": "unaware"
+  },
+  {
+    "persona_number": 19,
+    "persona_name": "Trust-First Buyer",
+    "pain": "They are interested, but the category feels full of big claims, soft proof, and products that sound more like marketing than medicine.",
+    "desire": "They want a weight-loss system they can trust before they spend, start, and explain it to family.",
+    "friction": "They do not trust generic supplement language, self-medication energy, or testimonials without real credibility behind them.",
+    "proof": "They need doctor-formulated credibility, Arogyam backing, a clear explanation of how the kit works, and honest boundaries around what it can and cannot do.",
+    "tone": "careful and trust-led",
+    "awareness_stage": "product_aware"
+  },
+  {
+    "persona_number": 20,
+    "persona_name": "Support-Dependent Persona",
+    "pain": "They can start strong, but when motivation dips or life hits, the plan silently collapses and no one catches it.",
+    "desire": "They want accountability that keeps them moving through slow weeks, setbacks, and off days.",
+    "friction": "Solo weight-loss attempts fail because drift starts small and turns into a full reset before they recover.",
+    "proof": "They need proof of real check-ins, a daily tracker, coach guidance, and success stories from people who needed external accountability to stay consistent.",
+    "tone": "coach-like and non-judgmental",
+    "awareness_stage": "solution_aware"
+  },
+  {
+    "persona_number": 21,
+    "persona_name": "Beginner Who Hates Complex Plans",
+    "pain": "Calories, macros, meal rules, and fitness advice all feel like too much, so they freeze before they even start properly.",
+    "desire": "They want a simple path that tells them what to do each day without turning weight loss into a second job.",
+    "friction": "Complexity kills momentum fast, and detailed tracking makes them feel overwhelmed or mentally drained.",
+    "proof": "They need proof of a low-decision routine, clear instructions, guided food rules, and support that keeps things simple instead of adding more noise.",
+    "tone": "simple and direct",
+    "awareness_stage": "problem_aware"
+  },
+  {
+    "persona_number": 22,
+    "persona_name": "35+ Slow-Progress Persona",
+    "pain": "Weight loss feels slower now, small gains happen easily, and old tricks do not seem to work the way they once did.",
+    "desire": "They want steady, visible movement and a routine they can actually live with at this stage of life.",
+    "friction": "Years of trying and regaining have made them doubt anything will stick unless it is realistic and repeatable.",
+    "proof": "They need proof from people in their age range showing slow-but-real progress, consistency support, and no extreme promises.",
+    "tone": "respectful and realistic",
+    "awareness_stage": "solution_aware"
+  },
+  {
+    "persona_number": 23,
+    "persona_name": "New Mother",
+    "pain": "Their body feels unfamiliar, sleep is broken, and they feel pressure to bounce back before they even feel like themselves again.",
+    "desire": "They want a gentle way to feel lighter and more in control when they are ready, without adding stress to early motherhood.",
+    "friction": "They worry any weight-loss attempt will drain energy, feel unsafe, or collide with the demands of caring for a baby.",
+    "proof": "They need proof that the plan feels guided, home-routine friendly, and easy to follow once self-care becomes realistic again.",
+    "tone": "empathetic and protective",
+    "awareness_stage": "problem_aware"
+  },
+  {
+    "persona_number": 24,
+    "persona_name": "Menopause",
+    "pain": "Belly weight, poor sleep, cravings, and feeling unlike themselves make menopause-related weight gain feel especially stubborn and unfair.",
+    "desire": "They want to feel lighter, less inflamed, and more in control without pretending hormones are not part of the picture.",
+    "friction": "They are tired of generic advice that ignores menopause and skeptical of anything that sounds too easy or too young for their stage of life.",
+    "proof": "They need credible guidance, women-like-me proof, and realistic evidence that a simpler natural routine can still help during this life stage.",
+    "tone": "respectful and evidence-led",
+    "awareness_stage": "solution_aware"
+  },
+  {
+    "persona_number": 25,
+    "persona_name": "Natural Solution Seeker",
+    "pain": "They want weight loss help but dislike anything that feels chemical, invasive, or harsh on the body.",
+    "desire": "They want a natural path that feels safe, familiar, and serious enough to trust, not a random herbal gamble.",
+    "friction": "They are interested in Ayurveda and natural products, but they distrust flashy labels and weakly explained supplement claims.",
+    "proof": "They need doctor-formulated Ayurvedic credibility, ingredient seriousness, and proof that the system is structured and not just another herbal bottle.",
+    "tone": "calm and trust-led",
+    "awareness_stage": "solution_aware"
+  },
+  {
+    "persona_number": 26,
+    "persona_name": "Sustainable Weight Loss Seeker",
+    "pain": "They are exhausted by losing weight in bursts only to gain it back when the method becomes impossible to live with.",
+    "desire": "They want progress they can maintain after the course instead of another intense phase followed by rebound.",
+    "friction": "They avoid extreme plans because dependency, burnout, and bounce-back feel more likely than real change.",
+    "proof": "They need proof that the system is easier to stick with, works with normal life, and includes structure and support that reduce rebound risk.",
+    "tone": "realistic and steady",
+    "awareness_stage": "solution_aware"
+  },
+  {
+    "persona_number": 27,
+    "persona_name": "Injection-Averse User",
+    "pain": "They want weight loss, but injections feel intimidating, too medicalized, or simply not like something they are ready to do.",
+    "desire": "They want a natural, non-invasive path that feels safe enough to start and easier to live with.",
+    "friction": "Fear of needles, side effects, dependency, and being locked into a long-term medication route keeps them from acting.",
+    "proof": "They need a believable alternative with doctor credibility, real user results, a guided routine, and clear proof that it feels natural and non-invasive.",
+    "tone": "calm and reassuring",
+    "awareness_stage": "solution_aware"
+  }
+]

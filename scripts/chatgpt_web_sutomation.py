@@ -2840,7 +2840,7 @@ def run() -> None:
                             test_variables=test_variables,
                             saved_path=saved_path,
                         )
-                        (saved_path.with_suffix(saved_path.suffix + ".json")).write_text(
+                        saved_path.with_suffix(".json").write_text(
                             json.dumps(metadata, indent=2, ensure_ascii=False),
                             encoding="utf-8",
                         )
