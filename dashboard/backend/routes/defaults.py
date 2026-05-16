@@ -7,6 +7,8 @@ from dashboard.backend.app import (
     api_opencode_catalog,
     api_product_doc,
     api_save_product_doc,
+    api_prompt_file_content,
+    api_save_prompt_file_content,
 )
 
 router = APIRouter()
@@ -30,3 +32,11 @@ def _product_doc() -> dict[str, Any]:
 @router.post("/api/product-doc")
 def _save_product_doc(payload: dict[str, Any] = Body(...)) -> dict[str, Any]:
     return api_save_product_doc(payload)
+
+@router.get("/api/prompt-file-content")
+def _prompt_file_content(prompt_path: str = "") -> dict[str, Any]:
+    return api_prompt_file_content(prompt_path)
+
+@router.post("/api/prompt-file-content")
+def _save_prompt_file_content(payload: dict[str, Any] = Body(...)) -> dict[str, Any]:
+    return api_save_prompt_file_content(payload)

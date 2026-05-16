@@ -10,6 +10,9 @@ from dashboard.backend.app import (
     api_edit_prompt,
     api_delete_prompt,
     api_delete_image,
+    api_mark_images_to_regenerate,
+    api_restore_images_from_regeneration_queue,
+    api_regenerate_queued_images,
     api_replace_image,
     api_download_single_image,
     api_download_batch_images,
@@ -45,6 +48,18 @@ def _delete_prompt(run_id: str, payload: dict[str, Any] = Body(...)) -> dict[str
 @router.post("/api/runs/{run_id}/delete-image")
 def _delete_image(run_id: str, payload: dict[str, Any] = Body(...)) -> dict[str, Any]:
     return api_delete_image(run_id, payload)
+
+@router.post("/api/runs/{run_id}/mark-images-to-regenerate")
+def _mark_images_to_regenerate(run_id: str, payload: dict[str, Any] = Body(...)) -> dict[str, Any]:
+    return api_mark_images_to_regenerate(run_id, payload)
+
+@router.post("/api/runs/{run_id}/restore-images-from-queue")
+def _restore_images_from_queue(run_id: str, payload: dict[str, Any] = Body(...)) -> dict[str, Any]:
+    return api_restore_images_from_regeneration_queue(run_id, payload)
+
+@router.post("/api/runs/{run_id}/regenerate-queued-images")
+def _regenerate_queued_images(run_id: str, payload: dict[str, Any] = Body(...)) -> dict[str, Any]:
+    return api_regenerate_queued_images(run_id, payload)
 
 @router.post("/api/runs/{run_id}/replace-image")
 async def _replace_image(

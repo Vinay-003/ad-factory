@@ -3,6 +3,7 @@ import { setStatus, setSelectOptions } from "./ui.js";
 import { renderPersonas, showPersonaSkeletons, renderGlobalFormats, renderLanguageModes, renderFormatPatterns } from "./personas.js";
 import { renderHypothesisUI } from "./hypothesis.js";
 import { loadRuns as loadAndRenderRuns, showRunsSkeletons } from "./runs.js";
+import { showPromptFullscreen } from "./images.js";
 import { stopProgressPolling } from "./chrome.js";
 import { initTheme } from "./theme.js";
 import { fetchJSON, invalidateRuns } from "./api.js";
@@ -116,9 +117,31 @@ function renderProductDocInfo(productDoc) {
     </div>
   `;
   document.getElementById("openProductDoc")?.addEventListener("click", () => {
-    window.open(`/${doc.path || "input/docs/product master doc.txt"}`, "_blank");
+    fetchJSON("/api/product-doc").then((doc) => {
+      showPromptFullscreen(
+        doc.name || "Product Master Doc",
+        doc.content || "",
+        {
+          fetchUrl: "/api/product-doc",
+          saveUrl: "/api/product-doc",
+          saveBody: (text) => ({ content: text }),
+        }
+      );
+    }).catch((err) => setStatus(`Failed to load product doc: ${String(err)}`));
   });
-  document.getElementById("editProductDoc")?.addEventListener("click", openProductDocEditor);
+  document.getElementById("editProductDoc")?.addEventListener("click", () => {
+    fetchJSON("/api/product-doc").then((doc) => {
+      showPromptFullscreen(
+        doc.name || "Product Master Doc",
+        doc.content || "",
+        {
+          fetchUrl: "/api/product-doc",
+          saveUrl: "/api/product-doc",
+          saveBody: (text) => ({ content: text }),
+        }
+      );
+    }).catch((err) => setStatus(`Failed to load product doc: ${String(err)}`));
+  });
 }
 
 async function openProductDocEditor() {
@@ -175,9 +198,16 @@ async function runPipeline() {
     setStatus("Select at least one persona.");
     return;
   }
-  const reusingPreviousRun = document.getElementById("reuseBackgrounds")?.checked || document.getElementById("reuseVisualPatterns")?.checked;
-  if (reusingPreviousRun && !document.getElementById("backgroundReuseRun")?.value) {
-    setStatus("Select a previous run/batch to reuse from.");
+  const reuseBackgrounds = Boolean(document.getElementById("reuseBackgrounds")?.checked);
+  const reuseVisualPatterns = Boolean(document.getElementById("reuseVisualPatterns")?.checked);
+  const backgroundReuseRunId = document.getElementById("backgroundReuseRun")?.value || "";
+  const visualPatternReuseRunId = document.getElementById("visualPatternReuseRun")?.value || "";
+  if (reuseBackgrounds && !backgroundReuseRunId) {
+    setStatus("Select a previous run/batch for background reuse.");
+    return;
+  }
+  if (reuseVisualPatterns && !visualPatternReuseRunId) {
+    setStatus("Select a previous run/batch for visual pattern reuse.");
     return;
   }
 
@@ -189,8 +219,8 @@ async function runPipeline() {
     visual_archetypes_by_format: state.selectedVisualArchetypesByFormat,
     multiplier: Math.max(1, Math.min(20, Number.parseInt(document.getElementById("adMultiplier")?.value || "1", 10) || 1)),
     share_background_across_personas: Boolean(document.getElementById("shareBackgroundAcrossPersonas")?.checked),
-    reuse_backgrounds_from_run_id: document.getElementById("reuseBackgrounds")?.checked ? (document.getElementById("backgroundReuseRun")?.value || "") : "",
-    reuse_visual_patterns_from_run_id: document.getElementById("reuseVisualPatterns")?.checked ? (document.getElementById("backgroundReuseRun")?.value || "") : "",
+    reuse_backgrounds_from_run_id: reuseBackgrounds ? backgroundReuseRunId : "",
+    reuse_visual_patterns_from_run_id: reuseVisualPatterns ? visualPatternReuseRunId : "",
     generate_images: false,
     server_type: state.currentServerType,
     opencode_api_url: document.getElementById("opencodeApiUrl").value.trim(),
@@ -291,15 +321,19 @@ document.getElementById("saveProductDoc")?.addEventListener("click", async () =>
 
 document.getElementById("reuseBackgrounds")?.addEventListener("change", (event) => {
   const select = document.getElementById("backgroundReuseRun");
-  const shouldEnable = event.target.checked || Boolean(document.getElementById("reuseVisualPatterns")?.checked);
-  if (select) select.disabled = !shouldEnable;
+  if (select) {
+    select.disabled = !event.target.checked;
+    if (!event.target.checked) select.value = "";
+  }
   refreshSelect(select);
 });
 
 document.getElementById("reuseVisualPatterns")?.addEventListener("change", (event) => {
-  const select = document.getElementById("backgroundReuseRun");
-  const shouldEnable = event.target.checked || Boolean(document.getElementById("reuseBackgrounds")?.checked);
-  if (select) select.disabled = !shouldEnable;
+  const select = document.getElementById("visualPatternReuseRun");
+  if (select) {
+    select.disabled = !event.target.checked;
+    if (!event.target.checked) select.value = "";
+  }
   refreshSelect(select);
 });
 

@@ -1003,16 +1003,70 @@ button.is-loading::after {
   margin-bottom: 8px;
 }
 
-.run-prompt-files ul {
-  list-style: none;
-  margin: 6px 0 0;
-  padding: 0;
-  display: flex;
-  flex-direction: column;
-  gap: 3px;
+.run-prompt-files {
+  margin-top: 10px;
+  padding: 12px;
+  border: 1px solid color-mix(in srgb, var(--line) 70%, transparent);
+  border-radius: var(--radius-md);
+  background: color-mix(in srgb, var(--surface) 72%, var(--surface-2));
 }
 
-.run-prompt-files li { font-size: 12px; }
+.run-prompt-files summary {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  cursor: pointer;
+  color: var(--ink);
+}
+
+.run-prompt-files summary span {
+  color: var(--muted);
+  font-size: 12px;
+  font-weight: 700;
+}
+
+.prompt-file-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+  gap: 8px;
+  margin-top: 10px;
+}
+
+.prompt-file-card {
+  display: grid;
+  gap: 3px;
+  min-width: 0;
+  padding: 9px 10px;
+  border: 1px solid color-mix(in srgb, var(--line) 70%, transparent);
+  border-radius: 10px;
+  background: color-mix(in srgb, var(--status-bg) 72%, var(--surface));
+  color: var(--status-fg);
+  text-decoration: none;
+}
+
+.prompt-file-card:hover {
+  border-color: color-mix(in srgb, var(--primary) 55%, var(--line));
+  text-decoration: none;
+}
+
+.prompt-file-card strong {
+  color: #fff;
+  font-size: 12px;
+}
+
+.prompt-file-card span {
+  color: color-mix(in srgb, var(--status-fg) 78%, transparent);
+  font-size: 11px;
+  font-weight: 800;
+}
+
+.prompt-file-aspect {
+  justify-self: start;
+  padding: 2px 7px;
+  border-radius: 999px;
+  background: color-mix(in srgb, var(--primary) 25%, transparent);
+}
 
 /* ── Prompt Editor ────────────────────────────────────────────────────────── */
 .prompt-actions {
@@ -1075,6 +1129,33 @@ button.is-loading::after {
 
 .gallery-filters { display: flex; gap: 6px; margin-bottom: 10px; flex-wrap: wrap; }
 
+.regeneration-toolbar {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-wrap: wrap;
+  margin: 0 0 10px;
+  padding: 10px;
+  border: 1px solid color-mix(in srgb, var(--accent-coral) 28%, var(--line));
+  border-radius: var(--radius-md);
+  background: color-mix(in srgb, var(--accent-coral) 8%, var(--surface));
+}
+
+.regeneration-toolbar .ghost-btn {
+  padding: 7px 10px;
+  border-radius: var(--radius-sm);
+  font-size: 12px;
+  font-weight: 800;
+  cursor: pointer;
+}
+
+.regeneration-count {
+  color: var(--accent-coral);
+  font-size: 12px;
+  font-weight: 900;
+  margin-right: 4px;
+}
+
 .gallery-filter {
   border: 1px solid var(--line);
   border-radius: 8px;
@@ -1112,10 +1193,41 @@ button.is-loading::after {
   border-color: color-mix(in srgb, var(--primary) 35%, var(--line));
 }
 
+.image-card.selected-for-regeneration {
+  border-color: color-mix(in srgb, var(--accent-coral) 72%, var(--line));
+  box-shadow: 0 0 0 2px color-mix(in srgb, var(--accent-coral) 24%, transparent);
+}
+
 .image-wrap {
+  position: relative;
   overflow: hidden;
   aspect-ratio: 4 / 5;
   background: color-mix(in srgb, var(--line) 12%, var(--surface));
+}
+
+.image-select-label {
+  position: absolute;
+  left: 6px;
+  bottom: 6px;
+  z-index: 4;
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  max-width: calc(100% - 12px);
+  padding: 4px 7px;
+  border-radius: 999px;
+  background: color-mix(in srgb, var(--surface) 92%, #00000066);
+  color: var(--ink);
+  font-size: 10px;
+  font-weight: 900;
+  cursor: pointer;
+}
+
+.image-select-label input {
+  width: 13px;
+  height: 13px;
+  margin: 0;
+  accent-color: var(--accent-coral);
 }
 
 .image-card[data-aspect="9_16"] .image-wrap { aspect-ratio: 9 / 16; }
@@ -1153,6 +1265,208 @@ button.is-loading::after {
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
+}
+
+.image-prompt-box {
+  border-top: 1px solid color-mix(in srgb, var(--line) 70%, transparent);
+  padding: 7px 8px 8px;
+  background: color-mix(in srgb, var(--surface) 90%, var(--surface-2));
+}
+
+.image-prompt-box summary {
+  cursor: pointer;
+  color: var(--ink);
+  font-size: 11px;
+  font-weight: 800;
+  overflow-wrap: anywhere;
+}
+
+.image-prompt-box a {
+  display: block;
+  margin: 6px 0;
+  font-size: 11px;
+  overflow-wrap: anywhere;
+}
+
+.prompt-mapping-note {
+  margin: 6px 0;
+  padding: 5px 7px;
+  border-radius: 7px;
+  background: color-mix(in srgb, var(--accent-amber) 12%, var(--surface));
+  color: color-mix(in srgb, var(--accent-amber) 74%, var(--ink));
+  font-size: 10px;
+  font-weight: 800;
+}
+
+.prompt-fullscreen-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  margin: 2px 0 4px;
+  padding: 5px 8px;
+  border: 1px solid color-mix(in srgb, var(--primary) 45%, var(--line));
+  border-radius: 7px;
+  background: color-mix(in srgb, var(--primary) 12%, var(--surface));
+  color: var(--primary);
+  font-size: 10px;
+  font-weight: 900;
+  cursor: pointer;
+}
+
+.image-prompt-box pre {
+  max-height: 220px;
+  margin: 6px 0 0;
+  padding: 8px;
+  overflow: auto;
+  white-space: pre-wrap;
+  border-radius: 8px;
+  border: 1px solid color-mix(in srgb, var(--line) 70%, transparent);
+  background: var(--status-bg);
+  color: var(--status-fg);
+  font-size: 10px;
+  line-height: 1.45;
+  scrollbar-width: thin;
+  scrollbar-color: color-mix(in srgb, var(--status-fg) 15%, transparent) transparent;
+}
+.image-prompt-box pre::-webkit-scrollbar { width: 4px; height: 4px; }
+.image-prompt-box pre::-webkit-scrollbar-track { background: transparent; }
+.image-prompt-box pre::-webkit-scrollbar-thumb { background: color-mix(in srgb, var(--status-fg) 15%, transparent); border-radius: 3px; }
+
+.prompt-fullscreen-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 10000;
+  display: flex;
+  align-items: stretch;
+  justify-content: center;
+  padding: 0;
+  background: rgba(8, 12, 18, 0.78);
+  backdrop-filter: blur(10px);
+}
+
+.prompt-fullscreen-modal {
+  width: 100%;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  border: none;
+  border-radius: 0;
+  background: var(--status-bg);
+  color: var(--status-fg);
+  box-shadow: none;
+  overflow: hidden;
+}
+
+.prompt-fullscreen-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 14px 16px;
+  border-bottom: 1px solid color-mix(in srgb, var(--status-fg) 18%, transparent);
+}
+
+.prompt-fullscreen-header strong {
+  overflow-wrap: anywhere;
+}
+
+.prompt-fullscreen-actions {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex-shrink: 0;
+}
+
+.prompt-fullscreen-close {
+  border: 1px solid color-mix(in srgb, var(--status-fg) 26%, transparent);
+  border-radius: 9px;
+  padding: 7px 11px;
+  background: color-mix(in srgb, var(--status-fg) 8%, transparent);
+  color: var(--status-fg);
+  cursor: pointer;
+  font-weight: 900;
+}
+
+.prompt-fullscreen-btn.save-btn {
+  border: 2px solid #22c55e;
+  border-radius: 9px;
+  padding: 7px 16px;
+  background: transparent;
+  color: #22c55e;
+  cursor: pointer;
+  font-weight: 900;
+}
+
+.prompt-fullscreen-btn.save-btn:hover {
+  background: color-mix(in srgb, #22c55e 12%, transparent);
+}
+
+.prompt-fullscreen-btn.cancel-btn {
+  border: 2px solid #ef4444;
+  border-radius: 9px;
+  padding: 7px 16px;
+  background: transparent;
+  color: #ef4444;
+  cursor: pointer;
+  font-weight: 900;
+}
+
+.prompt-fullscreen-btn.cancel-btn:hover {
+  background: color-mix(in srgb, #ef4444 12%, transparent);
+}
+
+.prompt-fullscreen-modal pre {
+  flex: 1;
+  margin: 0;
+  padding: 18px;
+  overflow: auto;
+  white-space: pre-wrap;
+  font-family: "JetBrains Mono", "Consolas", monospace;
+  font-size: 13px;
+  line-height: 1.55;
+}
+
+.prompt-fullscreen-textarea {
+  flex: 1;
+  margin: 0;
+  padding: 18px;
+  border: none;
+  border-radius: 0;
+  background: var(--status-bg);
+  color: var(--status-fg);
+  font-family: "JetBrains Mono", "Consolas", monospace;
+  font-size: 13px;
+  line-height: 1.55;
+  resize: none;
+  outline: none;
+}
+
+.prompt-fullscreen-textarea:focus {
+  box-shadow: none;
+  border: none;
+}
+
+/* ── Regeneration Queue ──────────────────────────────────────────────────── */
+.regeneration-queue-section {
+  margin-top: 28px;
+  padding-top: 18px;
+  border-top: 2px dashed color-mix(in srgb, var(--accent-coral) 28%, var(--line));
+}
+
+.regeneration-queue-section .gallery-header strong {
+  color: var(--accent-coral);
+}
+
+.regeneration-queue-card {
+  opacity: 0.7;
+  filter: saturate(0.65);
+  border-color: color-mix(in srgb, var(--line) 50%, transparent) !important;
+  transition: opacity var(--transition-fast);
+}
+
+.regeneration-queue-card:hover {
+  opacity: 1;
+  filter: none;
 }
 
 .image-delete-btn {

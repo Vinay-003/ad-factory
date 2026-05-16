@@ -6,6 +6,7 @@ import json
 import os
 import random
 import re
+import shutil
 import subprocess
 import sys
 import time
@@ -931,6 +932,30 @@ def api_save_product_doc(payload: dict[str, Any] = Body(...)) -> dict[str, Any]:
     return {"status": "saved", **default_product_doc_info()}
 
 
+def api_prompt_file_content(prompt_path: str = "") -> dict[str, Any]:
+    """Return the full text of a prompt file."""
+    if not prompt_path:
+        raise HTTPException(status_code=400, detail="prompt_path is required")
+    full_path = ROOT / prompt_path
+    if not full_path.exists() or not full_path.is_file():
+        raise HTTPException(status_code=404, detail=f"Prompt file not found: {prompt_path}")
+    content = full_path.read_text(encoding="utf-8", errors="ignore")
+    return {"content": content, "path": prompt_path}
+
+
+def api_save_prompt_file_content(payload: dict[str, Any] = Body(...)) -> dict[str, Any]:
+    """Save full content of a prompt file."""
+    prompt_path = str(payload.get("prompt_path") or "").strip()
+    content = str(payload.get("content") or "")
+    if not prompt_path:
+        raise HTTPException(status_code=400, detail="prompt_path is required")
+    full_path = ROOT / prompt_path
+    if not full_path.exists():
+        raise HTTPException(status_code=404, detail=f"Prompt file not found: {prompt_path}")
+    full_path.write_text(content, encoding="utf-8")
+    return {"status": "saved", "path": prompt_path}
+
+
 def _is_opencode_run_cmd(cmd: list[str]) -> bool:
     return bool(cmd) and Path(cmd[0]).name == "opencode" and len(cmd) > 1 and cmd[1] == "run"
 
@@ -1367,7 +1392,7 @@ def load_batch_image_summary(batch: str) -> list[dict[str, Any]]:
                 if not isinstance(payload, dict):
                     continue
                 rec_type = str(payload.get("type") or payload.get("record_type") or "").strip()
-                if rec_type not in ("ad_image", "generated_image"):
+                if rec_type not in ("ad_image", "generated_image", "gemini_ad_image", "chatgpt_ad_image"):
                     continue
 
                 prompt_file = str(payload.get("prompt_file_relative") or payload.get("prompt_file") or "").strip().replace("\\", "/")
@@ -2533,6 +2558,17 @@ def collect_run_result(run_dir: Path, batch_name: str, image_generated: bool) ->
     return result
 
 
+_IMAGE_PATH_SORT_RE = re.compile(r"p(\d+)", re.IGNORECASE)
+
+
+def _image_path_sort_key(rel: str):
+    name = rel.rsplit("/", 1)[-1]
+    m = _IMAGE_PATH_SORT_RE.search(name)
+    persona = int(m.group(1)) if m else 0
+    aspect = 0 if "/4_5/" in rel else 1
+    return (persona, aspect, name)
+
+
 def _collect_aspect_ratio_images(batch_name: str, aspect_ratio: str) -> list[str]:
     """Collect generated image paths for a specific aspect ratio.
 
@@ -2546,11 +2582,12 @@ def _collect_aspect_ratio_images(batch_name: str, aspect_ratio: str) -> list[str
         if not image_dir.exists():
             continue
         for ext in ("*.png", "*.jpg", "*.jpeg", "*.webp"):
-            for file in sorted(image_dir.glob(f"**/{ext}")):
+            for file in image_dir.glob(f"**/{ext}"):
                 rel = str(file.relative_to(ROOT)).replace("\\", "/")
                 if "/debug/" in rel or "/.browser_downloads/" in rel:
                     continue
                 image_files.append(rel)
+    image_files.sort(key=_image_path_sort_key)
     return image_files
 
 
@@ -2572,15 +2609,322 @@ def scan_image_files_for_batch(batch_name: str) -> list[str]:
         if not image_dir.exists():
             continue
         for ext in ("*.png", "*.jpg", "*.jpeg", "*.webp"):
-            for file in sorted(image_dir.glob(f"**/{ext}")):
+            for file in image_dir.glob(f"**/{ext}"):
                 rel = str(file.relative_to(ROOT)).replace("\\", "/")
-                if "/debug/" in rel or "/.browser_downloads/" in rel:
+                if "/debug/" in rel or "/.browser_downloads/" in rel or "/to_be_regenerated/" in rel:
                     continue
                 if rel in seen:
                     continue
                 seen.add(rel)
                 image_files.append(rel)
+    image_files.sort(key=_image_path_sort_key)
     return image_files
+
+
+def scan_regeneration_queue_files_for_batch(batch_name: str) -> list[str]:
+    queue_files: list[str] = []
+    seen: set[str] = set()
+    for generated_root in generated_image_roots():
+        for tbr_dir in sorted(generated_root.glob(f"{batch_name}/**/to_be_regenerated")):
+            if not tbr_dir.is_dir():
+                continue
+            for ext in ("*.png", "*.jpg", "*.jpeg", "*.webp"):
+                for file in tbr_dir.glob(ext):
+                    rel = str(file.relative_to(ROOT)).replace("\\", "/")
+                    if rel in seen:
+                        continue
+                    seen.add(rel)
+                    queue_files.append(rel)
+    queue_files.sort(key=_image_path_sort_key)
+    return queue_files
+
+
+def _read_image_metadata(image_rel_path: str) -> dict[str, Any]:
+    image_path = ROOT / image_rel_path
+    meta_path = image_path.with_suffix(".json")
+    if not meta_path.exists() or not meta_path.is_file():
+        return {}
+    try:
+        payload = json.loads(meta_path.read_text(encoding="utf-8"))
+    except Exception:
+        return {}
+    return payload if isinstance(payload, dict) else {}
+
+
+def _prompt_stem_for_image(image_rel_path: str) -> str:
+    stem = Path(image_rel_path).stem
+    if stem.startswith("gemini-"):
+        stem = stem.removeprefix("gemini-")
+    elif stem.startswith("chatgpt-"):
+        stem = stem.removeprefix("chatgpt-")
+    return stem.replace("-", "_").upper()
+
+
+def _find_prompt_for_image(
+    image_rel_path: str,
+    prompt_files: list[str],
+    metadata: dict[str, Any],
+) -> str:
+    prompt_from_name = _find_prompt_from_image_name(image_rel_path, prompt_files)
+    if prompt_from_name:
+        return prompt_from_name
+
+    prompt_name = str(metadata.get("prompt_file_relative") or metadata.get("prompt_file") or "").strip().replace("\\", "/")
+    if prompt_name:
+        if prompt_name.startswith("output/") and prompt_name in prompt_files:
+            return prompt_name
+        by_name = [p for p in prompt_files if Path(p).name == Path(prompt_name).name]
+        if by_name:
+            if "/45/" in image_rel_path:
+                return next((p for p in by_name if "/45/" in p), by_name[0])
+            if "/9_16/" in image_rel_path or "/916/" in image_rel_path or "/96/" in image_rel_path:
+                return next((p for p in by_name if "/916/" in p or "/96/" in p), by_name[0])
+            return by_name[0]
+
+    stem_key = _prompt_stem_for_image(image_rel_path)
+    scored: list[tuple[int, str]] = []
+    for prompt_file in prompt_files:
+        parsed = parse_prompt_filename(prompt_file)
+        if not parsed:
+            continue
+        fmt, lang, persona_num = parsed
+        if persona_num is None:
+            continue
+        creative_index = parse_prompt_creative_index(prompt_file)
+        tokens = [fmt.upper(), f"P{persona_num:02d}", lang.upper()]
+        score = sum(1 for token in tokens if token in stem_key)
+        if creative_index > 1 and f"A{creative_index:02d}" in stem_key:
+            score += 1
+        if "/45/" in prompt_file:
+            score += 1
+        if score >= 3:
+            scored.append((score, prompt_file))
+    if not scored:
+        return ""
+    scored.sort(key=lambda item: item[0], reverse=True)
+    return scored[0][1]
+
+
+def _find_45_prompt_for_regeneration(prompt_file: str, prompt_files: list[str]) -> str:
+    if not prompt_file:
+        return ""
+    if "/45/" in prompt_file:
+        return prompt_file
+    parsed = parse_prompt_filename(prompt_file)
+    if not parsed:
+        return ""
+    fmt, lang, persona_num = parsed
+    creative_index = parse_prompt_creative_index(prompt_file)
+    for candidate in prompt_files:
+        if "/45/" not in candidate:
+            continue
+        c_parsed = parse_prompt_filename(candidate)
+        if not c_parsed:
+            continue
+        c_fmt, c_lang, c_persona_num = c_parsed
+        if c_fmt == fmt and c_lang == lang and c_persona_num == persona_num and parse_prompt_creative_index(candidate) == creative_index:
+            return candidate
+    for candidate in prompt_files:
+        if "/45/" in candidate and Path(candidate).name == Path(prompt_file).name:
+            return candidate
+    return ""
+
+
+def _prompt_excerpt(prompt_file: str, max_chars: int | None = None) -> str:
+    if not prompt_file:
+        return ""
+    prompt_path = ROOT / prompt_file
+    if not prompt_path.exists() or not prompt_path.is_file():
+        return ""
+    text = prompt_path.read_text(encoding="utf-8", errors="ignore").strip()
+    if max_chars is None or len(text) <= max_chars:
+        return text
+    return text[:max_chars].rstrip() + "\n..."
+
+
+def _aspect_key_for_image(rel: str) -> str:
+    return "9_16" if "/9_16/" in rel or "/916/" in rel or "/96/" in rel else "4_5"
+
+
+def _prompt_matches_persona(prompt_file: str, fmt: str, lang: str, persona_num: int) -> bool:
+    parsed = parse_prompt_filename(prompt_file)
+    if not parsed:
+        return False
+    p_fmt, p_lang, p_persona = parsed
+    return p_fmt.upper() == fmt.upper() and p_lang.upper() == lang.upper() and p_persona == persona_num
+
+
+def _match_metadata_prompt(rel: str, prompt_files: list[str]) -> str:
+    meta = _read_image_metadata(rel)
+    prompt_name = str(meta.get("prompt_file") or "").strip()
+    if not prompt_name:
+        return ""
+    matches = [p for p in prompt_files if Path(p).name == Path(prompt_name).name]
+    if matches:
+        return matches[0]
+    return ""
+
+
+def _find_prompt_for_group_bucket(
+    rel: str,
+    prompt_files: list[str],
+    group_prompts: list[str],
+    remaining: list[str],
+) -> str:
+    if not group_prompts and not remaining:
+        return _match_metadata_prompt(rel, prompt_files)
+    return ""
+
+
+def _group_prompt_map_for_images(image_paths: list[str], prompt_files: list[str]) -> dict[str, dict[str, str]]:
+    """Map generated images to prompts.
+
+    Precedence:
+      1. Sidecar metadata (the .json written alongside each image) stores the
+         exact prompt_file name — use it when the file exists in prompt_files.
+      2. Group-based heuristic for older images without metadata — assign within
+         each (fmt, lang, persona, aspect) group so extra images don't shift later groups.
+         Within a group, images and prompts are both sorted ascending by A-index.
+    """
+    direct: dict[str, dict[str, str]] = {}
+    groups: dict[tuple[str, str, int, str], list[tuple[int, str]]] = {}
+    out: dict[str, dict[str, str]] = {}
+
+    for rel in image_paths:
+        metadata_match = _match_metadata_prompt(rel, prompt_files)
+        if metadata_match:
+            direct[rel] = {"prompt_file": metadata_match, "mapping_status": ""}
+            continue
+        parsed = _parse_generated_image_name(rel)
+        if not parsed:
+            continue
+        fmt = str(parsed.get("format") or "")
+        lang = str(parsed.get("language") or "")
+        persona_num = parsed.get("persona_number")
+        image_index = parsed.get("image_index")
+        if not fmt or not lang or not isinstance(persona_num, int):
+            continue
+        sort_index = int(image_index) if isinstance(image_index, int) else 0
+        groups.setdefault((fmt, lang, persona_num, _aspect_key_for_image(rel)), []).append((sort_index, rel))
+
+    for (fmt, lang, persona_num, _aspect), images in groups.items():
+        prompts = sorted(
+            [p for p in prompt_files if "/45/" in p and _prompt_matches_persona(p, fmt, lang, persona_num)],
+            key=lambda p: (parse_prompt_creative_index(p), p),
+        )
+        if not prompts:
+            prompts = sorted(
+                [p for p in prompt_files if _prompt_matches_persona(p, fmt, lang, persona_num)],
+                key=lambda p: (parse_prompt_creative_index(p), p),
+            )
+        if not prompts:
+            continue
+
+        images_sorted = [rel for _idx, rel in sorted(images, key=lambda item: (item[0], item[1]))]
+        if len(images_sorted) > len(prompts):
+            extras = images_sorted[: len(images_sorted) - len(prompts)]
+            for rel in extras:
+                out[rel] = {
+                    "prompt_file": "",
+                    "mapping_status": f"extra image: {len(images_sorted)} images for {len(prompts)} prompts in this persona",
+                }
+            images_sorted = images_sorted[-len(prompts):]
+
+        for rel, prompt_file in zip(images_sorted, prompts):
+            out[rel] = {"prompt_file": prompt_file, "mapping_status": ""}
+
+    return {**direct, **out}
+
+
+def _build_image_item(
+    rel: str,
+    prompt_files: list[str],
+    *,
+    is_queued: bool = False,
+    prompt_file_override: str | None = None,
+    mapping_status: str = "",
+) -> dict[str, Any]:
+    metadata = _read_image_metadata(rel)
+    prompt_file = prompt_file_override if prompt_file_override is not None else _find_prompt_for_image(rel, prompt_files, metadata)
+    regen_prompt_file = _find_45_prompt_for_regeneration(prompt_file, prompt_files) if not is_queued else prompt_file
+    aspect = "9:16" if "/9_16/" in rel or "/916/" in rel or "/96/" in rel else "4:5"
+    display_name = Path(rel).name
+    if prompt_file:
+        display_name = f"{Path(prompt_file).stem}{Path(rel).suffix}"
+    return {
+        "path": rel,
+        "display_name": display_name,
+        "aspect_ratio": aspect,
+        "prompt_file": prompt_file,
+        "regenerate_prompt_file": regen_prompt_file,
+        "prompt_url": ("/output/" + prompt_file.replace("output/", "")) if prompt_file else "",
+        "prompt_excerpt": _prompt_excerpt(prompt_file),
+        "is_queued": is_queued,
+        "mapping_status": mapping_status,
+        "metadata": {
+            "format": metadata.get("format", ""),
+            "persona": metadata.get("persona", ""),
+            "language": metadata.get("language", ""),
+            "job_key": metadata.get("job_key", ""),
+            "status": metadata.get("status", ""),
+        },
+    }
+
+
+def _image_sort_key(item: dict[str, Any]) -> tuple:
+    """Sort key: aspect (4:5 before 9:16), persona number, creative index."""
+    aspect = 0 if item.get("aspect_ratio") == "4:5" else 1
+    prompt_file = item.get("prompt_file") or ""
+    pf = parse_prompt_filename(prompt_file) if prompt_file else None
+    persona = pf[2] if pf and pf[2] is not None else 999
+    creative = parse_prompt_creative_index(prompt_file) if prompt_file else 999
+    return (aspect, persona, creative)
+
+
+def build_image_items_for_manifest(manifest: dict[str, Any]) -> list[dict[str, Any]]:
+    prompt_files = [str(path).replace("\\", "/") for path in (manifest.get("prompt_files") or [])]
+    image_paths = [str(rel_raw).replace("\\", "/") for rel_raw in manifest.get("image_files") or []]
+    prompt_map = _group_prompt_map_for_images(image_paths, prompt_files)
+    image_items: list[dict[str, Any]] = []
+    for rel in image_paths:
+        mapped = prompt_map.get(rel, {})
+        image_items.append(
+            _build_image_item(
+                rel,
+                prompt_files,
+                prompt_file_override=mapped.get("prompt_file") if mapped else None,
+                mapping_status=str(mapped.get("mapping_status") or ""),
+            )
+        )
+    image_items.sort(key=_image_sort_key)
+    return image_items
+
+
+def build_regeneration_queue_items_for_manifest(manifest: dict[str, Any]) -> list[dict[str, Any]]:
+    prompt_files = [str(path).replace("\\", "/") for path in (manifest.get("prompt_files") or [])]
+    queue_paths = [str(rel_raw).replace("\\", "/") for rel_raw in manifest.get("regeneration_queue_files") or []]
+    prompt_map = _group_prompt_map_for_images(queue_paths, prompt_files)
+    queue_items: list[dict[str, Any]] = []
+    for rel in queue_paths:
+        mapped = prompt_map.get(rel, {})
+        queue_items.append(
+            _build_image_item(
+                rel,
+                prompt_files,
+                is_queued=True,
+                prompt_file_override=mapped.get("prompt_file") if mapped else None,
+                mapping_status=str(mapped.get("mapping_status") or ""),
+            )
+        )
+    queue_items.sort(key=_image_sort_key)
+    return queue_items
+
+
+def enrich_manifest_for_dashboard(manifest: dict[str, Any]) -> dict[str, Any]:
+    enriched = dict(manifest)
+    enriched["image_items"] = build_image_items_for_manifest(enriched)
+    enriched["regeneration_queue_items"] = build_regeneration_queue_items_for_manifest(enriched)
+    return enriched
 
 
 def refresh_manifest_file_state(run_dir: Path, manifest: dict[str, Any]) -> dict[str, Any]:
@@ -2590,12 +2934,15 @@ def refresh_manifest_file_state(run_dir: Path, manifest: dict[str, Any]) -> dict
 
     prompt_files = scan_prompt_files_for_batch(batch_name)
     image_files = scan_image_files_for_batch(batch_name)
+    regeneration_queue_files = scan_regeneration_queue_files_for_batch(batch_name)
     image_generated = bool(image_files) or bool(manifest.get("image_generated", False))
     previous_prompt_files = list(manifest.get("prompt_files") or [])
     previous_image_files = list(manifest.get("image_files") or [])
+    previous_queue_files = list(manifest.get("regeneration_queue_files") or [])
     if (
         previous_prompt_files == prompt_files
         and previous_image_files == image_files
+        and previous_queue_files == regeneration_queue_files
         and bool(manifest.get("image_generated", False)) == image_generated
     ):
         return manifest
@@ -2618,6 +2965,7 @@ def refresh_manifest_file_state(run_dir: Path, manifest: dict[str, Any]) -> dict
         "batch": batch_name,
         "prompt_files": prompt_files,
         "image_files": image_files,
+        "regeneration_queue_files": regeneration_queue_files,
         "image_generated": image_generated,
         "updated_at": updated_at,
     }
@@ -2663,6 +3011,96 @@ def parse_prompt_filename(prompt_path: str) -> tuple[str, str, int | None] | Non
 def parse_prompt_creative_index(prompt_path: str) -> int:
     match = re.search(r"_A(\d+)\.txt$", Path(prompt_path).name, flags=re.IGNORECASE)
     return int(match.group(1)) if match else 1
+
+
+def _parse_generated_image_name(image_rel_path: str) -> dict[str, Any]:
+    stem = Path(image_rel_path).stem.lower()
+    match = re.search(
+        r"^(?:gemini|chatgpt)-(?P<fmt>[a-z0-9]+)-p(?P<persona>\d+)-(?P<lang>[a-z0-9]+)(?:-a(?P<image_index>\d+))?$",
+        stem,
+        flags=re.IGNORECASE,
+    )
+    if not match:
+        return {}
+    return {
+        "format": match.group("fmt").upper(),
+        "persona_number": int(match.group("persona")),
+        "language": match.group("lang").upper(),
+        "image_index": int(match.group("image_index")) if match.group("image_index") else None,
+    }
+
+
+def _sorted_prompt_candidates(
+    prompt_files: list[str],
+    *,
+    fmt: str,
+    lang: str,
+    prefer_45: bool,
+) -> list[str]:
+    candidates: list[str] = []
+    for prompt_file in prompt_files:
+        parsed = parse_prompt_filename(prompt_file)
+        if not parsed:
+            continue
+        p_fmt, p_lang, persona_num = parsed
+        if persona_num is None:
+            continue
+        if p_fmt.upper() != fmt.upper() or p_lang.upper() != lang.upper():
+            continue
+        if prefer_45 and "/45/" not in prompt_file:
+            continue
+        candidates.append(prompt_file)
+    return sorted(
+        candidates,
+        key=lambda prompt_file: (
+            parse_prompt_filename(prompt_file)[2] or 0,
+            parse_prompt_creative_index(prompt_file),
+            prompt_file,
+        ),
+    )
+
+
+def _find_prompt_from_image_name(image_rel_path: str, prompt_files: list[str]) -> str:
+    parsed_image = _parse_generated_image_name(image_rel_path)
+    if not parsed_image:
+        return ""
+
+    fmt = str(parsed_image.get("format") or "")
+    lang = str(parsed_image.get("language") or "")
+    persona_num = parsed_image.get("persona_number")
+    image_index = parsed_image.get("image_index")
+    prefer_45 = True
+
+    candidates = _sorted_prompt_candidates(prompt_files, fmt=fmt, lang=lang, prefer_45=prefer_45)
+    if not candidates and prefer_45:
+        candidates = _sorted_prompt_candidates(prompt_files, fmt=fmt, lang=lang, prefer_45=False)
+
+    if isinstance(image_index, int):
+        # Current/future naming: image a02 should map to persona Pxx prompt A02.
+        for prompt_file in candidates:
+            parsed_prompt = parse_prompt_filename(prompt_file)
+            if not parsed_prompt:
+                continue
+            _fmt, _lang, prompt_persona = parsed_prompt
+            if prompt_persona == persona_num and parse_prompt_creative_index(prompt_file) == image_index:
+                return prompt_file
+
+        # Older generated images used a global sequence in filenames: P02 a04
+        # means the 4th prompt in sorted FORMAT/LANG order, not prompt A04.
+        if 1 <= image_index <= len(candidates):
+            global_prompt = candidates[image_index - 1]
+            parsed_global = parse_prompt_filename(global_prompt)
+            if parsed_global and parsed_global[2] == persona_num:
+                return global_prompt
+
+    persona_candidates = [
+        prompt_file
+        for prompt_file in candidates
+        if (parse_prompt_filename(prompt_file) or (None, None, None))[2] == persona_num
+    ]
+    if len(persona_candidates) == 1:
+        return persona_candidates[0]
+    return ""
 
 
 def parse_persona_number_from_prompt(prompt_text: str) -> int | None:
@@ -3240,11 +3678,13 @@ def _build_backfill_manifest(run_id: str, batch: str) -> dict[str, Any]:
     updated_at = now_iso()
     if batch_dir.exists():
         updated_at = datetime.fromtimestamp(batch_dir.stat().st_mtime, tz=timezone.utc).replace(microsecond=0).isoformat().replace("+00:00", "Z")
+    regeneration_queue_files = scan_regeneration_queue_files_for_batch(batch)
     return {
         "run_id": run_id,
         "batch": batch,
         "prompt_files": prompt_files,
         "image_files": image_files,
+        "regeneration_queue_files": regeneration_queue_files,
         "image_generated": bool(image_files),
         "updated_at": updated_at,
         "source": "output_backfill",
@@ -3289,7 +3729,7 @@ def api_runs() -> dict[str, Any]:
             seen_run_ids.add(run_id)
             if batch:
                 seen_batches.add(batch)
-            runs.append(refreshed)
+            runs.append(enrich_manifest_for_dashboard(refreshed))
 
     # Backfill batches that exist on disk but have no run manifest
     # (e.g., older/generated output imported from another machine).
@@ -3305,17 +3745,19 @@ def api_runs() -> dict[str, Any]:
             if not prompt_files:
                 continue
             image_files = scan_image_files_for_batch(batch_name)
+            regeneration_queue_files = scan_regeneration_queue_files_for_batch(batch_name)
             updated_at = datetime.fromtimestamp(batch_dir.stat().st_mtime, tz=timezone.utc).replace(microsecond=0).isoformat().replace("+00:00", "Z")
             runs.append(
-                {
+                enrich_manifest_for_dashboard({
                     "run_id": f"batch_{batch_name}",
                     "batch": batch_name,
                     "prompt_files": prompt_files,
                     "image_files": image_files,
+                    "regeneration_queue_files": regeneration_queue_files,
                     "image_generated": bool(image_files),
                     "updated_at": updated_at,
                     "source": "output_backfill",
-                }
+                })
             )
 
     def batch_sort_key(run: dict[str, Any]) -> tuple[int, float]:
@@ -3337,7 +3779,7 @@ def api_runs() -> dict[str, Any]:
 
 def api_run(run_id: str) -> dict[str, Any]:
     _run_dir, manifest, _has_storage_manifest = load_manifest_for_run(run_id)
-    return manifest
+    return enrich_manifest_for_dashboard(manifest)
 
 
 def api_run_prompt_copies(run_id: str) -> dict[str, Any]:
@@ -5044,6 +5486,383 @@ def api_delete_image(run_id: str, payload: dict[str, Any] = Body(...)) -> dict[s
         manifest_path.write_text(json.dumps(manifest, ensure_ascii=False, indent=2) + "\n", encoding="utf-8")
 
     return {"status": "deleted", "image_file": image_path}
+
+
+def _unique_path(path: Path) -> Path:
+    if not path.exists():
+        return path
+    for index in range(2, 10_000):
+        candidate = path.with_name(f"{path.stem}_{index}{path.suffix}")
+        if not candidate.exists():
+            return candidate
+    raise HTTPException(status_code=500, detail=f"Could not create unique path for {path.name}")
+
+
+def _regeneration_archive_path(full_path: Path) -> Path:
+    parent = full_path.parent
+    if parent.name == "generated images":
+        archive_dir = parent.parent / "to_be_regenerated"
+    else:
+        archive_dir = parent / "to_be_regenerated"
+    archive_dir.mkdir(parents=True, exist_ok=True)
+    return _unique_path(archive_dir / full_path.name)
+
+
+def api_mark_images_to_regenerate(run_id: str, payload: dict[str, Any] = Body(...)) -> dict[str, Any]:
+    """Move bad generated images out of the active gallery before regeneration."""
+    run_dir, manifest, has_storage_manifest = load_manifest_for_run(run_id)
+    batch = str(manifest.get("batch") or "").strip()
+    if not batch:
+        raise HTTPException(status_code=400, detail="Run has no batch folder")
+
+    image_files = payload.get("image_files")
+    if not isinstance(image_files, list) or not image_files:
+        raise HTTPException(status_code=400, detail="image_files must be a non-empty array")
+
+    moved: list[dict[str, str]] = []
+    skipped: list[dict[str, str]] = []
+    generated_root = GENERATED_IMAGES_ROOT.resolve()
+
+    for raw in image_files:
+        rel = str(raw or "").strip().replace("\\", "/")
+        if not rel:
+            continue
+        full_path = resolve_safe_path(rel)
+        resolved = full_path.resolve()
+        if generated_root not in resolved.parents:
+            skipped.append({"image_file": rel, "reason": "not under generated_images"})
+            continue
+        if f"/generated_images/{batch}/" not in f"/{rel}":
+            skipped.append({"image_file": rel, "reason": "not in this run batch"})
+            continue
+        if "/to_be_regenerated/" in rel:
+            skipped.append({"image_file": rel, "reason": "already archived"})
+            continue
+        if not full_path.exists() or not full_path.is_file():
+            skipped.append({"image_file": rel, "reason": "missing"})
+            continue
+
+        archive_path = _regeneration_archive_path(full_path)
+        shutil.move(str(full_path), str(archive_path))
+        archive_rel = str(archive_path.relative_to(ROOT)).replace("\\", "/")
+        moved.append({"image_file": rel, "archived_file": archive_rel})
+
+        meta_path = full_path.with_suffix(".json")
+        if meta_path.exists() and meta_path.is_file():
+            meta_archive = archive_path.with_suffix(".json")
+            shutil.move(str(meta_path), str(_unique_path(meta_archive)))
+
+    refreshed = collect_backfill_result(run_id, batch)
+    if has_storage_manifest and run_dir is not None:
+        refreshed = collect_run_result(run_dir, batch, True)
+        refreshed = merge_manifest(run_dir, manifest, refreshed)
+
+    return {
+        "status": "archived",
+        "moved": moved,
+        "skipped": skipped,
+        "manifest": enrich_manifest_for_dashboard(refreshed),
+    }
+
+
+def _original_path_for_queued_image(rel: str) -> str | None:
+    original = rel.replace("/to_be_regenerated/", "/")
+    if original == rel:
+        return None
+    return original
+
+
+def api_restore_images_from_regeneration_queue(run_id: str, payload: dict[str, Any] = Body(...)) -> dict[str, Any]:
+    """Move images from to_be_regenerated back to their original location."""
+    run_dir, manifest, has_storage_manifest = load_manifest_for_run(run_id)
+    batch = str(manifest.get("batch") or "").strip()
+    if not batch:
+        raise HTTPException(status_code=400, detail="Run has no batch folder")
+
+    image_files = payload.get("image_files")
+    if not isinstance(image_files, list) or not image_files:
+        raise HTTPException(status_code=400, detail="image_files must be a non-empty array")
+
+    restored: list[dict[str, str]] = []
+    skipped: list[dict[str, str]] = []
+    generated_root = GENERATED_IMAGES_ROOT.resolve()
+
+    for raw in image_files:
+        rel = str(raw or "").strip().replace("\\", "/")
+        if not rel:
+            continue
+        if "/to_be_regenerated/" not in rel:
+            skipped.append({"image_file": rel, "reason": "not in to_be_regenerated"})
+            continue
+        full_path = resolve_safe_path(rel)
+        resolved = full_path.resolve()
+        if generated_root not in resolved.parents:
+            skipped.append({"image_file": rel, "reason": "not under generated_images"})
+            continue
+        if not full_path.exists() or not full_path.is_file():
+            skipped.append({"image_file": rel, "reason": "missing"})
+            continue
+
+        original_rel = _original_path_for_queued_image(rel)
+        if not original_rel:
+            skipped.append({"image_file": rel, "reason": "could not resolve original path"})
+            continue
+
+        original_abs = (ROOT / original_rel).resolve()
+        original_abs.parent.mkdir(parents=True, exist_ok=True)
+
+        if original_abs.exists():
+            # A new image already occupies this slot — move it aside
+            backup = _unique_path(original_abs)
+            shutil.move(str(original_abs), str(backup))
+
+        shutil.move(str(resolved), str(original_abs))
+        restored.append({
+            "restored_file": original_rel,
+            "archived_file": rel,
+        })
+
+        meta_path = full_path.with_suffix(".json")
+        if meta_path.exists() and meta_path.is_file():
+            original_meta = original_abs.with_suffix(".json")
+            if original_meta.exists():
+                backup_meta = _unique_path(original_meta)
+                shutil.move(str(original_meta), str(backup_meta))
+            shutil.move(str(meta_path), str(original_meta))
+
+    refreshed = collect_backfill_result(run_id, batch)
+    if has_storage_manifest and run_dir is not None:
+        refreshed = collect_run_result(run_dir, batch, True)
+        refreshed = merge_manifest(run_dir, manifest, refreshed)
+
+    return {
+        "status": "restored",
+        "restored": restored,
+        "skipped": skipped,
+        "manifest": enrich_manifest_for_dashboard(refreshed),
+    }
+
+
+# ── Queue regeneration helpers ──────────────────────────────────────────────
+
+
+def _find_prompt_by_name(prompt_name: str, prompt_files: list[str]) -> str:
+    """Find a prompt path in prompt_files whose filename matches prompt_name."""
+    target = Path(prompt_name).name
+    for pf in prompt_files:
+        if Path(pf).name == target:
+            return pf
+    return ""
+
+
+def _build_output_stem_from_prompt(prompt_path: str, engine: str) -> str:
+    """Build the deterministic output stem for a generated image.
+
+    Example:  prompt=OUTPUT_HERO_P25_EN_A34.txt, engine=chatgpt
+              -> "chatgpt-hero-p25-en-a34"
+    """
+    name = Path(prompt_path).stem
+    match = re.match(r"^(?:FINAL|OUTPUT_)?([A-Za-z0-9]+)_P(\d+)_([A-Za-z0-9]+)(?:_([AV]\d+))?$", name, flags=re.IGNORECASE)
+    if not match:
+        return ""
+    fmt = match.group(1).lower()
+    persona = f"p{int(match.group(2)):02d}"
+    lang = match.group(3).lower()
+    variant = match.group(4).lower() if match.group(4) else ""
+    variant_suffix = f"-{variant}" if variant else ""
+    return f"{engine}-{fmt}-{persona}-{lang}{variant_suffix}"
+
+
+def _build_expected_output_path(batch: str, prompt_path: str, aspect_dir: str, engine: str) -> Path | None:
+    """Compute the expected full output path for a generated image."""
+    stem = _build_output_stem_from_prompt(prompt_path, engine)
+    if not stem:
+        return None
+    return GENERATED_IMAGES_ROOT / batch / aspect_dir / "generated images" / f"{stem}.png"
+
+
+def _find_45_parent_for_prompt(batch: str, prompt_path: str, engine: str) -> Path | None:
+    """Find the 4:5 reference image for a given prompt."""
+    expected = _build_expected_output_path(batch, prompt_path, "4_5", engine)
+    if expected and expected.exists() and expected.is_file():
+        return expected
+    # Try the other engine
+    other_engine = "gemini" if engine == "chatgpt" else "chatgpt"
+    expected_other = _build_expected_output_path(batch, prompt_path, "4_5", other_engine)
+    if expected_other and expected_other.exists() and expected_other.is_file():
+        return expected_other
+    # Scan the directory for any image whose metadata links to this prompt
+    four_five_dir = GENERATED_IMAGES_ROOT / batch / "4_5" / "generated images"
+    if four_five_dir.exists() and four_five_dir.is_dir():
+        target_name = Path(prompt_path).name
+        for child in four_five_dir.iterdir():
+            if child.suffix.lower() not in {".png", ".jpg", ".jpeg", ".webp"}:
+                continue
+            meta = child.with_suffix(".json")
+            if meta.exists() and meta.is_file():
+                try:
+                    meta_data = json.loads(meta.read_text(encoding="utf-8"))
+                    if Path(meta_data.get("prompt_file", "")).name == target_name:
+                        return child
+                except Exception:
+                    continue
+    return None
+
+
+def api_regenerate_queued_images(run_id: str, payload: dict[str, Any] = Body(...)) -> dict[str, Any]:
+    """Regenerate images already in the to_be_regenerated queue.
+
+    Single endpoint that handles both 4:5 and 9:16 images in one call.
+    New images stay in to_be_regenerated for user review before restore.
+    """
+    run_dir, manifest, has_storage_manifest = load_manifest_for_run(run_id)
+    batch = str(manifest.get("batch") or "").strip()
+    if not batch:
+        raise HTTPException(status_code=400, detail="Run has no batch folder")
+
+    image_files = payload.get("image_files")
+    if not isinstance(image_files, list) or not image_files:
+        raise HTTPException(status_code=400, detail="image_files must be a non-empty array")
+
+    headless = bool(payload.get("headless", False))
+    engine = str(payload.get("engine") or "gemini").strip().lower()
+    if engine not in {"gemini", "chatgpt"}:
+        raise HTTPException(status_code=400, detail="engine must be gemini or chatgpt")
+
+    prompt_files_list = list(manifest.get("prompt_files") or [])
+    generated_root = GENERATED_IMAGES_ROOT.resolve()
+
+    prompts_45: set[str] = set()
+    jobs_916: list[dict[str, Any]] = []
+    skipped: list[dict[str, str]] = []
+
+    for raw in image_files:
+        rel = str(raw or "").strip().replace("\\", "/")
+        if not rel:
+            continue
+        if "/to_be_regenerated/" not in rel:
+            skipped.append({"image_file": rel, "reason": "not in to_be_regenerated"})
+            continue
+
+        meta = _read_image_metadata(rel)
+        prompt_name = str(meta.get("prompt_file") or "").strip()
+        if not prompt_name:
+            skipped.append({"image_file": rel, "reason": "no prompt_file in metadata"})
+            continue
+        prompt_path = _find_prompt_by_name(prompt_name, prompt_files_list)
+        if not prompt_path:
+            skipped.append({"image_file": rel, "reason": f"prompt {prompt_name} not found in manifest"})
+            continue
+
+        aspect_dir = "4_5" if "/4_5/" in rel else ("9_16" if "/9_16/" in rel else "")
+        if not aspect_dir:
+            skipped.append({"image_file": rel, "reason": "unknown aspect ratio"})
+            continue
+
+        if aspect_dir == "4_5":
+            prompts_45.add(prompt_path)
+        else:
+            parent_path = _find_45_parent_for_prompt(batch, prompt_path, engine)
+            if not parent_path:
+                skipped.append({"image_file": rel, "reason": "no 4:5 parent image found"})
+                continue
+            parsed = parse_prompt_filename(prompt_path)
+            if not parsed:
+                skipped.append({"image_file": rel, "reason": "could not parse prompt filename"})
+                continue
+            p_fmt, p_lang, persona_num = parsed
+            jobs_916.append({
+                "format": p_fmt.upper(),
+                "persona_number": int(persona_num) if persona_num else 0,
+                "language": p_lang.upper(),
+                "image_rel": str(parent_path.relative_to(ROOT)).replace("\\", "/"),
+                "image_abs": str(parent_path.resolve()),
+            })
+
+    if not prompts_45 and not jobs_916:
+        raise HTTPException(status_code=400, detail=f"No valid queued images to regenerate ({len(skipped)} skipped)")
+
+    generated_files: list[str] = []
+
+    # ── Regenerate 4:5 images ──────────────────────────────────────────
+    if prompts_45:
+        try:
+            if engine == "chatgpt":
+                run_chatgpt_generation(
+                    batch=batch,
+                    prompt_files=list(prompts_45),
+                    aspect_ratio="4:5",
+                    image_sources_file=None,
+                    headless=headless,
+                    run_dir=run_dir,
+                )
+            else:
+                run_gemini_generation(
+                    batch=batch,
+                    prompt_files=list(prompts_45),
+                    aspect_ratio="4:5",
+                    image_sources_file=None,
+                    headless=headless,
+                    run_dir=run_dir,
+                )
+        except Exception as exc:
+            raise HTTPException(status_code=500, detail=f"4:5 regeneration failed: {exc}")
+
+        for pf in prompts_45:
+            expected = _build_expected_output_path(batch, pf, "4_5", engine)
+            if expected and expected.exists() and expected.is_file():
+                archive_dir = GENERATED_IMAGES_ROOT / batch / "to_be_regenerated" / "generated images"
+                archive_dir.mkdir(parents=True, exist_ok=True)
+                dest = _unique_path(archive_dir / expected.name)
+                shutil.move(str(expected), str(dest))
+                generated_files.append(str(dest.relative_to(ROOT)).replace("\\", "/"))
+                # Move sidecar
+                meta_src = expected.with_suffix(".json")
+                if meta_src.exists() and meta_src.is_file():
+                    shutil.move(str(meta_src), str(dest.with_suffix(".json")))
+
+    # ── Regenerate 9:16 images ─────────────────────────────────────────
+    if jobs_916:
+        try:
+            run_916_conversion_from_45_for_batch(
+                batch=batch,
+                headless=headless,
+                run_dir=run_dir,
+                engine=engine,
+                jobs=jobs_916,
+            )
+        except Exception as exc:
+            raise HTTPException(status_code=500, detail=f"9:16 regeneration failed: {exc}")
+
+        for job in jobs_916:
+            prompt_path = str(ROOT / "output" / batch / "45" / f"OUTPUT_{job['format']}_P{job['persona_number']:02d}_{job['language']}.txt")
+            # Try to find exact prompt path
+            pname = f"OUTPUT_{job['format']}_P{job['persona_number']:02d}_{job['language']}"
+            candidates = [pf for pf in prompt_files_list if pname in Path(pf).name]
+            if candidates:
+                prompt_path = candidates[0]
+            expected = _build_expected_output_path(batch, prompt_path, "9_16", engine)
+            if expected and expected.exists() and expected.is_file():
+                archive_dir = GENERATED_IMAGES_ROOT / batch / "to_be_regenerated" / "generated images"
+                archive_dir.mkdir(parents=True, exist_ok=True)
+                dest = _unique_path(archive_dir / expected.name)
+                shutil.move(str(expected), str(dest))
+                generated_files.append(str(dest.relative_to(ROOT)).replace("\\", "/"))
+                meta_src = expected.with_suffix(".json")
+                if meta_src.exists() and meta_src.is_file():
+                    shutil.move(str(meta_src), str(dest.with_suffix(".json")))
+
+    refreshed = collect_backfill_result(run_id, batch)
+    if has_storage_manifest and run_dir is not None:
+        refreshed = collect_run_result(run_dir, batch, True)
+        refreshed = merge_manifest(run_dir, manifest, refreshed)
+
+    return {
+        "status": "regenerated",
+        "generated_files": generated_files,
+        "skipped": skipped,
+        "manifest": enrich_manifest_for_dashboard(refreshed),
+    }
 
 
 async def api_replace_image(run_id: str, image_file: str = Form(...), replacement_file: UploadFile = File(...)) -> dict[str, Any]:

@@ -1,7 +1,7 @@
 import { state } from "./state.js";
 import { appendLog, skeletonRunCard } from "./ui.js";
 import { fetchJSON, invalidateRuns } from "./api.js";
-import { buildImageGallery } from "./images.js";
+import { buildImageGallery, showPromptFullscreen } from "./images.js";
 import { buildPromptEditor } from "./prompts.js";
 import { refreshSelect } from "./custom-select.js";
 
@@ -11,6 +11,67 @@ const runNextEl = document.getElementById("runNext");
 const runIndexEl = document.getElementById("runIndex");
 
 let batchDropdownInitialized = false;
+
+function parsePromptPath(path) {
+  const name = path.split("/").pop() || path;
+  const match = name.match(/^OUTPUT_([A-Z0-9]+)_P(\d+)_([A-Z0-9]+)(?:_A(\d+))?\.txt$/i);
+  const aspect = path.includes("/916/") || path.includes("/96/") ? "9:16" : path.includes("/45/") ? "4:5" : "Other";
+  return {
+    name,
+    aspect,
+    format: match ? match[1].toUpperCase() : "PROMPT",
+    persona: match ? `P${String(Number(match[2])).padStart(2, "0")}` : "P--",
+    lang: match ? match[3].toUpperCase() : "--",
+    creative: match && match[4] ? `A${String(Number(match[4])).padStart(2, "0")}` : "A01",
+  };
+}
+
+function buildPromptFileSummary(promptFiles) {
+  const wrap = document.createElement("details");
+  wrap.className = "run-prompt-files";
+  wrap.open = false;
+
+  const summary = document.createElement("summary");
+  const byAspect = promptFiles.reduce((acc, path) => {
+    const parsed = parsePromptPath(path);
+    acc[parsed.aspect] = (acc[parsed.aspect] || 0) + 1;
+    return acc;
+  }, {});
+  const parts = Object.entries(byAspect).map(([aspect, count]) => `${aspect}: ${count}`).join(" · ");
+  summary.innerHTML = `<strong>Prompt files</strong><span>${promptFiles.length} total${parts ? ` · ${parts}` : ""}</span>`;
+  wrap.appendChild(summary);
+
+  const grid = document.createElement("div");
+  grid.className = "prompt-file-grid";
+
+  promptFiles.forEach((path) => {
+    const parsed = parsePromptPath(path);
+    const card = document.createElement("div");
+    card.className = "prompt-file-card";
+    card.title = path;
+    card.innerHTML = `
+      <span class="prompt-file-aspect">${parsed.aspect}</span>
+      <strong>${parsed.format} ${parsed.persona}</strong>
+      <span>${parsed.creative} · ${parsed.lang}</span>
+    `;
+    card.addEventListener("click", () => {
+      showPromptFullscreen(
+        Path(path).name || path,
+        "",
+        {
+          fetchUrl: `/api/prompt-file-content?prompt_path=${encodeURIComponent(path)}`,
+          saveUrl: "/api/prompt-file-content",
+          saveBody: (text) => ({ prompt_path: path, content: text }),
+        }
+      );
+    });
+    grid.appendChild(card);
+  });
+  wrap.appendChild(grid);
+  return wrap;
+}
+
+function Path(p) { return { name: p.split("/").pop() || p }; }
 
 export function renderRun(run) {
   const div = document.createElement("div");
@@ -27,21 +88,7 @@ export function renderRun(run) {
   div.appendChild(llm);
 
   if (run.prompt_files && run.prompt_files.length) {
-    const pf = document.createElement("div");
-    pf.className = "run-prompt-files";
-    pf.innerHTML = `<strong>Prompt files</strong>`;
-    const ul = document.createElement("ul");
-    run.prompt_files.forEach((path) => {
-      const li = document.createElement("li");
-      const a = document.createElement("a");
-      a.href = `/output/${path.replace(/^output\//, "")}`;
-      a.target = "_blank";
-      a.textContent = path;
-      li.appendChild(a);
-      ul.appendChild(li);
-    });
-    pf.appendChild(ul);
-    div.appendChild(pf);
+    div.appendChild(buildPromptFileSummary(run.prompt_files));
   }
 
   const promptActions = document.createElement("div");
@@ -102,26 +149,31 @@ function updateBatchDropdownButtonLabel() {
   btn.textContent = count ? `${count} batch(es) selected` : "Select batch(es)";
 }
 
-function updateBackgroundReuseRunOptions() {
-  const select = document.getElementById("backgroundReuseRun");
-  if (!select) return;
-  const previous = select.value;
-  select.innerHTML = "";
-  const empty = document.createElement("option");
-  empty.value = "";
-  empty.textContent = "Select previous batch/run";
-  select.appendChild(empty);
-  state.runsData.forEach((run) => {
-    const label = run.batch || run.run_id;
-    const opt = document.createElement("option");
-    opt.value = run.run_id;
-    opt.textContent = label;
-    select.appendChild(opt);
+function updatePreviousRunOptions() {
+  [
+    ["backgroundReuseRun", "Select background source run"],
+    ["visualPatternReuseRun", "Select visual-pattern source run"],
+  ].forEach(([selectId, placeholder]) => {
+    const select = document.getElementById(selectId);
+    if (!select) return;
+    const previous = select.value;
+    select.innerHTML = "";
+    const empty = document.createElement("option");
+    empty.value = "";
+    empty.textContent = placeholder;
+    select.appendChild(empty);
+    state.runsData.forEach((run) => {
+      const label = run.batch || run.run_id;
+      const opt = document.createElement("option");
+      opt.value = run.run_id;
+      opt.textContent = label;
+      select.appendChild(opt);
+    });
+    if (previous && Array.from(select.options).some((opt) => opt.value === previous)) {
+      select.value = previous;
+    }
+    refreshSelect(select);
   });
-  if (previous && Array.from(select.options).some((opt) => opt.value === previous)) {
-    select.value = previous;
-  }
-  refreshSelect(select);
 }
 
 function closeBatchDropdown() {
@@ -145,7 +197,7 @@ export async function loadRuns() {
     const data = await fetchJSON("/api/runs");
     state.runsData = data.runs || [];
     state.currentRunIndex = 0;
-    updateBackgroundReuseRunOptions();
+    updatePreviousRunOptions();
 
     const batchMenu = document.getElementById("batchDropdownMenu");
     batchMenu.innerHTML = "";
