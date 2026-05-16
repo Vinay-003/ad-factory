@@ -415,7 +415,7 @@ def _build_hypothesis_variables() -> dict[str, dict[str, Any]]:
         options = [{"id": vid, "label": _hypothesis_variant_label(vid)} for vid in arch.get(hyp_type, {})]
         hv[hyp_type] = {**meta, "options": options}
 
-    cf_types = {
+    aux_types = {
         "proof_style": {
             "label": "Proof Style (H4)",
             "description": "Test which trust framing works best for this persona: authority vs. social proof vs. mechanism explainer.",
@@ -425,9 +425,9 @@ def _build_hypothesis_variables() -> dict[str, dict[str, Any]]:
             "description": "Test which call-to-action tone converts better: urgent vs. guided vs. reassuring vs. discovery.",
         },
     }
-    cf = COPY_PROMPTS.get("concept_framework", {})
-    for hyp_type, meta in cf_types.items():
-        options = [{"id": vid, "label": _hypothesis_variant_label(vid)} for vid in cf.get(hyp_type, {})]
+    aux = COPY_ARCH.get("non_headline_hypotheses", {})
+    for hyp_type, meta in aux_types.items():
+        options = [{"id": vid, "label": _hypothesis_variant_label(vid)} for vid in aux.get(hyp_type, {})]
         hv[hyp_type] = {**meta, "options": options}
 
     return hv
@@ -438,14 +438,81 @@ HYPOTHESIS_VARIABLES = _build_hypothesis_variables()
 CTA_VARIANTS = COPY_PROMPTS.get("cta_variants", {})
 
 
+def _headline_architecture_group(group: str) -> str:
+    return {
+        "audience_stage": "awareness_stage",
+        "lead_angle": "concept_angle",
+        "message_structure": "concept_structure",
+    }.get(group, group)
+
+
+def _entry_direction(entry: dict[str, Any]) -> str:
+    return str(entry.get("direction") or entry.get("template") or "")
+
+
 def _framework_item(group: str, item_id: str) -> dict[str, str]:
-    items = COPY_PROMPTS.get("concept_framework", {}).get(group, [])
-    if not items:
+    arch_group = _headline_architecture_group(group)
+    items = COPY_ARCH.get("headline_architectures", {}).get(arch_group, {})
+    if not isinstance(items, dict) or not items:
         return {"id": item_id, "direction": ""}
-    for item in items:
-        if item["id"] == item_id:
-            return item
-    return items[0]
+    entry = items.get(item_id)
+    if not isinstance(entry, dict):
+        first_id, first_entry = next(iter(items.items()))
+        return {"id": first_id, "direction": _entry_direction(first_entry)}
+    return {"id": item_id, "direction": _entry_direction(entry)}
+
+
+def _hypothesis_guidance(hyp_type: str, variant: str) -> str:
+    headline_group = _headline_architecture_group(hyp_type)
+    headline_entry = COPY_ARCH.get("headline_architectures", {}).get(headline_group, {}).get(variant)
+    if isinstance(headline_entry, dict):
+        return _entry_direction(headline_entry)
+    aux_entry = COPY_ARCH.get("non_headline_hypotheses", {}).get(hyp_type, {}).get(variant)
+    if isinstance(aux_entry, dict):
+        return _entry_direction(aux_entry)
+    return ""
+
+
+def _support_line_strategy_item(group: str, item_id: str) -> dict[str, Any]:
+    source_map = {
+        "by_concept_angle": ("headline_architectures", "concept_angle"),
+        "by_hook_structure": ("headline_architectures", "hook_structure"),
+        "by_concept_structure": ("headline_architectures", "concept_structure"),
+        "by_awareness_stage": ("headline_architectures", "awareness_stage"),
+        "by_proof_style": ("non_headline_hypotheses", "proof_style"),
+    }
+    root_key, arch_group = source_map.get(group, ("", ""))
+    entry = COPY_ARCH.get(root_key, {}).get(arch_group, {}).get(item_id) if root_key else None
+    strategy = entry.get("support_strategy") if isinstance(entry, dict) else None
+    if not isinstance(strategy, dict):
+        return {"source": group, "variant": item_id, "direction": "", "must_include": [], "avoid": ""}
+    return {"source": group, "variant": item_id, **strategy}
+
+
+def _build_support_line_strategy(audience_id: str, lead_angle: str, concept_structure_id: str) -> dict[str, Any]:
+    support_arch = COPY_ARCH.get("support_line_architectures", {})
+    return {
+        "composition_rule": support_arch.get(
+            "composition_rule",
+            "Final support line = active support strategy meaning + assigned support_line_architecture sentence shape.",
+        ),
+        "active": _support_line_strategy_item("by_concept_angle", lead_angle),
+        "concept_structure": _support_line_strategy_item("by_concept_structure", concept_structure_id),
+        "awareness_stage": _support_line_strategy_item("by_awareness_stage", audience_id),
+        "selection_note": "Use active as the main meaning strategy. Also satisfy concept_structure and awareness_stage when they add relevant constraints.",
+    }
+
+
+def _set_active_support_line_strategy(copy_req: dict[str, Any], group: str, variant: str) -> None:
+    strategy = copy_req.get("support_line_strategy")
+    if not isinstance(strategy, dict):
+        return
+    active = _support_line_strategy_item(group, variant)
+    strategy["active"] = active
+    strategy["selection_note"] = (
+        f"Active support strategy selected from {group}.{variant} because the current hypothesis/variant controls the headline. "
+        "Use this as the support line's main job, then apply support_line_architecture for sentence shape."
+    )
 
 
 # Feature-lane-driven headline concept selection removed.
@@ -514,6 +581,7 @@ def build_copy_requirements(persona_number: int, fmt: str, format_sequence_index
             "examples": support_line_arch.get("examples", []),
             "variant": support_line_arch.get("variant", ""),
         },
+        "support_line_strategy": _build_support_line_strategy(audience_id, lead_angle, concept_structure_id),
     }
 
 
@@ -4600,35 +4668,45 @@ async def api_run_execute(
             concept = copy_req.get("concept_variation") or {}
             hyp_type = hyp_meta.get("type")
             variant = hyp_meta.get("variant")
-            arch_guidance = COPY_PROMPTS.get("concept_framework", {})
             if hyp_type == "awareness_stage" and variant:
                 concept["audience_stage"] = _framework_item("audience_stage", variant)
-                guidance = arch_guidance.get("awareness_stage", {}).get(variant)
+                _set_active_support_line_strategy(copy_req, "by_awareness_stage", variant)
+                strategy = copy_req.get("support_line_strategy")
+                if isinstance(strategy, dict):
+                    strategy["awareness_stage"] = _support_line_strategy_item("by_awareness_stage", variant)
+                guidance = _hypothesis_guidance("awareness_stage", variant)
                 if guidance:
                     concept["awareness_stage_guidance"] = guidance
             elif hyp_type == "concept_angle" and variant:
                 concept["lead_angle"] = _framework_item("lead_angle", variant)
-                guidance = arch_guidance.get("concept_angle", {}).get(variant)
+                _set_active_support_line_strategy(copy_req, "by_concept_angle", variant)
+                guidance = _hypothesis_guidance("concept_angle", variant)
                 if guidance:
                     concept["concept_angle_guidance"] = guidance
             elif hyp_type == "concept_structure" and variant:
                 concept["message_structure"] = _framework_item("message_structure", variant)
-                guidance = arch_guidance.get("concept_structure", {}).get(variant)
+                _set_active_support_line_strategy(copy_req, "by_concept_structure", variant)
+                strategy = copy_req.get("support_line_strategy")
+                if isinstance(strategy, dict):
+                    strategy["concept_structure"] = _support_line_strategy_item("by_concept_structure", variant)
+                guidance = _hypothesis_guidance("concept_structure", variant)
                 if guidance:
                     concept["concept_structure_guidance"] = guidance
             elif hyp_type == "hook_structure" and variant:
                 concept["hook_structure_override"] = variant
-                guidance = arch_guidance.get("hook_structure", {}).get(variant)
+                _set_active_support_line_strategy(copy_req, "by_hook_structure", variant)
+                guidance = _hypothesis_guidance("hook_structure", variant)
                 if guidance:
                     concept["hook_structure_guidance"] = guidance
             elif hyp_type == "proof_style" and variant:
                 concept["proof_style_override"] = variant
-                guidance = arch_guidance.get("proof_style", {}).get(variant)
+                _set_active_support_line_strategy(copy_req, "by_proof_style", variant)
+                guidance = _hypothesis_guidance("proof_style", variant)
                 if guidance:
                     concept["proof_style_guidance"] = guidance
             elif hyp_type == "cta_voice" and variant:
                 concept["cta_voice_override"] = variant
-                guidance = arch_guidance.get("cta_voice", {}).get(variant)
+                guidance = _hypothesis_guidance("cta_voice", variant)
                 if guidance:
                     concept["cta_voice_guidance"] = guidance
             copy_req["concept_variation"] = concept

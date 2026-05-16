@@ -11,13 +11,15 @@
     "copy_requirements.concept_variation contains 3 pre-selected execution axes: audience_stage (who the reader is), lead_angle (what to lead with in the headline), message_structure (how to shape the headline-support flow). Copy each .id into your response's awareness_stage, concept_angle, and concept_structure fields respectively. Use the .direction text of each to guide your copy approach.",
     "If copy_requirements.hypothesis exists and type is not none, obey it as the controlled test.",
     "If concept_variation includes optional guidance fields (hook_structure_guidance, proof_style_guidance, cta_voice_guidance, concept_structure_guidance, awareness_stage_guidance, concept_angle_guidance), follow them. Otherwise derive naturally from the persona.",
-    "Write one clean, short, concrete headline. Do not lead headlines with Start, Begin, Kickstart, or Follow.",
-    "Keep AM/PM timing, protocol mechanics, and product component names out of the headline; put them in support lines or bullets when needed.",
+    "Write one clean, short, catchy headline that conveys the main meaning in one idea. Do not lead headlines with Start, Begin, Kickstart, or Follow.",
+    "Divide the payload: headline earns attention with the sharp promise, pain, proof, or contrast; support lines carry the mechanism, timing, product components, proof, routine details, and caveats.",
+    "Keep AM/PM timing, protocol mechanics, and product component names out of the headline unless they are the single hook; put them in support lines or bullets when needed.",
     "Avoid AI-ad words such as unlock, transform your journey, revolutionary, holistic wellness, game-changing, effortlessly, and tailored solution.",
-    "Do a final editor pass: shorten the headline, remove generic phrasing, and ensure supporting copy follows the assigned concept_structure flow (four_us, pas, bab, fab) instead of repeating the headline.",
+    "Do a final editor pass: shorten the headline, remove generic phrasing, and ensure supporting copy follows the assigned concept_structure flow (four_us, pas, bab, fab) by completing the headline instead of repeating it.",
     "Prioritize fast visible weight loss, safer natural-feeling differentiation, real proof, and practical ease; do not let digestion or emotional benefits overshadow weight loss.",
-    "Read copy_requirements.headline_architecture.template and .examples — the headline must follow that sentence structure, not just match the content angle.",
-    "Read copy_requirements.support_line_architecture.template and .examples — the support line must follow that sentence architecture. Do not default to a feature-list pattern.",
+    "Read copy_requirements.headline_architecture.template and .examples — the headline must follow that sentence structure, not just match the content angle. If the template asks for the full framework, compress it into one headline idea and move the rest to support.",
+    "Read copy_requirements.support_line_architecture.template and .examples — the support line must follow that sentence architecture. It must add the missing reason/proof/mechanism behind the headline, not default to a generic feature-list pattern.",
+    "Read copy_requirements.support_line_strategy.active — it tells you the support line's meaning job for the selected hypothesis/variant. Use support_line_strategy for meaning and support_line_architecture for sentence shape.",
     "The already_used_ads_DO_NOT_REUSE list is a BAN LIST for deduplication only. Do not copy, imitate, adapt, or reference its headlines, support lines, skeletons, or angles. Treat it as forbidden output, not as examples."
   ],
   "system_prompt_format_rules": {
@@ -27,7 +29,9 @@
     ],
     "TEST": [
       "For TEST format only: headline must read like a first-person review line suitable for a quote card, not generic highly-rated phrasing.",
-      "For TEST format only: attribution must be role/source-based without personal names. If no real quote is provided, create one believable representative review grounded in persona pain/desire and safe claims."
+      "For TEST format only: we do not have real customer testimonials in the source material. Create a made-up but believable representative review line grounded only in product-doc claims, persona pain/desire, and safe outcomes. Do not imply it is a real named customer quote.",
+      "For TEST format only: attribution must be role/source-based without personal names and must not imply verification, certification, or a real collected testimonial. Use labels like representative user experience, routine feedback snapshot, or persona-based review note.",
+      "For TEST format only: avoid superficial praise such as 'amazing product', 'best ever', 'life-changing', or unbelievable before/after claims. The review should sound specific, modest, and plausible: routine fit, reduced cravings, easier adherence, regular homemade food, guided steps, or visible 15-day progress where supported by the product doc."
     ],
     "FEAT": [
       "For FEAT format only: make each bullet a different product feature."
@@ -54,9 +58,12 @@
       "already_used_ads_DO_NOT_REUSE is a BAN LIST. Do not copy, echo, paraphrase, or adapt any headline, support line, skeleton, or persuasion angle from it.",
       "Obey the headline_architecture.template and support_line_architecture.template in copy_requirements. These override any default pattern.",
       "Before writing, read copy_requirements.concept_variation: use audience_stage.direction to set the reader's awareness level, lead_angle.direction to choose the headline approach, and message_structure.direction to shape the headline-to-support flow.",
+      "Before writing the {support_target}, read copy_requirements.support_line_strategy.active.direction, .must_include, and .avoid. This is the active support strategy for the current headline hypothesis/variant.",
+      "The {support_target} must combine support_line_strategy.active meaning with support_line_architecture.template structure. If they conflict, preserve the strategy's meaning and adapt the sentence shape naturally.",
       "If hook_structure_override is present, the EN headline must visibly match it. For contrast_loop, use a clear but natural contrast word such as but, yet, still, without, before/after, or even with.",
-      "Final editor pass before JSON: rewrite the headline into a finished human ad line, usually 5-12 words, one central idea only. Move mechanism/proof/timing details into support line or bullets.",
-      "Use supporting copy to explain why the headline is believable: simple routine, 5-minute ease, doctor-formulated proof, 70,000+ users, 15-day progress, cravings/fullness, digestion support, or less sacrifice.",
+      "Final editor pass before JSON: rewrite the headline into a finished human ad line, usually 4-9 words, one central idea only. Move mechanism/proof/timing details into support line or bullets.",
+      "Use supporting copy to make the headline believable and complete: simple routine, 5-minute ease, doctor-formulated proof, 70,000+ users, 15-day progress, cravings/fullness, digestion support, or less sacrifice.",
+      "Support line must add new payload after the headline. If it could sit under any headline, rewrite it with persona friction, mechanism, proof, or result detail from the master doc.",
       "Reject your own first draft if the headline reads like a generic AI slogan, a keyword list, or a paraphrase of supporting copy.",
       "Do not return framework labels, rationale, or explanations."
     ]
@@ -78,12 +85,12 @@
   "copy_requirements": {
     "must_mention": "Headline or paired support must ensure the copy is clearly about weight loss — directly or indirectly.",
     "variation_rule": "Do not reuse the same headline skeleton, support-line skeleton, or persuasion angle as other ads in the same format for this batch.",
-    "hierarchy_rule": "Use the assigned concept_structure flow (four_us, pas, bab, fab) to shape headline and support line. Do not output framework labels. Derive actual headline/support from product master doc content.",
+    "hierarchy_rule": "Use the assigned concept_structure flow (four_us, pas, bab, fab) across headline and support line, not inside the headline alone. Headline = short hook/meaning; support = missing proof/mechanism/context. Do not output framework labels. Derive actual headline/support from product master doc content.",
     "format_specific": {
-      "HERO": "Keep headline as one clean idea. Support line must follow the assigned support_line_architecture template.",
+      "HERO": "Keep headline as one clean idea. Support line must follow the assigned support_line_architecture template and complete the headline with proof, mechanism, or practical ease.",
       "UGC": "Creator-like tone is allowed, but keep headline/support grounded in master-doc facts and compliance.",
       "BA": "Split copy: left bullets are struggle state; right bullets are progress/routine shift.",
-      "TEST": "Quote-like headline; attribution + trust line must be role/source-based and non-personal.",
+      "TEST": "Quote-like representative headline; attribution + trust line must be role/source-based, non-personal, and must not imply a real verified testimonial.",
       "FEAT": "Bullets must be distinct product features (LLM decides which features from master doc)."
     },
     "default_format_rule": "Respect format-specific structure; no lane enforcement."
@@ -221,121 +228,6 @@
     },
     "hindi_ready_default": "टोन संकेत: सरल, भरोसेमंड, व्यावहारिक"
   },
-  "concept_framework": {
-    "_description": "Direction/guidance text for all hypothesis types. Sent to the LLM via concept_variation.*_guidance fields. Each group maps variant id → guidance string.",
-    "hook_structure": {
-      "question_lead": "Open with a plain question the buyer would actually ask. Keep it specific, not clever.",
-      "proof_lead": "Open with proof, authority, or a concrete result window before explaining the product reason elsewhere.",
-      "contrast_loop": "Open with a natural spoken contrast using but, yet, still, without, before/after, or even with. Show the old friction and the improved weight-loss path in one readable line. Avoid stiff grammar like a slogan template.",
-      "confession_lead": "Open like a believable first-person admission, not a polished testimonial headline.",
-      "command_lead": "Open with a direct, simple instruction only when it sounds like ad copy, not a how-to manual."
-    },
-    "concept_angle": {
-      "pain_point": "Lead from one real buyer frustration. Keep it concrete and specific, not dramatic or shame-based.",
-      "desired_outcome": "Lead with the practical weight-loss outcome or felt relief. Keep it believable, not transformational hype.",
-      "social_proof": "Lead with trust, usage, testimonials, or crowd proof. Use proof as credibility, not empty popularity.",
-      "authority": "Lead with doctor-formulated, Ayurveda, or expert credibility. Keep it simple and ad-readable.",
-      "curiosity": "Lead with a specific mechanism gap or question that makes the reader want the explanation. Avoid clickbait.",
-      "comparison": "Lead by contrasting the kit with strict diets, random attempts, or high-friction routines. Avoid competitor bashing.",
-      "offer": "Lead with a clear reason to act: 15-day result window, kit completeness, or guarantee logic. Do not mention price."
-    },
-    "awareness_stage": {
-      "unaware": "Name a hidden daily friction before talking like the reader already wants this kit.",
-      "problem_aware": "Start from a problem the reader already recognizes, then make the next step feel clear.",
-      "solution_aware": "Assume the reader has tried fixes. Show why this system is easier, safer, or more guided.",
-      "product_aware": "Assume the reader knows the kit. Give a proof, urgency, trust, or simplicity push to act."
-    },
-    "proof_style": {
-      "authority_anchor": "Use doctor-formulated or Ayurvedic credibility as the trust lane. Avoid vague 'expert-backed' filler.",
-      "social_proof": "Use user count, testimonials, reviews, or served-users proof where safe. Make it specific.",
-      "mechanism_explainer": "Explain the product mechanism simply: hunger/cravings, routine, fullness, digestion, or adherence.",
-      "routine_clarity": "Make the proof feel easy to follow: clear steps, low guesswork, simple daily routine.",
-      "objection_flip": "Address a real doubt directly, then resolve it with proof or mechanism. Avoid sounding defensive."
-    },
-    "cta_voice": {
-      "urgent_start": "Ask for action now/today without sounding pushy or using sale pressure.",
-      "guided_next_step": "Ask the user to see, check, or view the plan/protocol/steps.",
-      "reassurance_start": "Make the next step feel safe or low-risk: check fit, see if it suits, try safely.",
-      "challenge_action": "Frame the action as a 15-day test or challenge. Keep it compliant and simple.",
-      "discovery_action": "Invite learning: see how it works, learn the steps, discover the routine."
-    },
-    "concept_structure": {
-      "pas": "Shape copy as problem first, consequence next, then product-led resolution.",
-      "bab": "Use before-to-after bridge flow: current struggle, better state, then the bridge routine.",
-      "fab": "Lead with concrete feature, explain practical advantage, then connect to weight-loss benefit.",
-      "four_us": "Keep wording useful, honestly urgent, unique enough to stand out, and ultra-specific."
-    },
-    "audience_stage": [
-      {
-        "id": "unaware",
-        "direction": "Name a hidden or ignored weight-loss friction before presenting the product."
-      },
-      {
-        "id": "problem_aware",
-        "direction": "Start from the known problem and make the fix feel clearer."
-      },
-      {
-        "id": "solution_aware",
-        "direction": "Assume they know fixes exist; show why this system is easier, safer, or more guided."
-      },
-      {
-        "id": "product_aware",
-        "direction": "Assume they know the kit; give the push through proof, urgency, trust, or simplicity."
-      }
-    ],
-    "lead_angle": [
-      {
-        "id": "pain_point",
-        "direction": "Lead with the specific problem or friction."
-      },
-      {
-        "id": "desired_outcome",
-        "direction": "Lead with the result or felt outcome."
-      },
-      {
-        "id": "social_proof",
-        "direction": "Lead with others' trust, usage, or testimonial logic."
-      },
-      {
-        "id": "authority",
-        "direction": "Lead with expertise, doctor formulation, or Ayurveda credibility."
-      },
-      {
-        "id": "story",
-        "direction": "Lead with a real-life routine or user-situation narrative."
-      },
-      {
-        "id": "curiosity",
-        "direction": "Lead with a question or mechanism gap that makes the reader want the explanation."
-      },
-      {
-        "id": "comparison",
-        "direction": "Lead by contrasting this system with stricter, messier, or harder alternatives."
-      },
-      {
-        "id": "offer",
-        "direction": "Lead with practical reason to act, result window, guarantee, or kit completeness."
-      }
-    ],
-    "message_structure": [
-      {
-        "id": "pas",
-        "direction": "Problem, then sharpen the consequence, then present the product-led solution."
-      },
-      {
-        "id": "bab",
-        "direction": "Before state, after/progress state, then the bridge that gets them there."
-      },
-      {
-        "id": "fab",
-        "direction": "Feature, advantage, benefit; keep the feature concrete and the benefit weight-loss-linked."
-      },
-      {
-        "id": "four_us",
-        "direction": "Make it useful, urgent where honest, unique, and ultra-specific."
-      }
-    ]
-  },
   "cta_variants": {
     "_description": "CTA text options per language per format. Used by enforce_unique_ctas to assign unique CTAs.",
     "EN": {
@@ -415,20 +307,20 @@
   "testimonial_attribution_variants": {
     "_description": "Attribution text variants per language for ensure_testimonial_attribution. Picked deterministically via hash.",
     "EN": [
-      "Verified routine user feedback",
+      "Representative routine feedback",
       "15-day adherence feedback snapshot",
-      "Community obesity-care review",
-      "Early weight-loss routine review",
-      "Structured-plan user feedback",
-      "Repeat-user experience note"
+      "Persona-based obesity-care review note",
+      "Representative weight-loss routine review",
+      "Structured-plan feedback example",
+      "Representative user experience note"
     ],
     "HI": [
-      "रूटीन-फॉलो यूजर फीडबैक",
+      "प्रतिनिधि रूटीन फीडबैक",
       "15-दिन adherence फीडबैक स्नैपशॉट",
-      "कम्यूनिटी obesity-care रिव्यू",
-      "शुरुआती वजन-घटाने रूटीन रिव्यू",
-      "स्ट्रक्चर्ड-प्लान यूजर फीडबैक",
-      "रीपीट-यूजर अनुभव नोट"
+      "पर्सोना-आधारित obesity-care रिव्यू नोट",
+      "प्रतिनिधि वजन-घटाने रूटीन रिव्यू",
+      "स्ट्रक्चर्ड-प्लान फीडबैक उदाहरण",
+      "प्रतिनिधि यूजर अनुभव नोट"
     ]
   },
   "feature_templates": {
