@@ -8,6 +8,7 @@ import random
 import re
 import shutil
 import subprocess
+import threading
 import sys
 import time
 import urllib.request
@@ -3601,15 +3602,32 @@ app.add_middleware(
 )
 
 
+_opencode_catalog_cache: dict[str, Any] = {}
+_opencode_catalog_lock = threading.Lock()
+
+
+def _build_opencode_catalog_cached():
+    global _opencode_catalog_cache
+    catalog = build_opencode_catalog()
+    with _opencode_catalog_lock:
+        _opencode_catalog_cache = catalog
+
+
+def _get_opencode_catalog():
+    with _opencode_catalog_lock:
+        return dict(_opencode_catalog_cache)
+
+
 @app.on_event("startup")
 def startup() -> None:
     load_env_file(ENV_PATH)
     ensure_dirs()
+    threading.Thread(target=_build_opencode_catalog_cached, daemon=True).start()
 
 
 def api_defaults() -> dict[str, Any]:
     personas = parse_persona_library(DEFAULT_PLAYBOOK)
-    opencode = build_opencode_catalog()
+    opencode = _get_opencode_catalog()
     return {
         "personas": personas,
         "formats": FORMATS,

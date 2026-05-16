@@ -583,7 +583,7 @@ textarea {
   overflow-y: auto;
   overflow-x: hidden;
   padding-right: 6px;
-  overscroll-behavior: contain;
+  overscroll-behavior: auto;
   scrollbar-width: thin;
   scrollbar-color: color-mix(in srgb, var(--line) 55%, transparent) transparent;
 }
