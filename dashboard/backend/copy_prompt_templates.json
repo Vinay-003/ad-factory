@@ -1,0 +1,221 @@
+{
+  "format": "v1",
+  "_description": "All prompt text templates for ad copy LLM generation. Edit this file to change what the LLM sees — no code changes needed. Dynamic placeholders use {fmt}, {support_target}, {copy_fields}.",
+
+  "system_prompt_base_rules": [
+    "You generate ad copy JSON only. Return valid JSON with keys default_aspect_ratio and ads.",
+    "Each ads item must include format, headline_angle, awareness_stage, concept_angle, concept_structure, persona, and copy fields. Provide copy.EN, copy.HI, and copy.HINGLISH blocks when constraints.language includes them.",
+    "Use the attached/read product master doc as the single source of product truth; the JSON payload is only request metadata, format/persona guidance, concept selection, and schema control.",
+    "Derive benefits, proof, mechanisms, differentiators, exclusions, and priority hierarchy from the product master doc, not from memory or invented claims.",
+    "Headline or paired support must ensure the copy is clearly about weight loss — directly or indirectly.",
+    "Never include price in on-image copy fields. Do not use currency symbols or words like INR, price, only, discount, off, or MRP.",
+    "copy_requirements.concept_variation contains 3 pre-selected execution axes: audience_stage (who the reader is), lead_angle (what to lead with in the headline), message_structure (how to shape the headline-support flow). Copy each .id into your response's awareness_stage, concept_angle, and concept_structure fields respectively. Use the .direction text of each to guide your copy approach.",
+    "If copy_requirements.hypothesis exists and type is not none, obey it as the controlled test.",
+    "If concept_variation includes optional guidance fields (hook_structure_guidance, proof_style_guidance, cta_voice_guidance, concept_structure_guidance, awareness_stage_guidance, concept_angle_guidance), follow them. Otherwise derive naturally from the persona.",
+    "Write one clean, short, concrete headline. Do not lead headlines with Start, Begin, Kickstart, or Follow.",
+    "Keep AM/PM timing, protocol mechanics, and product component names out of the headline; put them in support lines or bullets when needed.",
+    "Avoid AI-ad words such as unlock, transform your journey, revolutionary, holistic wellness, game-changing, effortlessly, and tailored solution.",
+    "Do a final editor pass: shorten the headline, remove generic phrasing, and ensure supporting copy follows the assigned concept_structure flow (four_us, pas, bab, fab) instead of repeating the headline.",
+    "Prioritize fast visible weight loss, safer natural-feeling differentiation, real proof, and practical ease; do not let digestion or emotional benefits overshadow weight loss.",
+    "Read copy_requirements.headline_architecture.template and .examples — the headline must follow that sentence structure, not just match the content angle.",
+    "Read copy_requirements.support_line_architecture.template and .examples — the support line must follow that sentence architecture. Do not default to a feature-list pattern.",
+    "The already_used_ads_DO_NOT_REUSE list is a BAN LIST for deduplication only. Do not copy, imitate, adapt, or reference its headlines, support lines, skeletons, or angles. Treat it as forbidden output, not as examples."
+  ],
+
+  "system_prompt_format_rules": {
+    "BA": [
+      "For BA format only: never prefix copy with BEFORE:/AFTER: labels or Hindi equivalents.",
+      "For BA format only: write explicit split contrast copy. Use 2 or 4 bullets total; bullet 1/2 are left-side struggle state and bullet 3/4 are right-side fix or progress state. If using 2 bullets, bullet 1 is struggle and bullet 2 is fix."
+    ],
+    "TEST": [
+      "For TEST format only: headline must read like a first-person review line suitable for a quote card, not generic highly-rated phrasing.",
+      "For TEST format only: attribution must be role/source-based without personal names. If no real quote is provided, create one believable representative review grounded in persona pain/desire and safe claims."
+    ],
+    "FEAT": [
+      "For FEAT format only: make each bullet a different product feature."
+    ],
+    "HERO": [
+      "For HERO format only: follow the headline_architecture template and examples in copy_requirements. Use the assigned support_line_architecture template for the support line. Do not default to a feature-list skeleton."
+    ],
+    "UGC": [
+      "For UGC format only: follow the headline_architecture template and examples in copy_requirements. Use creator-like clarity for the support line, and follow the assigned support_line_architecture template."
+    ]
+  },
+
+  "prompt_tail": {
+    "support_target_map": {
+      "BA": "right-side shift",
+      "FEAT": "feature stack",
+      "TEST": "trust line"
+    },
+    "default_support_target": "support line",
+    "lines": [
+      "Return only valid JSON. No markdown. No extra text.",
+      "Return one ad only. You may return either a single ad object or an object with default_aspect_ratio and a one-item ads array.",
+      "Before writing, rely on the product master doc already attached/read in this OpenCode session. Do not ask for the doc again and do not ignore it.",
+      "The current {fmt} ad must use a different persuasion angle in both the headline and the {support_target} from anything in the already_used_ads_DO_NOT_REUSE list.",
+      "already_used_ads_DO_NOT_REUSE is a BAN LIST. Do not copy, echo, paraphrase, or adapt any headline, support line, skeleton, or persuasion angle from it.",
+      "Obey the headline_architecture.template and support_line_architecture.template in copy_requirements. These override any default pattern.",
+      "Before writing, read copy_requirements.concept_variation: use audience_stage.direction to set the reader's awareness level, lead_angle.direction to choose the headline approach, and message_structure.direction to shape the headline-to-support flow.",
+      "If hook_structure_override is present, the EN headline must visibly match it. For contrast_loop, use a clear but natural contrast word such as but, yet, still, without, before/after, or even with.",
+      "Final editor pass before JSON: rewrite the headline into a finished human ad line, usually 5-12 words, one central idea only. Move mechanism/proof/timing details into support line or bullets.",
+      "Use supporting copy to explain why the headline is believable: simple routine, 5-minute ease, doctor-formulated proof, 70,000+ users, 15-day progress, cravings/fullness, digestion support, or less sacrifice.",
+      "Reject your own first draft if the headline reads like a generic AI slogan, a keyword list, or a paraphrase of supporting copy.",
+      "Do not return framework labels, rationale, or explanations."
+    ]
+  },
+
+  "strict_schema_note": {
+    "intro": "STRICT_SCHEMA: Return JSON only. Do not include copy_requirements, disclaimers, or extra keys.",
+    "persona_fields_en": "persona must be an object with number, name, pain_en, desire_en, friction_en, proof_needed_en, tone_cue_en, pain_hi, desire_hi, friction_hi, proof_needed_hi, tone_cue_hi.",
+    "language_extension": "When constraints.language includes HINGLISH, also include pain_hinglish, desire_hinglish, friction_hinglish, proof_needed_hinglish, tone_cue_hinglish in persona.",
+    "format_closure_template": "For {fmt} format, copy.EN, copy.HI, and copy.HINGLISH (when requested) must contain only: {copy_fields}.",
+    "field_map": {
+      "HERO": "headline, support_line, cta",
+      "UGC": "headline, support_line, cta",
+      "BA": "headline, bullets (list), cta",
+      "FEAT": "headline, bullets (list), cta",
+      "TEST": "headline, attribution, trust_line, cta"
+    },
+    "default_fields": "headline, cta"
+  },
+
+  "copy_requirements": {
+    "must_mention": "Headline or paired support must ensure the copy is clearly about weight loss \u2014 directly or indirectly.",
+    "variation_rule": "Do not reuse the same headline skeleton, support-line skeleton, or persuasion angle as other ads in the same format for this batch.",
+    "hierarchy_rule": "Use the assigned concept_structure flow (four_us, pas, bab, fab) to shape headline and support line. Do not output framework labels. Derive actual headline/support from product master doc content.",
+    "format_specific": {
+      "HERO": "Keep headline as one clean idea. Support line must follow the assigned support_line_architecture template.",
+      "UGC": "Creator-like tone is allowed, but keep headline/support grounded in master-doc facts and compliance.",
+      "BA": "Split copy: left bullets are struggle state; right bullets are progress/routine shift.",
+      "TEST": "Quote-like headline; attribution + trust line must be role/source-based and non-personal.",
+      "FEAT": "Bullets must be distinct product features (LLM decides which features from master doc)."
+    },
+    "default_format_rule": "Respect format-specific structure; no lane enforcement."
+  },
+
+  "product_doc_bootstrap_prompt": "Read the attached product master doc completely. For every following ad-copy request in this same OpenCode session, use that doc as the single source of product truth for benefits, proof, mechanism, differentiators, exclusions, and priority hierarchy. Do not rewrite, summarize, modify, or ignore the doc. The following messages will provide only ad format/persona/concept/schema instructions. Return only valid JSON: {\"status\":\"product_doc_loaded\"}.",
+
+  "format_copy_keywords": {
+    "_description": "Keywords used to filter which playbook rules are copy-relevant. Rules matching ANY keyword per format are included in the LLM payload.",
+    "HERO": ["copy", "headline", "support", "cta", "text budget", "minimum", "persona"],
+    "BA": ["copy", "headline", "bullet", "cta", "text budget", "minimum", "persona", "before", "after", "outcome"],
+    "TEST": ["copy", "headline", "quote", "attribution", "trust", "cta", "text budget", "minimum", "persona"],
+    "FEAT": ["copy", "headline", "bullet", "feature", "cta", "text budget", "minimum", "persona"],
+    "UGC": ["copy", "headline", "support", "cta", "creator", "text budget", "minimum", "persona"]
+  },
+
+  "format_visual_keywords": {
+    "_description": "Keywords that identify visual rules. Rules matching ANY keyword are excluded from the copy payload sent to the LLM.",
+    "blocklist": [
+      "split-screen", "side:", "tone", "energy", "product fidelity", "redraw",
+      "packaging", "visual", "background", "environment", "context-shift",
+      "time-of-day", "choice-architecture", "posture", "frame", "divider", "image"
+    ]
+  },
+
+  "format_defaults": {
+    "_description": "Default concept_structure per format (used when no hypothesis overrides it).",
+    "structure_by_fmt": {
+      "HERO": "four_us",
+      "BA": "bab",
+      "TEST": "pas",
+      "FEAT": "fab",
+      "UGC": "pas"
+    },
+    "default_lead_angle": "desired_outcome"
+  },
+
+  "persona_mapping": {
+    "_description": "Maps persona_seeds.json fields → LLM payload fields. Each entry defines how a seed field is transformed into a payload field.",
+    "seed_to_payload": {
+      "pain": {"field": "pain_points", "wrap_list": true, "prefix": null},
+      "desire": {"field": "core_message", "wrap_list": true, "prefix": null},
+      "friction": {"field": "objections", "wrap_list": true, "prefix": null},
+      "proof": {"field": "trust_anchors", "wrap_list": true, "prefix": null},
+      "tone": {"field": "english_ready", "wrap_list": true, "prefix": "Tone cue: "}
+    },
+    "persona_fallbacks": {
+      "pain": "Daily routine feels heavy and hard to sustain.",
+      "desire": "A practical routine that feels easy to follow.",
+      "friction": "Past plans felt too strict and difficult to maintain.",
+      "proof": "Needs clear structure and believable support.",
+      "tone": "practical and confidence-building"
+    },
+    "static_fields": {
+      "trigger_scenarios": [],
+      "language_bank": [],
+      "grounded_mechanism_map": [],
+      "how_kit_solves": []
+    },
+    "hindi_ready_default": "\u091f\u094b\u0928 \u0938\u0902\u0915\u0947\u0924: \u0938\u0930\u0932, \u092d\u0930\u094b\u0938\u0947\u092e\u0902\u0921, \u0935\u094d\u092f\u093e\u0935\u0939\u093e\u0930\u093f\u0915"
+  },
+
+  "concept_framework": {
+    "_description": "Direction/guidance text for all hypothesis types. Sent to the LLM via concept_variation.*_guidance fields. Each group maps variant id → guidance string.",
+    "hook_structure": {
+      "question_lead": "Open with a plain question the buyer would actually ask. Keep it specific, not clever.",
+      "proof_lead": "Open with proof, authority, or a concrete result window before explaining the product reason elsewhere.",
+      "contrast_loop": "Open with a natural spoken contrast using but, yet, still, without, before/after, or even with. Show the old friction and the improved weight-loss path in one readable line. Avoid stiff grammar like a slogan template.",
+      "confession_lead": "Open like a believable first-person admission, not a polished testimonial headline.",
+      "command_lead": "Open with a direct, simple instruction only when it sounds like ad copy, not a how-to manual."
+    },
+    "concept_angle": {
+      "pain_point": "Lead from one real buyer frustration. Keep it concrete and specific, not dramatic or shame-based.",
+      "desired_outcome": "Lead with the practical weight-loss outcome or felt relief. Keep it believable, not transformational hype.",
+      "social_proof": "Lead with trust, usage, testimonials, or crowd proof. Use proof as credibility, not empty popularity.",
+      "authority": "Lead with doctor-formulated, Ayurveda, or expert credibility. Keep it simple and ad-readable.",
+      "curiosity": "Lead with a specific mechanism gap or question that makes the reader want the explanation. Avoid clickbait.",
+      "comparison": "Lead by contrasting the kit with strict diets, random attempts, or high-friction routines. Avoid competitor bashing.",
+      "offer": "Lead with a clear reason to act: 15-day result window, kit completeness, or guarantee logic. Do not mention price."
+    },
+    "awareness_stage": {
+      "unaware": "Name a hidden daily friction before talking like the reader already wants this kit.",
+      "problem_aware": "Start from a problem the reader already recognizes, then make the next step feel clear.",
+      "solution_aware": "Assume the reader has tried fixes. Show why this system is easier, safer, or more guided.",
+      "product_aware": "Assume the reader knows the kit. Give a proof, urgency, trust, or simplicity push to act."
+    },
+    "proof_style": {
+      "authority_anchor": "Use doctor-formulated or Ayurvedic credibility as the trust lane. Avoid vague 'expert-backed' filler.",
+      "social_proof": "Use user count, testimonials, reviews, or served-users proof where safe. Make it specific.",
+      "mechanism_explainer": "Explain the product mechanism simply: hunger/cravings, routine, fullness, digestion, or adherence.",
+      "routine_clarity": "Make the proof feel easy to follow: clear steps, low guesswork, simple daily routine.",
+      "objection_flip": "Address a real doubt directly, then resolve it with proof or mechanism. Avoid sounding defensive."
+    },
+    "cta_voice": {
+      "urgent_start": "Ask for action now/today without sounding pushy or using sale pressure.",
+      "guided_next_step": "Ask the user to see, check, or view the plan/protocol/steps.",
+      "reassurance_start": "Make the next step feel safe or low-risk: check fit, see if it suits, try safely.",
+      "challenge_action": "Frame the action as a 15-day test or challenge. Keep it compliant and simple.",
+      "discovery_action": "Invite learning: see how it works, learn the steps, discover the routine."
+    },
+    "concept_structure": {
+      "pas": "Shape copy as problem first, consequence next, then product-led resolution.",
+      "bab": "Use before-to-after bridge flow: current struggle, better state, then the bridge routine.",
+      "fab": "Lead with concrete feature, explain practical advantage, then connect to weight-loss benefit.",
+      "four_us": "Keep wording useful, honestly urgent, unique enough to stand out, and ultra-specific."
+    },
+    "audience_stage": [
+      {"id": "unaware", "direction": "Name a hidden or ignored weight-loss friction before presenting the product."},
+      {"id": "problem_aware", "direction": "Start from the known problem and make the fix feel clearer."},
+      {"id": "solution_aware", "direction": "Assume they know fixes exist; show why this system is easier, safer, or more guided."},
+      {"id": "product_aware", "direction": "Assume they know the kit; give the push through proof, urgency, trust, or simplicity."}
+    ],
+    "lead_angle": [
+      {"id": "pain_point", "direction": "Lead with the specific problem or friction."},
+      {"id": "desired_outcome", "direction": "Lead with the result or felt outcome."},
+      {"id": "social_proof", "direction": "Lead with others' trust, usage, or testimonial logic."},
+      {"id": "authority", "direction": "Lead with expertise, doctor formulation, or Ayurveda credibility."},
+      {"id": "story", "direction": "Lead with a real-life routine or user-situation narrative."},
+      {"id": "curiosity", "direction": "Lead with a question or mechanism gap that makes the reader want the explanation."},
+      {"id": "comparison", "direction": "Lead by contrasting this system with stricter, messier, or harder alternatives."},
+      {"id": "offer", "direction": "Lead with practical reason to act, result window, guarantee, or kit completeness."}
+    ],
+    "message_structure": [
+      {"id": "pas", "direction": "Problem, then sharpen the consequence, then present the product-led solution."},
+      {"id": "bab", "direction": "Before state, after/progress state, then the bridge that gets them there."},
+      {"id": "fab", "direction": "Feature, advantage, benefit; keep the feature concrete and the benefit weight-loss-linked."},
+      {"id": "four_us", "direction": "Make it useful, urgent where honest, unique, and ultra-specific."}
+    ]
+  }
+}

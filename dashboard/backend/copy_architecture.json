@@ -1,0 +1,210 @@
+{
+  "format": "v1",
+  "_description": "Headline and support line architecture templates for LLM ad copy generation. Edit this file to change what structures the LLM produces — no code changes needed. Each entry has a template (describes the sentence shape) and examples (show real implementations).",
+
+  "headline_architectures": {
+    "concept_structure": {
+      "four_us": {
+        "template": "Structure: [Specific measurable outcome or number-led claim] + [Unique differentiator]. Must feel useful (tangible benefit), urgent (time-bound), unique (not generic), ultra-specific (named ingredient, day count, mechanism). Avoid vague adjectives.",
+        "examples": [
+          "Lose 3 to 5 Kg in 15 Days Without a Separate Diet",
+          "31 Ayurvedic Ingredients. 15 Days. No Crash Diet.",
+          "Doctor-Formulated Hunger Control While Eating Regular Food"
+        ]
+      },
+      "pas": {
+        "template": "Structure: [Problem] + [Cost of inaction/agitation] + [Solution]. Open with the persona's specific pain, escalate why it persists or costs them, then introduce the resolution. Can be one sentence with commas or two short sentences.",
+        "examples": [
+          "Cravings Control Your Eating? Diets Fail by Week Two. Here's a 15-Day System That Works With Your Kitchen.",
+          "Late-Day Hunger Keeps You From Losing. Most Plans Don't Fix That. This Doctor-Formulated System Does."
+        ]
+      },
+      "bab": {
+        "template": "Structure: [Before/struggle state] vs [After/progress state] by [Bridge mechanism]. Show the contrast first, then the product as the bridge. Use a contrast word (but, without, yet, instead) or a dash/punctuation to separate the two states.",
+        "examples": [
+          "From Struggling With Every Meal to Losing 3-5 Kg in 15 Days Without a Separate Diet",
+          "Weight Loss That Survives Hectic Days Instead of Collapsing by Week Two"
+        ]
+      },
+      "fab": {
+        "template": "Structure: [Product feature or credential] → [Practical advantage] → [Weight-loss benefit]. Lead with a concrete system fact, explain what it means in daily life, then connect directly to weight loss. All three elements must be in one readable headline.",
+        "examples": [
+          "Doctor-Formulated Ayurvedic System: Reduces Hunger Naturally So You Eat Less Without Fighting Cravings",
+          "31 Unique Ingredients With No Synthetics — Visible Weight Loss in 15 Days"
+        ]
+      }
+    },
+
+    "hook_structure": {
+      "question_lead": {
+        "template": "Structure: Open with a question the persona would actually ask themselves. The question must mirror their desire or hidden friction. Then answer or imply the outcome. Keep the question specific — not generic like 'Want to lose weight?'",
+        "examples": [
+          "What If Weight Loss Didn't Mean Cooking Separately?",
+          "Tired of Plans That Don't Survive Your Real Schedule?"
+        ]
+      },
+      "proof_lead": {
+        "template": "Structure: Lead with a credibility marker, number, or trust anchor before the outcome. Doctor credential, ingredient count, user count, or time-bound proof. Then connect to the persona's result.",
+        "examples": [
+          "Doctor-Formulated. 31 Ingredients. 15-Day Weight Loss Without Crash Dieting.",
+          "Trusted by 70,000+ People — 15-Day Weight Loss With Real Support"
+        ]
+      },
+      "contrast_loop": {
+        "template": "Structure: Use a natural contrast word (but, yet, still, without, instead, doesn't have to) to show the hard way vs the easy way. Both sides must be in the same headline. Avoid stiff slogan grammar.",
+        "examples": [
+          "Lose Weight Without Losing Your Mind — Or Your Kitchen",
+          "Weight Loss That Works on Hectic Days, Not Just Perfect Ones"
+        ]
+      },
+      "confession_lead": {
+        "template": "Structure: Open as a believable first-person-like admission or shared struggle. Should feel like something the persona has thought or felt. Then pivot to the resolution. Keep it grounded, not dramatic.",
+        "examples": [
+          "I'd Tried Every Diet. This Was the First One That Didn't Ask Me to Cook Separately.",
+          "Yes, You Can Lose Weight on Regular Homemade Food"
+        ]
+      },
+      "command_lead": {
+        "template": "Structure: Direct instruction or invitation. Must sound like helpful guidance, not a pushy order. Keep the benefit visible in the command itself. Use sparingly — only when the action is clearly in the reader's interest.",
+        "examples": [
+          "See How 31 Ayurvedic Ingredients Can Help You Lose Weight in 15 Days",
+          "Try a 15-Day System That Works With Your Own Kitchen"
+        ]
+      }
+    },
+
+    "concept_angle": {
+      "pain_point": {
+        "template": "Structure: Lead with one specific, concrete friction. Name the exact struggle the persona feels. Do not generalize or dramatize. The pain should feel recognizable, not exaggerated.",
+        "examples": [
+          "Weight Loss Gets Harder When Cravings Control Your Day",
+          "PCOD Can Make Weight Loss Feel Slower — Here's 15-Day Support"
+        ]
+      },
+      "desired_outcome": {
+        "template": "Structure: Lead with the practical result or felt relief. Keep it believable and specific. Use concrete numbers (kg, days) and avoid transformational language like 'entirely new you.'",
+        "examples": [
+          "Lose 3 to 5 Kg in 15 Days Without a Separate Diet",
+          "Feel Lighter in 15 Days — With Regular Homemade Food"
+        ]
+      },
+      "social_proof": {
+        "template": "Structure: Lead with crowd evidence — user count, testimonials, or trust numbers. The proof comes first, then the outcome. Must feel like credibility, not vanity metrics.",
+        "examples": [
+          "Trusted by 70,000+ People for 15-Day Weight Loss",
+          "200+ Video Testimonials. One Doctor-Formulated System."
+        ]
+      },
+      "authority": {
+        "template": "Structure: Lead with doctor, Ayurveda, or institutional credibility. Name the expert or credential upfront. Then connect the authority to the weight-loss outcome.",
+        "examples": [
+          "Doctor-Formulated by Dr. Arun Tyagi — 15-Day Weight Loss You Can Trust",
+          "Ayurvedic Weight Loss System Backed by Real Formulation, Not Herbal Hype"
+        ]
+      },
+      "curiosity": {
+        "template": "Structure: Lead with a mechanism gap or question that makes the reader want the explanation. The gap must be specific enough to feel real, not clickbait. Then hint at the reveal.",
+        "examples": [
+          "The 5-Minute Routine That Changes How Your Body Responds to Food",
+          "Why Most Weight-Loss Plans Collapse by Week Two — and What Actually Works"
+        ]
+      },
+      "comparison": {
+        "template": "Structure: Contrast this system with harder alternatives — strict diets, gym routines, separate meal prep. Show why this path requires less sacrifice. Never name competitors.",
+        "examples": [
+          "Weight Loss That Doesn't Require a Separate Kitchen",
+          "No Gym. No Crash Diet. Just 15 Days With a Guided System."
+        ]
+      },
+      "offer": {
+        "template": "Structure: Lead with a practical reason to act now. Result window, kit completeness, guarantee logic, or risk reduction. Keep it concrete and time-aware. Never mention price.",
+        "examples": [
+          "15 Days to Visible Progress — With a 7-Day Money-Back Guarantee",
+          "A Complete Ayurvedic Kit for 15-Day Weight Loss — One Purchase, No Add-Ons"
+        ]
+      }
+    },
+
+    "awareness_stage": {
+      "unaware": {
+        "template": "Structure: Name a hidden daily friction that the reader experiences but hasn't labeled as solvable. Do not assume they want this product. Make them recognize the problem first, then imply a better path exists.",
+        "examples": [
+          "Why Late-Day Cravings Keep Stealing Your Progress — and What to Do About It",
+          "The Hidden Reason Your Clothes Feel Tighter Despite Eating Less"
+        ]
+      },
+      "problem_aware": {
+        "template": "Structure: Start from a problem the reader already knows they have. Validate their frustration. Then make the next step feel clear and smaller than they expected.",
+        "examples": [
+          "Struggling With Stubborn Weight? 15 Days Can Change That.",
+          "Yes, Weight Loss Is Harder With PCOD. Here's a System Built for It."
+        ]
+      },
+      "solution_aware": {
+        "template": "Structure: Assume the reader has tried fixes before. Show why this system is easier, safer, or more guided than what they've attempted. Differentiate without dismissing their past effort.",
+        "examples": [
+          "Tried Diets That Didn't Stick? This System Works With Your Kitchen, Not Against It.",
+          "You've Tried Weight Loss Before. This Time, It's Doctor-Formulated and Guided."
+        ]
+      },
+      "product_aware": {
+        "template": "Structure: Assume the reader already knows about the kit. Don't re-explain the basics. Give a proof push, urgency cue, trust anchor, or simplicity reason to act now.",
+        "examples": [
+          "15-Day Weight Loss You Can Trust — Backed by 70,000+ Users",
+          "Still Considering the Obesity Killer Kit? Here's Why 70,000+ Already Started."
+        ]
+      }
+    }
+  },
+
+  "support_line_architectures": {
+    "_rotation": "Deterministically rotate across personas using (persona_number + format_index). Each persona gets the architecture at index (persona_number + format_index) % len(rotation_order).",
+    "rotation_order": [
+      "pain_first",
+      "result_first",
+      "contrast",
+      "simple_facts",
+      "question_led",
+      "bridge"
+    ],
+    "definitions": {
+      "pain_first": {
+        "template": "Structure: Open with the persona's specific friction or pain point. Then bridge to how the system solves it. End with a concrete feature or proof that makes it believable. Flow: [pain] → [solution bridge] → [credibility anchor].",
+        "examples": [
+          "For women whose weight loss feels harder with PCOD, this doctor-formulated system is designed for visible progress with regular homemade food and guided support. Not sold as a cure — made for weight loss."
+        ]
+      },
+      "result_first": {
+        "template": "Structure: Lead with the measurable outcome first. Then explain the mechanism. End with what the persona doesn't have to sacrifice. Flow: [outcome] → [how it works] → [what you keep/no sacrifice].",
+        "examples": [
+          "Lose 3 to 5 kg in 15 days by reducing cravings naturally. No crash diets, no gym membership, and no cooking separately from your family."
+        ]
+      },
+      "contrast": {
+        "template": "Structure: Set up what doesn't work for this persona. Then show how this system is different. Use a 'not X, but Y' or 'most X fail because Y, this does Z' structure. Flow: [failed approach] → [why it fails] → [what this system does instead].",
+        "examples": [
+          "Most plans collapse when work gets hectic because they demand too much separate effort. This system fits your real schedule with a 5-minute daily routine and regular homemade food."
+        ]
+      },
+      "simple_facts": {
+        "template": "Structure: 2-3 short declarative sentences. Each sentence is one concrete fact. No transition words, no fluff, no persuasive connectors. Let the facts speak. Flow: [fact 1] + [fact 2] + [fact 3].",
+        "examples": [
+          "Doctor-formulated with 31 unique ingredients. No synthetic preservatives. Guided daily routine with trained coach support. Visible results in 15 days."
+        ]
+      },
+      "question_led": {
+        "template": "Structure: Open with a rhetorical question that mirrors the persona's deepest desire or hidden friction. Then answer with the system's specific mechanism and proof. Flow: [desire/friction question] → [system answer] → [specific mechanism].",
+        "examples": [
+          "What if you could lose weight without fighting hunger all day? This doctor-formulated system uses specific Ayurvedic ingredients to reduce cravings naturally, with a guided routine that fits your existing kitchen."
+        ]
+      },
+      "bridge": {
+        "template": "Structure: Show progression from pain to mechanism to outcome in three connected phrases. Each step builds on the previous. Flow: [daily pain] → [system step] → [measurable result]. Can be one slightly longer sentence or 2-3 short clauses.",
+        "examples": [
+          "Late-day cravings keep you from seeing progress. The kit's hunger-control ingredients help you eat less without fighting yourself. Real users report 3 to 5 kg loss in 15 days."
+        ]
+      }
+    }
+  }
+
+}

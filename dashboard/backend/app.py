@@ -41,6 +41,8 @@ INPUT_IMAGES_DIR = ROOT / "input" / "images"
 GENERATED_IMAGES_ROOT = ROOT / "generated_images"
 CONVERT_916_TEMPLATE_PATH = ROOT / "input" / "prompt_916_from_45.txt"
 PERSONA_SEEDS_PATH = ROOT / "persona_seeds.json"
+COPY_ARCH_PATH = ROOT / "dashboard" / "backend" / "copy_architecture.json"
+COPY_PROMPTS_PATH = ROOT / "dashboard" / "backend" / "copy_prompt_templates.json"
 
 DEFAULT_916_CONVERSION_PROMPT = """Convert the attached 4:5 ad creative into a 9:16 version for the same campaign.
 
@@ -103,78 +105,6 @@ def load_format_visual_archetypes() -> dict[str, list[dict[str, str]]]:
         ]
     return out
 
-HEADLINE_CONCEPT_FRAMEWORK = {
-    "audience_stage": [
-        {"id": "unaware", "direction": "Name a hidden or ignored weight-loss friction before presenting the product."},
-        {"id": "problem_aware", "direction": "Start from the known problem and make the fix feel clearer."},
-        {"id": "solution_aware", "direction": "Assume they know fixes exist; show why this system is easier, safer, or more guided."},
-        {"id": "product_aware", "direction": "Assume they know the kit; give the push through proof, urgency, trust, or simplicity."},
-    ],
-    "lead_angle": [
-        {"id": "pain_point", "direction": "Lead with the specific problem or friction."},
-        {"id": "desired_outcome", "direction": "Lead with the result or felt outcome."},
-        {"id": "social_proof", "direction": "Lead with others' trust, usage, or testimonial logic."},
-        {"id": "authority", "direction": "Lead with expertise, doctor formulation, or Ayurveda credibility."},
-        {"id": "story", "direction": "Lead with a real-life routine or user-situation narrative."},
-        {"id": "curiosity", "direction": "Lead with a question or mechanism gap that makes the reader want the explanation."},
-        {"id": "comparison", "direction": "Lead by contrasting this system with stricter, messier, or harder alternatives."},
-        {"id": "offer", "direction": "Lead with practical reason to act, result window, guarantee, or kit completeness."},
-    ],
-    "message_structure": [
-        {"id": "pas", "direction": "Problem, then sharpen the consequence, then present the product-led solution."},
-        {"id": "bab", "direction": "Before state, after/progress state, then the bridge that gets them there."},
-        {"id": "fab", "direction": "Feature, advantage, benefit; keep the feature concrete and the benefit weight-loss-linked."},
-        {"id": "four_us", "direction": "Make it useful, urgent where honest, unique, and ultra-specific."},
-    ],
-}
-
-HOOK_STRUCTURE_GUIDANCE: dict[str, str] = {
-    "question_lead": "Open with a plain question the buyer would actually ask. Keep it specific, not clever.",
-    "proof_lead": "Open with proof, authority, or a concrete result window before explaining the product reason elsewhere.",
-    "contrast_loop": "Open with a natural spoken contrast using but, yet, still, without, before/after, or even with. Show the old friction and the improved weight-loss path in one readable line. Avoid stiff grammar like a slogan template.",
-    "confession_lead": "Open like a believable first-person admission, not a polished testimonial headline.",
-    "command_lead": "Open with a direct, simple instruction only when it sounds like ad copy, not a how-to manual.",
-}
-
-CONCEPT_ANGLE_GUIDANCE: dict[str, str] = {
-    "pain_point": "Lead from one real buyer frustration. Keep it concrete and specific, not dramatic or shame-based.",
-    "desired_outcome": "Lead with the practical weight-loss outcome or felt relief. Keep it believable, not transformational hype.",
-    "social_proof": "Lead with trust, usage, testimonials, or crowd proof. Use proof as credibility, not empty popularity.",
-    "authority": "Lead with doctor-formulated, Ayurveda, or expert credibility. Keep it simple and ad-readable.",
-    "curiosity": "Lead with a specific mechanism gap or question that makes the reader want the explanation. Avoid clickbait.",
-    "comparison": "Lead by contrasting the kit with strict diets, random attempts, or high-friction routines. Avoid competitor bashing.",
-    "offer": "Lead with a clear reason to act: 15-day result window, kit completeness, or guarantee logic. Do not mention price.",
-}
-
-AWARENESS_STAGE_GUIDANCE: dict[str, str] = {
-    "unaware": "Name a hidden daily friction before talking like the reader already wants this kit.",
-    "problem_aware": "Start from a problem the reader already recognizes, then make the next step feel clear.",
-    "solution_aware": "Assume the reader has tried fixes. Show why this system is easier, safer, or more guided.",
-    "product_aware": "Assume the reader knows the kit. Give a proof, urgency, trust, or simplicity push to act.",
-}
-
-PROOF_STYLE_GUIDANCE: dict[str, str] = {
-    "authority_anchor": "Use doctor-formulated or Ayurvedic credibility as the trust lane. Avoid vague 'expert-backed' filler.",
-    "social_proof": "Use user count, testimonials, reviews, or served-users proof where safe. Make it specific.",
-    "mechanism_explainer": "Explain the product mechanism simply: hunger/cravings, routine, fullness, digestion, or adherence.",
-    "routine_clarity": "Make the proof feel easy to follow: clear steps, low guesswork, simple daily routine.",
-    "objection_flip": "Address a real doubt directly, then resolve it with proof or mechanism. Avoid sounding defensive.",
-}
-
-CTA_VOICE_GUIDANCE: dict[str, str] = {
-    "urgent_start": "Ask for action now/today without sounding pushy or using sale pressure.",
-    "guided_next_step": "Ask the user to see, check, or view the plan/protocol/steps.",
-    "reassurance_start": "Make the next step feel safe or low-risk: check fit, see if it suits, try safely.",
-    "challenge_action": "Frame the action as a 15-day test or challenge. Keep it compliant and simple.",
-    "discovery_action": "Invite learning: see how it works, learn the steps, discover the routine.",
-}
-
-CONCEPT_STRUCTURE_GUIDANCE: dict[str, str] = {
-    "pas": "Shape copy as problem first, consequence next, then product-led resolution.",
-    "bab": "Use before-to-after bridge flow: current struggle, better state, then the bridge routine.",
-    "fab": "Lead with concrete feature, explain practical advantage, then connect to weight-loss benefit.",
-    "four_us": "Keep wording useful, honestly urgent, unique enough to stand out, and ultra-specific.",
-}
 
 
 def classify_hook_structure(headline: str) -> str:
@@ -491,94 +421,129 @@ def _load_persona_seeds() -> dict[int, dict[str, str]]:
 PERSONA_SEED_INPUTS = _load_persona_seeds()
 
 
+def _load_copy_architecture() -> dict[str, Any]:
+    path = COPY_ARCH_PATH
+    if not path.exists():
+        print(f"WARNING: {path} not found. Copy architecture templates disabled.", file=sys.stderr)
+        return {"headline_architectures": {}, "support_line_architectures": {"rotation_order": [], "definitions": {}}}
+    try:
+        return json.loads(path.read_text(encoding="utf-8"))
+    except Exception as exc:
+        print(f"WARNING: Failed to load {path}: {exc}", file=sys.stderr)
+        return {"headline_architectures": {}, "support_line_architectures": {"rotation_order": [], "definitions": {}}}
+
+
+COPY_ARCH = _load_copy_architecture()
+
+
+def _load_copy_prompts() -> dict[str, Any]:
+    path = COPY_PROMPTS_PATH
+    if not path.exists():
+        print(f"WARNING: {path} not found. Prompt templates disabled.", file=sys.stderr)
+        return {}
+    try:
+        return json.loads(path.read_text(encoding="utf-8"))
+    except Exception as exc:
+        print(f"WARNING: Failed to load {path}: {exc}", file=sys.stderr)
+        return {}
+
+
+COPY_PROMPTS = _load_copy_prompts()
+
+
 def _framework_item(group: str, item_id: str) -> dict[str, str]:
-    for item in HEADLINE_CONCEPT_FRAMEWORK[group]:
+    items = COPY_PROMPTS.get("concept_framework", {}).get(group, [])
+    if not items:
+        return {"id": item_id, "direction": ""}
+    for item in items:
         if item["id"] == item_id:
             return item
-    return HEADLINE_CONCEPT_FRAMEWORK[group][0]
+    return items[0]
 
 
 # Feature-lane-driven headline concept selection removed.
 
 
+def _select_headline_architecture(persona_number: int, fmt: str, concept_structure_id: str) -> dict[str, Any]:
+    arch = COPY_ARCH.get("headline_architectures", {})
+    structure_arch = arch.get("concept_structure", {}).get(concept_structure_id)
+    if structure_arch:
+        return {"source": "concept_structure", "variant": concept_structure_id, **structure_arch}
+    hook_arch = arch.get("hook_structure", {})
+    hook_keys = list(hook_arch.keys())
+    if hook_keys:
+        idx = (persona_number + sum(ord(c) for c in fmt)) % len(hook_keys)
+        hook_id = hook_keys[idx]
+        return {"source": "hook_structure", "variant": hook_id, **hook_arch[hook_id]}
+    return {"source": "four_us", "variant": "four_us", "template": "", "examples": []}
+
+
+def _select_support_line_architecture(persona_number: int, fmt: str, format_sequence_index: int) -> dict[str, Any]:
+    sla = COPY_ARCH.get("support_line_architectures", {})
+    rotation = sla.get("rotation_order", [])
+    defs = sla.get("definitions", {})
+    if not rotation:
+        return {"variant": "none", "template": "", "examples": []}
+    idx = (persona_number + format_sequence_index) % len(rotation)
+    arch_id = rotation[idx]
+    entry = defs.get(arch_id, {})
+    return {"variant": arch_id, **entry}
+
+
 def build_copy_requirements(persona_number: int, fmt: str, format_sequence_index: int, variation_seed: str = "") -> dict[str, Any]:
-    # Lanes removed: copy requirements should only enforce goal/structure constraints and let the LLM choose the product facts.
     persona_seed = PERSONA_SEED_INPUTS.get(persona_number, {})
     audience_id = persona_seed.get("awareness_stage", "unaware")
 
-    # Choose a lightweight structure direction only; headline/support must still be selected freely by the LLM.
-    # Keep format-appropriate default structure.
-    structure_by_fmt = {
-        "HERO": "four_us",
-        "BA": "bab",
-        "TEST": "pas",
-        "FEAT": "fab",
-        "UGC": "pas",
-    }
-    concept_structure = structure_by_fmt.get(fmt, "four_us")
+    fmt_defaults = COPY_PROMPTS.get("format_defaults", {})
+    structure_by_fmt = fmt_defaults.get("structure_by_fmt", {"HERO": "four_us"})
+    concept_structure_id = structure_by_fmt.get(fmt, "four_us")
 
-    # Lead angle: always desired_outcome for all personas (no persona-aware selection).
-    lead_angle = "desired_outcome"
+    lead_angle = fmt_defaults.get("default_lead_angle", "desired_outcome")
+
+    headline_arch = _select_headline_architecture(persona_number, fmt, concept_structure_id)
+    support_line_arch = _select_support_line_architecture(persona_number, fmt, format_sequence_index)
+
+    prompts = COPY_PROMPTS.get("copy_requirements", {})
+    format_specific = prompts.get("format_specific", {})
 
     return {
-        "must_mention": "Headline or paired support copy must explicitly mention weight loss, obesity reduction, excess-weight reduction, or a 15-day weight outcome.",
-        "variation_rule": "Do not reuse the same headline skeleton, support-line skeleton, or persuasion angle as other ads in the same format for this batch.",
+        "must_mention": prompts.get("must_mention", "Headline or paired support must ensure the copy is clearly about weight loss \u2014 directly or indirectly."),
+        "variation_rule": prompts.get("variation_rule", "Do not reuse the same headline skeleton, support-line skeleton, or persuasion angle as other ads in the same format for this batch."),
         "concept_variation": {
             "audience_stage": _framework_item("audience_stage", audience_id),
             "lead_angle": _framework_item("lead_angle", lead_angle),
-            "message_structure": _framework_item("message_structure", concept_structure),
+            "message_structure": _framework_item("message_structure", concept_structure_id),
         },
-        "hierarchy_rule": "Use concept_variation to set awareness stage / hook direction / flow structure. Do not output labels. Derive actual headline/support from product master doc content.",
-        "format_specific_rule": {
-            "HERO": "Keep headline as one clean idea. Support line must add believable reason-to-believe and practical ease.",
-            "UGC": "Creator-like tone is allowed, but keep headline/support grounded in master-doc facts and compliance.",
-            "BA": "Split copy: left bullets are struggle state; right bullets are progress/routine shift.",
-            "TEST": "Quote-like headline; attribution + trust line must be role/source-based and non-personal.",
-            "FEAT": "Bullets must be distinct product features (LLM decides which features from master doc).",
-        }.get(fmt, "Respect format-specific structure; no lane enforcement."),
+        "hierarchy_rule": prompts.get("hierarchy_rule", "Use the assigned concept_structure flow to shape headline and support line. Do not output framework labels."),
+        "format_specific_rule": format_specific.get(fmt, prompts.get("default_format_rule", "")),
+        "headline_architecture": {
+            "template": headline_arch.get("template", ""),
+            "examples": headline_arch.get("examples", []),
+            "source": headline_arch.get("source", ""),
+            "variant": headline_arch.get("variant", ""),
+        },
+        "support_line_architecture": {
+            "template": support_line_arch.get("template", ""),
+            "examples": support_line_arch.get("examples", []),
+            "variant": support_line_arch.get("variant", ""),
+        },
     }
 
 
-FORMAT_COPY_RULE_KEYWORDS: dict[str, list[str]] = {
-    "HERO": ["copy", "headline", "support", "cta", "text budget", "minimum", "persona"],
-    "BA": ["copy", "headline", "bullet", "cta", "text budget", "minimum", "persona", "before", "after", "outcome"],
-    "TEST": ["copy", "headline", "quote", "attribution", "trust", "cta", "text budget", "minimum", "persona"],
-    "FEAT": ["copy", "headline", "bullet", "feature", "cta", "text budget", "minimum", "persona"],
-    "UGC": ["copy", "headline", "support", "cta", "creator", "text budget", "minimum", "persona"],
-}
-
-FORMAT_VISUAL_RULE_KEYWORDS = [
-    "split-screen",
-    "side:",
-    "tone",
-    "energy",
-    "product fidelity",
-    "redraw",
-    "packaging",
-    "visual",
-    "background",
-    "environment",
-    "context-shift",
-    "time-of-day",
-    "choice-architecture",
-    "posture",
-    "frame",
-    "divider",
-    "image",
-]
-
 def compact_format_rules_for_copy(fmt: str, format_rules: dict[str, Any]) -> dict[str, Any]:
     fmt = fmt.strip().upper()
-    wanted = FORMAT_COPY_RULE_KEYWORDS.get(fmt, [])
+    prompts = COPY_PROMPTS
+    wanted = (prompts.get("format_copy_keywords") or {}).get(fmt, [])
+    blocked = (prompts.get("format_visual_keywords") or {}).get("blocklist", [])
     out: list[str] = []
     for raw_rule in format_rules.get("rules") or []:
         rule = str(raw_rule).strip()
         if not rule:
             continue
         lower = rule.lower()
-        if any(blocked in lower for blocked in FORMAT_VISUAL_RULE_KEYWORDS):
+        if any(b in lower for b in blocked):
             continue
-        if wanted and not any(keyword in lower for keyword in wanted):
+        if wanted and not any(k in lower for k in wanted):
             continue
         out.append(rule)
         if len(out) >= 8:
@@ -587,77 +552,33 @@ def compact_format_rules_for_copy(fmt: str, format_rules: dict[str, Any]) -> dic
 
 def build_ad_copy_system_prompt(fmt: str) -> str:
     fmt = fmt.strip().upper()
-    base_rules = [
-        "You generate ad copy JSON only. Return valid JSON with keys default_aspect_ratio and ads.",
-        "Each ads item must include format, headline_angle, awareness_stage, concept_angle, concept_structure, persona, and copy fields. Provide copy.EN, copy.HI, and copy.HINGLISH blocks when constraints.language includes them.",
-        "Use the attached/read product master doc as the single source of product truth; the JSON payload is only request metadata, format/persona guidance, concept selection, and schema control.",
-        "Derive benefits, proof, mechanisms, differentiators, exclusions, and priority hierarchy from the product master doc, not from memory or invented claims.",
-        "Make obesity and weight-loss intent obvious to a first-time viewer; headline or paired copy must mention weight loss, obesity reduction, excess-weight reduction, or a direct 15-day result framing.",
-        "Never include price in on-image copy fields. Do not use currency symbols or words like INR, price, only, discount, off, or MRP.",
-        "Use copy_requirements.concept_variation as the selected execution path; copy its selected ids into awareness_stage, concept_angle, and concept_structure.",
-        "If copy_requirements.hypothesis exists and type is not none, obey it as the controlled test.",
-        "Use any provided hook/proof/CTA guidance only when present in concept_variation.",
-        "Write one clean, short, concrete headline. Do not lead headlines with Start, Begin, Kickstart, or Follow.",
-        "Keep AM/PM timing, protocol mechanics, and product component names out of the headline; put them in support lines or bullets when needed.",
-        "Avoid AI-ad words such as unlock, transform your journey, revolutionary, holistic wellness, game-changing, effortlessly, and tailored solution.",
-        "Do a final editor pass: shorten the headline, remove generic phrasing, and ensure supporting copy adds proof, mechanism, or ease instead of repeating the headline.",
-        "Prioritize fast visible weight loss, safer natural-feeling differentiation, real proof, and practical ease; do not let digestion or emotional benefits overshadow weight loss.",
-    ]
-    format_rules = {
-        "BA": [
-            "For BA format only: never prefix copy with BEFORE:/AFTER: labels or Hindi equivalents.",
-            "For BA format only: write explicit split contrast copy. Use 2 or 4 bullets total; bullet 1/2 are left-side struggle state and bullet 3/4 are right-side fix or progress state. If using 2 bullets, bullet 1 is struggle and bullet 2 is fix.",
-        ],
-        "TEST": [
-            "For TEST format only: headline must read like a first-person review line suitable for a quote card, not generic highly-rated phrasing.",
-            "For TEST format only: attribution must be role/source-based without personal names. If no real quote is provided, create one believable representative review grounded in persona pain/desire and safe claims.",
-        ],
-        "FEAT": ["For FEAT format only: make each bullet a different product feature."],
-        "HERO": ["For HERO format only: support line must add a second feature or proof lane instead of restating the headline."],
-        "UGC": ["For UGC format only: use creator-like clarity, and make support line add a second feature or proof lane instead of restating the headline."],
-    }
-    return " ".join(base_rules + format_rules.get(fmt, []))
+    prompts = COPY_PROMPTS
+    base_rules = prompts.get("system_prompt_base_rules", [])
+    format_rules = prompts.get("system_prompt_format_rules", {})
+    fmt_rules = format_rules.get(fmt, [])
+    return " ".join(base_rules + fmt_rules)
 
 
 def build_strict_schema_note(fmt: str) -> str:
     fmt = fmt.strip().upper()
-    field_map = {
-        "HERO": "headline, support_line, cta",
-        "UGC": "headline, support_line, cta",
-        "BA": "headline, bullets (list), cta",
-        "FEAT": "headline, bullets (list), cta",
-        "TEST": "headline, attribution, trust_line, cta",
-    }
-    copy_fields = field_map.get(fmt, "headline, cta")
-    return (
-        "STRICT_SCHEMA: Return JSON only. Do not include copy_requirements, disclaimers, or extra keys. "
-        "persona must be an object with number, name, pain_en, desire_en, friction_en, proof_needed_en, tone_cue_en, "
-        "pain_hi, desire_hi, friction_hi, proof_needed_hi, tone_cue_hi. "
-        "When constraints.language includes HINGLISH, also include pain_hinglish, desire_hinglish, friction_hinglish, proof_needed_hinglish, tone_cue_hinglish in persona. "
-        f"For {fmt or 'this'} format, copy.EN, copy.HI, and copy.HINGLISH (when requested) must contain only: {copy_fields}."
-    )
+    prompts = COPY_PROMPTS.get("strict_schema_note", {})
+    field_map = prompts.get("field_map", {})
+    copy_fields = field_map.get(fmt, prompts.get("default_fields", "headline, cta"))
+    return " ".join([
+        prompts.get("intro", ""),
+        prompts.get("persona_fields_en", ""),
+        prompts.get("language_extension", ""),
+        prompts.get("format_closure_template", "").format(fmt=fmt or "this", copy_fields=copy_fields),
+    ])
 
 
 def build_ad_prompt_tail(fmt: str) -> str:
     fmt = fmt.strip().upper()
-    support_target = {
-        "BA": "right-side shift",
-        "FEAT": "feature stack",
-        "TEST": "trust line",
-    }.get(fmt, "support line")
-    return (
-        "Return only valid JSON. No markdown. No extra text.\n"
-        "Return one ad only. You may return either a single ad object or an object with default_aspect_ratio and a one-item ads array.\n"
-        "Before writing, rely on the product master doc already attached/read in this OpenCode session. Do not ask for the doc again and do not ignore it.\n"
-        f"The current {fmt or 'ad'} ad must use a new persuasion angle in both the headline and the {support_target} compared with generated_same_format_so_far.\n"
-        "Do not reuse the same angle family or sentence pattern from generated_same_format_so_far.\n"
-        "Before writing, read copy_requirements.concept_variation and make the headline/support hierarchy match that chosen concept path.\n"
-        "If hook_structure_override is present, the EN headline must visibly match it. For contrast_loop, use a clear but natural contrast word such as but, yet, still, without, before/after, or even with.\n"
-        "Final editor pass before JSON: rewrite the headline into a finished human ad line, usually 5-12 words, one central idea only. Move mechanism/proof/timing details into support line or bullets.\n"
-        "Use supporting copy to explain why the headline is believable: simple routine, 5-minute ease, doctor-formulated proof, 70,000+ users, 15-day progress, cravings/fullness, digestion support, or less sacrifice.\n"
-        "Reject your own first draft if the headline reads like a generic AI slogan, a keyword list, or a paraphrase of supporting copy.\n"
-        "Do not return framework labels, rationale, or explanations."
-    )
+    tail = COPY_PROMPTS.get("prompt_tail", {})
+    support_map = tail.get("support_target_map", {})
+    support_target = support_map.get(fmt, tail.get("default_support_target", "support line"))
+    lines = [line.format(fmt=fmt or "ad", support_target=support_target) for line in tail.get("lines", [])]
+    return "\n".join(lines)
 
 
 def build_generation_payload_for_llm(context: dict[str, Any]) -> dict[str, Any]:
@@ -672,16 +593,7 @@ def build_generation_payload_for_llm(context: dict[str, Any]) -> dict[str, Any]:
         compact_ads.append(
             {
                 "format": fmt,
-                "persona": {
-                    "persona_number": persona.get("persona_number"),
-                    "persona_name": persona.get("persona_name"),
-                    "pain_points": persona.get("pain_points") or [],
-                    "objections": persona.get("objections") or [],
-                    "core_message": persona.get("core_message") or [],
-                    "trust_anchors": persona.get("trust_anchors") or [],
-                    "english_ready": persona.get("english_ready") or [],
-                    "hindi_ready": persona.get("hindi_ready") or [],
-                },
+                "persona": persona,
                 "format_rules": compact_format_rules_for_copy(fmt, format_rules),
                 "copy_requirements": copy_requirements,
             }
@@ -836,6 +748,14 @@ def hydrate_generated_ad_candidate(candidate: dict[str, Any], planned_ad: dict[s
     return hydrated
 
 
+def _build_persona_payload_field(seed_field_value: Any, config: dict[str, Any]) -> Any:
+    wrap = config.get("wrap_list", False)
+    prefix = config.get("prefix")
+    if wrap:
+        val = str(seed_field_value) if seed_field_value else ""
+        return [f"{prefix}{val}" if prefix and val else val]
+    return seed_field_value
+
 def build_persona_payload(persona_number: int, personas: list[dict[str, Any]]) -> dict[str, Any]:
     persona_name = f"Persona {persona_number}"
     for item in personas:
@@ -845,26 +765,28 @@ def build_persona_payload(persona_number: int, personas: list[dict[str, Any]]) -
                 persona_name = name
             break
     seed = PERSONA_SEED_INPUTS.get(persona_number, {})
-    pain = seed.get("pain", "Daily routine feels heavy and hard to sustain.")
-    desire = seed.get("desire", "A practical routine that feels easy to follow.")
-    friction = seed.get("friction", "Past plans felt too strict and difficult to maintain.")
-    proof = seed.get("proof", "Needs clear structure and believable support.")
-    tone = seed.get("tone", "practical and confidence-building")
+    mapping = COPY_PROMPTS.get("persona_mapping", {})
+    seed_to_payload = mapping.get("seed_to_payload", {})
+    fallbacks = mapping.get("persona_fallbacks", {})
 
-    return {
+    payload: dict[str, Any] = {
         "persona_number": persona_number,
         "persona_name": persona_name,
-        "pain_points": [pain],
-        "trigger_scenarios": [],
-        "objections": [friction],
-        "language_bank": [],
-        "core_message": [desire],
-        "grounded_mechanism_map": [],
-        "how_kit_solves": [],
-        "trust_anchors": [proof],
-        "english_ready": [f"Tone cue: {tone}"],
-        "hindi_ready": ["टोन संकेत: सरल, भरोसेमंद, व्यावहारिक"],
     }
+
+    for seed_key, field_cfg in seed_to_payload.items():
+        raw = seed.get(seed_key, fallbacks.get(seed_key, ""))
+        payload[field_cfg["field"]] = _build_persona_payload_field(raw, field_cfg)
+
+    static = mapping.get("static_fields", {})
+    for key, val in static.items():
+        payload[key] = val
+
+    hindi_default = mapping.get("hindi_ready_default", "")
+    if hindi_default and payload.get("hindi_ready") in (None, []):
+        payload["hindi_ready"] = [hindi_default]
+
+    return payload
 
 
 def read_active_images(path: Path) -> list[str]:
@@ -1913,12 +1835,7 @@ def parse_opencode_session_id(stdout: str) -> str | None:
 
 
 def build_product_doc_bootstrap_prompt() -> str:
-    return (
-        "Read the attached product master doc completely. For every following ad-copy request in this same OpenCode session, "
-        "use that doc as the single source of product truth for benefits, proof, mechanism, differentiators, exclusions, and priority hierarchy. "
-        "Do not rewrite, summarize, modify, or ignore the doc. The following messages will provide only ad format/persona/concept/schema instructions. "
-        "Return only valid JSON: {\"status\":\"product_doc_loaded\"}."
-    )
+    return COPY_PROMPTS.get("product_doc_bootstrap_prompt", "Read the attached product master doc completely. Return only valid JSON: {\"status\":\"product_doc_loaded\"}.")
 
 
 def append_run_log(run_dir: Path, filename: str, message: str) -> None:
@@ -2485,7 +2402,7 @@ def call_opencode_compatible(config: dict[str, Any], context: dict[str, Any], ru
             user_payload = {
                 "task": "Generate fresh ad copy JSON for provided context.",
                 "context": build_generation_payload_for_llm(single_context),
-                "generated_same_format_so_far": previous_same_format,
+                "already_used_ads_DO_NOT_REUSE": previous_same_format,
                 "constraints": {
                     "language": target_langs.get(language_mode, ["EN", "HI"]),
                     "language_mode": language_mode,
@@ -4719,31 +4636,58 @@ async def api_run_execute(
             concept = copy_req.get("concept_variation") or {}
             hyp_type = hyp_meta.get("type")
             variant = hyp_meta.get("variant")
+            arch_guidance = COPY_PROMPTS.get("concept_framework", {})
             if hyp_type == "awareness_stage" and variant:
                 concept["audience_stage"] = _framework_item("audience_stage", variant)
-                if variant in AWARENESS_STAGE_GUIDANCE:
-                    concept["awareness_stage_guidance"] = AWARENESS_STAGE_GUIDANCE[variant]
+                guidance = arch_guidance.get("awareness_stage", {}).get(variant)
+                if guidance:
+                    concept["awareness_stage_guidance"] = guidance
             elif hyp_type == "concept_angle" and variant:
                 concept["lead_angle"] = _framework_item("lead_angle", variant)
-                if variant in CONCEPT_ANGLE_GUIDANCE:
-                    concept["concept_angle_guidance"] = CONCEPT_ANGLE_GUIDANCE[variant]
+                guidance = arch_guidance.get("concept_angle", {}).get(variant)
+                if guidance:
+                    concept["concept_angle_guidance"] = guidance
             elif hyp_type == "concept_structure" and variant:
                 concept["message_structure"] = _framework_item("message_structure", variant)
-                if variant in CONCEPT_STRUCTURE_GUIDANCE:
-                    concept["concept_structure_guidance"] = CONCEPT_STRUCTURE_GUIDANCE[variant]
+                guidance = arch_guidance.get("concept_structure", {}).get(variant)
+                if guidance:
+                    concept["concept_structure_guidance"] = guidance
             elif hyp_type == "hook_structure" and variant:
                 concept["hook_structure_override"] = variant
-                if variant in HOOK_STRUCTURE_GUIDANCE:
-                    concept["hook_structure_guidance"] = HOOK_STRUCTURE_GUIDANCE[variant]
+                guidance = arch_guidance.get("hook_structure", {}).get(variant)
+                if guidance:
+                    concept["hook_structure_guidance"] = guidance
             elif hyp_type == "proof_style" and variant:
                 concept["proof_style_override"] = variant
-                if variant in PROOF_STYLE_GUIDANCE:
-                    concept["proof_style_guidance"] = PROOF_STYLE_GUIDANCE[variant]
+                guidance = arch_guidance.get("proof_style", {}).get(variant)
+                if guidance:
+                    concept["proof_style_guidance"] = guidance
             elif hyp_type == "cta_voice" and variant:
                 concept["cta_voice_override"] = variant
-                if variant in CTA_VOICE_GUIDANCE:
-                    concept["cta_voice_guidance"] = CTA_VOICE_GUIDANCE[variant]
+                guidance = arch_guidance.get("cta_voice", {}).get(variant)
+                if guidance:
+                    concept["cta_voice_guidance"] = guidance
             copy_req["concept_variation"] = concept
+
+            # Update headline_architecture if hypothesis changed the structural driver
+            arch_src = None
+            arch_variant = None
+            if hyp_type == "concept_structure" and variant:
+                arch_src = "concept_structure"
+                arch_variant = variant
+            elif hyp_type == "hook_structure" and variant:
+                arch_src = "hook_structure"
+                arch_variant = variant
+            if arch_src and arch_variant:
+                ha_group = COPY_ARCH.get("headline_architectures", {}).get(arch_src, {})
+                ha_entry = ha_group.get(arch_variant)
+                if ha_entry:
+                    copy_req["headline_architecture"] = {
+                        "template": ha_entry.get("template", ""),
+                        "examples": ha_entry.get("examples", []),
+                        "source": arch_src,
+                        "variant": arch_variant,
+                    }
 
         ads_context.append(
             {
