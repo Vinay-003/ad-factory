@@ -27,47 +27,51 @@ function parsePromptPath(path) {
 }
 
 function buildPromptFileSummary(promptFiles) {
-  const wrap = document.createElement("details");
+  const wrap = document.createElement("div");
   wrap.className = "run-prompt-files";
-  wrap.open = false;
 
-  const summary = document.createElement("summary");
+  const header = document.createElement("div");
+  header.className = "run-prompt-files-header";
   const byAspect = promptFiles.reduce((acc, path) => {
     const parsed = parsePromptPath(path);
     acc[parsed.aspect] = (acc[parsed.aspect] || 0) + 1;
     return acc;
   }, {});
   const parts = Object.entries(byAspect).map(([aspect, count]) => `${aspect}: ${count}`).join(" · ");
-  summary.innerHTML = `<strong>Prompt files</strong><span>${promptFiles.length} total${parts ? ` · ${parts}` : ""}</span>`;
-  wrap.appendChild(summary);
+  header.innerHTML = `<strong>Prompt files</strong><span>${promptFiles.length} total${parts ? ` · ${parts}` : ""}</span>`;
+  wrap.appendChild(header);
 
   const grid = document.createElement("div");
   grid.className = "prompt-file-grid";
+  grid.style.display = "none";
 
-  promptFiles.forEach((path) => {
+  const frag = document.createDocumentFragment();
+  for (let i = 0; i < promptFiles.length; i++) {
+    const path = promptFiles[i];
     const parsed = parsePromptPath(path);
     const card = document.createElement("div");
     card.className = "prompt-file-card";
     card.title = path;
-    card.innerHTML = `
-      <span class="prompt-file-aspect">${parsed.aspect}</span>
-      <strong>${parsed.format} ${parsed.persona}</strong>
-      <span>${parsed.creative} · ${parsed.lang}</span>
-    `;
+    card.innerHTML = `<span class="prompt-file-aspect">${parsed.aspect}</span><strong>${parsed.format} ${parsed.persona}</strong><span>${parsed.creative} · ${parsed.lang}</span>`;
     card.addEventListener("click", () => {
-      showPromptFullscreen(
-        Path(path).name || path,
-        "",
-        {
-          fetchUrl: `/api/prompt-file-content?prompt_path=${encodeURIComponent(path)}`,
-          saveUrl: "/api/prompt-file-content",
-          saveBody: (text) => ({ prompt_path: path, content: text }),
-        }
-      );
+      showPromptFullscreen(Path(path).name || path, "", {
+        fetchUrl: `/api/prompt-file-content?prompt_path=${encodeURIComponent(path)}`,
+        saveUrl: "/api/prompt-file-content",
+        saveBody: (text) => ({ prompt_path: path, content: text }),
+      });
     });
-    grid.appendChild(card);
-  });
+    frag.appendChild(card);
+  }
+  grid.appendChild(frag);
   wrap.appendChild(grid);
+
+  let isOpen = false;
+  header.addEventListener("click", () => {
+    isOpen = !isOpen;
+    grid.style.display = isOpen ? "" : "none";
+    header.classList.toggle("open", isOpen);
+  });
+
   return wrap;
 }
 
@@ -96,8 +100,19 @@ export function renderRun(run) {
   buildPromptEditor(run, promptActions);
   div.appendChild(promptActions);
 
-  const gallery = buildImageGallery(run);
-  if (gallery) div.appendChild(gallery);
+  const galleryContainer = document.createElement("div");
+  div.appendChild(galleryContainer);
+
+  let galleryBuilt = false;
+  const observer = new IntersectionObserver((entries) => {
+    if (entries[0].isIntersecting && !galleryBuilt) {
+      galleryBuilt = true;
+      observer.disconnect();
+      const gallery = buildImageGallery(run);
+      if (gallery) galleryContainer.appendChild(gallery);
+    }
+  }, { rootMargin: "400px" });
+  observer.observe(galleryContainer);
 
   return div;
 }
