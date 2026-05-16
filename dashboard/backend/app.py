@@ -263,79 +263,7 @@ def hypothesis_mismatch(candidate: dict[str, Any], planned_ad: dict[str, Any]) -
     return None
 
 
-HYPOTHESIS_VARIABLES: dict[str, dict[str, Any]] = {
-    "none": {
-        "label": "No hypothesis test",
-        "description": "Generate ads normally without controlled A/B testing.",
-        "options": [],
-    },
-    "hook_structure": {
-        "label": "Hook Structure (H1)",
-        "description": "Test which headline opening pattern performs best: question vs. proof vs. contrast vs. confession vs. command.",
-        "options": [
-            {"id": "question_lead", "label": "Question Lead", "hint": "Headline opens with a question"},
-            {"id": "proof_lead", "label": "Proof Lead", "hint": "Headline opens with credibility or numbers"},
-            {"id": "contrast_loop", "label": "Contrast Loop", "hint": "Headline uses before/after tension"},
-            {"id": "confession_lead", "label": "Confession Lead", "hint": "Headline uses first-person admission"},
-            {"id": "command_lead", "label": "Command Lead", "hint": "Headline uses direct instruction"},
-        ],
-    },
-    "concept_angle": {
-        "label": "Concept Angle (H2)",
-        "description": "Test which messaging angle drives better results: pain vs. outcome vs. proof vs. authority vs. curiosity.",
-        "options": [
-            {"id": "pain_point", "label": "Pain Point", "hint": "Lead with the specific problem"},
-            {"id": "desired_outcome", "label": "Desired Outcome", "hint": "Lead with the result or felt outcome"},
-            {"id": "social_proof", "label": "Social Proof", "hint": "Lead with others' trust or usage"},
-            {"id": "authority", "label": "Authority", "hint": "Lead with expertise or doctor credibility"},
-            {"id": "curiosity", "label": "Curiosity", "hint": "Lead with a question or mechanism gap"},
-            {"id": "comparison", "label": "Comparison", "hint": "Lead by contrasting with harder alternatives"},
-            {"id": "offer", "label": "Offer", "hint": "Lead with practical reason to act"},
-        ],
-    },
-    "awareness_stage": {
-        "label": "Awareness Stage (H3)",
-        "description": "Test whether matching the ad to the audience's funnel stage improves performance.",
-        "options": [
-            {"id": "unaware", "label": "Unaware", "hint": "Reader does not yet realize the hidden friction"},
-            {"id": "problem_aware", "label": "Problem Aware", "hint": "Reader knows the problem but not the fix"},
-            {"id": "solution_aware", "label": "Solution Aware", "hint": "Reader knows fixes exist but not why this kit is different"},
-            {"id": "product_aware", "label": "Product Aware", "hint": "Reader already knows the kit; give the final push"},
-        ],
-    },
-    "proof_style": {
-        "label": "Proof Style (H4)",
-        "description": "Test which trust framing works best for this persona: authority vs. social proof vs. mechanism explainer.",
-        "options": [
-            {"id": "authority_anchor", "label": "Authority Anchor", "hint": "Doctor credibility and Ayurveda trust"},
-            {"id": "social_proof", "label": "Social Proof", "hint": "70,000+ users and testimonials"},
-            {"id": "mechanism_explainer", "label": "Mechanism Explainer", "hint": "How the protocol works step-by-step"},
-            {"id": "routine_clarity", "label": "Routine Clarity", "hint": "Simple, clear daily steps"},
-            {"id": "objection_flip", "label": "Objection Flip", "hint": "Address skepticism directly"},
-        ],
-    },
-    "cta_voice": {
-        "label": "CTA Voice (H5)",
-        "description": "Test which call-to-action tone converts better: urgent vs. guided vs. reassuring vs. discovery.",
-        "options": [
-            {"id": "urgent_start", "label": "Urgent Start", "hint": "Start Today / Act Now"},
-            {"id": "guided_next_step", "label": "Guided Next Step", "hint": "See The Steps / View Details"},
-            {"id": "reassurance_start", "label": "Reassurance Start", "hint": "Check If It Fits / Try Risk-Free"},
-            {"id": "challenge_action", "label": "Challenge Action", "hint": "Take The 15-Day Test"},
-            {"id": "discovery_action", "label": "Discovery Action", "hint": "See How It Works / Learn More"},
-        ],
-    },
-    "concept_structure": {
-        "label": "Concept Structure (H6)",
-        "description": "Test copy flow structure: PAS vs BAB vs FAB vs Four Us.",
-        "options": [
-            {"id": "pas", "label": "PAS", "hint": "Problem → Agitation → Solution"},
-            {"id": "bab", "label": "BAB", "hint": "Before → After → Bridge"},
-            {"id": "fab", "label": "FAB", "hint": "Feature → Advantage → Benefit"},
-            {"id": "four_us", "label": "Four Us", "hint": "Useful, urgent, unique, ultra-specific"},
-        ],
-    },
-}
+HYPOTHESIS_VARIABLES: dict[str, dict[str, Any]] = {}
 
 
 
@@ -448,7 +376,66 @@ def _load_copy_prompts() -> dict[str, Any]:
         return {}
 
 
+def _hypothesis_variant_label(variant_id: str) -> str:
+    acronyms = {"pas", "bab", "fab"}
+    if variant_id in acronyms:
+        return variant_id.upper()
+    return variant_id.replace("_", " ").title()
+
+
+def _build_hypothesis_variables() -> dict[str, dict[str, Any]]:
+    hv: dict[str, dict[str, Any]] = {
+        "none": {
+            "label": "No hypothesis test",
+            "description": "Generate ads normally without controlled A/B testing.",
+            "options": [],
+        }
+    }
+
+    arch_types = {
+        "hook_structure": {
+            "label": "Hook Structure (H1)",
+            "description": "Test which headline opening pattern performs best: question vs. proof vs. contrast vs. confession vs. command.",
+        },
+        "concept_angle": {
+            "label": "Concept Angle (H2)",
+            "description": "Test which messaging angle drives better results: pain vs. outcome vs. proof vs. authority vs. curiosity.",
+        },
+        "awareness_stage": {
+            "label": "Awareness Stage (H3)",
+            "description": "Test whether matching the ad to the audience\u2019s funnel stage improves performance.",
+        },
+        "concept_structure": {
+            "label": "Concept Structure (H6)",
+            "description": "Test copy flow structure: PAS vs BAB vs FAB vs Four Us.",
+        },
+    }
+    arch = COPY_ARCH.get("headline_architectures", {})
+    for hyp_type, meta in arch_types.items():
+        options = [{"id": vid, "label": _hypothesis_variant_label(vid)} for vid in arch.get(hyp_type, {})]
+        hv[hyp_type] = {**meta, "options": options}
+
+    cf_types = {
+        "proof_style": {
+            "label": "Proof Style (H4)",
+            "description": "Test which trust framing works best for this persona: authority vs. social proof vs. mechanism explainer.",
+        },
+        "cta_voice": {
+            "label": "CTA Voice (H5)",
+            "description": "Test which call-to-action tone converts better: urgent vs. guided vs. reassuring vs. discovery.",
+        },
+    }
+    cf = COPY_PROMPTS.get("concept_framework", {})
+    for hyp_type, meta in cf_types.items():
+        options = [{"id": vid, "label": _hypothesis_variant_label(vid)} for vid in cf.get(hyp_type, {})]
+        hv[hyp_type] = {**meta, "options": options}
+
+    return hv
+
+
 COPY_PROMPTS = _load_copy_prompts()
+HYPOTHESIS_VARIABLES = _build_hypothesis_variables()
+CTA_VARIANTS = COPY_PROMPTS.get("cta_variants", {})
 
 
 def _framework_item(group: str, item_id: str) -> dict[str, str]:
@@ -1603,22 +1590,7 @@ def strip_internal_markers_from_payload(payload: dict[str, Any]) -> dict[str, An
     return payload
 
 
-CTA_VARIANTS: dict[str, dict[str, list[str]]] = {
-    "EN": {
-        "HERO": ["Start Today", "See The 15-Day Plan", "Begin The Kit"],
-        "BA": ["See The Shift", "Start The Reset", "View The Change"],
-        "TEST": ["See The Proof", "Read The Routine", "Start With Proof"],
-        "FEAT": ["View Kit Steps", "See The Protocol", "Check The Steps"],
-        "UGC": ["See My Routine", "Watch The Routine", "Try The Steps"],
-    },
-    "HI": {
-        "HERO": ["आज शुरू करें", "15 दिन का प्लान देखें", "किट शुरू करें"],
-        "BA": ["बदलाव देखें", "रीसेट शुरू करें", "फर्क देखें"],
-        "TEST": ["प्रमाण देखें", "दिनचर्या पढ़ें", "भरोसे से शुरू करें"],
-        "FEAT": ["किट कदम देखें", "प्रोटोकॉल देखें", "कदम देखें"],
-        "UGC": ["मेरी दिनचर्या देखें", "दिनचर्या देखें", "कदम अपनाएं"],
-    },
-}
+CTA_VARIANTS: dict[str, dict[str, list[str]]] = {}
 
 
 def registry_banlist_values(context: dict[str, Any]) -> set[str]:
@@ -1938,46 +1910,41 @@ def concept_ids_from_requirements(copy_req: dict[str, Any]) -> dict[str, str]:
 
 def ensure_testimonial_headline(headline: str, lang: str, persona: dict[str, Any]) -> str:
     clean = shorten_copy_line(headline)
+    guidance = COPY_PROMPTS.get("testimonial_headline_guidance", {})
+    cfg = guidance.get(lang, guidance.get("EN", {}))
+    first_pat = cfg.get("first_person_pattern", "")
+    weight_pat = cfg.get("weight_pattern", "")
+    suffix = cfg.get("suffix", "")
+    desire_template = cfg.get("desire_template", "")
+    fallback_text = cfg.get("fallback", "")
+    desire_field = cfg.get("desire_field", "")
+
     if lang == "EN":
-        if re.search(r"\b(i|i'm|i’ve|i'd|my|me)\b", clean, flags=re.IGNORECASE):
-            if re.search(r"\b(weight|obesity|excess\s*weight|kg|kilo)\b", clean, flags=re.IGNORECASE):
+        if first_pat and re.search(first_pat, clean, flags=re.IGNORECASE):
+            if weight_pat and re.search(weight_pat, clean, flags=re.IGNORECASE):
                 return clean
-            return shorten_copy_line(f'{clean.rstrip(".")}. It finally fit my weight-loss routine.')
-        desire = _clean_str(persona.get("desire_en")).rstrip(".")
+            return shorten_copy_line(f'{clean.rstrip(".")}. {suffix}')
+        desire = _clean_str(persona.get(desire_field)).rstrip(".")
         if desire:
             desire_phrase = desire[:1].lower() + desire[1:] if len(desire) > 1 else desire.lower()
-            return shorten_copy_line(f'"I finally found {desire_phrase} for my weight-loss goal."')
-        return '"I finally found a routine I can follow for weight loss every day."'
+            return shorten_copy_line(desire_template.format(desire_phrase=desire_phrase))
+        return fallback_text
 
-    if re.search(r"(मैं|मेरी|मेरा|मुझे|मैंने)", clean):
-        if re.search(r"(वजन|मोटापा|किलो|kg)", clean):
+    if first_pat and re.search(first_pat, clean):
+        if weight_pat and re.search(weight_pat, clean):
             return clean
-        return shorten_copy_line(f'{clean.rstrip("।")}। यह मेरे वजन घटाने के लिए काम आया।')
-    desire_hi = _clean_str(persona.get("desire_hi")).rstrip("।")
-    if desire_hi:
-        return shorten_copy_line(f'"मुझे आखिर {desire_hi} वाला रूटीन मिला जो वजन घटाने में मदद करता है।"')
-    return '"मुझे आखिर ऐसा रूटीन मिला जिसे मैं रोज निभा सकूं और वजन घटा सकूं।"'
+        return shorten_copy_line(f'{clean.rstrip("।")}। {suffix}')
+    desire = _clean_str(persona.get(desire_field)).rstrip("।")
+    if desire:
+        return shorten_copy_line(desire_template.format(desire_phrase=desire))
+    return fallback_text
 
 
 def ensure_testimonial_attribution(attribution: str, lang: str, persona: dict[str, Any], headline: str, trust_line: str) -> str:
-    if lang == "EN":
-        variants = [
-            "Verified routine user feedback",
-            "15-day adherence feedback snapshot",
-            "Community obesity-care review",
-            "Early weight-loss routine review",
-            "Structured-plan user feedback",
-            "Repeat-user experience note",
-        ]
-    else:
-        variants = [
-            "रूटीन-फॉलो यूजर फीडबैक",
-            "15-दिन adherence फीडबैक स्नैपशॉट",
-            "कम्युनिटी obesity-care रिव्यू",
-            "शुरुआती वजन-घटाने रूटीन रिव्यू",
-            "स्ट्रक्चर्ड-प्लान यूजर फीडबैक",
-            "रीपीट-यूजर अनुभव नोट",
-        ]
+    variant_lists = COPY_PROMPTS.get("testimonial_attribution_variants", {})
+    variants = variant_lists.get(lang, variant_lists.get("EN", []))
+    if not variants:
+        return attribution
 
     current = _clean_str(attribution)
     seed_input = (
@@ -2119,9 +2086,9 @@ def normalize_generated_copy(
 
 
 def _template_copy(primary_key: str, secondary_key: str, concept_angle: str, pain: str, lang: str) -> str:
-    if lang == "HI":
-        return f"{primary_key} का {secondary_key} सिस्टम जो {pain} को संभालने में मदद करता है।"
-    return f"A clear {primary_key} system for {secondary_key} that helps manage {pain}."
+    templates = COPY_PROMPTS.get("template_copy_headline_sentence", {})
+    template = templates.get(lang, templates.get("EN", ""))
+    return template.format(primary_key=primary_key, secondary_key=secondary_key, pain=pain)
 
 
 def template_headline(primary_key: str, concept_angle: str, pain: str, lang: str) -> str:
@@ -2129,20 +2096,18 @@ def template_headline(primary_key: str, concept_angle: str, pain: str, lang: str
 
 
 def template_support(primary_key: str, secondary_key: str, lang: str) -> str:
-    if lang == "HI":
-        return f"सरल कदम, जो {primary_key} और {secondary_key} पर आधारित हैं।"
-    return f"Simple steps rooted in {primary_key} and {secondary_key}."
+    templates = COPY_PROMPTS.get("template_copy_support_sentence", {})
+    template = templates.get(lang, templates.get("EN", ""))
+    return template.format(primary_key=primary_key, secondary_key=secondary_key)
 
 
 def feature_template(key: str) -> dict[str, str]:
-    FEATURES = {
-        "structured_system": {"support_en": "Structured system for consistent weight-loss progress.", "support_hi": "लगातार वजन-सपोर्ट के लिए व्यवस्थित सिस्टम।"},
-        "cravings_down": {"support_en": "Helps reduce cravings for better daily weight management.", "support_hi": "बेहतर दैनिक वजन-प्रबंधन के लिए लालसा कम करने में सहायक।"},
-        "guided_weight_loss": {"support_en": "Guided morning and night steps for visible results.", "support_hi": "दिखने वाले परिणामों के लिए निर्देशित सुबह-रात के कदम।"},
-        "natural_ingredients": {"support_en": "Natural Ayurvedic formulation without side effects.", "support_hi": "बिना दुष्प्रभाव के प्राकृतिक आयुर्वेदिक फॉर्मूलेशन।"},
-        "easy_routine": {"support_en": "Simple routine that fits into daily life easily.", "support_hi": "रोज़मर्रा की ज़िंदगी में आसानी से फिट होने वाली सरल दिनचर्या।"},
-    }
-    return FEATURES.get(key, {"support_en": "Structured system for consistent progress.", "support_hi": "लगातार प्रगति के लिए व्यवस्थित सिस्टम।"})
+    templates = COPY_PROMPTS.get("feature_templates", {})
+    entry = templates.get(key)
+    if entry:
+        return {"support_en": entry.get("EN", ""), "support_hi": entry.get("HI", "")}
+    default = templates.get("_default", {})
+    return {"support_en": default.get("EN", "Structured system for consistent progress."), "support_hi": default.get("HI", "लगातार प्रगति के लिए व्यवस्थित सिस्टम।")}
 
 
 def build_template_copy(context: dict[str, Any], run_id: str) -> dict[str, Any]:
@@ -2163,46 +2128,39 @@ def build_template_copy(context: dict[str, Any], run_id: str) -> dict[str, Any]:
         desire_en = choose_text(persona.get("core_message", []), "A practical routine that feels easy to follow.")
         friction_en = choose_text(persona.get("objections", []), "Past plans felt too strict and difficult to maintain.")
         proof_en = choose_text(persona.get("trust_anchors", []), "Needs proof through clear structure and believable support.")
-        tone_en = "Practical, empathetic, and confidence-building"
+        en_fallbacks = COPY_PROMPTS.get("template_copy_en_fallbacks", {})
+        tone_en = en_fallbacks.get("tone", "Practical, empathetic, and confidence-building")
 
-        pain_hi = "रोज की वजन-घटाने की दिनचर्या टूटना आसान है।"
-        desire_hi = "ऐसा आसान सिस्टम चाहिए जो रोज निभ सके।"
-        friction_hi = "पहले के प्लान बहुत सख्त और मुश्किल थे।"
-        proof_hi = "साफ कदम, भरोसेमंद सपोर्ट और व्यावहारिक प्रमाण चाहिए।"
-        tone_hi = "सरल, भरोसेमंद, और व्यावहारिक"
+        hi_fallbacks = COPY_PROMPTS.get("template_copy_hi_fallbacks", {})
+        pain_hi = hi_fallbacks.get("pain", "रोज की वजन-घटाने की दिनचर्या टूटना आसान है।")
+        desire_hi = hi_fallbacks.get("desire", "ऐसा आसान सिस्टम चाहिए जो रोज निभ सके।")
+        friction_hi = hi_fallbacks.get("friction", "पहले के प्लान बहुत सख्त और मुश्किल थे।")
+        proof_hi = hi_fallbacks.get("proof", "साफ कदम, भरोसेमंद सपोर्ट और व्यावहारिक प्रमाण चाहिए।")
+        tone_hi = hi_fallbacks.get("tone", "सरल, भरोसेमंद, और व्यावहारिक")
 
         concept_angle = concept_ids["concept_angle"]
         headline_en = template_headline(primary_key, concept_angle, pain_en, "EN")
         headline_hi = template_headline(primary_key, concept_angle, pain_en, "HI")
-        if fmt == "BA":
-            headline_en = "A clear kit routine beats random dieting."
-            headline_hi = "साफ किट दिनचर्या अनियमित डाइटिंग से बेहतर है।"
-        elif fmt == "FEAT":
-            headline_en = "Three kit steps support 15-day weight loss."
-            headline_hi = "तीन किट कदम 15 दिन के वजन-सपोर्ट में मदद करते हैं।"
-        elif fmt == "UGC":
-            headline_en = "Late-night cravings can feel easier to control."
-            headline_hi = "रात की लालसा नियंत्रित करना आसान लग सकता है।"
-        cta_by_format = {
-            "HERO": ("Start Today", "आज शुरू करें"),
-            "BA": ("See The Shift", "बदलाव देखें"),
-            "TEST": ("See The Proof", "प्रमाण देखें"),
-            "FEAT": ("View Kit Steps", "किट कदम देखें"),
-            "UGC": ("See My Routine", "मेरी दिनचर्या देखें"),
-        }
-        cta_en, cta_hi = cta_by_format.get(fmt, ("Start Today", "आज शुरू करें"))
-        if fmt == "TEST":
-            headline_en = shorten_copy_line(f"I trusted the 15-day kit because the steps felt clear for weight loss.")
-            headline_hi = "मैंने 15 दिन की किट पर भरोसा किया क्योंकि वजन-घटाने के कदम साफ लगे।"
+        fmt_overrides = COPY_PROMPTS.get("template_copy_format_overrides", {})
+        fo = fmt_overrides.get(fmt, {})
+        if fo.get("headline"):
+            headline_en = fo["headline"].get("EN", headline_en)
+            headline_hi = fo["headline"].get("HI", headline_hi)
+
+        cta_map = COPY_PROMPTS.get("template_copy_cta_map", {})
+        default_cta = cta_map.get("_default", {"EN": "Start Today", "HI": "आज शुरू करें"})
+        fmt_cta = cta_map.get(fmt, default_cta)
+        cta_en = fmt_cta.get("EN", "Start Today")
+        cta_hi = fmt_cta.get("HI", "आज शुरू करें")
 
         copy_en: dict[str, Any]
         copy_hi: dict[str, Any]
         if fmt in {"HERO", "UGC"}:
             support_en = template_support(primary_key, secondary_key, "EN")
             support_hi = template_support(primary_key, secondary_key, "HI")
-            if fmt == "UGC":
-                support_en = "A simple first step helps keep late-night weight-loss control practical."
-                support_hi = "एक सरल पहला कदम रात के वजन-नियंत्रण को व्यावहारिक रखता है।"
+            if fo.get("support_override"):
+                support_en = fo["support_override"].get("EN", support_en)
+                support_hi = fo["support_override"].get("HI", support_hi)
             copy_en = {"headline": headline_en, "support_line": support_en, "cta": cta_en}
             copy_hi = {"headline": headline_hi, "support_line": support_hi, "cta": cta_hi}
         elif fmt == "BA":
@@ -2221,12 +2179,14 @@ def build_template_copy(context: dict[str, Any], run_id: str) -> dict[str, Any]:
             copy_en = {"headline": headline_en, "bullets": bullets_en, "cta": cta_en}
             copy_hi = {"headline": headline_hi, "bullets": bullets_hi, "cta": cta_hi}
         elif fmt == "FEAT":
-            bullets_en = [
+            feat_bullets_en = fo.get("bullets", {}).get("EN", [])
+            feat_bullets_hi = fo.get("bullets", {}).get("HI", [])
+            bullets_en = feat_bullets_en or [
                 "Morning OK Liquid helps reduce hunger and random snacking for weight loss.",
                 "Night Tablet + Powder support digestion and lighter mornings in obesity routine.",
                 "Built for visible 15-day weight-loss support without crash-diet pressure.",
             ]
-            bullets_hi = [
+            bullets_hi = feat_bullets_hi or [
                 "सुबह का OK Liquid वजन घटाने के लिए भूख और अचानक खाने की आदत कम करने में सहायक है।",
                 "रात का Tablet + Powder मोटापा-नियंत्रण दिनचर्या में पाचन-सपोर्ट देता है।",
                 "कठोर डाइट दबाव के बिना 15 दिन के वजन-सपोर्ट के लिए बनाया गया।",
@@ -2234,16 +2194,20 @@ def build_template_copy(context: dict[str, Any], run_id: str) -> dict[str, Any]:
             copy_en = {"headline": headline_en, "bullets": bullets_en, "cta": cta_en}
             copy_hi = {"headline": headline_hi, "bullets": bullets_hi, "cta": cta_hi}
         else:
+            attribution_en = fo.get("attribution", {}).get("EN", "Doctor-formulated Ayurvedic obesity and weight-loss protocol")
+            attribution_hi = fo.get("attribution", {}).get("HI", "डॉक्टर-फॉर्मुलेटेड आयुर्वेदिक मोटापा और वजन-घटाने का प्रोटोकॉल")
+            trust_en = fo.get("trust_line", {}).get("EN", "Structured morning-night steps for visible weight-loss progress and obesity control.")
+            trust_hi = fo.get("trust_line", {}).get("HI", "सुबह-रात के स्पष्ट कदमों से वजन घटाने और मोटापा नियंत्रण का भरोसेमंद सपोर्ट।")
             copy_en = {
                 "headline": headline_en,
-                "attribution": "Doctor-formulated Ayurvedic obesity and weight-loss protocol",
-                "trust_line": "Structured morning-night steps for visible weight-loss progress and obesity control.",
+                "attribution": attribution_en,
+                "trust_line": trust_en,
                 "cta": cta_en,
             }
             copy_hi = {
                 "headline": headline_hi,
-                "attribution": "डॉक्टर-फॉर्मुलेटेड आयुर्वेदिक मोटापा और वजन-घटाने का प्रोटोकॉल",
-                "trust_line": "सुबह-रात के स्पष्ट कदमों से वजन घटाने और मोटापा नियंत्रण का भरोसेमंद सपोर्ट।",
+                "attribution": attribution_hi,
+                "trust_line": trust_hi,
                 "cta": cta_hi,
             }
 

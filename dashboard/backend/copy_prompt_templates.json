@@ -1,7 +1,6 @@
 {
   "format": "v1",
   "_description": "All prompt text templates for ad copy LLM generation. Edit this file to change what the LLM sees — no code changes needed. Dynamic placeholders use {fmt}, {support_target}, {copy_fields}.",
-
   "system_prompt_base_rules": [
     "You generate ad copy JSON only. Return valid JSON with keys default_aspect_ratio and ads.",
     "Each ads item must include format, headline_angle, awareness_stage, concept_angle, concept_structure, persona, and copy fields. Provide copy.EN, copy.HI, and copy.HINGLISH blocks when constraints.language includes them.",
@@ -21,7 +20,6 @@
     "Read copy_requirements.support_line_architecture.template and .examples — the support line must follow that sentence architecture. Do not default to a feature-list pattern.",
     "The already_used_ads_DO_NOT_REUSE list is a BAN LIST for deduplication only. Do not copy, imitate, adapt, or reference its headlines, support lines, skeletons, or angles. Treat it as forbidden output, not as examples."
   ],
-
   "system_prompt_format_rules": {
     "BA": [
       "For BA format only: never prefix copy with BEFORE:/AFTER: labels or Hindi equivalents.",
@@ -41,7 +39,6 @@
       "For UGC format only: follow the headline_architecture template and examples in copy_requirements. Use creator-like clarity for the support line, and follow the assigned support_line_architecture template."
     ]
   },
-
   "prompt_tail": {
     "support_target_map": {
       "BA": "right-side shift",
@@ -64,7 +61,6 @@
       "Do not return framework labels, rationale, or explanations."
     ]
   },
-
   "strict_schema_note": {
     "intro": "STRICT_SCHEMA: Return JSON only. Do not include copy_requirements, disclaimers, or extra keys.",
     "persona_fields_en": "persona must be an object with number, name, pain_en, desire_en, friction_en, proof_needed_en, tone_cue_en, pain_hi, desire_hi, friction_hi, proof_needed_hi, tone_cue_hi.",
@@ -79,9 +75,8 @@
     },
     "default_fields": "headline, cta"
   },
-
   "copy_requirements": {
-    "must_mention": "Headline or paired support must ensure the copy is clearly about weight loss \u2014 directly or indirectly.",
+    "must_mention": "Headline or paired support must ensure the copy is clearly about weight loss — directly or indirectly.",
     "variation_rule": "Do not reuse the same headline skeleton, support-line skeleton, or persuasion angle as other ads in the same format for this batch.",
     "hierarchy_rule": "Use the assigned concept_structure flow (four_us, pas, bab, fab) to shape headline and support line. Do not output framework labels. Derive actual headline/support from product master doc content.",
     "format_specific": {
@@ -93,27 +88,84 @@
     },
     "default_format_rule": "Respect format-specific structure; no lane enforcement."
   },
-
   "product_doc_bootstrap_prompt": "Read the attached product master doc completely. For every following ad-copy request in this same OpenCode session, use that doc as the single source of product truth for benefits, proof, mechanism, differentiators, exclusions, and priority hierarchy. Do not rewrite, summarize, modify, or ignore the doc. The following messages will provide only ad format/persona/concept/schema instructions. Return only valid JSON: {\"status\":\"product_doc_loaded\"}.",
-
   "format_copy_keywords": {
     "_description": "Keywords used to filter which playbook rules are copy-relevant. Rules matching ANY keyword per format are included in the LLM payload.",
-    "HERO": ["copy", "headline", "support", "cta", "text budget", "minimum", "persona"],
-    "BA": ["copy", "headline", "bullet", "cta", "text budget", "minimum", "persona", "before", "after", "outcome"],
-    "TEST": ["copy", "headline", "quote", "attribution", "trust", "cta", "text budget", "minimum", "persona"],
-    "FEAT": ["copy", "headline", "bullet", "feature", "cta", "text budget", "minimum", "persona"],
-    "UGC": ["copy", "headline", "support", "cta", "creator", "text budget", "minimum", "persona"]
+    "HERO": [
+      "copy",
+      "headline",
+      "support",
+      "cta",
+      "text budget",
+      "minimum",
+      "persona"
+    ],
+    "BA": [
+      "copy",
+      "headline",
+      "bullet",
+      "cta",
+      "text budget",
+      "minimum",
+      "persona",
+      "before",
+      "after",
+      "outcome"
+    ],
+    "TEST": [
+      "copy",
+      "headline",
+      "quote",
+      "attribution",
+      "trust",
+      "cta",
+      "text budget",
+      "minimum",
+      "persona"
+    ],
+    "FEAT": [
+      "copy",
+      "headline",
+      "bullet",
+      "feature",
+      "cta",
+      "text budget",
+      "minimum",
+      "persona"
+    ],
+    "UGC": [
+      "copy",
+      "headline",
+      "support",
+      "cta",
+      "creator",
+      "text budget",
+      "minimum",
+      "persona"
+    ]
   },
-
   "format_visual_keywords": {
     "_description": "Keywords that identify visual rules. Rules matching ANY keyword are excluded from the copy payload sent to the LLM.",
     "blocklist": [
-      "split-screen", "side:", "tone", "energy", "product fidelity", "redraw",
-      "packaging", "visual", "background", "environment", "context-shift",
-      "time-of-day", "choice-architecture", "posture", "frame", "divider", "image"
+      "split-screen",
+      "side:",
+      "tone",
+      "energy",
+      "product fidelity",
+      "redraw",
+      "packaging",
+      "visual",
+      "background",
+      "environment",
+      "context-shift",
+      "time-of-day",
+      "choice-architecture",
+      "posture",
+      "frame",
+      "divider",
+      "image"
     ]
   },
-
   "format_defaults": {
     "_description": "Default concept_structure per format (used when no hypothesis overrides it).",
     "structure_by_fmt": {
@@ -125,15 +177,34 @@
     },
     "default_lead_angle": "desired_outcome"
   },
-
   "persona_mapping": {
     "_description": "Maps persona_seeds.json fields → LLM payload fields. Each entry defines how a seed field is transformed into a payload field.",
     "seed_to_payload": {
-      "pain": {"field": "pain_points", "wrap_list": true, "prefix": null},
-      "desire": {"field": "core_message", "wrap_list": true, "prefix": null},
-      "friction": {"field": "objections", "wrap_list": true, "prefix": null},
-      "proof": {"field": "trust_anchors", "wrap_list": true, "prefix": null},
-      "tone": {"field": "english_ready", "wrap_list": true, "prefix": "Tone cue: "}
+      "pain": {
+        "field": "pain_points",
+        "wrap_list": true,
+        "prefix": null
+      },
+      "desire": {
+        "field": "core_message",
+        "wrap_list": true,
+        "prefix": null
+      },
+      "friction": {
+        "field": "objections",
+        "wrap_list": true,
+        "prefix": null
+      },
+      "proof": {
+        "field": "trust_anchors",
+        "wrap_list": true,
+        "prefix": null
+      },
+      "tone": {
+        "field": "english_ready",
+        "wrap_list": true,
+        "prefix": "Tone cue: "
+      }
     },
     "persona_fallbacks": {
       "pain": "Daily routine feels heavy and hard to sustain.",
@@ -148,9 +219,8 @@
       "grounded_mechanism_map": [],
       "how_kit_solves": []
     },
-    "hindi_ready_default": "\u091f\u094b\u0928 \u0938\u0902\u0915\u0947\u0924: \u0938\u0930\u0932, \u092d\u0930\u094b\u0938\u0947\u092e\u0902\u0921, \u0935\u094d\u092f\u093e\u0935\u0939\u093e\u0930\u093f\u0915"
+    "hindi_ready_default": "टोन संकेत: सरल, भरोसेमंड, व्यावहारिक"
   },
-
   "concept_framework": {
     "_description": "Direction/guidance text for all hypothesis types. Sent to the LLM via concept_variation.*_guidance fields. Each group maps variant id → guidance string.",
     "hook_structure": {
@@ -196,26 +266,296 @@
       "four_us": "Keep wording useful, honestly urgent, unique enough to stand out, and ultra-specific."
     },
     "audience_stage": [
-      {"id": "unaware", "direction": "Name a hidden or ignored weight-loss friction before presenting the product."},
-      {"id": "problem_aware", "direction": "Start from the known problem and make the fix feel clearer."},
-      {"id": "solution_aware", "direction": "Assume they know fixes exist; show why this system is easier, safer, or more guided."},
-      {"id": "product_aware", "direction": "Assume they know the kit; give the push through proof, urgency, trust, or simplicity."}
+      {
+        "id": "unaware",
+        "direction": "Name a hidden or ignored weight-loss friction before presenting the product."
+      },
+      {
+        "id": "problem_aware",
+        "direction": "Start from the known problem and make the fix feel clearer."
+      },
+      {
+        "id": "solution_aware",
+        "direction": "Assume they know fixes exist; show why this system is easier, safer, or more guided."
+      },
+      {
+        "id": "product_aware",
+        "direction": "Assume they know the kit; give the push through proof, urgency, trust, or simplicity."
+      }
     ],
     "lead_angle": [
-      {"id": "pain_point", "direction": "Lead with the specific problem or friction."},
-      {"id": "desired_outcome", "direction": "Lead with the result or felt outcome."},
-      {"id": "social_proof", "direction": "Lead with others' trust, usage, or testimonial logic."},
-      {"id": "authority", "direction": "Lead with expertise, doctor formulation, or Ayurveda credibility."},
-      {"id": "story", "direction": "Lead with a real-life routine or user-situation narrative."},
-      {"id": "curiosity", "direction": "Lead with a question or mechanism gap that makes the reader want the explanation."},
-      {"id": "comparison", "direction": "Lead by contrasting this system with stricter, messier, or harder alternatives."},
-      {"id": "offer", "direction": "Lead with practical reason to act, result window, guarantee, or kit completeness."}
+      {
+        "id": "pain_point",
+        "direction": "Lead with the specific problem or friction."
+      },
+      {
+        "id": "desired_outcome",
+        "direction": "Lead with the result or felt outcome."
+      },
+      {
+        "id": "social_proof",
+        "direction": "Lead with others' trust, usage, or testimonial logic."
+      },
+      {
+        "id": "authority",
+        "direction": "Lead with expertise, doctor formulation, or Ayurveda credibility."
+      },
+      {
+        "id": "story",
+        "direction": "Lead with a real-life routine or user-situation narrative."
+      },
+      {
+        "id": "curiosity",
+        "direction": "Lead with a question or mechanism gap that makes the reader want the explanation."
+      },
+      {
+        "id": "comparison",
+        "direction": "Lead by contrasting this system with stricter, messier, or harder alternatives."
+      },
+      {
+        "id": "offer",
+        "direction": "Lead with practical reason to act, result window, guarantee, or kit completeness."
+      }
     ],
     "message_structure": [
-      {"id": "pas", "direction": "Problem, then sharpen the consequence, then present the product-led solution."},
-      {"id": "bab", "direction": "Before state, after/progress state, then the bridge that gets them there."},
-      {"id": "fab", "direction": "Feature, advantage, benefit; keep the feature concrete and the benefit weight-loss-linked."},
-      {"id": "four_us", "direction": "Make it useful, urgent where honest, unique, and ultra-specific."}
+      {
+        "id": "pas",
+        "direction": "Problem, then sharpen the consequence, then present the product-led solution."
+      },
+      {
+        "id": "bab",
+        "direction": "Before state, after/progress state, then the bridge that gets them there."
+      },
+      {
+        "id": "fab",
+        "direction": "Feature, advantage, benefit; keep the feature concrete and the benefit weight-loss-linked."
+      },
+      {
+        "id": "four_us",
+        "direction": "Make it useful, urgent where honest, unique, and ultra-specific."
+      }
     ]
+  },
+  "cta_variants": {
+    "_description": "CTA text options per language per format. Used by enforce_unique_ctas to assign unique CTAs.",
+    "EN": {
+      "HERO": [
+        "Start Today",
+        "See The 15-Day Plan",
+        "Begin The Kit"
+      ],
+      "BA": [
+        "See The Shift",
+        "Start The Reset",
+        "View The Change"
+      ],
+      "TEST": [
+        "See The Proof",
+        "Read The Routine",
+        "Start With Proof"
+      ],
+      "FEAT": [
+        "View Kit Steps",
+        "See The Protocol",
+        "Check The Steps"
+      ],
+      "UGC": [
+        "See My Routine",
+        "Watch The Routine",
+        "Try The Steps"
+      ]
+    },
+    "HI": {
+      "HERO": [
+        "आज शुरू करें",
+        "15 दिन का प्लान देखें",
+        "किट शुरू करें"
+      ],
+      "BA": [
+        "बदलाव देखें",
+        "रीसेट शुरू करें",
+        "फर्क देखें"
+      ],
+      "TEST": [
+        "प्रमाण देखें",
+        "दिनचर्या पढ़ें",
+        "भरोसे से शुरू करें"
+      ],
+      "FEAT": [
+        "किट कदम देखें",
+        "प्रोटोकॉल देखें",
+        "कदम देखें"
+      ],
+      "UGC": [
+        "मेरी दिनचर्या देखें",
+        "दिनचर्या देखें",
+        "कदम अपनाएं"
+      ]
+    }
+  },
+  "testimonial_headline_guidance": {
+    "_description": "Regex patterns and fallback strings for ensure_testimonial_headline. One entry per language.",
+    "EN": {
+      "first_person_pattern": "\\b(i|i'm|i've|i'd|my|me)\\b",
+      "weight_pattern": "\\b(weight|obesity|excess\\s*weight|kg|kilo)\\b",
+      "suffix": "It finally fit my weight-loss routine.",
+      "desire_template": "\"I finally found {desire_phrase} for my weight-loss goal.\"",
+      "fallback": "\"I finally found a routine I can follow for weight loss every day.\"",
+      "desire_field": "desire_en"
+    },
+    "HI": {
+      "first_person_pattern": "(मैं|मेरी|मेरा|मुझे|मैंने)",
+      "weight_pattern": "(वजन|मोटापा|किलो|kg)",
+      "suffix": "यह मेरे वजन घटाने के लिए काम आया।",
+      "desire_template": "\"मुझे आखिर {desire_phrase} वाला रूटीन मिला जो वजन घटाने में मदद करता है।\"",
+      "fallback": "\"मुझे आखिर ऐसा रूटीन मिला जिसे मैं रोज निभा सकूं और वजन घटा सकूं।\"",
+      "desire_field": "desire_hi"
+    }
+  },
+  "testimonial_attribution_variants": {
+    "_description": "Attribution text variants per language for ensure_testimonial_attribution. Picked deterministically via hash.",
+    "EN": [
+      "Verified routine user feedback",
+      "15-day adherence feedback snapshot",
+      "Community obesity-care review",
+      "Early weight-loss routine review",
+      "Structured-plan user feedback",
+      "Repeat-user experience note"
+    ],
+    "HI": [
+      "रूटीन-फॉलो यूजर फीडबैक",
+      "15-दिन adherence फीडबैक स्नैपशॉट",
+      "कम्यूनिटी obesity-care रिव्यू",
+      "शुरुआती वजन-घटाने रूटीन रिव्यू",
+      "स्ट्रक्चर्ड-प्लान यूजर फीडबैक",
+      "रीपीट-यूजर अनुभव नोट"
+    ]
+  },
+  "feature_templates": {
+    "_description": "Feature support lines per feature key. Used in build_template_copy for BA format bullets and HERO/UGC support lines.",
+    "structured_system": {
+      "EN": "Structured system for consistent weight-loss progress.",
+      "HI": "लगातार वजन-सपोर्ट के लिए व्यवस्थित सिस्टम।"
+    },
+    "cravings_down": {
+      "EN": "Helps reduce cravings for better daily weight management.",
+      "HI": "बेहतर दैनिक वजन-प्रबंधन के लिए लालसा कम करने में सहायक।"
+    },
+    "guided_weight_loss": {
+      "EN": "Guided morning and night steps for visible results.",
+      "HI": "दिखने वाले परिणामों के लिए निर्देशित सुबह-रात के कदम।"
+    },
+    "natural_ingredients": {
+      "EN": "Natural Ayurvedic formulation without side effects.",
+      "HI": "बिना दुष्प्रभाव के प्राकृतिक आयुर्वेदिक फॉर्मूलेशन।"
+    },
+    "easy_routine": {
+      "EN": "Simple routine that fits into daily life easily.",
+      "HI": "रोज़मर्रा की ज़िंदगी में आसानी से फिट होने वाली सरल दिनचर्या।"
+    },
+    "_default": {
+      "EN": "Structured system for consistent progress.",
+      "HI": "लगातार प्रगति के लिए व्यवस्थित सिस्टम।"
+    }
+  },
+  "template_copy_cta_map": {
+    "_description": "Single CTA per format for template copy (build_template_copy). Not the same as cta_variants (which are used by enforce_unique_ctas).",
+    "HERO": {
+      "EN": "Start Today",
+      "HI": "आज शुरू करें"
+    },
+    "BA": {
+      "EN": "See The Shift",
+      "HI": "बदलाव देखें"
+    },
+    "TEST": {
+      "EN": "See The Proof",
+      "HI": "प्रमाण देखें"
+    },
+    "FEAT": {
+      "EN": "View Kit Steps",
+      "HI": "किट कदम देखें"
+    },
+    "UGC": {
+      "EN": "See My Routine",
+      "HI": "मेरी दिनचर्या देखें"
+    },
+    "_default": {
+      "EN": "Start Today",
+      "HI": "आज शुरू करें"
+    }
+  },
+  "template_copy_format_overrides": {
+    "_description": "Format-specific overrides in build_template_copy. BA/FEAT/UGC override the generated template headline. UGC overrides support line. FEAT has hardcoded bullets. TEST has headline + attribution + trust_line.",
+    "BA": {
+      "headline": {
+        "EN": "A clear kit routine beats random dieting.",
+        "HI": "साफ किट दिनचर्या अनियमित डाइटिंग से बेहतर है।"
+      }
+    },
+    "FEAT": {
+      "headline": {
+        "EN": "Three kit steps support 15-day weight loss.",
+        "HI": "तीन किट कदम 15 दिन के वजन-सपोर्ट में मदद करते हैं।"
+      },
+      "bullets": {
+        "EN": [
+          "Morning OK Liquid helps reduce hunger and random snacking for weight loss.",
+          "Night Tablet + Powder support digestion and lighter mornings in obesity routine.",
+          "Built for visible 15-day weight-loss support without crash-diet pressure."
+        ],
+        "HI": [
+          "सुबह का OK Liquid वजन घटाने के लिए भूख और अचानक खाने की आदत कम करने में सहायक है।",
+          "रात का Tablet + Powder मोटापा-नियंत्रण दिनचर्या में पाचन-सपोर्ट देता है।",
+          "कठोर डाईट दबाव के बिना 15 दिन के वजन-सपोर्ट के लिए बनाया गया।"
+        ]
+      }
+    },
+    "UGC": {
+      "headline": {
+        "EN": "Late-night cravings can feel easier to control.",
+        "HI": "रात की लालसा नियंत्रित करना आसान लग सकता है।"
+      },
+      "support_override": {
+        "EN": "A simple first step helps keep late-night weight-loss control practical.",
+        "HI": "एक सरल पहला कदम रात के वजन-नियंत्रण को व्यावहारिक रखता है।"
+      }
+    },
+    "TEST": {
+      "headline": {
+        "EN": "I trusted the 15-day kit because the steps felt clear for weight loss.",
+        "HI": "मैंने 15 दिन की किट पर भरोसा किया क्योंकि वजन-घटाने के कदम साफ लगे।"
+      },
+      "attribution": {
+        "EN": "Doctor-formulated Ayurvedic obesity and weight-loss protocol",
+        "HI": "डॉक्टर-फॉर्मुलेटेड आयुर्वेदिक मोटापा और वजन-घटाने का प्रोटोकॉल"
+      },
+      "trust_line": {
+        "EN": "Structured morning-night steps for visible weight-loss progress and obesity control.",
+        "HI": "सुबह-रात के स्पष्ट कदमों से वजन घटाने और मोटापा नियंत्रण का भरोसेमंड सपोर्ट।"
+      }
+    }
+  },
+  "template_copy_en_fallbacks": {
+    "_description": "English fallback values for build_template_copy when persona fields are empty.",
+    "tone": "Practical, empathetic, and confidence-building"
+  },
+  "template_copy_hi_fallbacks": {
+    "_description": "Hindi fallback values for build_template_copy when persona fields are empty.",
+    "pain": "रोज की वजन-घटाने की दिनचर्या टूटना आसान है।",
+    "desire": "ऐसा आसान सिस्टम चाहिए जो रोज निभ सके।",
+    "friction": "पहले के प्लान बहुत सख्त और मुश्किल थे।",
+    "proof": "साफ कदम, भरोसेमंड सपोर्ट और व्यावहारिक प्रमाण चाहिए।",
+    "tone": "सरल, भरोसेमंड, और व्यावहारिक"
+  },
+  "template_copy_headline_sentence": {
+    "_description": "Template string for _template_copy (used by template_headline). {primary_key}, {secondary_key}, {pain} are filled at runtime.",
+    "EN": "A clear {primary_key} system for {secondary_key} that helps manage {pain}.",
+    "HI": "{primary_key} का {secondary_key} सिस्टम जो {pain} को संभालने में मदद करता है।"
+  },
+  "template_copy_support_sentence": {
+    "_description": "Template string for template_support in build_template_copy. {primary_key}, {secondary_key} are filled at runtime.",
+    "EN": "Simple steps rooted in {primary_key} and {secondary_key}.",
+    "HI": "सरल कदम, जो {primary_key} और {secondary_key} पर आधारित हैं।"
   }
 }
