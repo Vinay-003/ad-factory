@@ -96,7 +96,7 @@
         "template": "Structure: Open as a believable first-person-like weight-loss admission or shared struggle. Keep only the admission in the headline; put the resolution in support. Grounded, not dramatic.",
         "examples": [
           "Every Weight-Loss Diet Felt Too Hard.",
-          "Yes, You Can Lose Weight on Regular Homemade Food"
+          "Yes, You Can Lose Weight on Homemade Food"
         ],
         "support_strategy": {
           "direction": "Resolve the admission with what changes after the struggle.",
@@ -135,7 +135,7 @@
         "template": "Structure: Open with the practical weight-loss result or felt relief. Keep it believable, specific, and short. Use at most one concrete number in the headline.",
         "examples": [
           "Lose 3 to 5 Kg",
-          "Feel Lighter in 15 Days — With Regular Homemade Food"
+          "Feel Lighter in 15 Days — With Homemade Food"
         ],
         "support_strategy": {
           "direction": "Make the outcome believable with mechanism, daily-life fit, and no-sacrifice detail.",
@@ -300,7 +300,7 @@
         "template": "Make the proof feel easy to follow: clear steps, low guesswork, simple daily routine.",
         "examples": [
           "A simple daily routine with guidance instead of guesswork.",
-          "Low-friction steps that fit regular homemade food."
+          "Low-friction steps that fit homemade food."
         ],
         "support_strategy": {
           "direction": "Make ease of following the support line's trust engine.",
@@ -311,7 +311,7 @@
       "objection_flip": {
         "template": "Address a real doubt directly, then resolve it with proof or mechanism. Avoid sounding defensive.",
         "examples": [
-          "If strict diets have not lasted, this routine works around regular food.",
+          "If strict diets have not lasted, this routine works around homemade food.",
           "For hesitation around hunger, explain craving support and guided adherence."
         ],
         "support_strategy": {
@@ -362,7 +362,7 @@
 
   "support_line_architectures": {
     "_rotation": "Deterministically rotate across personas using (persona_number + format_index). Each persona gets the architecture at index (persona_number + format_index) % len(rotation_order).",
-    "composition_rule": "Final support line = active support_strategy meaning from the selected headline/hypothesis architecture + assigned support_line_architecture sentence shape. The support line must complete the headline, not repeat it.",
+    "composition_rule": "Final support line = active support_strategy meaning from the selected headline/hypothesis architecture + assigned support_line_architecture sentence shape. The support line must complete the headline, not repeat it. Keep it as short ad copy: one compact line, ideally 14-24 words, maximum 28 words.",
     "rotation_order": [
       "pain_first",
       "result_first",
@@ -373,31 +373,31 @@
     ],
     "definitions": {
       "pain_first": {
-        "template": "Structure: Support line completes what the short headline leaves out. Open with the persona's specific friction, then explain the product bridge and one credibility anchor. Flow: [headline context] → [mechanism] → [proof]. Avoid generic reassurance.",
+        "template": "Structure: Support line completes what the short headline leaves out in one compact ad line, ideally 14-24 words. Open with the persona's specific friction, then explain the product bridge and one credibility anchor. Flow: [headline context] → [mechanism] → [proof]. Avoid generic reassurance.",
         "examples": [
           "For PCOD-linked weight struggles, the kit supports hunger control and guided eating with a doctor-formulated routine. Built for weight loss, not cure claims."
         ]
       },
       "result_first": {
-        "template": "Structure: Support line adds the measurable outcome if the headline only hooks. Then explain the mechanism and what the persona does not sacrifice. Flow: [outcome detail] → [mechanism] → [no-sacrifice point].",
+        "template": "Structure: Support line adds the measurable outcome if the headline only hooks, in one compact ad line, ideally 14-24 words. Then explain the mechanism and what the persona does not sacrifice. Flow: [outcome detail] → [mechanism] → [no-sacrifice point].",
         "examples": [
-          "Target 3 to 5 kg in 15 days with natural craving support, a simple daily routine, and regular homemade food. No crash diet pressure."
+          "Target 3 to 5 kg in 15 days with craving support, a simple routine, and homemade food."
         ]
       },
       "contrast": {
-        "template": "Structure: Support line explains the contrast promised by the headline. Name what usually fails, why it fails for this persona, and what this system does instead. Flow: [failed approach] → [why] → [different system].",
+        "template": "Structure: Support line explains the contrast promised by the headline in one compact ad line, ideally 14-24 words. Name what usually fails, why it fails for this persona, and what this system does instead. Flow: [failed approach] → [why] → [different system].",
         "examples": [
-          "Most plans collapse when work gets hectic because they demand too much separate effort. This system fits your real schedule with a 5-minute daily routine and regular homemade food."
+          "Most strict diets collapse at home; this 5-minute routine supports weight loss with homemade food."
         ]
       },
       "simple_facts": {
-        "template": "Structure: 2-3 short declarative sentences that carry the payload details removed from the headline. Each sentence is one concrete fact: mechanism, proof, routine, or constraint. No fluff.",
+        "template": "Structure: One compact ad line with 2-3 concrete facts removed from the headline. Each phrase is one fact: mechanism, proof, routine, or constraint. No fluff. Maximum 28 words.",
         "examples": [
           "31 unique ingredients. Doctor-formulated routine. Trained coach support for the 15-day weight-loss plan."
         ]
       },
       "question_led": {
-        "template": "Structure: If the headline is a question, this support line answers it directly. Use the system's specific mechanism and one proof point. Flow: [direct answer] → [mechanism] → [proof/detail].",
+        "template": "Structure: If the headline is a question, answer like an ad line, not yes/no or blog copy. Do not start with 'Yes:' or 'No:'. Use the system's specific mechanism and one proof point. Flow: [direct answer] → [mechanism] → [proof/detail]. Maximum 28 words.",
         "examples": [
           "The system supports craving control with Ayurvedic ingredients and a guided routine, so weight loss fits your existing kitchen instead of fighting it."
         ]

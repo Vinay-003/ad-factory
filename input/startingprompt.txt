@@ -1,5 +1,9 @@
 OBESITY KILLER KIT - GLOBAL PRODUCT RULES
 
+A0. OUTPUT COUNT - ABSOLUTE RULE
+- Generate exactly one final image for each prompt. Do not create two options, variations, comparisons, grids, or ask which one is better.
+- Do not show alternatives. Do not present a choice. Output one finished ad image only.
+
 A1. PRODUCT LOCK - ABSOLUTE RULE
 - Use the provided Obesity Killer product packshot images pixel-for-pixel as visual truth.
 - Do not redraw, recreate, regenerate, relabel, recolor, blur, "fix", or reinterpret any product or packaging.
@@ -37,7 +41,7 @@ A4. COLOR AND LIGHTING
 
 A5. TYPOGRAPHY AND COPY
 - Use Poppins only for on-image ad copy.
-- Use maximum two weights: Regular/Medium and Bold. Avoid thin/light weights.
+- Use maximum two weights: Medium/Regular and Bold. Avoid thin/light weights.
 - Keep copy short, clean, benefit-led, premium, and mobile-readable.
 - Avoid hype, salesy language, unrealistic claims, exclamation spam, and dense copy blocks.
 - Do not use decorative fonts, serif fonts, outlines, glows, or drop shadows on ad copy text.
@@ -57,4 +61,4 @@ A7. QUALITY CHECK
 - No forbidden elements are present.
 - If product count, product identity, label accuracy, or requested background fails, silently regenerate until the output passes. Only the final image output is acceptable.
 
-Important !! Dont fuck  PRODUCT DIMENSIONS AND COUNT , the big should not neither too big in height nor too small 
+Important !! Dont fuck  PRODUCT DIMENSIONS AND COUNT , the box should not neither too big in height nor too small 

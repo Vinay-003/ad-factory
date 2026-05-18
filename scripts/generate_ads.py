@@ -1113,7 +1113,7 @@ def render_prompt(
     lines.append("Typography must be pin-sharp. If any text appears soft, blurry, or smeared, regenerate.")
     lines.append("Keep text count minimal and increase font size rather than packing more copy.")
     lines.append("Use clean sans typography with strong stroke clarity; no thin/light weights for body text.")
-    lines.append("Use Poppins only for on-image text: Headline in Poppins Bold, support/CTA in Poppins Medium or Regular.")
+    lines.append("Use Poppins only for on-image text: Headline in Poppins Bold, support/CTA in Poppins Medium/Regular.")
     lines.append("")
     lines.append(safezone_enforcement_block(aspect_ratio))
     lock_block = outpaint_lock_block(aspect_ratio)
