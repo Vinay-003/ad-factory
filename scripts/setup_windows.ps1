@@ -3,7 +3,7 @@
     Complete Windows setup script for OpenCode Ad Dashboard.
 .DESCRIPTION
     Installs all dependencies from scratch:
-    - Checks Python 3.10+ and Node.js
+    - Checks Python 3.10+ and Node.js (Auto-installs Node if missing)
     - Creates and activates a Python venv
     - Installs Python dependencies
     - Installs OpenCode CLI via npm
@@ -74,21 +74,17 @@ if ($Major -lt 3 -or ($Major -eq 3 -and $Minor -lt 10)) {
 }
 
 # ============================================================
-# [2/8] Check Node.js / npm
+# [2/8] Check Node.js / npm (Auto-Install if missing)
 # ============================================================
 Write-Host ""
 Write-Host "[2/8] Checking Node.js / npm" -ForegroundColor Yellow
 
-if (-not (Get-Command node -ErrorAction SilentlyContinue)) {
-    Write-Host "ERROR: node not found." -ForegroundColor Red
-    Write-Host "Install Node.js LTS from https://nodejs.org/" -ForegroundColor Red
-    exit 1
-}
-
 if (-not (Get-Command npm -ErrorAction SilentlyContinue)) {
-    Write-Host "ERROR: npm not found." -ForegroundColor Red
-    Write-Host "Install Node.js LTS from https://nodejs.org/" -ForegroundColor Red
-    exit 1
+    Write-Host "Node.js (npm) not found. Installing automatically via winget..." -ForegroundColor Yellow
+    winget install OpenJS.NodeJS.LTS --accept-package-agreements --accept-source-agreements
+    
+    # Refresh paths so setup can continue without restarting terminal
+    $env:Path = [System.Environment]::GetEnvironmentVariable("Path","Machine") + ";" + [System.Environment]::GetEnvironmentVariable("Path","User")
 }
 
 $NodeVersion = node --version
@@ -165,12 +161,17 @@ if ($SkipOpenCodeInstall) {
         $OCVersion = opencode --version 2>$null
         Write-Host "OpenCode already installed: $OCVersion" -ForegroundColor Green
     } else {
-        Write-Host "Installing opencode-cli globally via npm..." -ForegroundColor Gray
-        npm install -g opencode-cli
+        Write-Host "Installing opencode-ai globally via npm..." -ForegroundColor Gray
+        # FIX: Correct npm package name
+        npm install -g opencode-ai
+        
+        # Refresh paths immediately
+        $env:Path = [System.Environment]::GetEnvironmentVariable("Path","Machine") + ";" + [System.Environment]::GetEnvironmentVariable("Path","User")
+
         if ($LASTEXITCODE -ne 0) {
-            Write-Host "WARNING: npm install -g opencode-cli failed." -ForegroundColor Yellow
+            Write-Host "WARNING: npm install -g opencode-ai failed." -ForegroundColor Yellow
             Write-Host "You may need to run PowerShell as Administrator or fix npm global prefix." -ForegroundColor Yellow
-            Write-Host "Alternative: install from https://opencode.ai/docs/cli" -ForegroundColor Yellow
+            Write-Host "Alternative: install from https://open-code.ai/docs/cli" -ForegroundColor Yellow
         } else {
             Write-Host "OpenCode CLI installed" -ForegroundColor Green
         }
@@ -187,8 +188,8 @@ try {
 
 if (-not $OpenCodeAvailable) {
     Write-Host "WARNING: OpenCode CLI not found in PATH." -ForegroundColor Yellow
-    Write-Host "Install manually: npm install -g opencode-cli" -ForegroundColor Yellow
-    Write-Host "Or download from: https://opencode.ai/docs/cli" -ForegroundColor Yellow
+    Write-Host "Install manually: npm install -g opencode-ai" -ForegroundColor Yellow
+    Write-Host "Or download from: https://open-code.ai/docs/cli" -ForegroundColor Yellow
 } else {
     opencode --version 2>$null
 }
@@ -200,7 +201,8 @@ Write-Host ""
 Write-Host "[6/7] Setting up OpenCode server password" -ForegroundColor Yellow
 
 if (-not $Password) {
-    $Password = [System.Web.Security.Membership]::GeneratePassword(16, 3)
+    # FIX: Replaced System.Web.Security with native PowerShell generation
+    $Password = -join ((33..126) | Get-Random -Count 16 | ForEach-Object {[char]$_})
     Write-Host "Generated random password: $Password" -ForegroundColor Cyan
 }
 

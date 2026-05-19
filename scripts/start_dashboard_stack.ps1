@@ -25,8 +25,12 @@ $DashboardPort = "8787"
 
 $OpenCodePidFile = Join-Path $PidDir "opencode.pid"
 $DashboardPidFile = Join-Path $PidDir "dashboard.pid"
+
+# Separated standard output and error log paths to prevent PowerShell crashing
 $OpenCodeLog = Join-Path $LogDir "opencode.log"
+$OpenCodeErrorLog = Join-Path $LogDir "opencode_error.log"
 $DashboardLog = Join-Path $LogDir "dashboard.log"
+$DashboardErrorLog = Join-Path $LogDir "dashboard_error.log"
 
 # ============================================================
 # Load password from .env.dashboard if available
@@ -47,7 +51,8 @@ $OpenCodePassword = if ($env:OPENCODE_SERVER_PASSWORD) {
 } elseif ($PasswordFromFile) {
     $PasswordFromFile
 } else {
-    $Generated = [System.Web.Security.Membership]::GeneratePassword(16, 3)
+    # Native PowerShell random string generation
+    $Generated = -join ((33..126) | Get-Random -Count 16 | ForEach-Object {[char]$_})
     Write-Host "Generated new password: $Generated" -ForegroundColor Yellow
     Write-Host "Save this to .env.dashboard for future use." -ForegroundColor Yellow
     $Generated
@@ -65,10 +70,12 @@ New-Item -ItemType Directory -Force -Path $PidDir, $LogDir, $RunsDir | Out-Null
 # ============================================================
 function Test-PidRunning($pidFile) {
     if (-not (Test-Path $pidFile)) { return $false }
-    $pid = Get-Content $pidFile | Select-Object -First 1
-    if (-not $pid) { return $false }
+    
+    # FIX: Renamed $pid to $savedPid to avoid PowerShell read-only system variable conflict
+    $savedPid = Get-Content $pidFile | Select-Object -First 1
+    if (-not $savedPid) { return $false }
     try {
-        $proc = Get-Process -Id ([int]$pid) -ErrorAction SilentlyContinue
+        $proc = Get-Process -Id ([int]$savedPid) -ErrorAction SilentlyContinue
         return $null -ne $proc
     } catch {
         return $false
@@ -118,7 +125,7 @@ if (-not (Test-Path $UvicornExe)) {
 
 if (-not (Get-Command opencode -ErrorAction SilentlyContinue)) {
     Write-Host "ERROR: opencode CLI not found in PATH." -ForegroundColor Red
-    Write-Host "Install it: npm install -g opencode-cli" -ForegroundColor Red
+    Write-Host "Install it: npm install -g opencode-ai" -ForegroundColor Red
     exit 1
 }
 
@@ -130,7 +137,10 @@ if (-not $OpenCodeRunning) {
     Write-Host "Starting OpenCode server on $OpenCodeHost`:$OpenCodePort" -ForegroundColor Cyan
 
     $openCodeArgs = "serve --hostname $OpenCodeHost --port $OpenCodePort --cors http://$DashboardHost`:$DashboardPort"
-    $openCodeProc = Start-Process -FilePath "opencode" -ArgumentList $openCodeArgs -PassThru -WindowStyle Hidden -RedirectStandardOutput $OpenCodeLog -RedirectStandardError $OpenCodeLog
+    
+    # Run via cmd.exe to support the Node/NPM batch wrapper (.cmd) cleanly
+    $openCodeProc = Start-Process -FilePath "cmd.exe" -ArgumentList "/c opencode $openCodeArgs" -PassThru -WindowStyle Hidden -RedirectStandardOutput $OpenCodeLog -RedirectStandardError $OpenCodeErrorLog
+    
     $openCodeProc.Id | Set-Content -Path $OpenCodePidFile
     Write-Host "OpenCode started with pid $($openCodeProc.Id)" -ForegroundColor Green
 }
@@ -143,7 +153,10 @@ if (-not $DashboardRunning) {
     Write-Host "Starting dashboard API/UI on $DashboardHost`:$DashboardPort" -ForegroundColor Cyan
 
     $uvicornArgs = "dashboard.backend.app:app --host $DashboardHost --port $DashboardPort --app-dir `"$RootDir`""
-    $dashboardProc = Start-Process -FilePath $UvicornExe -ArgumentList $uvicornArgs -PassThru -WindowStyle Hidden -WorkingDirectory $RootDir -RedirectStandardOutput $DashboardLog -RedirectStandardError $DashboardLog
+    
+    # Wrapped path in quotes just in case your Windows username or path contains spaces
+    $dashboardProc = Start-Process -FilePath "$UvicornExe" -ArgumentList $uvicornArgs -PassThru -WindowStyle Hidden -WorkingDirectory $RootDir -RedirectStandardOutput $DashboardLog -RedirectStandardError $DashboardErrorLog
+    
     $dashboardProc.Id | Set-Content -Path $DashboardPidFile
     Write-Host "Dashboard started with pid $($dashboardProc.Id)" -ForegroundColor Green
 }
@@ -157,7 +170,7 @@ Write-Host "Waiting for dashboard..." -ForegroundColor Yellow
 $DashboardReady = $false
 for ($i = 0; $i -lt 60; $i++) {
     try {
-        $r = Invoke-WebRequest -Uri "http://$DashboardHost`:$DashboardPort/api/defaults" -TimeoutSec 2 -ErrorAction SilentlyContinue
+        $r = Invoke-WebRequest -Uri "http://$DashboardHost`:$DashboardPort/api/defaults" -UseBasicParsing -TimeoutSec 2 -ErrorAction SilentlyContinue
         if ($r.StatusCode -eq 200) {
             Write-Host "Dashboard is ready!" -ForegroundColor Green
             $DashboardReady = $true
@@ -171,8 +184,8 @@ if (-not $DashboardReady) {
     Write-Host ""
     Write-Host "WARNING: Dashboard did not become ready within 30 seconds." -ForegroundColor Yellow
     Write-Host "Check logs for errors:" -ForegroundColor Yellow
-    Write-Host "  Dashboard: $DashboardLog" -ForegroundColor Gray
-    Write-Host "  OpenCode:  $OpenCodeLog" -ForegroundColor Gray
+    Write-Host "  Dashboard Error Log: $DashboardErrorLog" -ForegroundColor Gray
+    Write-Host "  OpenCode Error Log:  $OpenCodeErrorLog" -ForegroundColor Gray
 }
 
 # ============================================================

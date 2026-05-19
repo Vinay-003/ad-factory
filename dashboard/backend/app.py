@@ -1454,7 +1454,9 @@ def load_batch_image_summary(batch: str) -> list[dict[str, Any]]:
     return []
 
 
-def strip_ansi(text: str) -> str:
+def strip_ansi(text: str | None) -> str:
+    if not text:
+        return ""
     return re.sub(r"\x1B\[[0-?]*[ -/]*[@-~]", "", text)
 
 
@@ -1488,7 +1490,25 @@ def opencode_discovery_env() -> dict[str, str]:
 
 
 def run_opencode_discovery_cmd(cmd: list[str]) -> subprocess.CompletedProcess[str]:
-    return subprocess.run(cmd, cwd=str(ROOT), text=True, capture_output=True, check=False, env=opencode_discovery_env())
+    if sys.platform == "win32" and cmd and cmd[0] == "opencode":
+        ps1_path = shutil.which("opencode.ps1") or shutil.which("opencode")
+        if ps1_path and ps1_path.lower().endswith(".ps1"):
+            cmd = ["powershell", "-ExecutionPolicy", "Bypass", "-File", ps1_path] + cmd[1:]
+        elif ps1_path:
+            base_dir = Path(ps1_path).parent
+            exe = base_dir / "node_modules" / "opencode-ai" / "bin" / "opencode.exe"
+            if exe.exists():
+                cmd = [str(exe)] + cmd[1:]
+    return subprocess.run(
+        cmd,
+        cwd=str(ROOT),
+        text=True,
+        capture_output=True,
+        check=False,
+        env=opencode_discovery_env(),
+        encoding="utf-8",
+        errors="replace",
+    )
 
 
 def list_opencode_models() -> list[str]:
