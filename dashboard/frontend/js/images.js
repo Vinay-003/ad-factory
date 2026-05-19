@@ -42,7 +42,12 @@ export function buildImageGallery(run) {
   markBtn.className = "ghost-btn";
   markBtn.textContent = "Move to to_be_regenerated";
 
-  regenBar.append(selectedCount, selectVisibleBtn, clearSelectionBtn, markBtn);
+  const regenerateNowBtn = document.createElement("button");
+  regenerateNowBtn.type = "button";
+  regenerateNowBtn.className = "ghost-btn";
+  regenerateNowBtn.textContent = "Regenerate selected";
+
+  regenBar.append(selectedCount, selectVisibleBtn, clearSelectionBtn, markBtn, regenerateNowBtn);
   gal.appendChild(regenBar);
 
   const allCount = activeImageFiles.length;
@@ -77,6 +82,7 @@ export function buildImageGallery(run) {
     selectedCount.textContent = `${selectedItems.size} selected`;
     const hasSelection = selectedItems.size > 0;
     markBtn.disabled = !hasSelection;
+    regenerateNowBtn.disabled = !hasSelection;
   }
 
   async function archiveSelectedImages() {
@@ -128,11 +134,52 @@ export function buildImageGallery(run) {
     }
   });
 
+  regenerateNowBtn.addEventListener("click", async () => {
+    if (!selectedItems.size) { appendLog("Select at least one image."); return; }
+    const engine = await showEngineSelector("selected");
+    if (!engine) return;
+    if (!confirm(`Move and regenerate ${selectedItems.size} selected image(s)?`)) return;
+    regenerateNowBtn.disabled = true;
+    markBtn.disabled = true;
+    try {
+      const archived = await archiveSelectedImages();
+      const queuedFiles = (archived?.moved || [])
+        .map((item) => item?.archived_file)
+        .filter(Boolean);
+      if (!queuedFiles.length) {
+        appendLog("No selected images were moved into the regeneration queue.");
+        invalidateRuns();
+        import("./runs.js").then((m) => m.loadRuns());
+        return;
+      }
+      appendLog(`Regenerating ${queuedFiles.length} selected image(s) with ${engine === "chatgpt" ? "ChatGPT" : "Gemini"}...`);
+      const data = await fetchJSON(`/api/runs/${run.run_id}/regenerate-queued-images`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          image_files: queuedFiles,
+          headless: state.headlessModeEnabled,
+          engine,
+        }),
+      });
+      appendLog(`Regenerated ${data?.generated_files?.length || 0} image(s). ${data?.skipped?.length || 0} skipped.`);
+      selectedItems.clear();
+      invalidateRuns();
+      import("./runs.js").then((m) => m.loadRuns());
+    } catch (err) {
+      appendLog(`Regeneration error: ${String(err)}`);
+    } finally {
+      regenerateNowBtn.disabled = false;
+      updateSelectedCount();
+    }
+  });
+
   activeImageFiles.forEach((path) => {
     const imageItem = imageItemsByPath.get(path) || { path, prompt_file: "", regenerate_prompt_file: "", prompt_excerpt: "" };
     const card = document.createElement("div");
     card.className = "image-card";
     card.dataset.path = path;
+    if (imageItem.metadata?.regenerated) card.classList.add("image-card-regenerated");
 
     const is916 = path.includes("/9_16/");
     const arLabel = is916 ? "9:16" : "4:5";
@@ -453,6 +500,7 @@ export function buildImageGallery(run) {
       const card = document.createElement("div");
       card.className = "image-card regeneration-queue-card";
       card.dataset.path = path;
+      if (queueItem.metadata?.regenerated) card.classList.add("image-card-regenerated");
 
       const is916 = path.includes("/9_16/");
       const arLabel = is916 ? "9:16" : "4:5";
@@ -482,10 +530,23 @@ export function buildImageGallery(run) {
       img.title = `${arLabel} - queued for regeneration`;
       imgWrap.appendChild(img);
 
+      const queueDeleteBtn = document.createElement("button");
+      queueDeleteBtn.type = "button";
+      queueDeleteBtn.className = "image-delete-btn";
+      queueDeleteBtn.textContent = "\u2715";
+      queueDeleteBtn.title = "Delete this queued image";
+      imgWrap.appendChild(queueDeleteBtn);
+
       const badge = document.createElement("span");
       badge.className = `aspect-badge ${is916 ? "ar-916" : "ar-45"}`;
       badge.textContent = arLabel;
       card.appendChild(badge);
+      if (queueItem.metadata?.regenerated) {
+        const regenDot = document.createElement("span");
+        regenDot.className = "regenerated-dot";
+        regenDot.title = "Regenerated image pending review";
+        card.appendChild(regenDot);
+      }
       card.appendChild(imgWrap);
 
       const fname = document.createElement("div");
@@ -544,6 +605,27 @@ export function buildImageGallery(run) {
           card.classList.remove("selected-for-regeneration");
         }
         updateQueueSelectedCount();
+      });
+
+      queueDeleteBtn.addEventListener("click", async (event) => {
+        event.stopPropagation();
+        if (!confirm(`Delete queued image "${path.split("/").pop()}"?`)) return;
+        queueDeleteBtn.disabled = true;
+        try {
+          await fetchJSON(`/api/runs/${run.run_id}/delete-image`, {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ image_file: path }),
+          });
+          queueSelectedItems.delete(path);
+          appendLog(`Deleted queued image: ${path.split("/").pop()}`);
+          card.remove();
+          updateQueueSelectedCount();
+          invalidateRuns();
+        } catch (err) {
+          appendLog(`Delete queued image error: ${String(err)}`);
+          queueDeleteBtn.disabled = false;
+        }
       });
 
       card.addEventListener("click", (event) => {

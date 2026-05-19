@@ -1336,6 +1336,23 @@ button.is-loading::after {
 .ar-45 { background: color-mix(in srgb, var(--primary) 75%, #000 20%); }
 .ar-916 { background: color-mix(in srgb, var(--accent-violet) 70%, #000 20%); }
 
+.regenerated-dot {
+  position: absolute;
+  top: 6px;
+  left: 6px;
+  z-index: 3;
+  width: 10px;
+  height: 10px;
+  border-radius: 999px;
+  background: #2f80ff;
+  border: 2px solid #ffffff;
+  box-shadow: 0 0 0 2px color-mix(in srgb, #2f80ff 28%, transparent);
+}
+
+.image-card-regenerated {
+  border-color: color-mix(in srgb, #2f80ff 55%, var(--line));
+}
+
 .image-filename {
   padding: 5px 6px;
   font-size: 10px;

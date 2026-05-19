@@ -49,6 +49,7 @@ STARTING_PROMPT_PATH = ROOT / "input" / "startingprompt.txt"
 
 FORMATS = ["HERO", "BA", "TEST", "FEAT", "UGC"]
 DEFAULT_OPENCODE_API_URL = os.getenv("OPENCODE_API_URL", "http://127.0.0.1:4090")
+OPENCODE_ADS_PER_SESSION_SCHEDULE = [25, 15, 10, 5, 2, 1]
 OPENCODE_MAX_CONCURRENT = 2
 OPENCODE_QUEUE_DIR = RUNTIME_ROOT / "opencode_queue"
 OPENCODE_QUEUE_LOG = OPENCODE_QUEUE_DIR / "queue.log"
@@ -2358,6 +2359,8 @@ def call_opencode_compatible(config: dict[str, Any], context: dict[str, Any], ru
     errors: list[str] = []
     warnings: list[str] = []
     session_id: str | None = None
+    session_request_count = 0
+    session_rollovers = 0
     session_fallback_used = False
 
     if not product_file.exists() or not product_file.is_file():
@@ -2399,11 +2402,16 @@ def call_opencode_compatible(config: dict[str, Any], context: dict[str, Any], ru
         parsed = parse_opencode_json_output(stdout)
         return (extract_generated_ad_candidate(parsed) if parsed else None), stdout, stderr, result.returncode
 
-    with _opencode_queue_slot(f"copy_session {run_dir.name}"):
+    def current_session_limit() -> int:
+        idx = min(session_rollovers, len(OPENCODE_ADS_PER_SESSION_SCHEDULE) - 1)
+        return OPENCODE_ADS_PER_SESSION_SCHEDULE[idx]
+
+    def bootstrap_product_doc_session(reason: str) -> None:
+        nonlocal session_id, session_request_count, session_fallback_used, session_rollovers
         append_run_log(
             run_dir,
             "opencode_session.log",
-            f"{now_iso()} Starting OpenCode product-doc session with file: {product_file}",
+            f"{now_iso()} Starting OpenCode product-doc session ({reason}) with file: {product_file}",
         )
         bootstrap_cmd = build_cmd(build_product_doc_bootstrap_prompt(), use_session=False, attach_product_doc=True)
         bootstrap = subprocess.run(bootstrap_cmd, cwd=str(ROOT), text=True, capture_output=True, check=False, env=env)
@@ -2411,26 +2419,50 @@ def call_opencode_compatible(config: dict[str, Any], context: dict[str, Any], ru
             run_dir,
             "opencode_session.log",
             (
-                f"{now_iso()} Bootstrap return_code={bootstrap.returncode}\n"
+                f"{now_iso()} Bootstrap reason={reason} return_code={bootstrap.returncode}\n"
                 f"STDOUT:\n{bootstrap.stdout or ''}\nSTDERR:\n{bootstrap.stderr or ''}"
             ),
         )
         if bootstrap.returncode == 0:
-            session_id = parse_opencode_session_id(bootstrap.stdout or "")
-            if session_id:
-                append_run_log(run_dir, "opencode_session.log", f"{now_iso()} Reusing OpenCode session: {session_id}")
+            next_session_id = parse_opencode_session_id(bootstrap.stdout or "")
+            if next_session_id:
+                if session_id:
+                    previous_limit = current_session_limit()
+                    session_rollovers += 1
+                    append_run_log(
+                        run_dir,
+                        "opencode_session.log",
+                        f"{now_iso()} Rolled OpenCode session after {previous_limit} ad requests: {session_id} -> {next_session_id}",
+                    )
+                session_id = next_session_id
+                session_request_count = 0
+                append_run_log(
+                    run_dir,
+                    "opencode_session.log",
+                    f"{now_iso()} Reusing OpenCode session: {session_id}; max_ad_requests={current_session_limit()}",
+                )
             else:
+                session_id = None
+                session_request_count = 0
                 session_fallback_used = True
                 warning = "OpenCode did not expose a session id; falling back to attaching product master doc on every ad request."
                 warnings.append(warning)
                 append_run_log(run_dir, "opencode_session.log", f"{now_iso()} FALLBACK: {warning}")
         else:
+            session_id = None
+            session_request_count = 0
             session_fallback_used = True
             warning = "OpenCode product-doc session bootstrap failed; falling back to attaching product master doc on every ad request."
             warnings.append(warning)
             append_run_log(run_dir, "opencode_session.log", f"{now_iso()} FALLBACK: {warning}")
 
+    with _opencode_queue_slot(f"copy_session {run_dir.name}"):
+        bootstrap_product_doc_session("initial")
+
         for index, ad_item in enumerate(context.get("ads") or [], start=1):
+            if session_id and session_request_count >= current_session_limit():
+                bootstrap_product_doc_session(f"rollover_before_ad_{index}")
+
             previous_same_format: list[dict[str, Any]] = []
             target_format = str(ad_item.get("format") or "").strip().upper()
             for prev in generated_ads:
@@ -2508,8 +2540,12 @@ def call_opencode_compatible(config: dict[str, Any], context: dict[str, Any], ru
 
             if not candidate:
                 errors.append(f"Ad {index}: returned no usable ad JSON; return code {last_code}\nSTDOUT:\n{last_stdout}\nSTDERR:\n{last_stderr}")
+                if session_id:
+                    session_request_count += 1
                 continue
             generated_ads.append(hydrate_generated_ad_candidate(candidate, ad_item))
+            if session_id:
+                session_request_count += 1
 
     if errors or warnings:
         (run_dir / "logs" / "opencode_error.txt").write_text("\n\n---\n\n".join(errors + warnings), encoding="utf-8")
@@ -2524,6 +2560,8 @@ def call_opencode_compatible(config: dict[str, Any], context: dict[str, Any], ru
         result_payload["_opencode_warnings"] = warnings
     if session_fallback_used:
         result_payload["_opencode_session_fallback"] = True
+    if session_rollovers:
+        result_payload["_opencode_session_rollovers"] = session_rollovers
     return result_payload
 
 
@@ -2627,7 +2665,7 @@ def scan_regeneration_queue_files_for_batch(batch_name: str) -> list[str]:
             if not tbr_dir.is_dir():
                 continue
             for ext in ("*.png", "*.jpg", "*.jpeg", "*.webp"):
-                for file in tbr_dir.glob(ext):
+                for file in tbr_dir.glob(f"**/{ext}"):
                     rel = str(file.relative_to(ROOT)).replace("\\", "/")
                     if rel in seen:
                         continue
@@ -2865,8 +2903,26 @@ def _build_image_item(
             "language": metadata.get("language", ""),
             "job_key": metadata.get("job_key", ""),
             "status": metadata.get("status", ""),
+            "regenerated": bool(metadata.get("regenerated")) or (is_queued and "/to_be_regenerated/generated images/" in rel),
+            "regenerated_at": metadata.get("regenerated_at", ""),
         },
     }
+
+
+def _mark_image_metadata_regenerated(meta_path: Path, image_path: Path) -> None:
+    if not meta_path.exists() or not meta_path.is_file():
+        return
+    try:
+        payload = json.loads(meta_path.read_text(encoding="utf-8"))
+    except Exception:
+        return
+    if not isinstance(payload, dict):
+        return
+    payload["regenerated"] = True
+    payload["regenerated_at"] = now_iso()
+    payload["regeneration_status"] = "pending_review"
+    payload["saved_file"] = str(image_path)
+    meta_path.write_text(json.dumps(payload, ensure_ascii=False, indent=2), encoding="utf-8")
 
 
 def _image_sort_key(item: dict[str, Any]) -> tuple:
@@ -3982,10 +4038,22 @@ def api_run_update_prompt_copies(run_id: str, payload: dict[str, Any] = Body(...
 EXACT_COPY_SHEET_COLUMNS = [
     "prompt_id",
     "vn",
-    "hypothesis_id",
-    "hypothesis_name",
-    "persona",
-    "angle",
+    "format",
+    "persona_name",
+    "persona_pain",
+    "persona_desire",
+    "persona_friction",
+    "persona_proof",
+    "persona_tone",
+    "persona_awareness_stage",
+    "concept_structure",
+    "concept_structure_definition",
+    "concept_angle",
+    "concept_angle_definition",
+    "awareness_stage",
+    "awareness_stage_definition",
+    "hypothesis_type",
+    "hypothesis_variant",
     "headline_copy",
     "exact_on_image_copy_block",
     "created_at",
@@ -4058,6 +4126,16 @@ def _load_run_prompt_files(run_id: str, aspect_ratios: list[str] | None = None) 
     return result or prompt_files_all
 
 
+def _get_architecture_definition(arch: dict[str, Any], group: str, variant: str) -> str:
+    """Get the template/definition for a concept_variation field from copy_architecture.json."""
+    if not arch or not group or not variant:
+        return ""
+    headline_archs = arch.get("headline_architectures") or {}
+    group_data = headline_archs.get(group) or {}
+    variant_data = group_data.get(variant) or {}
+    return str(variant_data.get("template") or "").strip()
+
+
 def _extract_prompt_row_metadata(run_id: str, copy_batch: dict[str, Any], prompt_rel_path: str, batch_vn: str = "") -> dict[str, Any]:
     prompt_path = ROOT / prompt_rel_path
     text = prompt_path.read_text(encoding="utf-8", errors="ignore")
@@ -4083,39 +4161,77 @@ def _extract_prompt_row_metadata(run_id: str, copy_batch: dict[str, Any], prompt
     if persona_number is None:
         persona_number = parse_persona_number_from_prompt(text)
 
-    persona = ""
-    angle = ""
-    hypothesis_id = ""
-    hypothesis_name = ""
+    persona_name = ""
+    persona_pain = ""
+    persona_desire = ""
+    persona_friction = ""
+    persona_proof = ""
+    persona_tone = ""
+    persona_awareness_stage = ""
+    concept_structure = ""
+    concept_angle = ""
+    awareness_stage = ""
+    hypothesis_type = ""
+    hypothesis_variant = ""
 
     if isinstance(persona_number, int):
+        # Pull full persona data from persona_seeds.json
+        seed = PERSONA_SEED_INPUTS.get(persona_number) or {}
+        persona_name = str(seed.get("persona_name") or f"Persona {persona_number}")
+        persona_pain = str(seed.get("pain", ""))
+        persona_desire = str(seed.get("desire", ""))
+        persona_friction = str(seed.get("friction", ""))
+        persona_proof = str(seed.get("proof", ""))
+        persona_tone = str(seed.get("tone", ""))
+        persona_awareness_stage = str(seed.get("awareness_stage", ""))
+
         for ad in copy_batch.get("ads") or []:
             if not isinstance(ad, dict):
                 continue
             if str(ad.get("format") or "").strip().upper() != fmt:
                 continue
-            persona = ""
             persona_obj = ad.get("persona")
             if isinstance(persona_obj, dict):
                 if isinstance(persona_obj.get("number"), int) and int(persona_obj.get("number")) == persona_number:
                     if int(ad.get("creative_index") or 1) != creative_index:
                         continue
-                    persona = str(persona_obj.get("persona_name") or persona_obj.get("name") or f"Persona {persona_number}")
-            if persona:
-                angle = str(ad.get("headline_angle") or ad.get("concept_angle") or "")
-                hyp = ad.get("hypothesis") if isinstance(ad.get("hypothesis"), dict) else {}
-                if hyp:
-                    hypothesis_id = str(hyp.get("hypothesis_id") or "")
-                    hypothesis_name = str(hyp.get("variant") or hyp.get("variable_label") or "")
-                break
+                    # Override persona_name from copy_batch if available
+                    pn = str(persona_obj.get("persona_name") or persona_obj.get("name") or "")
+                    if pn:
+                        persona_name = pn
+                    concept_angle = str(ad.get("concept_angle") or ad.get("headline_angle") or "")
+                    concept_structure = str(ad.get("concept_structure") or "")
+                    awareness_stage = str(ad.get("awareness_stage") or "")
+                    hyp = ad.get("hypothesis") if isinstance(ad.get("hypothesis"), dict) else {}
+                    if hyp:
+                        hypothesis_type = str(hyp.get("type") or hyp.get("variable_label") or "")
+                        hypothesis_variant = str(hyp.get("variant") or "")
+                    break
+
+    arch = COPY_ARCH
+    concept_structure_def = _get_architecture_definition(arch, "concept_structure", concept_structure)
+    concept_angle_def = _get_architecture_definition(arch, "concept_angle", concept_angle)
+    awareness_stage_def = _get_architecture_definition(arch, "awareness_stage", awareness_stage)
 
     return {
         "prompt_id": prompt_rel_path,
         "vn": vn,
-        "hypothesis_id": hypothesis_id,
-        "hypothesis_name": hypothesis_name,
-        "persona": persona,
-        "angle": angle,
+        "format": fmt,
+        "persona_name": persona_name,
+        "persona_pain": persona_pain,
+        "persona_desire": persona_desire,
+        "persona_friction": persona_friction,
+        "persona_proof": persona_proof,
+        "persona_tone": persona_tone,
+        "persona_awareness_stage": persona_awareness_stage,
+        "concept_structure": concept_structure,
+        "concept_structure_definition": concept_structure_def,
+        "concept_angle": concept_angle,
+        "concept_angle_definition": concept_angle_def,
+        "awareness_stage": awareness_stage,
+        "awareness_stage_definition": awareness_stage_def,
+        "hypothesis_type": hypothesis_type,
+        "hypothesis_variant": hypothesis_variant,
         "headline_copy": headline_copy,
         "exact_on_image_copy_block": exact_block,
         "created_at": created_at,
@@ -4222,9 +4338,23 @@ async def api_import_on_image_copy(
     # Build column index
     header = [str(cell.value or "").strip() for cell in next(ws.iter_rows(min_row=1, max_row=1))]
     col_idx = {name: i for i, name in enumerate(header) if name}
-    missing_cols = [c for c in EXACT_COPY_SHEET_COLUMNS if c not in col_idx]
-    if missing_cols:
-        raise HTTPException(status_code=400, detail=f"Missing required columns: {missing_cols}")
+
+    # Required columns for import (core copy fields)
+    REQUIRED_IMPORT_COLUMNS = ["prompt_id", "headline_copy", "exact_on_image_copy_block"]
+    missing_required = [c for c in REQUIRED_IMPORT_COLUMNS if c not in col_idx]
+    if missing_required:
+        raise HTTPException(status_code=400, detail=f"Missing required columns: {missing_required}")
+
+    # Optional context columns (from export, used for validation/reference)
+    OPTIONAL_CONTEXT_COLUMNS = [
+        "format", "persona_name", "persona_pain", "persona_desire", "persona_friction",
+        "persona_proof", "persona_tone", "persona_awareness_stage",
+        "concept_structure", "concept_structure_definition",
+        "concept_angle", "concept_angle_definition",
+        "awareness_stage", "awareness_stage_definition",
+        "hypothesis_type", "hypothesis_variant",
+        "vn", "created_at",
+    ]
 
     seen_prompt_ids: set[str] = set()
     rows: list[dict[str, Any]] = []
@@ -4243,6 +4373,12 @@ async def api_import_on_image_copy(
         headline_copy = str(values[col_idx["headline_copy"]] or "").strip()
         full_block = str(values[col_idx.get("exact_on_image_copy_block", -1)] or "").strip() if "exact_on_image_copy_block" in col_idx else ""
 
+        # Read optional context columns if present
+        ctx: dict[str, str] = {}
+        for opt_col in OPTIONAL_CONTEXT_COLUMNS:
+            if opt_col in col_idx:
+                ctx[opt_col] = str(values[col_idx[opt_col]] or "").strip()
+
         if not headline_copy.strip() and not full_block:
             errors.append({"prompt_id": prompt_id, "error": "empty_headline_copy_and_block"})
             continue
@@ -4252,6 +4388,7 @@ async def api_import_on_image_copy(
                 "prompt_id": prompt_id,
                 "headline_copy": headline_copy,
                 "full_block": full_block,
+                "context": ctx,
             }
         )
 
@@ -5259,6 +5396,7 @@ async def api_run_execute(
     opencode_failures = copy_json.pop("_opencode_failures", []) if isinstance(copy_json, dict) else []
     opencode_warnings = copy_json.pop("_opencode_warnings", []) if isinstance(copy_json, dict) else []
     opencode_session_fallback = bool(copy_json.pop("_opencode_session_fallback", False)) if isinstance(copy_json, dict) else False
+    opencode_session_rollovers = int(copy_json.pop("_opencode_session_rollovers", 0) or 0) if isinstance(copy_json, dict) else 0
     if opencode_failures and llm_mode == "opencode":
         llm_mode = "opencode_partial_fallback"
         (run_dir / "logs" / "opencode_fallback.txt").write_text(
@@ -5346,6 +5484,10 @@ async def api_run_execute(
         manifest["copy_generation_notes"] = [str(item).splitlines()[0] for item in opencode_warnings[:3]]
     if opencode_session_fallback:
         manifest["copy_session_fallback"] = True
+        manifest["copy_session_log"] = str((run_dir / "logs" / "opencode_session.log").relative_to(ROOT))
+    if opencode_session_rollovers:
+        manifest["copy_session_rollovers"] = opencode_session_rollovers
+        manifest["copy_session_schedule"] = OPENCODE_ADS_PER_SESSION_SCHEDULE
         manifest["copy_session_log"] = str((run_dir / "logs" / "opencode_session.log").relative_to(ROOT))
     manifest["context_source"] = product_ctx_source
     manifest["context_extractor_model"] = extractor_model
@@ -5593,6 +5735,12 @@ def api_mark_images_to_regenerate(run_id: str, payload: dict[str, Any] = Body(..
 
 
 def _original_path_for_queued_image(rel: str) -> str | None:
+    misplaced = re.match(r"^(generated_images/[^/]+)/to_be_regenerated/generated images/(.+)$", rel)
+    if misplaced:
+        metadata = _read_image_metadata(rel)
+        aspect = str((metadata.get("test_variables") or {}).get("aspect_ratio") or "4:5") if isinstance(metadata.get("test_variables"), dict) else "4:5"
+        aspect_dir = "9_16" if aspect == "9:16" else "4_5"
+        return f"{misplaced.group(1)}/{aspect_dir}/generated images/{misplaced.group(2)}"
     original = rel.replace("/to_be_regenerated/", "/")
     if original == rel:
         return None
@@ -5813,9 +5961,10 @@ def api_regenerate_queued_images(run_id: str, payload: dict[str, Any] = Body(...
 
     # ── Regenerate 4:5 images ──────────────────────────────────────────
     if prompts_45:
+        result: subprocess.CompletedProcess[str] | None = None
         try:
             if engine == "chatgpt":
-                run_chatgpt_generation(
+                result = run_chatgpt_generation(
                     batch=batch,
                     prompt_files=list(prompts_45),
                     aspect_ratio="4:5",
@@ -5824,7 +5973,7 @@ def api_regenerate_queued_images(run_id: str, payload: dict[str, Any] = Body(...
                     run_dir=run_dir,
                 )
             else:
-                run_gemini_generation(
+                result = run_gemini_generation(
                     batch=batch,
                     prompt_files=list(prompts_45),
                     aspect_ratio="4:5",
@@ -5834,11 +5983,14 @@ def api_regenerate_queued_images(run_id: str, payload: dict[str, Any] = Body(...
                 )
         except Exception as exc:
             raise HTTPException(status_code=500, detail=f"4:5 regeneration failed: {exc}")
+        generation_error = ""
+        if result is not None and result.returncode != 0:
+            generation_error = (result.stderr or result.stdout or "").strip()
 
         for pf in prompts_45:
             expected = _build_expected_output_path(batch, pf, "4_5", engine)
             if expected and expected.exists() and expected.is_file():
-                archive_dir = GENERATED_IMAGES_ROOT / batch / "to_be_regenerated" / "generated images"
+                archive_dir = GENERATED_IMAGES_ROOT / batch / "4_5" / "to_be_regenerated"
                 archive_dir.mkdir(parents=True, exist_ok=True)
                 dest = _unique_path(archive_dir / expected.name)
                 shutil.move(str(expected), str(dest))
@@ -5846,7 +5998,16 @@ def api_regenerate_queued_images(run_id: str, payload: dict[str, Any] = Body(...
                 # Move sidecar
                 meta_src = expected.with_suffix(".json")
                 if meta_src.exists() and meta_src.is_file():
-                    shutil.move(str(meta_src), str(dest.with_suffix(".json")))
+                    meta_dest = dest.with_suffix(".json")
+                    shutil.move(str(meta_src), str(meta_dest))
+                    _mark_image_metadata_regenerated(meta_dest, dest)
+            else:
+                skipped.append({"image_file": pf, "reason": "regenerated image was not downloaded/found"})
+        if generation_error and not generated_files:
+            short = "\n".join([line for line in generation_error.splitlines() if line.strip()][-6:])
+            raise HTTPException(status_code=500, detail=f"4:5 regeneration failed before any downloads were found. {short}")
+        if generation_error:
+            skipped.append({"image_file": "4:5 generation", "reason": "generator exited with errors after partial output"})
 
     # ── Regenerate 9:16 images ─────────────────────────────────────────
     if jobs_916:
@@ -5870,14 +6031,18 @@ def api_regenerate_queued_images(run_id: str, payload: dict[str, Any] = Body(...
                 prompt_path = candidates[0]
             expected = _build_expected_output_path(batch, prompt_path, "9_16", engine)
             if expected and expected.exists() and expected.is_file():
-                archive_dir = GENERATED_IMAGES_ROOT / batch / "to_be_regenerated" / "generated images"
+                archive_dir = GENERATED_IMAGES_ROOT / batch / "9_16" / "to_be_regenerated"
                 archive_dir.mkdir(parents=True, exist_ok=True)
                 dest = _unique_path(archive_dir / expected.name)
                 shutil.move(str(expected), str(dest))
                 generated_files.append(str(dest.relative_to(ROOT)).replace("\\", "/"))
                 meta_src = expected.with_suffix(".json")
                 if meta_src.exists() and meta_src.is_file():
-                    shutil.move(str(meta_src), str(dest.with_suffix(".json")))
+                    meta_dest = dest.with_suffix(".json")
+                    shutil.move(str(meta_src), str(meta_dest))
+                    _mark_image_metadata_regenerated(meta_dest, dest)
+            else:
+                skipped.append({"image_file": str(job.get("prompt_96") or job.get("format") or "9:16"), "reason": "regenerated image was not downloaded/found"})
 
     refreshed = collect_backfill_result(run_id, batch)
     if has_storage_manifest and run_dir is not None:

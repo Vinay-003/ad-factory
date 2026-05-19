@@ -191,6 +191,16 @@ function updatePreviousRunOptions() {
   });
 }
 
+function batchSortValue(batch) {
+  const match = String(batch || "").trim().match(/^v(\d+)$/i);
+  return match ? Number(match[1]) : -1;
+}
+
+function compareBatchesLatestFirst(a, b) {
+  const diff = batchSortValue(b) - batchSortValue(a);
+  return diff || String(b || "").localeCompare(String(a || ""));
+}
+
 function closeBatchDropdown() {
   const menu = document.getElementById("batchDropdownMenu");
   const btn = document.getElementById("batchDropdownBtn");
@@ -222,7 +232,7 @@ export async function loadRuns() {
 
     const grid = document.createElement("div");
     grid.className = "batch-grid";
-    const batchList = Array.from(batches).sort().reverse();
+    const batchList = Array.from(batches).sort(compareBatchesLatestFirst);
     const num = batchList.length;
     const cols = Math.max(1, Math.ceil(Math.sqrt(num)));
     const rows = Math.max(1, Math.ceil(num / cols));

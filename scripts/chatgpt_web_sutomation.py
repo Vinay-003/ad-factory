@@ -1867,6 +1867,50 @@ def wait_until_send_enabled(page: Page, composer: Locator | None = None, timeout
     return False
 
 
+def wait_until_ready_to_send(
+    page: Page,
+    composer: Locator | None,
+    *,
+    expected_attachment_count: int = 0,
+    timeout: float = 180.0,
+) -> None:
+    deadline = time.time() + timeout
+    stable_since: float | None = None
+    last_state: tuple[int, bool, int, bool] | None = None
+    last_log = 0.0
+    while time.time() < deadline:
+        attachment_count = _composer_attachment_count(page)
+        active = upload_activity_present(page)
+        spinners = _attachment_spinner_count(page)
+        send_enabled = _send_button_action(page, composer=composer, loose=True, click=False)
+        state = (attachment_count, active, spinners, send_enabled)
+        if state != last_state:
+            stable_since = time.time()
+            last_state = state
+
+        attachments_ready = expected_attachment_count <= 0 or attachment_count >= expected_attachment_count
+        if attachments_ready and not active and spinners == 0 and send_enabled and stable_since is not None and time.time() - stable_since >= 2.0:
+            print(f"  [send] Ready: attachments={attachment_count}, expected={expected_attachment_count}, send_enabled={send_enabled}")
+            return
+
+        if time.time() - last_log > 6:
+            print(
+                "  [send] Waiting until uploads finish and Send is enabled... "
+                f"attachments={attachment_count}, expected={expected_attachment_count}, active={active}, spinners={spinners}, send_enabled={send_enabled}"
+            )
+            last_log = time.time()
+        time.sleep(0.75)
+
+    attachment_count = _composer_attachment_count(page)
+    active = upload_activity_present(page)
+    spinners = _attachment_spinner_count(page)
+    send_enabled = _send_button_action(page, composer=composer, loose=True, click=False)
+    raise PWTimeoutError(
+        "ChatGPT was not ready to send after waiting for uploads/button readiness. "
+        f"attachments={attachment_count}, expected={expected_attachment_count}, active={active}, spinners={spinners}, send_enabled={send_enabled}"
+    )
+
+
 def click_send_button(page: Page, composer: Locator | None = None, loose: bool = False) -> bool:
     try:
         composer = composer or find_composer(page, timeout=3)
@@ -2007,6 +2051,8 @@ def click_send_and_confirm(
     settle_wait: float,
     submit_method: str,
     confirm_timeout: float,
+    expected_attachment_count: int = 0,
+    ready_timeout: float = 180.0,
 ) -> None:
     if settle_wait > 0:
         print(f"  [send] Waiting {settle_wait:g}s for ChatGPT composer to settle before final prompt check...")
@@ -2029,6 +2075,13 @@ def click_send_and_confirm(
     before_marker_count = prompt_visible_outside_composer_count(page, expected_prompt)
     before_url = page.url or ""
     print(f"  [send] Existing submitted-prompt markers before Send: {before_marker_count}")
+
+    wait_until_ready_to_send(
+        page,
+        composer,
+        expected_attachment_count=expected_attachment_count,
+        timeout=ready_timeout,
+    )
 
     submit_method = (submit_method or "auto").lower().strip()
     if submit_method == "enter":
@@ -2819,6 +2872,8 @@ def run() -> None:
                             settle_wait=args.prompt_settle_wait,
                             submit_method=args.send_submit_method,
                             confirm_timeout=args.send_confirm_timeout,
+                            expected_attachment_count=len(upload_images_for_all_jobs),
+                            ready_timeout=max(180.0, float(args.timeout)),
                         )
 
                         src = wait_for_generated_image(page_for_job, baseline_srcs, timeout=args.timeout)
