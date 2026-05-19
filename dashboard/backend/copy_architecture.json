@@ -52,6 +52,18 @@
           "must_include": ["missing FAB link", "daily advantage", "weight-loss outcome"],
           "avoid": "Do not list features without explaining the buyer benefit."
         }
+      },
+      "pab": {
+        "template": "Structure: Open with the specific problem, agitate the friction, then bridge to the solution. Headline names the problem; support line agitates and bridges.",
+        "examples": [
+          "Weight Loss Stalls When Cravings Win",
+          "Diets Fail Because Hunger Returns"
+        ],
+        "support_strategy": {
+          "direction": "Agitate the problem named in the headline, then bridge to the product solution.",
+          "must_include": ["agitation", "bridge mechanism", "solution link"],
+          "avoid": "Do not solve the problem in the headline."
+        }
       }
     },
 

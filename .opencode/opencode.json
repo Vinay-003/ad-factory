@@ -6,22 +6,22 @@
   "mcp": {
     "playwright": {
       "type": "local",
-      "command": ["$HOME/.nvm/versions/node/v24.14.1/bin/playwright-mcp"],
+      "command": ["npx", "@anthropic-ai/playwright-mcp"],
       "enabled": true
     },
     "firecrawl": {
       "type": "local",
-      "command": ["$HOME/.nvm/versions/node/v24.14.1/bin/firecrawl-mcp"],
+      "command": ["npx", "@anthropic-ai/firecrawl-mcp"],
       "enabled": true
     },
     "chrome-devtools": {
       "type": "local",
-      "command": ["$HOME/.nvm/versions/node/v24.14.1/bin/chrome-devtools-mcp"],
+      "command": ["npx", "@anthropic-ai/chrome-devtools-mcp"],
       "enabled": true
     },
     "glif": {
       "type": "local",
-      "command": ["$HOME/.nvm/versions/node/v24.14.1/bin/glif-mcp-server"],
+      "command": ["npx", "@anthropic-ai/glif-mcp-server"],
       "enabled": true
     }
   }

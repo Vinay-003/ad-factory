@@ -12,12 +12,16 @@ import threading
 import sys
 import time
 import urllib.request
-import fcntl
 import hashlib
 import importlib.util
 import mimetypes
 import uuid
 import psutil
+
+if sys.platform == "win32":
+    import msvcrt
+else:
+    import fcntl
 from contextlib import contextmanager
 from datetime import datetime, timezone
 from pathlib import Path
@@ -519,8 +523,8 @@ def build_copy_requirements(persona_number: int, fmt: str, format_sequence_index
     audience_id = persona_seed.get("awareness_stage", "unaware")
 
     fmt_defaults = COPY_PROMPTS.get("format_defaults", {})
-    structure_by_fmt = fmt_defaults.get("structure_by_fmt", {"HERO": "four_us"})
-    concept_structure_id = structure_by_fmt.get(fmt, "four_us")
+    structure_by_fmt = fmt_defaults.get("structure_by_fmt", {"HERO": "pab"})
+    concept_structure_id = structure_by_fmt.get(fmt, "pab")
 
     concept_angle = fmt_defaults.get("default_concept_angle", "desired_outcome")
 
@@ -967,9 +971,15 @@ def _append_opencode_queue_log(message: str) -> None:
 
 def dashboard_subprocess_env() -> dict[str, str]:
     env = dict(os.environ)
-    playwright_path = "/home/mylappy/.local/lib/python3.12/site-packages"
+    if sys.platform == "win32":
+        sep = ";"
+        venv_lib = Path(sys.executable).parent.parent / "Lib" / "site-packages"
+    else:
+        sep = ":"
+        venv_lib = Path(sys.executable).parent.parent / "lib" / f"python{sys.version_info.major}.{sys.version_info.minor}" / "site-packages"
+    playwright_path = str(venv_lib)
     if playwright_path not in env.get("PYTHONPATH", ""):
-        env["PYTHONPATH"] = playwright_path + ((":" + env["PYTHONPATH"]) if env.get("PYTHONPATH") else "")
+        env["PYTHONPATH"] = playwright_path + (sep + env["PYTHONPATH"] if env.get("PYTHONPATH") else "")
     return env
 
 
@@ -982,9 +992,23 @@ def _opencode_queue_slot(label: str) -> Iterator[None]:
         for slot in range(OPENCODE_MAX_CONCURRENT):
             lock_path = OPENCODE_QUEUE_DIR / f"slot_{slot}.lock"
             lock_handle = lock_path.open("a+")
+            acquired = False
             try:
-                fcntl.flock(lock_handle.fileno(), fcntl.LOCK_EX | fcntl.LOCK_NB)
-            except BlockingIOError:
+                if sys.platform == "win32":
+                    try:
+                        msvcrt.locking(lock_handle.fileno(), msvcrt.LK_NBLCK, 1)
+                        acquired = True
+                    except OSError:
+                        pass
+                else:
+                    try:
+                        fcntl.flock(lock_handle.fileno(), fcntl.LOCK_EX | fcntl.LOCK_NB)
+                        acquired = True
+                    except BlockingIOError:
+                        pass
+            except Exception:
+                pass
+            if not acquired:
                 lock_handle.close()
                 continue
             wait_seconds = time.time() - queued_at
@@ -995,7 +1019,11 @@ def _opencode_queue_slot(label: str) -> Iterator[None]:
                 return
             finally:
                 try:
-                    fcntl.flock(lock_handle.fileno(), fcntl.LOCK_UN)
+                    if sys.platform == "win32":
+                        lock_handle.seek(0)
+                        msvcrt.locking(lock_handle.fileno(), msvcrt.LK_UNLCK, 1)
+                    else:
+                        fcntl.flock(lock_handle.fileno(), fcntl.LOCK_UN)
                 finally:
                     lock_handle.close()
         if not logged_wait:
@@ -1432,15 +1460,30 @@ def strip_ansi(text: str) -> str:
 
 def opencode_discovery_env() -> dict[str, str]:
     env = os.environ.copy()
-    default_xdg = Path.home() / ".local" / "share"
-    default_auth = default_xdg / "opencode" / "auth.json"
+    if sys.platform == "win32":
+        local_appdata = os.environ.get("LOCALAPPDATA", str(Path.home() / "AppData" / "Local"))
+        default_auth_dir = Path(local_appdata) / "opencode"
+    else:
+        default_auth_dir = Path.home() / ".local" / "share" / "opencode"
+    default_auth = default_auth_dir / "auth.json"
 
-    raw_xdg = env.get("XDG_DATA_HOME", "").strip()
-    current_xdg = Path(raw_xdg).expanduser() if raw_xdg else default_xdg
+    if sys.platform == "win32":
+        raw_xdg = ""
+    else:
+        raw_xdg = env.get("XDG_DATA_HOME", "").strip()
+    if raw_xdg:
+        current_xdg = Path(raw_xdg).expanduser()
+    elif sys.platform == "win32":
+        current_xdg = Path(os.environ.get("LOCALAPPDATA", str(Path.home() / "AppData" / "Local")))
+    else:
+        current_xdg = Path.home() / ".local" / "share"
     current_auth = current_xdg / "opencode" / "auth.json"
 
     if default_auth.exists() and not current_auth.exists():
-        env["XDG_DATA_HOME"] = str(default_xdg)
+        if sys.platform == "win32":
+            env["LOCALAPPDATA"] = str(Path(local_appdata))
+        else:
+            env["XDG_DATA_HOME"] = str(Path.home() / ".local" / "share")
     return env
 
 
@@ -1991,7 +2034,7 @@ def concept_ids_from_requirements(copy_req: dict[str, Any]) -> dict[str, str]:
     return {
         "awareness_stage": nested_id("audience_stage", "problem_aware"),
         "concept_angle": nested_id("concept_angle", "desired_outcome"),
-        "concept_structure": nested_id("message_structure", "four_us"),
+        "concept_structure": nested_id("message_structure", "pab"),
     }
 
 

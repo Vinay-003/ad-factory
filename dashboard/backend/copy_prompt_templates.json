@@ -15,7 +15,7 @@
     "Divide the payload: headline earns attention with the sharp promise, pain, proof, or contrast; support lines carry the mechanism, timing, product components, proof, routine details, and caveats.",
     "Keep AM/PM timing, protocol mechanics, and product component names out of the headline unless they are the single hook; put them in support lines or bullets when needed.",
     "Avoid AI-ad words such as unlock, transform your journey, revolutionary, holistic wellness, game-changing, effortlessly, and tailored solution.",
-    "Do a final editor pass: shorten the headline, remove generic phrasing, reject vague lines that could fit any wellness product, and ensure supporting copy follows the assigned concept_structure flow (four_us, pas, bab, fab) by completing the headline instead of repeating it.",
+    "Do a final editor pass: shorten the headline, remove generic phrasing, reject vague lines that could fit any wellness product, and ensure supporting copy follows the assigned concept_structure flow (four_us, pas, bab, fab, pab) by completing the headline instead of repeating it.",
     "Prioritize fast visible weight loss, safer natural-feeling differentiation, real proof, and practical ease; do not let digestion or emotional benefits overshadow weight loss.",
     "Read copy_requirements.headline_architecture.template and .examples — the headline must follow that sentence structure, not just match the content angle. If the template asks for the full framework, compress it into one headline idea and move the rest to support.",
     "Treat copy_requirements.headline_architecture.source and .variant as the binding headline frame for this ad. Do not switch to another headline frame, hook shape, or hypothesis structure just because it appears in the ban list, examples, persona text, or prior outputs.",
@@ -87,7 +87,7 @@
   "copy_requirements": {
     "must_mention": "The headline itself must clearly signal weight loss directly or through an unmistakable proxy such as kg loss, fat loss, slimming, eating less, craving control for weight loss, or visible weight-loss progress. Support lines can add mechanism/proof, but cannot be the only place that makes the ad about weight loss.",
     "variation_rule": "Do not reuse the same headline skeleton, support-line skeleton, or persuasion angle as other ads in the same format for this batch.",
-    "hierarchy_rule": "Use the assigned concept_structure flow (four_us, pas, bab, fab) across headline and support line, not inside the headline alone. Headline = short hook/meaning; support = missing proof/mechanism/context. Do not output framework labels. Derive actual headline/support from product master doc content.",
+    "hierarchy_rule": "Use the assigned concept_structure flow (four_us, pas, bab, fab, pab) across headline and support line, not inside the headline alone. Headline = short hook/meaning; support = missing proof/mechanism/context. Do not output framework labels. Derive actual headline/support from product master doc content.",
     "format_specific": {
       "HERO": "Keep headline as one clean, finished ad sentence with clear weight-loss meaning. Support line must follow the assigned support_line_architecture template and complete the headline with proof, mechanism, or practical ease.",
       "UGC": "Creator-like tone is allowed, but keep headline/support grounded in master-doc facts and compliance.",
@@ -178,7 +178,7 @@
   "format_defaults": {
     "_description": "Default concept_structure per format (used when no hypothesis overrides it).",
     "structure_by_fmt": {
-      "HERO": "four_us",
+      "HERO": "pab",
       "BA": "bab",
       "TEST": "pas",
       "FEAT": "fab",
