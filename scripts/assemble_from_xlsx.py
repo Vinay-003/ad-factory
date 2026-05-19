@@ -25,6 +25,15 @@ from datetime import datetime, timezone
 from pathlib import Path
 from typing import Any
 
+import hashlib
+import json
+import random
+import re
+import time
+from datetime import datetime, timezone
+from pathlib import Path
+from typing import Any
+
 try:
     from openpyxl import load_workbook
 except ImportError:
@@ -39,14 +48,84 @@ STORAGE_ROOT = ROOT / "dashboard_storage"
 RUNS_ROOT = STORAGE_ROOT / "runs"
 
 
-# ── Re-use the prompt renderer from generate_ads.py ──────────────────────────
+def stable_signature_seed(*parts: Any) -> int:
+    joined = "|".join(str(part or "") for part in parts)
+    digest = hashlib.sha256(joined.encode("utf-8")).hexdigest()
+    return int(digest[:8], 16) or 1
 
-def _import_generate_ads():
-    import importlib.util
-    spec = importlib.util.spec_from_file_location("generate_ads", ROOT / "scripts" / "generate_ads.py")
-    mod = importlib.util.module_from_spec(spec)
-    spec.loader.exec_module(mod)
-    return mod
+
+FORMAT_VISUAL_ARCHETYPES: dict[str, list[dict[str, Any]]] = {
+    "HERO": [
+        {"id": "hero_center_stage", "label": "Centered premium packshot",
+         "layout_lines": ["- Archetype: centered premium packshot with headline centered above the product block.", "- Keep the product cluster compact in the middle third with a balanced pedestal feel and strong whitespace around it.", "- Use symmetrical spacing so the ad reads as premium and stable rather than busy or collage-like.", "- Keep both text and product centered; do not introduce obvious left/right asymmetry in this variant."],
+         "direction_lines": ["- Archetype direction: centered composition with soft pedestal energy and minimal side distractions.", "- Text placement: headline/support centered in upper safe field; CTA centered below support with generous breathing room.", "- This is the only HERO variant that should read as fully centered and symmetrical."]},
+        {"id": "hero_left_copy_right_product", "label": "Left-copy right-product hero",
+         "layout_lines": ["- Archetype: left-aligned copy block with product cluster weighted to the right half.", "- Build a clear asymmetric composition where text owns the left safe field and product owns the right safe field.", "- Preserve clean negative space between copy and product so the frame feels intentional, not cramped.", "- Headline, support, and CTA must align left in a clean copy column; do not center the typography in this variant."],
+         "direction_lines": ["- Archetype direction: editorial left-copy/right-product split with crisp column alignment.", "- Product emphasis: kit box and product stack dominate the right-center while copy stays in a protected left column.", "- Force visible asymmetry: if the result reads centered at a glance, reject and regenerate."]},
+        {"id": "hero_close_crop_pedestal", "label": "Close crop pedestal hero",
+         "layout_lines": ["- Archetype: larger, tighter product crop with the pack cluster feeling closer to camera.", "- Let product presence feel slightly oversized while keeping every label readable and fully inside safe field.", "- Copy should sit in a compact high-contrast block occupying one upper corner rather than a wide centered text stack.", "- Crop the product group noticeably larger than other HERO variants so the pack mass dominates the lower half."],
+         "direction_lines": ["- Archetype direction: premium close crop with a luxury pedestal feel and shallow scene complexity.", "- Visual balance: oversized product hero, minimal props, restrained typography footprint.", "- Composition should feel tighter and more zoomed-in than the centered or split variants; reject if it reads like a standard balanced packshot."]},
+        {"id": "hero_soft_lifestyle_frame", "label": "Lifestyle-assisted premium hero",
+         "layout_lines": ["- Archetype: premium hero layout softened by subtle lifestyle context, not pure studio isolation.", "- Keep product dominant while allowing background context cues to add warmth and realism.", "- Headline and support should sit in a calm editorial block with more atmospheric breathing room than strict commercial grid.", "- Product cluster should sit lower-left or lower-right with the opposite upper zone reserved for copy; do not center both elements together."],
+         "direction_lines": ["- Archetype direction: premium lifestyle frame with product dominance preserved over the environment.", "- Background behavior: warm believable context adds credibility but never competes with the packshot.", "- This variant must feel more environmental and editorial than the studio-centered HERO options."]},
+    ],
+    "BA": [
+        {"id": "ba_classic_split", "label": "Classic vertical split contrast",
+         "layout_lines": ["- Archetype: strict left/right split with a clear vertical divider and fast-scroll readability.", "- Left side must instantly read as friction; right side must instantly read as first practical win.", "- Keep products bridging the lower center so both panels still feel like one branded story."],
+         "direction_lines": ["- Archetype direction: disciplined vertical split with highly legible contrast in mood, props, and posture.", "- Contrast behavior: same overall palette family, different clarity and routine signals on each side."]},
+        {"id": "ba_soft_diagonal_transition", "label": "Soft diagonal transition",
+         "layout_lines": ["- Archetype: transition from struggle to control happens along a soft diagonal flow instead of a hard binary panel wall.", "- Use composition to move the eye from upper-left friction toward lower-right control without losing split-story clarity.", "- Keep the product cluster near lower center as the bridge that unifies the two states."],
+         "direction_lines": ["- Archetype direction: diagonal story flow with subtle transition edge and premium editorial polish.", "- Panel behavior: struggle cues and control cues remain distinct even without a thick central divider."]},
+        {"id": "ba_desk_to_discipline", "label": "Desk-scene routine contrast",
+         "layout_lines": ["- Archetype: same broad routine surface evolves from cluttered impulsive setup to clean repeatable setup.", "- Let props and orderliness carry much of the contrast, not only facial expression.", "- Keep the headline spanning both states while the lower product bridge anchors the solution."],
+         "direction_lines": ["- Archetype direction: one routine zone shown in two states, emphasizing practical environmental contrast.", "- Visual proof: clutter-to-clarity progression should feel plausible and grounded, never dramatic or fake."]},
+        {"id": "ba_emotion_to_control", "label": "Emotion-to-control contrast",
+         "layout_lines": ["- Archetype: subject emotion shift is the primary contrast driver, with supporting routine cues around it.", "- The left panel should feel mentally stuck; the right panel should feel calmer, steadier, and more in control.", "- Product cluster remains stable and premium so the frame does not become too portrait-heavy."],
+         "direction_lines": ["- Archetype direction: human emotional contrast leads, product proof anchors, environment stays secondary.", "- Contrast behavior: subtle mood correction rather than exaggerated transformation theatrics."]},
+    ],
+    "TEST": [
+        {"id": "test_editorial_quote_card", "label": "Editorial quote card",
+         "layout_lines": ["- Archetype: large editorial quote card is the primary visual element, with strong quote-first hierarchy.", "- Quote card should occupy the upper safe field prominently while product remains a secondary but visible proof anchor below.", "- Use clean premium spacing so the testimonial feels designed, not templated."],
+         "direction_lines": ["- Archetype direction: oversized quote card with calm editorial rhythm and a restrained premium card treatment.", "- Product placement: compact bottom-right or bottom-center proof anchor beneath the quote hierarchy."]},
+        {"id": "test_portrait_overlay_card", "label": "Portrait with floating review card",
+         "layout_lines": ["- Archetype: believable human portrait is more visible, while the review card floats over part of the scene.", "- The quote must still win attention first, but the portrait should noticeably increase authenticity and relatability.", "- Product cluster should remain smaller than in HERO and act as proof, not main subject."],
+         "direction_lines": ["- Archetype direction: portrait-led testimonial with floating review panel overlap and controlled depth.", "- Layering: quote card overlaps portrait space without obscuring the face or reducing readability."]},
+        {"id": "test_minimal_review_poster", "label": "Minimal review poster",
+         "layout_lines": ["- Archetype: very large typography with minimal card chrome, almost like an editorial poster.", "- Reduce decorative panel treatment and let type scale, spacing, and contrast carry the testimonial weight.", "- Product cluster should stay compact and lower in frame so the quote remains the unmistakable hero."],
+         "direction_lines": ["- Archetype direction: minimal poster-like layout, premium typography-first attitude, almost no ornamental card styling.", "- Hierarchy: quote dominates first, proof strip and product sit as controlled secondary anchors."]},
+        {"id": "test_proof_strip_layout", "label": "Proof-strip testimonial",
+         "layout_lines": ["- Archetype: compact quote block with a clearer verification/proof strip and slightly stronger product presence.", "- Trust line should feel like a deliberate proof rail, not just a small subheading.", "- Product cluster can be larger here than other TEST variants, but testimonial hierarchy must still stay primary."],
+         "direction_lines": ["- Archetype direction: compact testimonial card plus strong proof strip and polished product confirmation below.", "- Structure: quote block -> attribution -> proof strip -> product cluster -> CTA with clean separation between each layer."]},
+    ],
+    "FEAT": [
+        {"id": "feat_bullet_panel", "label": "Classic bullet panel",
+         "layout_lines": ["- Archetype: structured bullet panel on one side and product proof on the opposite side.", "- Bullets should read as a calm functional stack, never as dense paragraph copy.", "- Keep the information panel crisp and balanced against the product cluster."],
+         "direction_lines": ["- Archetype direction: classic info-column layout with bullets grouped neatly in one protected text panel.", "- Product placement: kit stack occupies the opposite side as a clear proof anchor."]},
+        {"id": "feat_modular_cards", "label": "Modular feature cards",
+         "layout_lines": ["- Archetype: features appear as small modular cards or tiles rather than one continuous bullet column.", "- Maintain generous spacing between feature modules so each benefit scans instantly on mobile.", "- Product cluster remains visually stable while feature modules create structured variation around it."],
+         "direction_lines": ["- Archetype direction: modular information architecture with 3-4 clearly separated feature tiles.", "- Layout behavior: feature cards can wrap around the product zone without feeling cluttered."]},
+        {"id": "feat_mechanism_steps", "label": "Mechanism step stack",
+         "layout_lines": ["- Archetype: present features as a clear step-by-step or mechanism ladder instead of isolated bullets.", "- Create a directional reading flow from headline into numbered or sequenced feature logic.", "- Product cluster should support the mechanism story rather than overpower it."],
+         "direction_lines": ["- Archetype direction: vertical step stack with ordered reading rhythm and low-noise spacing.", "- Information behavior: each feature line should feel like one stage of a practical routine or benefit chain."]},
+        {"id": "feat_callout_annotations", "label": "Annotated product callouts",
+         "layout_lines": ["- Archetype: feature lines behave like concise callout annotations pointing toward the product group.", "- Keep annotation lines short and clean so the frame still reads premium, not technical or noisy.", "- Product cluster stays central enough that the callouts feel attached to a real focal object."],
+         "direction_lines": ["- Archetype direction: annotated product explainer with short callout labels and disciplined connector logic.", "- Visual balance: callouts orbit the product safely without crowding the safe zones."]},
+    ],
+    "UGC": [
+        {"id": "ugc_selfie_hold", "label": "Selfie beside-product frame",
+         "layout_lines": ["- Archetype: creator appears beside the kit in a selfie-like composition while products rest on a surface at correct scale.", "- The frame should feel personal and immediate without losing product label readability.", "- Text should stay compact and social-native, with clear protected space around the face and product."],
+         "direction_lines": ["- Archetype direction: near-product selfie shot with intimate creator energy and stable phone realism, but products remain placed on a table/counter.", "- Subject behavior: easy facial expression and optional open-palm gesture toward the product, never holding or gripping any package."]},
+        {"id": "ugc_desk_review", "label": "Desk review setup",
+         "layout_lines": ["- Archetype: creator is seated or standing by a desk/surface, presenting the kit like a practical recommendation.", "- Product cluster sits on the routine surface while one hand or gesture supports explanation.", "- Text can occupy a cleaner side of the frame as if added to a real review moment."],
+         "direction_lines": ["- Archetype direction: review-at-desk composition with believable routine props and calm speaking posture.", "- Product behavior: some products rest on the desk while the kit box stays clearly visible in the creator zone."]},
+        {"id": "ugc_morning_routine", "label": "Morning routine scene",
+         "layout_lines": ["- Archetype: morning-routine context with subtle vanity, counter, or getting-ready cues.", "- The scene should feel like a real use moment, not a polished set or stock ad template.", "- Keep text lighter and more integrated so the environment can carry authenticity."],
+         "direction_lines": ["- Archetype direction: morning routine realism with warm, soft, believable domestic context.", "- Environment behavior: lightly styled vanity or counter cues, never cluttered or glamorous."]},
+        {"id": "ugc_unboxing_reaction", "label": "Soft unboxing / discovery moment",
+         "layout_lines": ["- Archetype: creator appears near an already-opened kit in a first-impression style frame, with all products placed on the surface.", "- No product is held closer to camera; the full set remains grouped visibly at real-world package scale.", "- Preserve premium cleanliness so the ad feels authentic but not sloppy."],
+         "direction_lines": ["- Archetype direction: discovery moment with a pointing/open-palm reaction beside the arranged pack, not a hand-held reveal.", "- Subject behavior: natural curiosity and calm approval, no exaggerated reaction faces."]},
+    ],
+}
 
 
 def now_iso() -> str:
@@ -213,17 +292,12 @@ def base_layout_lines_for_format(fmt: str) -> list[str]:
     raise RuntimeError(f"Unsupported format: {fmt}")
 
 
-def find_visual_archetype(fmt: str, archetype_id: str) -> dict[str, Any]:
-    gen = _import_generate_ads()
-    return gen.find_visual_archetype(fmt, archetype_id)
-
 
 def pick_visual_archetype(fmt: str, persona_number: int, headline: str, seed: int) -> dict[str, Any]:
-    gen = _import_generate_ads()
-    variants = gen.FORMAT_VISUAL_ARCHETYPES.get(fmt, [])
+    variants = FORMAT_VISUAL_ARCHETYPES.get(fmt, [])
     if not variants:
         raise RuntimeError(f"No visual archetypes configured for format {fmt}")
-    selector_seed = gen.stable_signature_seed(fmt, persona_number, seed, headline)
+    selector_seed = stable_signature_seed(fmt, persona_number, seed, headline)
     rng = random.Random(selector_seed)
     return variants[rng.randrange(len(variants))]
 
@@ -443,8 +517,9 @@ def parse_xlsx(xlsx_path: Path) -> list[dict[str, Any]]:
     return rows
 
 
-def prompt_filename(fmt: str, persona_number: int, lang: str) -> str:
-    return f"OUTPUT_{fmt}_P{persona_number:02d}_{lang}.txt"
+def prompt_filename(fmt: str, persona_number: int, lang: str, creative_index: int = 1, creative_total: int = 1) -> str:
+    suffix = f"_A{creative_index:02d}" if creative_total > 1 else ""
+    return f"OUTPUT_{fmt}_P{persona_number:02d}_{lang}{suffix}.txt"
 
 
 def aspect_ratio_folder(aspect_ratio: str) -> str:
@@ -475,6 +550,26 @@ def main() -> int:
     if not rows:
         print("ERROR: No data rows found in xlsx")
         return 1
+
+    # Group rows by (format, persona_number) to handle multipliers
+    from collections import OrderedDict
+    groups = OrderedDict()
+    for row in rows:
+        prompt_id = row.get("prompt_id", "").strip()
+        persona_match = re.search(r"P(\d+)", prompt_id)
+        persona_number = int(persona_match.group(1)) if persona_match else None
+        fmt = row.get("format", "").strip().upper()
+        key = (fmt, persona_number)
+        groups.setdefault(key, []).append(row)
+
+    # Flatten back with creative_index assigned per group
+    deduped_rows = []
+    for key, group_rows in groups.items():
+        for idx, row in enumerate(group_rows):
+            row["_creative_index"] = idx + 1
+            row["_creative_total"] = len(group_rows)
+            deduped_rows.append(row)
+    rows = deduped_rows
 
     # Collect unique formats
     formats = set()
@@ -584,7 +679,10 @@ def main() -> int:
             visual_archetype=visual_archetype,
         )
 
-        filename = prompt_filename(fmt, persona_number, lang)
+        creative_index = row.get("_creative_index", 1)
+        creative_total = row.get("_creative_total", 1)
+
+        filename = prompt_filename(fmt, persona_number, lang, creative_index, creative_total)
         out_path = ratio_dir / filename
         out_path.write_text(prompt_text, encoding="utf-8")
 
@@ -597,6 +695,9 @@ def main() -> int:
             "persona_name": persona_name,
             "language": lang,
             "aspect_ratio": aspect_ratio,
+            "creative_index": creative_index,
+            "creative_total": creative_total,
+            "multiplier": creative_total,
             "background": {
                 "slot": bg["id"],
                 "name": bg.get("title", ""),
@@ -629,8 +730,8 @@ def main() -> int:
                 "type": row.get("hypothesis_type", "").strip(),
                 "variant": row.get("hypothesis_variant", "").strip(),
             },
-            "creative_index": 1,
-            "creative_total": 1,
+            "creative_index": creative_index,
+            "creative_total": creative_total,
         })
 
         print(f"  Wrote: {rel_path}")
